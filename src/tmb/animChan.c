@@ -23,7 +23,18 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationStar
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationSetToFrame__FR11_animHandlef);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FC0A8);
+#include "m2c_macros.h"
+f32 animationGetCurrentTime__FR11_animHandle_1FC0A8() __asm__("animationGetCurrentTime__FR11_animHandle");
+
+f32 func_001FC0A8(s32* arg0) {
+    f32 var_f0;
+
+    var_f0 = -1.0f;
+    if (*arg0 != 0) {
+        var_f0 = animationGetCurrentTime__FR11_animHandle_1FC0A8();
+    }
+    return var_f0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationSetToPercent__FR11_animHandlef);
 
