@@ -37,7 +37,7 @@ options:
   # binutils >= 2.4x with -mabi=eabi names $8-$15 as a4-a7,t0-t3 (n32 style).
   # o32 names ($t0=$8) would silently assemble to the wrong registers.
   mips_abi_gpr: n32
-  use_gp_rel_macro_nonmatching: False
+  use_gp_rel_macro_nonmatching: True
   disassemble_all: True
 
 # Section layout from the ELF headers of SCUS_971.96 (ROM offset = VRAM - 0x100000):

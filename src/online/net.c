@@ -538,7 +538,21 @@ INCLUDE_RODATA("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", D_004E8960);
 
 INCLUDE_RODATA("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", D_004E8978);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", netGetMyClientIndex);
+int netGetMyClientIndex(NetState* state) {
+    int index;
+    int err;
+
+    err = dmeGetMyClientIndex(&index, state->mConnectionIndex);
+    if (err == 0) {
+        if ((unsigned int)index >= 8) {
+            printf("NETWORK:  ERROR:  GetMyClientIndex() RETURNING %d\n", index);
+        }
+        return index;
+    } else {
+        printf("NETWORK: NetGetMyClientIndex returned an error of %d index = %d mConnectionIndex = %d\n", err, index, state->mConnectionIndex);
+        return 0;
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001734B8);
 
@@ -578,9 +592,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00174218);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00174230);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", netGetDmeTime);
+int netGetDmeTime(NetState* state) {
+    int time;
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00174268);
+    dmeGetTime(&time);
+    return time;
+}
+
+int func_00174268(NetState* state, int index) {
+    return D_00321018[netGetMyClientIndex(state)][index];
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001742B0);
 

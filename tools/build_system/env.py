@@ -188,7 +188,8 @@ class EnvironmentToolchain:
         Construct the toolchain variables for the build using the given
         binary version and the compiler directory in the repository.
         """
-        compiler = str(directories.tools / "ee-gcc2.9/bin/ee-gcc")
+        # Online: SN ProDG ee-gcc 2.95.x (C -> asm), assembled by GNU as; see tools/sn_cc.sh
+        compiler = "tools/sn_cc.sh"
 
         return EnvironmentToolchain(
             c_compiler_cmd=compiler,
@@ -199,7 +200,7 @@ class EnvironmentToolchain:
             strip_cmd=f"{_CROSS}strip",
             c_preprocessor_cmd=f"{_CROSS}gcc",
             gp_value=0x005015F0,
-            c_flags=["-O2", "-G8", "-fno-exceptions"],
+            c_flags=["-O2", "-G0", "-fno-exceptions"],
             cxx_flags=["-O2", "-G8", "-x c++", "-fno-exceptions"],
             as_flags=[
                 "-EL",
