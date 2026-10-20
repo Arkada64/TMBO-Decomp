@@ -42,9 +42,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", func_0023C420);
 void DeleteEntry__12CTODLinkListi(void) {
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", GetNumEntries__12CTODLinkList);
+#include "m2c_macros.h"
+s32 GetNumEntries__12CTODLinkList(s32* arg0) {
+    return *arg0;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", FindNodeByTime__12CTODLinkListf);
+#include "m2c_macros.h"
+s32 FindNodeByTime__12CTODLinkListf(void) {
+    return 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", FindFreeNode__12CTODLinkList);
 
