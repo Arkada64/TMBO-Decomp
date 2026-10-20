@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.1514958,
-    "total_code": "1753184",
+    "fuzzy_match_percent": 0.15149614,
+    "total_code": "1753180",
     "matched_code": "2656",
-    "matched_code_percent": 0.1514958,
+    "matched_code_percent": 0.15149614,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -6939,7 +6939,7 @@
     {
       "name": "tmb/hwyloop",
       "measures": {
-        "total_code": "88",
+        "total_code": "84",
         "matched_data_percent": 100.0,
         "total_functions": 3,
         "total_units": 1
@@ -6947,7 +6947,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "88",
+          "size": "84",
           "metadata": {
             "virtual_address": "1372136"
           }
@@ -6970,7 +6970,7 @@
         },
         {
           "name": "addNode__11HighwayLoopiP9_hierhead",
-          "size": "24",
+          "size": "20",
           "metadata": {
             "virtual_address": "1372200"
           }
@@ -50861,10 +50861,10 @@
       "id": "tmb",
       "name": "tmb",
       "measures": {
-        "fuzzy_match_percent": 0.023010906,
-        "total_code": "1112516",
+        "fuzzy_match_percent": 0.023010988,
+        "total_code": "1112512",
         "matched_code": "256",
-        "matched_code_percent": 0.023010906,
+        "matched_code_percent": 0.023010988,
         "matched_data_percent": 100.0,
         "total_functions": 2731,
         "matched_functions": 32,
