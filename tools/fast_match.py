@@ -17,9 +17,10 @@ for l in (R / "config/US/symbol_addrs.txt").read_text().splitlines():
     m = re.match(r"\s*(\S+)\s*=\s*(0x[0-9A-Fa-f]+);.*size:(0x[0-9A-Fa-f]+)", l)
     if m: addr_size[m.group(1)] = (int(m.group(2), 16), int(m.group(3), 16))
 
+ASM_INDEX = {p.stem: p for p in (R / "asm/nonmatchings").rglob("*.s")}
 def orig(name):
     if name in addr_size: return addr_size[name]
-    t = next((R / "asm/nonmatchings").rglob(f"{name}.s")).read_text()
+    t = ASM_INDEX[name].read_text()
     s = int(re.search(rf"nonmatching {re.escape(name)}, (0x[0-9A-F]+)", t).group(1), 16)
     a = int(re.search(r"/\* [0-9A-F]+ ([0-9A-F]{8}) [0-9A-F]{8} \*/", t).group(1), 16)
     return a, s

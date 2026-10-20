@@ -27,8 +27,21 @@
 ## Matched in C (build byte-identical)
 - `netGetMyClientIndex`, `netGetDmeTime`, `func_00174268`, `netMsgChatHandler` (early-return form)
 
+## NEXT STEP (start here)
+Run the automatic matcher over all C files (resumable; commits per file; ~1.5-2.5 h):
+    cd ~/tmbo_decomp && source .venv/bin/activate && python3 tools/auto_all.py 2>&1 | tee logs/auto_all.txt
+Then read the DONE line for the real automation hit rate and re-estimate the timeline from it.
+
 ## Progress
 - 52 of 241 functions in src/online/net.c are matched C, all verified in the real build (commit ffd402a).
+- 180 SN-compiled game files converted from asm to C (INCLUDE_ASM), build byte-identical (commit 8782b60).
+  2,466 functions are INCLUDE_ASM across 181 C files, ready for auto_all.py.
+  tools/plan_c_files.py picks eligible files (sq-saving game code, clean own .rodata); tools/convert_c.py
+  converts them in groups and isolates failures. 11 rejected (stay asm, need hand rodata work): tmb/collis,
+  tmb/combo, tmb/destruct, tmb/gastank, tmb/hud, tmb/ped, tmb/shelloverlays, tmb/hd, tmb/resetcom,
+  tmb/zip, online/after_zip_83. 14 more were skipped for shared .rodata.
+- m2c gives up often on rendering files (vector ops, e.g. tmb/drawc 7/8) and drafts in gameplay files
+  fail to compile more often (~70% in ai/vehicle) - expected; cheap to skip.
 
 ## Automatic matching (tools/auto_m2c.py + tools/fast_match.py + tools/batch_try.py)
 - auto_m2c.py: m2c draft per INCLUDE_ASM function. Feeds m2c a fixed copy of the .s (named registers,
