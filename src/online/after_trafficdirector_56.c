@@ -10,11 +10,36 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_trafficdirector
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_trafficdirector_56", func_001B23A8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_trafficdirector_56", func_001B23C8);
+#include "m2c_macros.h"
+s32 func_001B23C8(s32 arg0) {
+    return arg0 != 0xB;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_trafficdirector_56", func_001B23D8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_trafficdirector_56", func_001B2558);
+#include "m2c_macros.h"
+M2C_UNK func_001B23D8_1B2558() __asm__("func_001B23D8");
+
+void func_001B2558(s32 arg0, M2C_UNK arg1) {
+    switch (arg0) {                                 /* irregular */
+    case 6:
+        func_001B23D8_1B2558(6, 1, arg1, 0);
+        func_001B23D8_1B2558(6, 3, arg1, 0);
+        func_001B23D8_1B2558(6, 4, arg1, 0);
+        func_001B23D8_1B2558(6, 5, arg1, 0);
+        func_001B23D8_1B2558(6, 6, arg1, 0);
+        func_001B23D8_1B2558(6, 8, arg1, 1);
+        return;
+    case 33:
+        func_001B23D8_1B2558(0x21, 0, arg1, 0);
+        func_001B23D8_1B2558(0x21, 1, arg1, 0);
+        func_001B23D8_1B2558(0x21, 2, arg1, 0);
+        func_001B23D8_1B2558(0x21, 3, arg1, 0);
+        func_001B23D8_1B2558(0x21, 4, arg1, 0);
+        func_001B23D8_1B2558(0x21, 5, arg1, 1);
+        break;
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_trafficdirector_56", func_001B2690);
 
