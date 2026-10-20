@@ -27,10 +27,14 @@
 ## Matched in C (build byte-identical)
 - `netGetMyClientIndex`, `netGetDmeTime`, `func_00174268`, `netMsgChatHandler` (early-return form)
 
-## NEXT STEP (start here)
-Run the automatic matcher over all C files (resumable; commits per file; ~1.5-2.5 h):
-    cd ~/tmbo_decomp && source .venv/bin/activate && python3 tools/auto_all.py 2>&1 | tee logs/auto_all.txt
-Then read the DONE line for the real automation hit rate and re-estimate the timeline from it.
+## Latest (2026-10-20 evening)
+- First full auto_all.py pass: 234 of 2,466 INCLUDE_ASM functions matched (9.5%), every one verified
+  in the real build; 99 of 181 files gained nothing. 2,232 functions remain in C files as INCLUDE_ASM.
+- Automation alone clears ~10%. Biggest levers next: (1) fix the draft compile errors m2c makes in
+  gameplay code (incompatible types, pointer*int, float/pointer mixups) so more drafts reach the check;
+  (2) assisted matching in batches (assistant writes C variants, tools/batch_try.py verifies);
+  (3) the 11 rejected + 14 shared-rodata files.
+- Re-run auto_all.py any time; it resumes on what is left (log: logs/auto_all.txt).
 
 ## Progress
 - 52 of 241 functions in src/online/net.c are matched C, all verified in the real build (commit ffd402a).
