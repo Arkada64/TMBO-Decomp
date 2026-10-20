@@ -79,7 +79,10 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00163EB8);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00163EC0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001641A8);
+void func_001641A8(char* p) {
+    p[0x64] = 0;
+    *(char**)(p + 0x1E64) = p + 0x64;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001641B8);
 
@@ -129,7 +132,10 @@ INCLUDE_RODATA("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", D_004E6380);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00165620);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001658C8);
+void func_00259FBC(void);
+void func_001658C8(void) {
+    func_00259FBC();
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001658E8);
 
@@ -187,7 +193,10 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00166940);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001669A0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001669C8);
+void func_001669A0(int a, int b);
+void func_001669C8(void) {
+    func_001669A0(1, 0xFFFF);
+}
 
 int netMsgChatHandler(int unused0, int unused1, int client, void* text) {
     NetChatLine line;
@@ -305,7 +314,10 @@ INCLUDE_RODATA("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", D_004E72A0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", netInitDme);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016E6D8);
+int iSignalSema(int sema);
+void func_0016E6D8(int sema) {
+    iSignalSema(sema);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016E6F8);
 
@@ -332,9 +344,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016EC50);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016EE60);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016EF58);
+char* func_0016EF58(char* base, int slot) {
+    return base + (slot * 0x220 + 0x10);
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016EF70);
+char* func_0016EF70(char* base, int index) {
+    return base + (index * 0x84 + 0x1110);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016EF88);
 
@@ -474,7 +490,10 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00171818);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00171AA8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00171B58);
+void func_00268260(int handle);
+void func_00171B58(void* unused, char* obj) {
+    func_00268260(*(int*)(obj + 0x50));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00171B78);
 
@@ -600,9 +619,14 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00173FF0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001740B0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00174218);
+int func_00174218(char* base, int slot) {
+    return *(int*)(base + slot * 0x220 + 0xB4);
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00174230);
+int func_00174230(char* base, int value, int slot) {
+    *(int*)(base + slot * 0x220 + 0xB4) = value;
+    return 1;
+}
 
 int netGetDmeTime(NetState* state) {
     int time;
