@@ -24,7 +24,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", aiTurn__7Vehicle);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", aiTurnCorner__7Vehicle);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", aiInitTurnAndShoot__7Vehicleii);
+#include "m2c_macros.h"
+void aiInitTurnAndShoot__7Vehicleii(void* arg0, s32 arg1, s32 arg2) {
+    if (M2C_FIELD(M2C_FIELD(arg0, void** , 0x2018), f32* , 0x1A0) == 0.0f) {
+        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x5CC) = 1;
+        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x5D0) = 0;
+        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x444) = arg1;
+        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x448) = arg2;
+        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x458) = 0;
+        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2018), s32* , 0x250) = 0;
+        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2018), s32* , 0x254) = 0;
+        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2018), s32* , 0x258) = 1;
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_00102948);
 
