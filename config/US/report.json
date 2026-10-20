@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.15149717,
-    "total_code": "1753168",
+    "fuzzy_match_percent": 0.15149753,
+    "total_code": "1753164",
     "matched_code": "2656",
-    "matched_code_percent": 0.15149717,
+    "matched_code_percent": 0.15149753,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -3668,7 +3668,7 @@
     {
       "name": "online/after_debris_12",
       "measures": {
-        "total_code": "120",
+        "total_code": "116",
         "matched_data_percent": 100.0,
         "total_functions": 1,
         "total_units": 1
@@ -3676,7 +3676,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "120",
+          "size": "116",
           "metadata": {
             "virtual_address": "1216328"
           }
@@ -3685,7 +3685,7 @@
       "functions": [
         {
           "name": "func_00128F48",
-          "size": "120",
+          "size": "116",
           "metadata": {
             "virtual_address": "1216328"
           }
@@ -50845,10 +50845,10 @@
       "id": "online",
       "name": "online",
       "measures": {
-        "fuzzy_match_percent": 0.49547872,
-        "total_code": "484380",
+        "fuzzy_match_percent": 0.4954828,
+        "total_code": "484376",
         "matched_code": "2400",
-        "matched_code_percent": 0.49547875,
+        "matched_code_percent": 0.49548283,
         "matched_data_percent": 100.0,
         "total_functions": 1890,
         "matched_functions": 60,
