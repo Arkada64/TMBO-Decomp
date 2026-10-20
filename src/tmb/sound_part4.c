@@ -40,13 +40,24 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part4", func_001A9
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part4", func_001A94C0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part4", func_001A9590);
+#include "m2c_macros.h"
+s32 snd_FlushSoundCommands_1A9590() __asm__("snd_FlushSoundCommands");
+
+s32 func_001A9590(void) {
+    return snd_FlushSoundCommands_1A9590() != 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part4", soundPlayVAGCB__FUiUl);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part4", soundPlayCB__FUiUl);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part4", soundStopSound__FPUi);
+#include "m2c_macros.h"
+M2C_UNK func_001F9608___FPUi() __asm__("func_001F9608");
+
+void soundStopSound__FPUi(s32* arg0) {
+    func_001F9608___FPUi(*arg0);
+    *arg0 = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part4", func_001A9600);
 
