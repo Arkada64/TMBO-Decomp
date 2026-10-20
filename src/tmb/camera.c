@@ -18,7 +18,10 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/camera", SetDeathPOV__6C
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/camera", SetCameraOffsets__6Cameraiffffff);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/camera", GetClosestVehicleInFov__6Camerai);
+#include "m2c_macros.h"
+s32 GetClosestVehicleInFov__6Camerai(void) {
+    return 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/camera", func_00117FC8);
 
