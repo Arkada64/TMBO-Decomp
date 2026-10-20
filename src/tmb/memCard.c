@@ -36,7 +36,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", doesFileExist_
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", getFileAttr__10MemoryCardPc);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", func_00220CE0);
+#include "m2c_macros.h"
+s32 getFileAttr__10MemoryCardPc_220CE0() __asm__("getFileAttr__10MemoryCardPc");
+
+s32 func_00220CE0(void) {
+    return getFileAttr__10MemoryCardPc_220CE0() != 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", deleteUserDirectory__10MemoryCardPc);
 
@@ -44,7 +49,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", getUserDirecto
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", func_00220F98);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", func_00220FC0);
+#include "m2c_macros.h"
+M2C_UNK func_00221E38_220FC0() __asm__("func_00221E38");
+M2C_UNK memset_220FC0() __asm__("memset");
+
+s32 func_00220FC0(s32 arg0, M2C_UNK arg1) {
+    memset_220FC0(arg1, 0, 0x10);
+    func_00221E38_220FC0(arg0, arg1, 0x10);
+    return 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", formatMemoryCard__10MemoryCard);
 
@@ -72,7 +85,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", Sjis2Ascii__FP
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", func_00221B98);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", func_00221C40);
+#include "m2c_macros.h"
+s32 func_00221C40(u8* arg0) {
+    u8 temp_v1;
+
+    temp_v1 = *arg0;
+    if (((u32) ((temp_v1 + 0x7F) & 0xFF) < 0x1FU) || ((u32) ((temp_v1 + 0x20) & 0xFF) < 0x10U)) {
+        return 1;
+    }
+    return (temp_v1 < 0x81U) ? 0 : -1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", IsAscii__FPc);
 
@@ -80,7 +102,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", func_00221C90)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", AsciiString2Sjis__FPUcPUs);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", SwapShort__FUs);
+#include "m2c_macros.h"
+s16 SwapShort__FUs(s32 arg0) {
+    u32 temp_v0;
+
+    temp_v0 = arg0 & 0xFFFF;
+    return (s16) ((temp_v0 << 8) | (temp_v0 >> 8));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", func_00221E38);
 
