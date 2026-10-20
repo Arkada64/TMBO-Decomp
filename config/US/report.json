@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.15149337,
-    "total_code": "1753212",
+    "fuzzy_match_percent": 0.15149371,
+    "total_code": "1753208",
     "matched_code": "2656",
-    "matched_code_percent": 0.15149337,
+    "matched_code_percent": 0.15149371,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -3531,7 +3531,7 @@
     {
       "name": "online/after_death2_11",
       "measures": {
-        "total_code": "32",
+        "total_code": "28",
         "matched_data_percent": 100.0,
         "total_functions": 1,
         "total_units": 1
@@ -3539,7 +3539,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "32",
+          "size": "28",
           "metadata": {
             "virtual_address": "1211440"
           }
@@ -3548,7 +3548,7 @@
       "functions": [
         {
           "name": "func_00127C30",
-          "size": "32",
+          "size": "28",
           "metadata": {
             "virtual_address": "1211440"
           }
@@ -50845,10 +50845,10 @@
       "id": "online",
       "name": "online",
       "measures": {
-        "fuzzy_match_percent": 0.49547055,
-        "total_code": "484388",
+        "fuzzy_match_percent": 0.49547464,
+        "total_code": "484384",
         "matched_code": "2400",
-        "matched_code_percent": 0.49547058,
+        "matched_code_percent": 0.49547464,
         "matched_data_percent": 100.0,
         "total_functions": 1890,
         "matched_functions": 60,
