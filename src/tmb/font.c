@@ -22,7 +22,22 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", fontSetSize__Fii)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", fontSetCharWidth__Fii);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", fontSetDefaultSize__Fi);
+#include "m2c_macros.h"
+M2C_UNK fontSetSize__Fii_ze__Fi() __asm__("fontSetSize__Fii");
+M2C_UNK fontSetSpacing__Fii_ze__Fi() __asm__("fontSetSpacing__Fii");
+
+void fontSetDefaultSize__Fi(s32 arg0) {
+    switch (arg0) {                                 /* irregular */
+    case 0:
+        fontSetSize__Fii_ze__Fi(0, 0x10);
+        fontSetSpacing__Fii_ze__Fi(0, 2);
+        return;
+    case 1:
+        fontSetSize__Fii_ze__Fi(1, 0xC);
+        fontSetSpacing__Fii_ze__Fi(1, 1);
+        break;
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", fontSetSpacing__Fii);
 
