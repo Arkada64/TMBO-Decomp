@@ -73,7 +73,12 @@ void hierSetCsEpNode__FP3_csP9_hierhead(s32* arg0, s32 arg1) {
     *arg0 = arg1;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierCsPtLightMe__FP3_csi);
+#include "m2c_macros.h"
+void hierCsPtLightMe__FP3_csi(void* arg0) {
+    if (arg0 != NULL) {
+        M2C_FIELD(arg0, s8* , 0xF) = 1;
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierCsPoolInit__Fv);
 
