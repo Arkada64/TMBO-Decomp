@@ -16,7 +16,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_00139F48);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", UpdateShadow__7TheGame);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013A0B0);
+#include "m2c_macros.h"
+s32 func_00127AF8_13A0B0() __asm__("func_00127AF8");
+
+s32 func_0013A0B0(void) {
+    return func_00127AF8_13A0B0() - 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013A0D0);
 
@@ -82,7 +87,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013CEE0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013D0C0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", InitTakeHitInfo__7TheGame);
+#include "m2c_macros.h"
+M2C_UNK memset_heGame() __asm__("memset");
+
+s32 InitTakeHitInfo__7TheGame(s32 arg0) {
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0x2BC10;
+    memset_heGame(temp_s0, 0, 0x1C);
+    return temp_s0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", IsInteractiveAVehicle__7TheGameiPi);
 
@@ -116,7 +130,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013E688);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013E6E0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013E740);
+#include "m2c_macros.h"
+M2C_UNK func_001F2B40_13E740() __asm__("func_001F2B40");
+
+void func_0013E740(s32 arg0) {
+    func_001F2B40_13E740(arg0 + 0x6C310);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013E768);
 
@@ -133,7 +152,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013E8D0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013EBC0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013EC58);
+#include "m2c_macros.h"
+M2C_UNK func_00242658_13EC58() __asm__("func_00242658");
+M2C_UNK viewSetNumViews__Fi_13EC58() __asm__("viewSetNumViews__Fi");
+
+void func_0013EC58(void) {
+    viewSetNumViews__Fi_13EC58(2);
+    func_00242658_13EC58(0xE, 1);
+    viewSetNumViews__Fi_13EC58(1);
+    func_00242658_13EC58(0, 0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013EC98);
 
