@@ -1,0 +1,83 @@
+name: SCUS_971.96
+sha1: 2d49dbee93c42ef168ad4a8e86c9cc685c669232
+options:
+  platform: ps2
+  compiler: EEGCC
+  basename: SCUS_971.96
+  base_path: ../..
+  target_path: disks/SCUS_971.96.rom
+  asm_path: asm
+  src_path: src
+  ld_script_path: config/US/SCUS_971.96.ld
+  cache_path: config/US/.splache
+  symbol_addrs_path: config/US/symbol_addrs.txt
+  reloc_addrs_path: config/US/reloc_addrs.txt
+  undefined_funcs_auto_path: config/US/undefined_funcs.txt
+  undefined_syms_auto_path: config/US/undefined_syms_auto.txt
+  nonmatchings_path: nonmatchings
+
+  # First pass: let splat guess file boundaries. We'll replace this with real
+  # splits once functions are matched against the retail decomp.
+  find_file_boundaries: True
+  gp_value: 0x005015F0
+  use_legacy_include_asm: False
+  section_order: [".text", ".data", ".rodata", ".sdata", ".sbss", ".bss"]
+  auto_link_sections: []
+  create_undefined_funcs_auto: False
+  create_undefined_syms_auto: False
+  do_c_func_detection: True
+  string_encoding: ASCII
+  data_string_encoding: ASCII
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+  ld_bss_is_noload: True
+  subalign: null
+  migrate_rodata_to_functions: True
+  named_regs_for_c_funcs: False
+  use_gp_rel_macro_nonmatching: False
+  disassemble_all: True
+
+# Section layout from the ELF headers of SCUS_971.96 (ROM offset = VRAM - 0x100000):
+#   .text 0x100000-0x2AC078  .vutext 0x2AC080-0x2B89E0  .data 0x2B8A00-0x4DEDDC
+#   .rodata 0x4DEE00-0x4F949B  .gcc_except_table 0x4F9500-0x4F95D8
+#   .sdata 0x4F9600-0x4FB3C4  .sbss 0x4FB400 (0x73C)  .bss 0x4FBB80-0x725694
+segments:
+  - name: main
+    type: code
+    start: 0x0
+    vram: 0x00100000
+    bss_size: 0x22A294
+    align: 4
+    subsegments:
+      # ------------------------------------------------
+      # .text segment (C/C++ code)
+      # ------------------------------------------------
+      - [0x0000, asm, gcc/_crt0]
+      - [0x00C0, asm, text]
+      # ------------------------------------------------
+      # .vutext segment
+      # ------------------------------------------------
+      - [0x1AC080, data, vutext]
+      # ------------------------------------------------
+      # .data segment
+      # ------------------------------------------------
+      - [0x1B8A00, data]
+      # ------------------------------------------------
+      # .rodata segment
+      # ------------------------------------------------
+      - [0x3DEE00, rodata]
+      # ------------------------------------------------
+      # .gcc_except_table segment
+      # ------------------------------------------------
+      - [0x3F9500, rodatabin, gcc_except_table]
+      # ------------------------------------------------
+      # .sdata segment
+      # ------------------------------------------------
+      - [0x3F9600, sdata]
+      # ------------------------------------------------
+      # .sbss / .bss segments
+      # ------------------------------------------------
+      - {type: sbss, vram: 0x004FB400, name: sbss1}
+      - {type: bss, vram: 0x004FBB80, name: bss1}
+
+  - [0x3FB400] # end of file

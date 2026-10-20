@@ -1,14 +1,14 @@
-name: Twisted Metal Black
+name: Twisted Metal Black Online
 platform: ps2
 versions:
 - name: US
-  fullname: NTSC
+  fullname: NTSC Online
   paths:
-    target: "disks/SCUS_971.01.rom"
+    target: "disks/SCUS_971.96.rom"
     build_dir: "build/"
-    map: "build/SCUS_971.01.map"
-    compiled_target: "build/SCUS_971.01.rom"
-    elf: "build/SCUS_971.01.elf"
+    map: "build/SCUS_971.96.map"
+    compiled_target: "build/SCUS_971.96.rom"
+    elf: "build/SCUS_971.96.elf"
     asm: "asm"
     nonmatchings: "asm/nonmatchings"
 tools:

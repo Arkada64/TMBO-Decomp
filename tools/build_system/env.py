@@ -22,7 +22,7 @@ class Version(StrEnum):
         """
         Get the binary basename corresponding to this version of the game.
         """
-        return "SCUS_971.01"
+        return "SCUS_971.96"
 
 
 @dataclasses.dataclass
@@ -198,7 +198,7 @@ class EnvironmentToolchain:
             objcopy_cmd=f"{_CROSS}objcopy",
             strip_cmd=f"{_CROSS}strip",
             c_preprocessor_cmd=f"{_CROSS}gcc",
-            gp_value=0x004FEE70,
+            gp_value=0x005015F0,
             c_flags=["-O2", "-G8", "-fno-exceptions"],
             cxx_flags=["-O2", "-G8", "-x c++", "-fno-exceptions"],
             as_flags=[

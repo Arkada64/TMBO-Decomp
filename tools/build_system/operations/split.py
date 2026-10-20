@@ -53,7 +53,7 @@ def _prepare_rom(env: Environment):
     if not env.files.disk_rom.is_file():
         LOG.info("Creating ROM file for comparison: `%s`", str(env.files.disk_rom))
         subprocess.run(
-            f"{env.generate_objcopy_rom_cmd('0x4FBD00')} {env.files.disk} {env.files.disk_rom}",
+            f"{env.generate_objcopy_rom_cmd('0x4FB400')} {env.files.disk} {env.files.disk_rom}",
             shell=True,
             check=True,
         )

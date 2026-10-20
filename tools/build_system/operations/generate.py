@@ -81,7 +81,7 @@ def _generate_ninja_script(env: Environment, linker_entries: list[LinkerEntry]):
         ninja.rule(
             name="rom",
             description="ROM         $in",
-            command=f"{env.generate_objcopy_rom_cmd('0x3FBD00')} $in $out",
+            command=f"{env.generate_objcopy_rom_cmd('0x3FB400')} $in $out",
         )
         ninja.rule(
             name="check",

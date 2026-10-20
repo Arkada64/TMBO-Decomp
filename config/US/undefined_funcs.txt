@@ -1,1 +1,0 @@
-texmFindVramSpaceAsm = 0x1FBBEC;
