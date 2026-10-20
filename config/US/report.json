@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.1514951,
-    "total_code": "1753192",
+    "fuzzy_match_percent": 0.15149546,
+    "total_code": "1753188",
     "matched_code": "2656",
-    "matched_code_percent": 0.1514951,
+    "matched_code_percent": 0.15149546,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -6293,7 +6293,7 @@
     {
       "name": "tmb/highway",
       "measures": {
-        "total_code": "504",
+        "total_code": "500",
         "matched_data_percent": 100.0,
         "total_functions": 8,
         "total_units": 1
@@ -6301,7 +6301,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "504",
+          "size": "500",
           "metadata": {
             "virtual_address": "1319192"
           }
@@ -6359,7 +6359,7 @@
         },
         {
           "name": "isRoadblockSet__7Highwayi",
-          "size": "40",
+          "size": "36",
           "metadata": {
             "virtual_address": "1319656"
           }
@@ -50861,10 +50861,10 @@
       "id": "tmb",
       "name": "tmb",
       "measures": {
-        "fuzzy_match_percent": 0.02301074,
-        "total_code": "1112524",
+        "fuzzy_match_percent": 0.023010822,
+        "total_code": "1112520",
         "matched_code": "256",
-        "matched_code_percent": 0.02301074,
+        "matched_code_percent": 0.023010822,
         "matched_data_percent": 100.0,
         "total_functions": 2731,
         "matched_functions": 32,
