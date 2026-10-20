@@ -58,11 +58,24 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", aiCheckForPickup__7
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_00104DF8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", aiGoingTooFast__7Vehicle);
+#include "m2c_macros.h"
+s32 aiGoingTooFast__7Vehicle(void) {
+    return 0;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", aiLockingOnHuntCs__7Vehicle);
+#include "m2c_macros.h"
+s32 aiLockingOnHuntCs__7Vehicle(void) {
+    return 0;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", aiLoseBeads__7Vehicle);
+#include "m2c_macros.h"
+void aiLoseBeads__7Vehicle(void* arg0) {
+    M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x5A8) = 0;
+    if (M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x5B0) != 0) {
+        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2018), s32* , 0x258) = 0;
+        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x5B0) = 0;
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_00104FA0);
 
@@ -86,7 +99,25 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_001065A0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_00106778);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", aiOkToUseWeaponForRearFiring__7Vehiclei);
+#include "m2c_macros.h"
+s32 aiOkToUseWeaponForRearFiring__7Vehiclei(void* arg0, s32 arg1) {
+    s32 var_a1;
+
+    var_a1 = 0;
+    switch (arg1) {
+    case 2:
+    case 3:
+    case 4:
+    case 6:
+    case 7:
+        var_a1 = 1;
+        break;
+    case 1:
+        var_a1 = M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x610);
+        break;
+    }
+    return var_a1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_00106888);
 
@@ -114,7 +145,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_001076E8);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_00107920);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", aiSetAttackState__7Vehicle12_attackState);
+#include "m2c_macros.h"
+void aiSetAttackState__7Vehicle12_attackState(void* arg0, s32 arg1) {
+    void* temp_v1;
+
+    temp_v1 = M2C_FIELD(arg0, void** , 0x2014);
+    if (M2C_FIELD(temp_v1, s32* , 0x414) != arg1) {
+        M2C_FIELD(temp_v1, s32* , 0x414) = arg1;
+        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x488) = 0;
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", aiUpdateBaitMode__7Vehicle);
 
