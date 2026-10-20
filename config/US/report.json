@@ -4,7 +4,7 @@
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "complete_data_percent": 100.0,
-    "total_units": 404
+    "total_units": 405
   },
   "units": [
     {
@@ -7681,7 +7681,7 @@
       }
     },
     {
-      "name": "online/after_looptank_29",
+      "name": "online/net",
       "measures": {
         "total_code": "84720",
         "matched_data_percent": 100.0,
@@ -7694,6 +7694,13 @@
           "size": "84720",
           "metadata": {
             "virtual_address": "1451480"
+          }
+        },
+        {
+          "name": ".rodata",
+          "size": "13784",
+          "metadata": {
+            "virtual_address": "5134544"
           }
         }
       ],
@@ -49094,9 +49101,35 @@
       "sections": [
         {
           "name": ".rodata",
-          "size": "108288",
+          "size": "27344",
           "metadata": {
             "virtual_address": "5107200"
+          }
+        }
+      ],
+      "metadata": {
+        "module_name": ".main",
+        "module_id": 0,
+        "progress_categories": [
+          "data"
+        ]
+      }
+    },
+    {
+      "name": "data/3E8EA8.rodata",
+      "measures": {
+        "fuzzy_match_percent": 100.0,
+        "matched_code_percent": 100.0,
+        "matched_data_percent": 100.0,
+        "matched_functions_percent": 100.0,
+        "total_units": 1
+      },
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": "67160",
+          "metadata": {
+            "virtual_address": "5148328"
           }
         }
       ],
@@ -49280,7 +49313,7 @@
         "matched_functions_percent": 100.0,
         "complete_code_percent": 100.0,
         "complete_data_percent": 100.0,
-        "total_units": 7
+        "total_units": 8
       }
     }
   ]

@@ -131,7 +131,7 @@ segments:
       - [0x05A2D8, asm, tmb/launch_part2]
       - [0x0612A0, asm, online/after_launch_28]
       - [0x061638, asm, tmb/looptank]
-      - [0x0625D8, asm, online/after_looptank_29]
+      - [0x0625D8, c, online/net]
       - [0x0770C8, asm, tmb/ped]
       - [0x078830, asm, online/after_ped_30]
       - [0x078AF8, asm, tmb/pickup]
@@ -464,6 +464,8 @@ segments:
       # .rodata segment
       # ------------------------------------------------
       - [0x3DEE00, rodata]
+      - [0x3E58D0, .rodata, online/net]
+      - [0x3E8EA8, rodata]
       # ------------------------------------------------
       # .gcc_except_table segment
       # ------------------------------------------------
