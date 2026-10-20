@@ -28,9 +28,17 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfScaleMatrix
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021D798);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021D7B8);
+#include "m2c_macros.h"
+void func_0021D7B8(void* arg0, void* arg1) {
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    M2C_FIELD(arg0, f32* , 4) = (f32) M2C_FIELD(arg1, f32* , 8);
+    M2C_FIELD(arg0, f32* , 8) = (f32) -M2C_FIELD(arg1, f32* , 4);
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfPlaneTest__FP6_planeP8_fvector);
+#include "m2c_macros.h"
+f32 mathfPlaneTest__FP6_planeP8_fvector(void* arg0, void* arg1) {
+    return ((M2C_FIELD(arg0, f32* , 0) * M2C_FIELD(arg1, f32* , 0)) + (M2C_FIELD(arg0, f32* , 4) * M2C_FIELD(arg1, f32* , 4)) + (M2C_FIELD(arg0, f32* , 8) * M2C_FIELD(arg1, f32* , 8))) - M2C_FIELD(arg0, f32* , 0xC);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021D810);
 
@@ -54,7 +62,12 @@ void func_0021DE90(s32 arg0, M2C_UNK arg1) {
     func_0021DB18_21DE90(arg0, sp, arg1);
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfCopyVector__FP8_fvectorT0);
+#include "m2c_macros.h"
+void mathfCopyVector__FP8_fvectorT0(void* arg0, void* arg1) {
+    M2C_FIELD(arg0, f32* , 0) = (f32) M2C_FIELD(arg1, f32* , 0);
+    M2C_FIELD(arg0, f32* , 4) = (f32) M2C_FIELD(arg1, f32* , 4);
+    M2C_FIELD(arg0, f32* , 8) = (f32) M2C_FIELD(arg1, f32* , 8);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfCopyMatrixNotAligned__FPA3_fT0);
 
@@ -85,7 +98,17 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfDist3__FP8_
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfDist2Squared__FP8_fvectorT0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfDist3Squared__FP8_fvectorT0);
+#include "m2c_macros.h"
+f32 mathfDist3Squared__FP8_fvectorT0(void* arg0, void* arg1) {
+    f32 temp_f0;
+    f32 temp_f1;
+    f32 temp_f2;
+
+    temp_f0 = M2C_FIELD(arg1, f32* , 0) - M2C_FIELD(arg0, f32* , 0);
+    temp_f2 = M2C_FIELD(arg1, f32* , 4) - M2C_FIELD(arg0, f32* , 4);
+    temp_f1 = M2C_FIELD(arg1, f32* , 8) - M2C_FIELD(arg0, f32* , 8);
+    return (temp_f0 * temp_f0) + (temp_f2 * temp_f2) + (temp_f1 * temp_f1);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfManhatDist__FP8_fvectorT0);
 
@@ -151,6 +174,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021FA88);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021FAF8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021FB70);
+#include "m2c_macros.h"
+void func_0021FB70(void* arg0, void* arg1) {
+    f32 temp_f0;
+    f32 temp_f1;
+
+    M2C_FIELD(arg0, f32* , 0) = (f32) (2.0f * ((M2C_FIELD(arg1, f32* , 0) * M2C_FIELD(arg1, f32* , 4)) - (M2C_FIELD(arg1, f32* , 8) * M2C_FIELD(arg1, f32* , 0xC))));
+    temp_f0 = M2C_FIELD(arg1, f32* , 0);
+    temp_f1 = M2C_FIELD(arg1, f32* , 8);
+    M2C_FIELD(arg0, f32* , 4) = (f32) (1.0f - (2.0f * ((temp_f0 * temp_f0) + (temp_f1 * temp_f1))));
+    M2C_FIELD(arg0, f32* , 8) = (f32) (2.0f * ((M2C_FIELD(arg1, f32* , 4) * M2C_FIELD(arg1, f32* , 8)) + (M2C_FIELD(arg1, f32* , 0) * M2C_FIELD(arg1, f32* , 0xC))));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfQuaternionToMatrix4x4__FPA3_fP8_fvector);
