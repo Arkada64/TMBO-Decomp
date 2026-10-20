@@ -6290,42 +6290,42 @@
           }
         },
         {
-          "name": "func_001669E8",
+          "name": "netMsgChatHandler",
           "size": "128",
           "metadata": {
             "virtual_address": "1468904"
           }
         },
         {
-          "name": "func_00166A68",
+          "name": "netMsgSessionHandler",
           "size": "1456",
           "metadata": {
             "virtual_address": "1469032"
           }
         },
         {
-          "name": "func_00167018",
+          "name": "netMsgGameEventHandler",
           "size": "4536",
           "metadata": {
             "virtual_address": "1470488"
           }
         },
         {
-          "name": "func_001681D0",
+          "name": "netMsgWorldEventHandler",
           "size": "1048",
           "metadata": {
             "virtual_address": "1475024"
           }
         },
         {
-          "name": "func_001685E8",
+          "name": "netMsgPlayerInfoHandler",
           "size": "1064",
           "metadata": {
             "virtual_address": "1476072"
           }
         },
         {
-          "name": "func_00168A10",
+          "name": "netMsgRosterHandler",
           "size": "328",
           "metadata": {
             "virtual_address": "1477136"
@@ -6402,70 +6402,70 @@
           }
         },
         {
-          "name": "func_00169308",
+          "name": "netObjCreateCB",
           "size": "2336",
           "metadata": {
             "virtual_address": "1479432"
           }
         },
         {
-          "name": "func_00169C28",
+          "name": "netObjUpdateVehicleCB",
           "size": "3624",
           "metadata": {
             "virtual_address": "1481768"
           }
         },
         {
-          "name": "func_0016AA50",
+          "name": "netObjDestroyCB",
           "size": "1080",
           "metadata": {
             "virtual_address": "1485392"
           }
         },
         {
-          "name": "func_0016AE88",
+          "name": "netWeaponCreateCB",
           "size": "1432",
           "metadata": {
             "virtual_address": "1486472"
           }
         },
         {
-          "name": "func_0016B420",
+          "name": "netWeaponUpdateCB",
           "size": "328",
           "metadata": {
             "virtual_address": "1487904"
           }
         },
         {
-          "name": "func_0016B568",
+          "name": "netWeaponDestroyCB",
           "size": "352",
           "metadata": {
             "virtual_address": "1488232"
           }
         },
         {
-          "name": "func_0016B6C8",
+          "name": "netFodderUpdateCB",
           "size": "2096",
           "metadata": {
             "virtual_address": "1488584"
           }
         },
         {
-          "name": "func_0016BEF8",
+          "name": "netStatsUpdateCB",
           "size": "8",
           "metadata": {
             "virtual_address": "1490680"
           }
         },
         {
-          "name": "func_0016BF00",
+          "name": "netGameDataUpdateCB",
           "size": "216",
           "metadata": {
             "virtual_address": "1490688"
           }
         },
         {
-          "name": "func_0016BFD8",
+          "name": "netPadFlagsUpdateCB",
           "size": "1192",
           "metadata": {
             "virtual_address": "1490904"
@@ -6612,7 +6612,7 @@
           }
         },
         {
-          "name": "func_0016D830",
+          "name": "netInitDme",
           "size": "3752",
           "metadata": {
             "virtual_address": "1497136"
@@ -6892,21 +6892,21 @@
           }
         },
         {
-          "name": "func_00171C90",
+          "name": "netSendSessionMsg",
           "size": "320",
           "metadata": {
             "virtual_address": "1514640"
           }
         },
         {
-          "name": "func_00171DD0",
+          "name": "netSendGameEvent",
           "size": "152",
           "metadata": {
             "virtual_address": "1514960"
           }
         },
         {
-          "name": "func_00171E68",
+          "name": "netBroadcastGameEvent",
           "size": "288",
           "metadata": {
             "virtual_address": "1515112"
@@ -7032,7 +7032,7 @@
           }
         },
         {
-          "name": "func_00173448",
+          "name": "netGetMyClientIndex",
           "size": "112",
           "metadata": {
             "virtual_address": "1520712"
@@ -7172,7 +7172,7 @@
           }
         },
         {
-          "name": "func_00174248",
+          "name": "netGetDmeTime",
           "size": "32",
           "metadata": {
             "virtual_address": "1524296"
@@ -29390,7 +29390,7 @@
           }
         },
         {
-          "name": "func_002674D8",
+          "name": "dmeSendMsg",
           "size": "144",
           "metadata": {
             "virtual_address": "2520280"
@@ -29439,7 +29439,7 @@
           }
         },
         {
-          "name": "func_00267E60",
+          "name": "dmeSendMsgToClient",
           "size": "88",
           "metadata": {
             "virtual_address": "2522720"
@@ -30517,28 +30517,28 @@
           }
         },
         {
-          "name": "func_002746B8",
+          "name": "dmeMsgLayoutBegin",
           "size": "40",
           "metadata": {
             "virtual_address": "2574008"
           }
         },
         {
-          "name": "func_002746E0",
+          "name": "dmeMsgLayoutAddField",
           "size": "120",
           "metadata": {
             "virtual_address": "2574048"
           }
         },
         {
-          "name": "func_00274758",
+          "name": "dmeObjLayoutBegin",
           "size": "40",
           "metadata": {
             "virtual_address": "2574168"
           }
         },
         {
-          "name": "func_00274780",
+          "name": "dmeObjLayoutAddField",
           "size": "200",
           "metadata": {
             "virtual_address": "2574208"
@@ -30552,7 +30552,7 @@
           }
         },
         {
-          "name": "func_00274958",
+          "name": "dmeObjRegisterType",
           "size": "424",
           "metadata": {
             "virtual_address": "2574680"
@@ -30580,14 +30580,14 @@
           }
         },
         {
-          "name": "func_00274CC0",
+          "name": "dmeMsgRegister",
           "size": "32",
           "metadata": {
             "virtual_address": "2575552"
           }
         },
         {
-          "name": "func_00274CE0",
+          "name": "dmeObjSetCallbacks",
           "size": "88",
           "metadata": {
             "virtual_address": "2575584"

@@ -1,0 +1,642 @@
+{
+ "objects": [
+  {
+   "name": "NetVehicle",
+   "id_var": "D_004F9D18",
+   "size": 56,
+   "fields": [
+    {
+     "arg": "4",
+     "off": 4,
+     "size": 1,
+     "kind": 1
+    }
+   ],
+   "callbacks": {
+    "create": "func_00169308",
+    "update": "func_00169C28",
+    "destroy": "func_0016AA50"
+   }
+  },
+  {
+   "name": "NetWeapon",
+   "id_var": "D_004F9D24",
+   "size": 76,
+   "fields": [
+    {
+     "arg": "4",
+     "off": 4,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp320 - &sp31B",
+     "off": 5,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp320 - &sp31A",
+     "off": 6,
+     "size": 1,
+     "kind": 0
+    },
+    {
+     "arg": "&sp320 - &sp319",
+     "off": 7,
+     "size": 1,
+     "kind": 0
+    },
+    {
+     "arg": "&sp320 - &sp318",
+     "off": 8,
+     "size": 1,
+     "kind": 0
+    },
+    {
+     "arg": "&sp320 - &sp316",
+     "off": 10,
+     "size": 2,
+     "kind": 2
+    },
+    {
+     "arg": "&sp320 - &sp314",
+     "off": 12,
+     "size": 1,
+     "kind": 0
+    },
+    {
+     "arg": "&sp320 - &sp312",
+     "off": 14,
+     "size": 2,
+     "kind": 2
+    },
+    {
+     "arg": "&sp320 - &sp310",
+     "off": 16,
+     "size": 2,
+     "kind": 2
+    },
+    {
+     "arg": "&sp320 - &sp30E",
+     "off": 18,
+     "size": 2,
+     "kind": 2
+    },
+    {
+     "arg": "&sp320 - &sp30C",
+     "off": 20,
+     "size": 12,
+     "kind": 13
+    },
+    {
+     "arg": "&sp320 - &sp300",
+     "off": 32,
+     "size": 12,
+     "kind": 13
+    },
+    {
+     "arg": "&sp320 - &sp2F4",
+     "off": 44,
+     "size": 12,
+     "kind": 13
+    },
+    {
+     "arg": "&sp320 - &sp2E8",
+     "off": 56,
+     "size": 4,
+     "kind": 6
+    },
+    {
+     "arg": "&sp320 - &sp2E4",
+     "off": 60,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp320 - &sp2DC",
+     "off": 68,
+     "size": 1,
+     "kind": 1
+    }
+   ],
+   "callbacks": {
+    "create": "func_0016AE88",
+    "update": "func_0016B420",
+    "destroy": "func_0016B568"
+   }
+  },
+  {
+   "name": "NetFodder",
+   "id_var": "D_004F9CA0",
+   "size": 44,
+   "fields": [
+    {
+     "arg": "0",
+     "off": 0,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp370 - &sp36C",
+     "off": 4,
+     "size": 12,
+     "kind": 13
+    },
+    {
+     "arg": "&sp370 - &sp360",
+     "off": 16,
+     "size": 12,
+     "kind": 13
+    },
+    {
+     "arg": "&sp370 - &sp354",
+     "off": 28,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp370 - &sp350",
+     "off": 32,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp370 - &sp34C",
+     "off": 36,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp370 - &sp348",
+     "off": 40,
+     "size": 4,
+     "kind": 4
+    }
+   ],
+   "callbacks": {
+    "create": "func_00169308",
+    "update": "func_0016B6C8",
+    "destroy": "func_0016AA50"
+   }
+  },
+  {
+   "name": "NetStats",
+   "id_var": "D_004F9CA4",
+   "size": 88,
+   "fields": [
+    {
+     "arg": "0",
+     "off": 0,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp3A0 - &sp39C",
+     "off": 4,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp3A0 - &sp398",
+     "off": 8,
+     "size": 4,
+     "kind": 5
+    },
+    {
+     "arg": "&sp3A0 - &sp394",
+     "off": 12,
+     "size": 4,
+     "kind": 5
+    },
+    {
+     "arg": "&sp3A0 - &sp390",
+     "off": 16,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp3A0 - &sp370",
+     "off": 48,
+     "size": 4,
+     "kind": 6
+    },
+    {
+     "arg": "&sp3A0 - &sp350",
+     "off": 80,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp3A0 - &sp34C",
+     "off": 84,
+     "size": 4,
+     "kind": 4
+    }
+   ],
+   "callbacks": {
+    "create": "func_00169308",
+    "update": "func_0016BEF8",
+    "destroy": "func_0016AA50"
+   }
+  },
+  {
+   "name": "NetPersistantStats",
+   "id_var": "D_004F9CA8",
+   "size": 160,
+   "fields": [
+    {
+     "arg": "0",
+     "off": 0,
+     "size": 4,
+     "kind": 6
+    },
+    {
+     "arg": "&sp400 - &sp3E0",
+     "off": 32,
+     "size": 4,
+     "kind": 6
+    },
+    {
+     "arg": "&sp400 - &sp3C0",
+     "off": 64,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp400 - &sp3A0",
+     "off": 96,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp400 - &sp380",
+     "off": 128,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp400 - &sp378",
+     "off": 136,
+     "size": 4,
+     "kind": 5
+    },
+    {
+     "arg": "&sp400 - &sp370",
+     "off": 144,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp400 - &sp368",
+     "off": 152,
+     "size": 4,
+     "kind": 4
+    }
+   ],
+   "callbacks": {
+    "create": "func_00169308",
+    "update": "func_0016BEF8",
+    "destroy": "func_0016AA50"
+   }
+  },
+  {
+   "name": "NetGameData",
+   "id_var": "D_004F9CAC",
+   "size": 200,
+   "fields": [
+    {
+     "arg": "0",
+     "off": 0,
+     "size": 4,
+     "kind": 5
+    },
+    {
+     "arg": "&sp4A0 - &sp49C",
+     "off": 4,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp4A0 - &sp49B",
+     "off": 5,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp4A0 - &sp49A",
+     "off": 6,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp4A0 - &sp498",
+     "off": 8,
+     "size": 4,
+     "kind": 5
+    },
+    {
+     "arg": "&sp4A0 - &sp494",
+     "off": 12,
+     "size": 4,
+     "kind": 5
+    },
+    {
+     "arg": "&sp4A0 - &sp490",
+     "off": 16,
+     "size": 4,
+     "kind": 5
+    },
+    {
+     "arg": "&sp4A0 - &sp48C",
+     "off": 20,
+     "size": 4,
+     "kind": 5
+    },
+    {
+     "arg": "&sp4A0 - &sp488",
+     "off": 24,
+     "size": 2,
+     "kind": 3
+    },
+    {
+     "arg": "&sp4A0 - &sp485",
+     "off": 27,
+     "size": 1,
+     "kind": 0
+    },
+    {
+     "arg": "&sp4A0 - &sp480",
+     "off": 32,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp4A0 - &sp47C",
+     "off": 36,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp4A0 - &sp47B",
+     "off": 37,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp4A0 - &sp478",
+     "off": 40,
+     "size": 4,
+     "kind": 5
+    },
+    {
+     "arg": "&sp4A0 - &sp474",
+     "off": 44,
+     "size": 4,
+     "kind": 5
+    },
+    {
+     "arg": "&sp4A0 - &sp470",
+     "off": 48,
+     "size": 2,
+     "kind": 3
+    },
+    {
+     "arg": "&sp4A0 - &sp46E",
+     "off": 50,
+     "size": 1,
+     "kind": 0
+    },
+    {
+     "arg": "&sp4A0 - &sp464",
+     "off": 60,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp4A0 - &sp414",
+     "off": 140,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp4A0 - &sp3E4",
+     "off": 188,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp4A0 - &sp486",
+     "off": 26,
+     "size": 1,
+     "kind": 0
+    },
+    {
+     "arg": "&sp4A0 - &sp3DC",
+     "off": 196,
+     "size": 1,
+     "kind": 0
+    }
+   ],
+   "callbacks": {
+    "create": "func_00169308",
+    "update": "func_0016BF00",
+    "destroy": "func_0016AA50"
+   }
+  },
+  {
+   "name": "NetVehiclePadFlagsObj",
+   "id_var": "D_004F9CB0",
+   "size": 24,
+   "fields": [
+    {
+     "arg": "0",
+     "off": 0,
+     "size": 1,
+     "kind": 1
+    },
+    {
+     "arg": "&sp570 - &sp560",
+     "off": 16,
+     "size": 1,
+     "kind": 0
+    },
+    {
+     "arg": "&sp570 - &sp55F",
+     "off": 17,
+     "size": 1,
+     "kind": 0
+    },
+    {
+     "arg": "&sp570 - &sp55E",
+     "off": 18,
+     "size": 2,
+     "kind": 2
+    },
+    {
+     "arg": "&sp570 - &sp55C",
+     "off": 20,
+     "size": 2,
+     "kind": 2
+    }
+   ],
+   "callbacks": {
+    "create": "func_00169308",
+    "update": "func_0016BFD8",
+    "destroy": "func_0016AA50"
+   }
+  },
+  {
+   "name": "NetArtifactObj",
+   "id_var": "D_004F9CB4",
+   "size": 124,
+   "fields": [
+    {
+     "arg": "0",
+     "off": 0,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp590 - &sp584",
+     "off": 12,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp590 - &sp580",
+     "off": 16,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp590 - &sp57C",
+     "off": 20,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp590 - &sp570",
+     "off": 32,
+     "size": 4,
+     "kind": 4
+    }
+   ],
+   "callbacks": {
+    "create": "func_00169308",
+    "update": "func_00169C28",
+    "destroy": "func_0016AA50"
+   }
+  }
+ ],
+ "messages": [
+  {
+   "handler": "func_00167018",
+   "fields": [
+    {
+     "arg": "&sp610",
+     "off": 0,
+     "size": 4,
+     "kind": 1
+    },
+    {
+     "arg": "&sp614",
+     "off": 4,
+     "size": 4,
+     "kind": 1
+    },
+    {
+     "arg": "&sp620",
+     "off": 16,
+     "size": 64,
+     "kind": 1
+    }
+   ],
+   "id_var": "D_004F9D84"
+  },
+  {
+   "handler": "func_00166A68",
+   "fields": [
+    {
+     "arg": "&sp660",
+     "off": 0,
+     "size": 4,
+     "kind": 1
+    },
+    {
+     "arg": "&sp670",
+     "off": 16,
+     "size": 224,
+     "kind": 1
+    }
+   ],
+   "id_var": "D_004F9D88"
+  },
+  {
+   "handler": "func_001681D0",
+   "fields": [
+    {
+     "arg": "&sp750",
+     "off": 0,
+     "size": 4,
+     "kind": 1
+    },
+    {
+     "arg": "&sp754",
+     "off": 4,
+     "size": 188,
+     "kind": 1
+    }
+   ],
+   "id_var": "D_004F9D90"
+  },
+  {
+   "handler": "func_001685E8",
+   "fields": [
+    {
+     "arg": "&sp810",
+     "off": 0,
+     "size": 4,
+     "kind": 1
+    },
+    {
+     "arg": "&sp814",
+     "off": 4,
+     "size": 92,
+     "kind": 1
+    }
+   ],
+   "id_var": "D_004F9D94"
+  },
+  {
+   "handler": "func_00168A10",
+   "fields": [
+    {
+     "arg": "&sp870",
+     "off": 0,
+     "size": 48,
+     "kind": 8
+    }
+   ],
+   "id_var": "D_004F9D98"
+  },
+  {
+   "handler": "func_001669E8",
+   "fields": [
+    {
+     "arg": "&sp9F0",
+     "off": 0,
+     "size": 4,
+     "kind": 4
+    },
+    {
+     "arg": "&sp9F4",
+     "off": 4,
+     "size": 68,
+     "kind": 68
+    }
+   ],
+   "id_var": "D_004F9D80"
+  }
+ ]
+}
