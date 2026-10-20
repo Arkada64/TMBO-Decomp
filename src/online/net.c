@@ -231,7 +231,18 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00168B60);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00168C30);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00168D90);
+extern char D_003156C0[];
+char func_00176B10(char* state, int arg);
+void func_00168D90(int connection, int client) {
+    char* state;
+
+    if (client != 0x100) {
+        state = D_003156C0;
+        if (connection == *(int*)(state + 0x2CF0)) {
+            *(char*)(*(char**)(state + 0x3148) + 0x24) = func_00176B10(state, 0);
+        }
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00168DE0);
 
@@ -527,7 +538,21 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00172A88);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00172A90);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00172F48);
+int func_00172F48(char* state, int which) {
+    char* game = *(char**)(state + 0x3148);
+    int mode = (*(unsigned int*)game >> 1) & 0xF;
+
+    if (mode == 4 || mode == 8) {
+        if (which == 0) {
+            return *(signed char*)(game + 0x1A);
+        }
+        if (which == 1) {
+            return *(signed char*)(game + 0x1B);
+        }
+        return -1;
+    }
+    return -1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00172FA0);
 
@@ -539,7 +564,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00173248);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00173340);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001733F8);
+int func_00264AE0(int* out, int connection, int index);
+int func_001733F8(NetState* state) {
+    int index;
+    int value;
+
+    if (dmeGetMyClientIndex(&index, state->mConnectionIndex) != 0) {
+        return 0;
+    }
+    if (func_00264AE0(&value, state->mConnectionIndex, index) != 0) {
+        return 0;
+    }
+    return value;
+}
 
 INCLUDE_RODATA("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", D_004E888C);
 
@@ -683,7 +720,18 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00176CC8);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00176EA0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00177028);
+extern int* D_003156C4;
+int func_00177028(int value) {
+    int i;
+    int* table = D_00321018[*D_003156C4];
+
+    for (i = 0; i < 8; i++) {
+        if (table[i] == value) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00177078);
 
