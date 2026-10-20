@@ -37,6 +37,11 @@ for asmdir, name in items:
         if m and m.group(1) in known: continue                           # declared in header
         lines.append(l)
     body = "\n".join(lines).strip()
+    # Globals the original reaches through $gp were declared small-data in Incog's source.
+    # At -G0 GCC only does that for variables placed in .sdata/.sbss, so place them there.
+    gp_syms = set(re.findall(r"%gp_rel\(([A-Za-z_]\w*)", t))
+    body = re.sub(r"^(extern [^;(]*?\b(" + "|".join(map(re.escape, gp_syms)) + r")\b[^;(]*);$",
+                  r'\1 __attribute__((section(".sdata")));', body, flags=re.M) if gp_syms else body
     # m2c lists only the args it sees used; fill gaps (arg3 alone -> arg0..arg3) so registers line up
     def fill(m):
         params = [p.strip() for p in m.group(2).split(",") if p.strip() and p.strip() != "void"]

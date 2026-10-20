@@ -134,8 +134,8 @@ extern M2C_UNK D_003156C0;
 extern M2C_UNK D_004E58D0;
 extern s32 D_004F9C58;
 extern s32 D_004F9C5C;
-extern s32 D_004F9C60;
-extern s32 D_004F9C64;
+extern s32 D_004F9C60 __attribute__((section(".sdata")));
+extern s32 D_004F9C64 __attribute__((section(".sdata")));
 extern s32 D_004F9C68;
 extern s32 D_004F9C6C;
 extern s32 D_004F9C70;
@@ -573,7 +573,7 @@ loop_2:
 extern M2C_UNK D_002C1690;
 extern M2C_UNK D_004E58D0;
 extern M2C_UNK D_004F9C38;
-extern s32 D_004F9C58;
+extern s32 D_004F9C58 __attribute__((section(".sdata")));
 
 void func_00163040(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     M2C_UNK sp10;
@@ -640,7 +640,7 @@ void func_00163200(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK D_00313EE0;
-extern s32 D_004F9C5C;
+extern s32 D_004F9C5C __attribute__((section(".sdata")));
 extern s32 D_004F9C60;
 extern s32 D_004F9C64;
 extern s32 D_004F9C68;
@@ -649,7 +649,7 @@ extern s32 D_004F9C70;
 extern s32 D_004F9C74;
 extern s32 D_004F9C78;
 extern s32 D_004F9C7C;
-extern s32 D_004F9C80;
+extern s32 D_004F9C80 __attribute__((section(".sdata")));
 extern s32 D_004F9C84;
 extern M2C_UNK func_00163040;
 
@@ -714,7 +714,7 @@ void func_00163278(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK D_00313EE0;
-extern s32 D_004F9C5C;
+extern s32 D_004F9C5C __attribute__((section(".sdata")));
 extern s32 D_004F9C60;
 extern s32 D_004F9C64;
 extern s32 D_004F9C68;
@@ -723,7 +723,7 @@ extern s32 D_004F9C70;
 extern s32 D_004F9C74;
 extern s32 D_004F9C78;
 extern s32 D_004F9C7C;
-extern s32 D_004F9C80;
+extern s32 D_004F9C80 __attribute__((section(".sdata")));
 extern s32 D_004F9C84;
 extern M2C_UNK func_00163040;
 
@@ -788,7 +788,7 @@ void func_00163278(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK D_00313EE0;
-extern s32 D_004F9C5C;
+extern s32 D_004F9C5C __attribute__((section(".sdata")));
 extern s32 D_004F9C60;
 extern s32 D_004F9C64;
 extern s32 D_004F9C68;
@@ -797,7 +797,7 @@ extern s32 D_004F9C70;
 extern s32 D_004F9C74;
 extern s32 D_004F9C78;
 extern s32 D_004F9C7C;
-extern s32 D_004F9C80;
+extern s32 D_004F9C80 __attribute__((section(".sdata")));
 extern s32 D_004F9C84;
 extern M2C_UNK func_00163040;
 
@@ -862,7 +862,7 @@ void func_00163278(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK D_00313EE0;
-extern s32 D_004F9C5C;
+extern s32 D_004F9C5C __attribute__((section(".sdata")));
 extern s32 D_004F9C60;
 extern s32 D_004F9C64;
 extern s32 D_004F9C68;
@@ -871,7 +871,7 @@ extern s32 D_004F9C70;
 extern s32 D_004F9C74;
 extern s32 D_004F9C78;
 extern s32 D_004F9C7C;
-extern s32 D_004F9C80;
+extern s32 D_004F9C80 __attribute__((section(".sdata")));
 extern s32 D_004F9C84;
 extern M2C_UNK func_00163040;
 
@@ -936,7 +936,7 @@ void func_00163278(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK D_00313EE0;
-extern s32 D_004F9C5C;
+extern s32 D_004F9C5C __attribute__((section(".sdata")));
 extern s32 D_004F9C60;
 extern s32 D_004F9C64;
 extern s32 D_004F9C68;
@@ -945,7 +945,7 @@ extern s32 D_004F9C70;
 extern s32 D_004F9C74;
 extern s32 D_004F9C78;
 extern s32 D_004F9C7C;
-extern s32 D_004F9C80;
+extern s32 D_004F9C80 __attribute__((section(".sdata")));
 extern s32 D_004F9C84;
 extern M2C_UNK func_00163040;
 
@@ -1271,7 +1271,7 @@ extern s32 D_004F9C70;
 extern s32 D_004F9C74;
 extern s32 D_004F9C78;
 extern s32 D_004F9C7C;
-extern s32 D_004F9C80;
+extern s32 D_004F9C80 __attribute__((section(".sdata")));
 
 void func_00163DC8(void* arg0) {
     M2C_FIELD(arg0, s32* , 0x41AB4) = 0;
@@ -1363,7 +1363,7 @@ extern s32 D_004F9C58;
 extern s32 D_004F9C5C;
 extern s32 D_004F9C60;
 extern s32 D_004F9C64;
-extern s32 D_004F9C68;
+extern s32 D_004F9C68 __attribute__((section(".sdata")));
 extern s32 D_004F9C6C;
 extern s32 D_004F9C70;
 extern s32 D_004F9C74;
@@ -3463,7 +3463,7 @@ extern s32 D_004F9C60;
 extern s32 D_004F9C64;
 extern s32 D_004F9C68;
 extern s32 D_004F9C6C;
-extern s32 D_004F9C84;
+extern s32 D_004F9C84 __attribute__((section(".sdata")));
 extern M2C_UNK func_00163278;
 
 void func_00166190(void* arg0, s16 arg1) {
@@ -3503,7 +3503,7 @@ extern s32 D_004F9C60;
 extern s32 D_004F9C64;
 extern s32 D_004F9C68;
 extern s32 D_004F9C6C;
-extern s32 D_004F9C84;
+extern s32 D_004F9C84 __attribute__((section(".sdata")));
 extern M2C_UNK func_00163278;
 
 void func_00166190(void* arg0, s16 arg1) {
@@ -3543,7 +3543,7 @@ extern s32 D_004F9C60;
 extern s32 D_004F9C64;
 extern s32 D_004F9C68;
 extern s32 D_004F9C6C;
-extern s32 D_004F9C84;
+extern s32 D_004F9C84 __attribute__((section(".sdata")));
 extern M2C_UNK func_00163278;
 
 void func_00166190(void* arg0, s16 arg1) {
@@ -3583,7 +3583,7 @@ extern s32 D_004F9C60;
 extern s32 D_004F9C64;
 extern s32 D_004F9C68;
 extern s32 D_004F9C6C;
-extern s32 D_004F9C84;
+extern s32 D_004F9C84 __attribute__((section(".sdata")));
 extern M2C_UNK func_00163278;
 
 void func_00166190(void* arg0, s16 arg1) {
@@ -3623,7 +3623,7 @@ extern s32 D_004F9C60;
 extern s32 D_004F9C64;
 extern s32 D_004F9C68;
 extern s32 D_004F9C6C;
-extern s32 D_004F9C84;
+extern s32 D_004F9C84 __attribute__((section(".sdata")));
 extern M2C_UNK func_00163278;
 
 void func_00166190(void* arg0, s16 arg1) {
@@ -5059,8 +5059,8 @@ void func_00166940(s32 arg0, s32 arg1, s32 arg2) {
 }
 //@@ netMsgWorldEventHandler m2c0
 #include "m2c_macros.h"
-extern void* D_004FA030;
-extern s32 D_004FA038;
+extern void* D_004FA030 __attribute__((section(".sdata")));
+extern s32 D_004FA038 __attribute__((section(".sdata")));
 
 s32 netMsgWorldEventHandler(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     u8 sp[0x20];
@@ -5243,8 +5243,8 @@ block_59:
 }
 //@@ netMsgWorldEventHandler m2c1
 #include "m2c_macros.h"
-extern void* D_004FA030;
-extern s32 D_004FA038;
+extern void* D_004FA030 __attribute__((section(".sdata")));
+extern s32 D_004FA038 __attribute__((section(".sdata")));
 
 s32 netMsgWorldEventHandler(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     u8 sp[0x10];
@@ -5427,8 +5427,8 @@ block_59:
 }
 //@@ netMsgWorldEventHandler m2c2
 #include "m2c_macros.h"
-extern void* D_004FA030;
-extern s32 D_004FA038;
+extern void* D_004FA030 __attribute__((section(".sdata")));
+extern s32 D_004FA038 __attribute__((section(".sdata")));
 
 s32 netMsgWorldEventHandler(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     u8 sp[0x8];
@@ -5611,8 +5611,8 @@ block_59:
 }
 //@@ netMsgWorldEventHandler m2c3
 #include "m2c_macros.h"
-extern void* D_004FA030;
-extern s32 D_004FA038;
+extern void* D_004FA030 __attribute__((section(".sdata")));
+extern s32 D_004FA038 __attribute__((section(".sdata")));
 
 s32 netMsgWorldEventHandler(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     u8 sp[0x4];
@@ -6195,7 +6195,7 @@ block_12:
 //@@ func_00169230 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
-extern s32 D_004FA030;
+extern s32 D_004FA030 __attribute__((section(".sdata")));
 
 void* func_00169230(s32 arg0) {
     u32 temp_a1;
@@ -6225,10 +6225,10 @@ void* func_00169230(s32 arg0) {
 //@@ netObjDestroyCB m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9CA4;
-extern s32 D_004F9CAC;
-extern s32 D_004F9D18;
-extern void* D_004FA030;
+extern s32 D_004F9CA4 __attribute__((section(".sdata")));
+extern s32 D_004F9CAC __attribute__((section(".sdata")));
+extern s32 D_004F9D18 __attribute__((section(".sdata")));
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 void netObjDestroyCB(s32 arg0, s32 arg1) {
     u8 sp[0x90];
@@ -6376,10 +6376,10 @@ loop_23:
 //@@ netObjDestroyCB m2c1
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9CA4;
-extern s32 D_004F9CAC;
-extern s32 D_004F9D18;
-extern void* D_004FA030;
+extern s32 D_004F9CA4 __attribute__((section(".sdata")));
+extern s32 D_004F9CAC __attribute__((section(".sdata")));
+extern s32 D_004F9D18 __attribute__((section(".sdata")));
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 void netObjDestroyCB(s32 arg0, s32 arg1) {
     u8 sp[0x80];
@@ -6527,10 +6527,10 @@ loop_23:
 //@@ netObjDestroyCB m2c2
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9CA4;
-extern s32 D_004F9CAC;
-extern s32 D_004F9D18;
-extern void* D_004FA030;
+extern s32 D_004F9CA4 __attribute__((section(".sdata")));
+extern s32 D_004F9CAC __attribute__((section(".sdata")));
+extern s32 D_004F9D18 __attribute__((section(".sdata")));
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 void netObjDestroyCB(s32 arg0, s32 arg1) {
     u8 sp[0x70];
@@ -6678,10 +6678,10 @@ loop_23:
 //@@ netObjDestroyCB m2c3
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9CA4;
-extern s32 D_004F9CAC;
-extern s32 D_004F9D18;
-extern void* D_004FA030;
+extern s32 D_004F9CA4 __attribute__((section(".sdata")));
+extern s32 D_004F9CAC __attribute__((section(".sdata")));
+extern s32 D_004F9D18 __attribute__((section(".sdata")));
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 void netObjDestroyCB(s32 arg0, s32 arg1) {
     u8 sp[0x60];
@@ -6829,10 +6829,10 @@ loop_23:
 //@@ netObjDestroyCB m2c4
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9CA4;
-extern s32 D_004F9CAC;
-extern s32 D_004F9D18;
-extern void* D_004FA030;
+extern s32 D_004F9CA4 __attribute__((section(".sdata")));
+extern s32 D_004F9CAC __attribute__((section(".sdata")));
+extern s32 D_004F9D18 __attribute__((section(".sdata")));
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 void netObjDestroyCB(s32 arg0, s32 arg1) {
     u8 sp[0x50];
@@ -6980,10 +6980,10 @@ loop_23:
 //@@ netObjDestroyCB m2c5
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9CA4;
-extern s32 D_004F9CAC;
-extern s32 D_004F9D18;
-extern void* D_004FA030;
+extern s32 D_004F9CA4 __attribute__((section(".sdata")));
+extern s32 D_004F9CAC __attribute__((section(".sdata")));
+extern s32 D_004F9D18 __attribute__((section(".sdata")));
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 void netObjDestroyCB(s32 arg0, s32 arg1) {
     u8 sp[0x40];
@@ -7131,7 +7131,7 @@ loop_23:
 //@@ netWeaponCreateCB m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
-extern void* D_004FA030;
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 void netWeaponCreateCB(s32 arg0, s32 arg1) {
     f32 sp10;
@@ -7444,9 +7444,9 @@ block_15:
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_003188F4;
 extern M2C_UNK D_00318F2C;
-extern s32 D_004F9CBC;
-extern s32 D_004F9CC0;
-extern s32 D_004F9CC8;
+extern s32 D_004F9CBC __attribute__((section(".sdata")));
+extern s32 D_004F9CC0 __attribute__((section(".sdata")));
+extern s32 D_004F9CC8 __attribute__((section(".sdata")));
 
 void netGameDataUpdateCB(s32 arg0, s32 arg1, s32 arg2) {
     s32 temp_a1;
@@ -7641,7 +7641,7 @@ void netPadFlagsUpdateCB(s32 arg0) {
 }
 //@@ func_0016C480 m2c0
 #include "m2c_macros.h"
-extern s32 D_004F9EB0;
+extern s32 D_004F9EB0 __attribute__((section(".sdata")));
 
 void func_0016C480(s32 arg0, s32 arg1, s32 arg2) {
     D_004F9EB0 = arg2;
@@ -7649,7 +7649,7 @@ void func_0016C480(s32 arg0, s32 arg1, s32 arg2) {
 //@@ func_0016C488 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
-extern s32 D_004FA030;
+extern s32 D_004FA030 __attribute__((section(".sdata")));
 
 void func_0016C488(void) {
     s32 temp_a0;
@@ -7835,7 +7835,7 @@ void func_0016C738(void* arg0) {
 #include "m2c_macros.h"
 extern M2C_UNK D_004E6D30;
 extern M2C_UNK D_004F9D38;
-extern s32 D_004F9D9C;
+extern s32 D_004F9D9C __attribute__((section(".sdata")));
 
 void func_0016C748(void* arg0) {
     M2C_FIELD(arg0, s32* , 0x4294) = 0xEA60;
@@ -8218,7 +8218,7 @@ block_57:
 #include "m2c_macros.h"
 extern M2C_UNK D_00319980;
 extern s32 D_00319984;
-extern s32 D_004F9D60;
+extern s32 D_004F9D60 __attribute__((section(".sdata")));
 
 s32 func_0016D238(void* arg0, s32 arg1) {
     s32 temp_v0;
@@ -8272,9 +8272,9 @@ s32 func_0016D338(void* arg0) {
 //@@ func_0016D3B0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_00319980;
-extern s32 D_004F9D58;
-extern s32 D_004F9D5C;
-extern s32 D_004F9D60;
+extern s32 D_004F9D58 __attribute__((section(".sdata")));
+extern s32 D_004F9D5C __attribute__((section(".sdata")));
+extern s32 D_004F9D60 __attribute__((section(".sdata")));
 
 s32 func_0016D3B0(void* arg0) {
     s32 temp_a0;
@@ -8381,8 +8381,8 @@ s32 func_0016D4F8(void* arg0, s32 arg1) {
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_00319980;
-extern s32 D_004F9D58;
-extern s32 D_004F9D5C;
+extern s32 D_004F9D58 __attribute__((section(".sdata")));
+extern s32 D_004F9D5C __attribute__((section(".sdata")));
 extern s32 D_004F9D9C;
 
 s32 func_0016D690(void* arg0) {
@@ -8444,11 +8444,11 @@ extern M2C_UNK D_004F9CD0;
 extern M2C_UNK D_004F9CD4;
 extern s32 D_004F9D18;
 extern s32 D_004F9D24;
-extern s32 D_004F9D80;
-extern s32 D_004F9D88;
-extern s32 D_004F9D90;
-extern s32 D_004F9D94;
-extern s32 D_004F9D98;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
+extern s32 D_004F9D88 __attribute__((section(".sdata")));
+extern s32 D_004F9D90 __attribute__((section(".sdata")));
+extern s32 D_004F9D94 __attribute__((section(".sdata")));
+extern s32 D_004F9D98 __attribute__((section(".sdata")));
 extern M2C_UNK func_0016C590;
 extern M2C_UNK netFodderUpdateCB;
 extern M2C_UNK netGameDataUpdateCB;
@@ -8778,11 +8778,11 @@ extern M2C_UNK D_004F9CD0;
 extern M2C_UNK D_004F9CD4;
 extern s32 D_004F9D18;
 extern s32 D_004F9D24;
-extern s32 D_004F9D80;
-extern s32 D_004F9D88;
-extern s32 D_004F9D90;
-extern s32 D_004F9D94;
-extern s32 D_004F9D98;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
+extern s32 D_004F9D88 __attribute__((section(".sdata")));
+extern s32 D_004F9D90 __attribute__((section(".sdata")));
+extern s32 D_004F9D94 __attribute__((section(".sdata")));
+extern s32 D_004F9D98 __attribute__((section(".sdata")));
 extern M2C_UNK func_0016C590;
 extern M2C_UNK netFodderUpdateCB;
 extern M2C_UNK netGameDataUpdateCB;
@@ -9112,11 +9112,11 @@ extern M2C_UNK D_004F9CD0;
 extern M2C_UNK D_004F9CD4;
 extern s32 D_004F9D18;
 extern s32 D_004F9D24;
-extern s32 D_004F9D80;
-extern s32 D_004F9D88;
-extern s32 D_004F9D90;
-extern s32 D_004F9D94;
-extern s32 D_004F9D98;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
+extern s32 D_004F9D88 __attribute__((section(".sdata")));
+extern s32 D_004F9D90 __attribute__((section(".sdata")));
+extern s32 D_004F9D94 __attribute__((section(".sdata")));
+extern s32 D_004F9D98 __attribute__((section(".sdata")));
 extern M2C_UNK func_0016C590;
 extern M2C_UNK netFodderUpdateCB;
 extern M2C_UNK netGameDataUpdateCB;
@@ -9446,11 +9446,11 @@ extern M2C_UNK D_004F9CD0;
 extern M2C_UNK D_004F9CD4;
 extern s32 D_004F9D18;
 extern s32 D_004F9D24;
-extern s32 D_004F9D80;
-extern s32 D_004F9D88;
-extern s32 D_004F9D90;
-extern s32 D_004F9D94;
-extern s32 D_004F9D98;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
+extern s32 D_004F9D88 __attribute__((section(".sdata")));
+extern s32 D_004F9D90 __attribute__((section(".sdata")));
+extern s32 D_004F9D94 __attribute__((section(".sdata")));
+extern s32 D_004F9D98 __attribute__((section(".sdata")));
 extern M2C_UNK func_0016C590;
 extern M2C_UNK netFodderUpdateCB;
 extern M2C_UNK netGameDataUpdateCB;
@@ -9780,11 +9780,11 @@ extern M2C_UNK D_004F9CD0;
 extern M2C_UNK D_004F9CD4;
 extern s32 D_004F9D18;
 extern s32 D_004F9D24;
-extern s32 D_004F9D80;
-extern s32 D_004F9D88;
-extern s32 D_004F9D90;
-extern s32 D_004F9D94;
-extern s32 D_004F9D98;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
+extern s32 D_004F9D88 __attribute__((section(".sdata")));
+extern s32 D_004F9D90 __attribute__((section(".sdata")));
+extern s32 D_004F9D94 __attribute__((section(".sdata")));
+extern s32 D_004F9D98 __attribute__((section(".sdata")));
 extern M2C_UNK func_0016C590;
 extern M2C_UNK netFodderUpdateCB;
 extern M2C_UNK netGameDataUpdateCB;
@@ -10114,11 +10114,11 @@ extern M2C_UNK D_004F9CD0;
 extern M2C_UNK D_004F9CD4;
 extern s32 D_004F9D18;
 extern s32 D_004F9D24;
-extern s32 D_004F9D80;
-extern s32 D_004F9D88;
-extern s32 D_004F9D90;
-extern s32 D_004F9D94;
-extern s32 D_004F9D98;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
+extern s32 D_004F9D88 __attribute__((section(".sdata")));
+extern s32 D_004F9D90 __attribute__((section(".sdata")));
+extern s32 D_004F9D94 __attribute__((section(".sdata")));
+extern s32 D_004F9D98 __attribute__((section(".sdata")));
 extern M2C_UNK func_0016C590;
 extern M2C_UNK netFodderUpdateCB;
 extern M2C_UNK netGameDataUpdateCB;
@@ -10430,7 +10430,7 @@ s32 netInitDme(void) {
 }
 //@@ func_0016E6F8 m2c0
 #include "m2c_macros.h"
-extern s32 D_004F9D64;
+extern s32 D_004F9D64 __attribute__((section(".sdata")));
 extern M2C_UNK D_004F9D68;
 extern M2C_UNK D_004F9D70;
 extern M2C_UNK D_004F9D78;
@@ -10459,7 +10459,7 @@ loop_7:
 }
 //@@ func_0016E6F8 m2c1
 #include "m2c_macros.h"
-extern s32 D_004F9D64;
+extern s32 D_004F9D64 __attribute__((section(".sdata")));
 extern M2C_UNK D_004F9D68;
 extern M2C_UNK D_004F9D70;
 extern M2C_UNK D_004F9D78;
@@ -10488,7 +10488,7 @@ loop_7:
 }
 //@@ func_0016E6F8 m2c2
 #include "m2c_macros.h"
-extern s32 D_004F9D64;
+extern s32 D_004F9D64 __attribute__((section(".sdata")));
 extern M2C_UNK D_004F9D68;
 extern M2C_UNK D_004F9D70;
 extern M2C_UNK D_004F9D78;
@@ -10517,7 +10517,7 @@ loop_7:
 }
 //@@ func_0016E7D0 m2c0
 #include "m2c_macros.h"
-extern s32 D_004F9D64;
+extern s32 D_004F9D64 __attribute__((section(".sdata")));
 extern M2C_UNK D_004FDD60;
 extern M2C_UNK D_005015F0;
 extern M2C_UNK func_0016E6D8;
@@ -10553,7 +10553,7 @@ s32 func_0016E7D0(s32 arg0) {
 }
 //@@ func_0016E7D0 m2c1
 #include "m2c_macros.h"
-extern s32 D_004F9D64;
+extern s32 D_004F9D64 __attribute__((section(".sdata")));
 extern M2C_UNK D_004FDD60;
 extern M2C_UNK D_005015F0;
 extern M2C_UNK func_0016E6D8;
@@ -10589,7 +10589,7 @@ s32 func_0016E7D0(s32 arg0) {
 }
 //@@ func_0016E7D0 m2c2
 #include "m2c_macros.h"
-extern s32 D_004F9D64;
+extern s32 D_004F9D64 __attribute__((section(".sdata")));
 extern M2C_UNK D_004FDD60;
 extern M2C_UNK D_005015F0;
 extern M2C_UNK func_0016E6D8;
@@ -10625,7 +10625,7 @@ s32 func_0016E7D0(s32 arg0) {
 }
 //@@ func_0016E7D0 m2c3
 #include "m2c_macros.h"
-extern s32 D_004F9D64;
+extern s32 D_004F9D64 __attribute__((section(".sdata")));
 extern M2C_UNK D_004FDD60;
 extern M2C_UNK D_005015F0;
 extern M2C_UNK func_0016E6D8;
@@ -10661,7 +10661,7 @@ s32 func_0016E7D0(s32 arg0) {
 }
 //@@ func_0016E7D0 m2c4
 #include "m2c_macros.h"
-extern s32 D_004F9D64;
+extern s32 D_004F9D64 __attribute__((section(".sdata")));
 extern M2C_UNK D_004FDD60;
 extern M2C_UNK D_005015F0;
 extern M2C_UNK func_0016E6D8;
@@ -10697,7 +10697,7 @@ s32 func_0016E7D0(s32 arg0) {
 }
 //@@ func_0016E7D0 m2c5
 #include "m2c_macros.h"
-extern s32 D_004F9D64;
+extern s32 D_004F9D64 __attribute__((section(".sdata")));
 extern M2C_UNK D_004FDD60;
 extern M2C_UNK D_005015F0;
 extern M2C_UNK func_0016E6D8;
@@ -10772,7 +10772,7 @@ void* func_0016E9A0(void* arg0) {
 //@@ func_0016EB78 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9DD8;
+extern s32 D_004F9DD8 __attribute__((section(".sdata")));
 extern M2C_UNK func_00169050;
 
 void func_0016EB78(void) {
@@ -11207,7 +11207,7 @@ extern M2C_UNK D_004E7E58;
 extern M2C_UNK D_004E7E70;
 extern M2C_UNK D_004E7EA0;
 extern M2C_UNK D_004E7ED0;
-extern s32 D_004F9EB0;
+extern s32 D_004F9EB0 __attribute__((section(".sdata")));
 extern s32 D_004F9EB4;
 extern M2C_UNK D_004F9EB8;
 extern M2C_UNK func_00168B60;
@@ -11268,7 +11268,7 @@ extern M2C_UNK D_004E7E58;
 extern M2C_UNK D_004E7E70;
 extern M2C_UNK D_004E7EA0;
 extern M2C_UNK D_004E7ED0;
-extern s32 D_004F9EB0;
+extern s32 D_004F9EB0 __attribute__((section(".sdata")));
 extern s32 D_004F9EB4;
 extern M2C_UNK D_004F9EB8;
 extern M2C_UNK func_00168B60;
@@ -11329,7 +11329,7 @@ extern M2C_UNK D_004E7E58;
 extern M2C_UNK D_004E7E70;
 extern M2C_UNK D_004E7EA0;
 extern M2C_UNK D_004E7ED0;
-extern s32 D_004F9EB0;
+extern s32 D_004F9EB0 __attribute__((section(".sdata")));
 extern s32 D_004F9EB4;
 extern M2C_UNK D_004F9EB8;
 extern M2C_UNK func_00168B60;
@@ -11390,7 +11390,7 @@ extern M2C_UNK D_004E7E58;
 extern M2C_UNK D_004E7E70;
 extern M2C_UNK D_004E7EA0;
 extern M2C_UNK D_004E7ED0;
-extern s32 D_004F9EB0;
+extern s32 D_004F9EB0 __attribute__((section(".sdata")));
 extern s32 D_004F9EB4;
 extern M2C_UNK D_004F9EB8;
 extern M2C_UNK func_00168B60;
@@ -11451,7 +11451,7 @@ extern M2C_UNK D_004E7E58;
 extern M2C_UNK D_004E7E70;
 extern M2C_UNK D_004E7EA0;
 extern M2C_UNK D_004E7ED0;
-extern s32 D_004F9EB0;
+extern s32 D_004F9EB0 __attribute__((section(".sdata")));
 extern s32 D_004F9EB4;
 extern M2C_UNK D_004F9EB8;
 extern M2C_UNK func_00168B60;
@@ -11512,7 +11512,7 @@ extern M2C_UNK D_004E7E58;
 extern M2C_UNK D_004E7E70;
 extern M2C_UNK D_004E7EA0;
 extern M2C_UNK D_004E7ED0;
-extern s32 D_004F9EB0;
+extern s32 D_004F9EB0 __attribute__((section(".sdata")));
 extern s32 D_004F9EB4;
 extern M2C_UNK D_004F9EB8;
 extern M2C_UNK func_00168B60;
@@ -11564,8 +11564,8 @@ loop_4:
 }
 //@@ func_0016F910 m2c0
 #include "m2c_macros.h"
-extern s32 D_004F9EB0;
-extern s32 D_004F9EB4;
+extern s32 D_004F9EB0 __attribute__((section(".sdata")));
+extern s32 D_004F9EB4 __attribute__((section(".sdata")));
 extern s32 D_004F9EB8;
 
 s32 func_0016F910(void* arg0, s32* arg1) {
@@ -11608,8 +11608,8 @@ s32 func_0016F910(void* arg0, s32* arg1) {
 }
 //@@ func_0016F910 m2c1
 #include "m2c_macros.h"
-extern s32 D_004F9EB0;
-extern s32 D_004F9EB4;
+extern s32 D_004F9EB0 __attribute__((section(".sdata")));
+extern s32 D_004F9EB4 __attribute__((section(".sdata")));
 extern s32 D_004F9EB8;
 
 s32 func_0016F910(void* arg0, s32* arg1) {
@@ -11652,8 +11652,8 @@ s32 func_0016F910(void* arg0, s32* arg1) {
 }
 //@@ func_0016F910 m2c2
 #include "m2c_macros.h"
-extern s32 D_004F9EB0;
-extern s32 D_004F9EB4;
+extern s32 D_004F9EB0 __attribute__((section(".sdata")));
+extern s32 D_004F9EB4 __attribute__((section(".sdata")));
 extern s32 D_004F9EB8;
 
 s32 func_0016F910(void* arg0, s32* arg1) {
@@ -11698,7 +11698,7 @@ s32 func_0016F910(void* arg0, s32* arg1) {
 #include "m2c_macros.h"
 extern s32 D_00317270;
 extern M2C_UNK D_004E7BC8;
-extern s32 D_004F9EB4;
+extern s32 D_004F9EB4 __attribute__((section(".sdata")));
 
 s32 func_0016FA30(void* arg0) {
     u8 sp[0x100];
@@ -11783,7 +11783,7 @@ block_16:
 #include "m2c_macros.h"
 extern s32 D_00317270;
 extern M2C_UNK D_004E7BC8;
-extern s32 D_004F9EB4;
+extern s32 D_004F9EB4 __attribute__((section(".sdata")));
 
 s32 func_0016FA30(void* arg0) {
     u8 sp[0xF0];
@@ -11868,7 +11868,7 @@ block_16:
 #include "m2c_macros.h"
 extern s32 D_00317270;
 extern M2C_UNK D_004E7BC8;
-extern s32 D_004F9EB4;
+extern s32 D_004F9EB4 __attribute__((section(".sdata")));
 
 s32 func_0016FA30(void* arg0) {
     u8 sp[0xE0];
@@ -11953,7 +11953,7 @@ block_16:
 #include "m2c_macros.h"
 extern s32 D_00317270;
 extern M2C_UNK D_004E7BC8;
-extern s32 D_004F9EB4;
+extern s32 D_004F9EB4 __attribute__((section(".sdata")));
 
 s32 func_0016FA30(void* arg0) {
     u8 sp[0xD0];
@@ -12038,7 +12038,7 @@ block_16:
 #include "m2c_macros.h"
 extern s32 D_00317270;
 extern M2C_UNK D_004E7BC8;
-extern s32 D_004F9EB4;
+extern s32 D_004F9EB4 __attribute__((section(".sdata")));
 
 s32 func_0016FA30(void* arg0) {
     u8 sp[0xC0];
@@ -12123,7 +12123,7 @@ block_16:
 #include "m2c_macros.h"
 extern s32 D_00317270;
 extern M2C_UNK D_004E7BC8;
-extern s32 D_004F9EB4;
+extern s32 D_004F9EB4 __attribute__((section(".sdata")));
 
 s32 func_0016FA30(void* arg0) {
     u8 sp[0xB0];
@@ -12328,12 +12328,12 @@ extern s32 D_002B8A00;
 extern M2C_UNK D_002C1690;
 extern s32 D_00313D6C;
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9E3C;
-extern u32 D_004F9E40;
-extern f32 D_004F9E44;
-extern f32 D_004F9E48;
-extern s32 D_004F9E4C;
-extern s32 D_004F9E50;
+extern s32 D_004F9E3C __attribute__((section(".sdata")));
+extern u32 D_004F9E40 __attribute__((section(".sdata")));
+extern f32 D_004F9E44 __attribute__((section(".sdata")));
+extern f32 D_004F9E48 __attribute__((section(".sdata")));
+extern s32 D_004F9E4C __attribute__((section(".sdata")));
+extern s32 D_004F9E50 __attribute__((section(".sdata")));
 extern M2C_UNK func_00168FB8;
 
 void func_001703E8(M2C_UNK* arg0) {
@@ -12457,12 +12457,12 @@ extern s32 D_002B8A00;
 extern M2C_UNK D_002C1690;
 extern s32 D_00313D6C;
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9E3C;
-extern u32 D_004F9E40;
-extern f32 D_004F9E44;
-extern f32 D_004F9E48;
-extern s32 D_004F9E4C;
-extern s32 D_004F9E50;
+extern s32 D_004F9E3C __attribute__((section(".sdata")));
+extern u32 D_004F9E40 __attribute__((section(".sdata")));
+extern f32 D_004F9E44 __attribute__((section(".sdata")));
+extern f32 D_004F9E48 __attribute__((section(".sdata")));
+extern s32 D_004F9E4C __attribute__((section(".sdata")));
+extern s32 D_004F9E50 __attribute__((section(".sdata")));
 extern M2C_UNK func_00168FB8;
 
 void func_001703E8(M2C_UNK* arg0) {
@@ -12586,12 +12586,12 @@ extern s32 D_002B8A00;
 extern M2C_UNK D_002C1690;
 extern s32 D_00313D6C;
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9E3C;
-extern u32 D_004F9E40;
-extern f32 D_004F9E44;
-extern f32 D_004F9E48;
-extern s32 D_004F9E4C;
-extern s32 D_004F9E50;
+extern s32 D_004F9E3C __attribute__((section(".sdata")));
+extern u32 D_004F9E40 __attribute__((section(".sdata")));
+extern f32 D_004F9E44 __attribute__((section(".sdata")));
+extern f32 D_004F9E48 __attribute__((section(".sdata")));
+extern s32 D_004F9E4C __attribute__((section(".sdata")));
+extern s32 D_004F9E50 __attribute__((section(".sdata")));
 extern M2C_UNK func_00168FB8;
 
 void func_001703E8(M2C_UNK* arg0) {
@@ -12715,12 +12715,12 @@ extern s32 D_002B8A00;
 extern M2C_UNK D_002C1690;
 extern s32 D_00313D6C;
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9E3C;
-extern u32 D_004F9E40;
-extern f32 D_004F9E44;
-extern f32 D_004F9E48;
-extern s32 D_004F9E4C;
-extern s32 D_004F9E50;
+extern s32 D_004F9E3C __attribute__((section(".sdata")));
+extern u32 D_004F9E40 __attribute__((section(".sdata")));
+extern f32 D_004F9E44 __attribute__((section(".sdata")));
+extern f32 D_004F9E48 __attribute__((section(".sdata")));
+extern s32 D_004F9E4C __attribute__((section(".sdata")));
+extern s32 D_004F9E50 __attribute__((section(".sdata")));
 extern M2C_UNK func_00168FB8;
 
 void func_001703E8(M2C_UNK* arg0) {
@@ -12844,12 +12844,12 @@ extern s32 D_002B8A00;
 extern M2C_UNK D_002C1690;
 extern s32 D_00313D6C;
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9E3C;
-extern u32 D_004F9E40;
-extern f32 D_004F9E44;
-extern f32 D_004F9E48;
-extern s32 D_004F9E4C;
-extern s32 D_004F9E50;
+extern s32 D_004F9E3C __attribute__((section(".sdata")));
+extern u32 D_004F9E40 __attribute__((section(".sdata")));
+extern f32 D_004F9E44 __attribute__((section(".sdata")));
+extern f32 D_004F9E48 __attribute__((section(".sdata")));
+extern s32 D_004F9E4C __attribute__((section(".sdata")));
+extern s32 D_004F9E50 __attribute__((section(".sdata")));
 extern M2C_UNK func_00168FB8;
 
 void func_001703E8(M2C_UNK* arg0) {
@@ -12973,12 +12973,12 @@ extern s32 D_002B8A00;
 extern M2C_UNK D_002C1690;
 extern s32 D_00313D6C;
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9E3C;
-extern u32 D_004F9E40;
-extern f32 D_004F9E44;
-extern f32 D_004F9E48;
-extern s32 D_004F9E4C;
-extern s32 D_004F9E50;
+extern s32 D_004F9E3C __attribute__((section(".sdata")));
+extern u32 D_004F9E40 __attribute__((section(".sdata")));
+extern f32 D_004F9E44 __attribute__((section(".sdata")));
+extern f32 D_004F9E48 __attribute__((section(".sdata")));
+extern s32 D_004F9E4C __attribute__((section(".sdata")));
+extern s32 D_004F9E50 __attribute__((section(".sdata")));
 extern M2C_UNK func_00168FB8;
 
 void func_001703E8(M2C_UNK* arg0) {
@@ -13100,7 +13100,7 @@ block_18:
 #include "m2c_macros.h"
 extern s8 D_003184B6;
 extern s32 D_004F9D18;
-extern s32 D_004F9DE4;
+extern s32 D_004F9DE4 __attribute__((section(".sdata")));
 
 void func_00170760(s32 arg0, void* arg1) {
     u8 sp[0x10];
@@ -13245,7 +13245,7 @@ block_42:
 #include "m2c_macros.h"
 extern s8 D_003184B6;
 extern s32 D_004F9D18;
-extern s32 D_004F9DE4;
+extern s32 D_004F9DE4 __attribute__((section(".sdata")));
 
 void func_00170760(s32 arg0, void* arg1) {
     u8 sp[0x8];
@@ -13390,7 +13390,7 @@ block_42:
 #include "m2c_macros.h"
 extern s8 D_003184B6;
 extern s32 D_004F9D18;
-extern s32 D_004F9DE4;
+extern s32 D_004F9DE4 __attribute__((section(".sdata")));
 
 void func_00170760(s32 arg0, void* arg1) {
     u8 sp[0x4];
@@ -13534,7 +13534,7 @@ block_42:
 //@@ func_00170B68 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9CA0;
-extern void* D_004FA030;
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 void func_00170B68(s32 arg0) {
     s32 temp_s0;
@@ -13600,7 +13600,7 @@ extern s32 D_004F9CA0;
 extern M2C_UNK D_004F9E60;
 extern M2C_UNK D_004F9E68;
 extern M2C_UNK D_004F9E70;
-extern void* D_004FA030;
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 void func_00170DF0(void* arg0, u32 arg1) {
     s32 temp_s0;
@@ -13880,7 +13880,7 @@ loop_20:
 #include "m2c_macros.h"
 extern s32 D_004F9D24;
 extern M2C_UNK D_004F9E78;
-extern void* D_004FA030;
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 s32 func_00171818(s32 arg0, void* arg1, s32 arg2) {
     void* sp10;
@@ -14183,7 +14183,7 @@ void func_00171B78(void* arg0, M2C_UNK arg1) {
 }
 //@@ func_00171C08 m2c0
 #include "m2c_macros.h"
-extern s32 D_004F9D80;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
 
 void func_00171C08(void* arg0) {
     u8 sp[0x60];
@@ -14206,7 +14206,7 @@ loop_1:
 }
 //@@ func_00171C08 m2c1
 #include "m2c_macros.h"
-extern s32 D_004F9D80;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
 
 void func_00171C08(void* arg0) {
     u8 sp[0x50];
@@ -14229,7 +14229,7 @@ loop_1:
 }
 //@@ func_00171C08 m2c2
 #include "m2c_macros.h"
-extern s32 D_004F9D80;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
 
 void func_00171C08(void* arg0) {
     u8 sp[0x40];
@@ -14252,7 +14252,7 @@ loop_1:
 }
 //@@ func_00171C08 m2c3
 #include "m2c_macros.h"
-extern s32 D_004F9D80;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
 
 void func_00171C08(void* arg0) {
     u8 sp[0x30];
@@ -14275,7 +14275,7 @@ loop_1:
 }
 //@@ func_00171C08 m2c4
 #include "m2c_macros.h"
-extern s32 D_004F9D80;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
 
 void func_00171C08(void* arg0) {
     u8 sp[0x20];
@@ -14298,7 +14298,7 @@ loop_1:
 }
 //@@ func_00171C08 m2c5
 #include "m2c_macros.h"
-extern s32 D_004F9D80;
+extern s32 D_004F9D80 __attribute__((section(".sdata")));
 
 void func_00171C08(void* arg0) {
     u8 sp[0x10];
@@ -15191,7 +15191,7 @@ s32 func_001722C0(void* arg0) {
 }
 //@@ func_00172A10 m2c0
 #include "m2c_macros.h"
-extern s8* D_004FB4F0;
+extern s8* D_004FB4F0 __attribute__((section(".sdata")));
 
 s8* func_00172A10(s32 arg0, s8* arg1) {
     s32 var_a1;
@@ -15229,7 +15229,7 @@ block_8:
 //@@ func_00172A90 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
-extern s32 D_004F9E8C;
+extern s32 D_004F9E8C __attribute__((section(".sdata")));
 
 void func_00172A90(void* arg0, void* arg1, void* arg2) {
     s32 temp_v0_6;
@@ -16485,7 +16485,7 @@ block_24:
 }
 //@@ func_001742B0 m2c0
 #include "m2c_macros.h"
-extern s32 D_004FA030;
+extern s32 D_004FA030 __attribute__((section(".sdata")));
 extern s32 D_004FA03C;
 
 void func_001742B0(s32 arg0) {
@@ -16746,7 +16746,7 @@ void func_00174860(void* arg0) {
 }
 //@@ func_001748D8 m2c0
 #include "m2c_macros.h"
-extern s32 D_004FA030;
+extern s32 D_004FA030 __attribute__((section(".sdata")));
 
 void func_001748D8(s32 arg0) {
     func_001746E8();
@@ -16755,8 +16755,8 @@ void func_001748D8(s32 arg0) {
 }
 //@@ func_00174BF0 m2c0
 #include "m2c_macros.h"
-extern s32 D_004F9CA8;
-extern s32 D_004F9CAC;
+extern s32 D_004F9CA8 __attribute__((section(".sdata")));
+extern s32 D_004F9CAC __attribute__((section(".sdata")));
 extern s32 D_004FA03C;
 
 void func_00174BF0(void* arg0) {
@@ -16843,7 +16843,7 @@ extern M2C_UNK D_004E8528;
 extern s32 D_004F9CA4;
 extern s32 D_004F9CB0;
 extern s32 D_004F9D18;
-extern void* D_004FA030;
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 s32 func_001756A0(void* arg0, void* arg1) {
     s32 sp10;
@@ -17525,7 +17525,7 @@ s32 func_00176CC8(void* arg0) {
 //@@ func_00176EA0 m2c0
 #include "m2c_macros.h"
 extern u32* D_00318808;
-extern void* D_004FA030;
+extern void* D_004FA030 __attribute__((section(".sdata")));
 
 void func_00176EA0(void* arg0) {
     s32 temp_a1;
