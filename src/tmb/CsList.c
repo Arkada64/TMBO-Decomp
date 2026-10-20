@@ -13,8 +13,8 @@ void pushCsFront__6CsListP3_cs(void** arg0, s32 arg1) {
     void* temp_v0;
 
     temp_v0 = allocateCsListNode__Fv_tP3_cs();
-    M2C_FIELD(temp_v0, s32* , 4) = arg1;
-    M2C_FIELD(temp_v0, void** , 0) = (void* ) *arg0;
+    M2C_FIELD_V1(temp_v0, s32* , 4) = arg1;
+    M2C_FIELD_V1(temp_v0, void** , 0) = (void* ) *arg0;
     *arg0 = temp_v0;
 }
 

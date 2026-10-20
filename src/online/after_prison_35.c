@@ -6,7 +6,7 @@ M2C_UNK plightDestroy__FP11_pointlight_17F230() __asm__("plightDestroy__FP11_poi
 void func_0017F230(void* arg0) {
     s32 temp_a0;
 
-    temp_a0 = M2C_FIELD(arg0, s32* , 0x10);
+    temp_a0 = M2C_FIELD_V1(arg0, s32* , 0x10);
     if (temp_a0 != 0) {
         plightDestroy__FP11_pointlight_17F230(temp_a0);
     }

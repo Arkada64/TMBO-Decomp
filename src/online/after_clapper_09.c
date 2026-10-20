@@ -40,11 +40,11 @@ M2C_UNK printf_11A860() __asm__("printf");
 void func_0011A860(void* arg0, s32 arg1, s32 arg2) {
     if (arg1 == 0x1E15) {
         printf_11A860("Found the collector Visual\n");
-        M2C_FIELD(arg0, s32* , 0x9E4) = arg2;
+        M2C_FIELD_V1(arg0, s32* , 0x9E4) = arg2;
     }
     if (arg1 == 0x1E16) {
         printf_11A860("Found the collector Teleport Visual\n");
-        M2C_FIELD(arg0, s32* , 0x9E8) = arg2;
+        M2C_FIELD_V1(arg0, s32* , 0x9E8) = arg2;
     }
 }
 

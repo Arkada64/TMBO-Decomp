@@ -8,8 +8,8 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_0013
 M2C_UNK removeOccupant__12AttractPointP7Vehicle_134F60() __asm__("removeOccupant__12AttractPointP7Vehicle");
 
 void func_00134F60(void* arg0) {
-    removeOccupant__12AttractPointP7Vehicle_134F60(M2C_FIELD(arg0, s32* , 0xC), M2C_FIELD(arg0, s32* , 0));
-    M2C_FIELD(arg0, s32* , 8) = 0;
+    removeOccupant__12AttractPointP7Vehicle_134F60(M2C_FIELD_V1(arg0, s32* , 0xC), M2C_FIELD_V1(arg0, s32* , 0));
+    M2C_FIELD_V1(arg0, s32* , 8) = 0;
 }
 
 void setupCheapDriving__12FodderDriver(void) {
@@ -30,11 +30,11 @@ M2C_UNK removeOccupant__12AttractPointP7Vehicle_tPoint() __asm__("removeOccupant
 void reattach__12FodderDriverP12AttractPoint(void* arg0, s32 arg1) {
     s32 temp_a0;
 
-    temp_a0 = M2C_FIELD(arg0, s32* , 0xC);
+    temp_a0 = M2C_FIELD_V1(arg0, s32* , 0xC);
     if (temp_a0 != arg1) {
-        removeOccupant__12AttractPointP7Vehicle_tPoint(temp_a0, M2C_FIELD(arg0, s32* , 0));
-        M2C_FIELD(arg0, s32* , 0xC) = arg1;
-        addOccupant__12AttractPointP7Vehicle_tPoint(arg1, M2C_FIELD(arg0, s32* , 0));
+        removeOccupant__12AttractPointP7Vehicle_tPoint(temp_a0, M2C_FIELD_V1(arg0, s32* , 0));
+        M2C_FIELD_V1(arg0, s32* , 0xC) = arg1;
+        addOccupant__12AttractPointP7Vehicle_tPoint(arg1, M2C_FIELD_V1(arg0, s32* , 0));
     }
 }
 
@@ -56,8 +56,8 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_0013
 
 #include "m2c_macros.h"
 void forceFullCollis__12FodderDriver(void** arg0) {
-    M2C_FIELD(*arg0, s32* , 0x17D0) = 0;
-    M2C_FIELD(*arg0, s32* , 0x1A64) = 1;
+    M2C_FIELD_V1(*arg0, s32* , 0x17D0) = 0;
+    M2C_FIELD_V1(*arg0, s32* , 0x1A64) = 1;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", vectorCrossUp__12FodderDriverP8_fvectorT1);

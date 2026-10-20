@@ -5,7 +5,7 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/pickup_part2", AddPickup
 #include "m2c_macros.h"
 void func_0017AC58(void* arg0, s32 arg1, s32 arg2) {
     if (arg1 == 0x1E17) {
-        M2C_FIELD(arg0, s32* , 0x48) = arg2;
+        M2C_FIELD_V1(arg0, s32* , 0x48) = arg2;
     }
 }
 

@@ -92,25 +92,25 @@ void func_001A02D8(void* arg0) {
     s32 temp_v0_2;
     s32 temp_v0_3;
 
-    M2C_FIELD(arg0, s32* , 0x54) = 0;
-    M2C_FIELD(arg0, s32* , 0x24) = 0;
-    M2C_FIELD(arg0, s32* , 0x3C) = 0;
-    M2C_FIELD(arg0, s32* , 0x20) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x54) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x24) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x3C) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x20) = 0;
     temp_v0 = timerGetFieldCount__Fv_1A02D8();
-    M2C_FIELD(arg0, s32* , 0x70) = 0;
-    M2C_FIELD(arg0, s32* , 0x6C) = temp_v0;
+    M2C_FIELD_V1(arg0, s32* , 0x70) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x6C) = temp_v0;
     temp_v0_2 = timerGetFieldCount__Fv_1A02D8();
-    M2C_FIELD(arg0, s32* , 0x64) = 0;
-    M2C_FIELD(arg0, s32* , 0x80) = 0;
-    M2C_FIELD(arg0, s32* , 0x84) = 0;
-    M2C_FIELD(arg0, s32* , 0x68) = temp_v0_2;
+    M2C_FIELD_V1(arg0, s32* , 0x64) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x80) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x84) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x68) = temp_v0_2;
     temp_v0_3 = timerGetFieldCount__Fv_1A02D8();
-    M2C_FIELD(arg0, s32* , 4) = 0;
-    M2C_FIELD(arg0, s32* , 0) = 0;
-    M2C_FIELD(arg0, s32* , 8) = 0;
-    M2C_FIELD(arg0, s32* , 0x78) = 0x3FFF;
-    M2C_FIELD(arg0, s32* , 0x7C) = temp_v0_3;
-    M2C_FIELD(arg0, s32* , 0x74) = timerGetFieldCount__Fv_1A02D8();
+    M2C_FIELD_V1(arg0, s32* , 4) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0) = 0;
+    M2C_FIELD_V1(arg0, s32* , 8) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x78) = 0x3FFF;
+    M2C_FIELD_V1(arg0, s32* , 0x7C) = temp_v0_3;
+    M2C_FIELD_V1(arg0, s32* , 0x74) = timerGetFieldCount__Fv_1A02D8();
     func_001FBCF8_1A02D8(&D_004FFF00_1A02D8, 0xFDB, 0, 0);
 }
 
@@ -170,14 +170,14 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2
 
 #include "m2c_macros.h"
 void func_001A22F8(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0) = 0;
-    M2C_FIELD(arg0, s32* , 4) = 0x10;
+    M2C_FIELD_V1(arg0, s32* , 0) = 0;
+    M2C_FIELD_V1(arg0, s32* , 4) = 0x10;
 }
 
 #include "m2c_macros.h"
 void func_001A2308(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0) = 0;
-    M2C_FIELD(arg0, s32* , 4) = 0x11;
+    M2C_FIELD_V1(arg0, s32* , 0) = 0;
+    M2C_FIELD_V1(arg0, s32* , 4) = 0x11;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2318);
@@ -201,14 +201,14 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", playMachin
 s32 func_001A30D8_1A2960() __asm__("func_001A30D8");
 
 void func_001A2960(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0) = func_001A30D8_1A2960(M2C_FIELD(arg0, s32* , 4));
+    M2C_FIELD_V1(arg0, s32* , 0) = func_001A30D8_1A2960(M2C_FIELD_V1(arg0, s32* , 4));
 }
 
 #include "m2c_macros.h"
 s32 func_001A30D8_1A2990() __asm__("func_001A30D8");
 
 void func_001A2990(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0) = func_001A30D8_1A2990(M2C_FIELD(arg0, s32* , 8));
+    M2C_FIELD_V1(arg0, s32* , 0) = func_001A30D8_1A2990(M2C_FIELD_V1(arg0, s32* , 8));
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A29C0);
@@ -270,11 +270,11 @@ M2C_UNK func_001FA490_1A3168() __asm__("func_001FA490");
 M2C_UNK sceCdInit_1A3168() __asm__("sceCdInit");
 
 void func_001A3168(void* arg0) {
-    if (M2C_FIELD(arg0, s32* , 0x90) != 0) {
+    if (M2C_FIELD_V1(arg0, s32* , 0x90) != 0) {
         func_001FA490_1A3168();
     }
     sceCdInit_1A3168(0);
-    if (M2C_FIELD(arg0, s32* , 0x90) != 0) {
+    if (M2C_FIELD_V1(arg0, s32* , 0x90) != 0) {
         func_001FA370_1A3168(5, 0xA000, 0, 1);
     }
 }

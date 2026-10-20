@@ -35,9 +35,9 @@ M2C_UNK WaitSema_2491D8() __asm__("WaitSema");
 s32 func_002491D8(void* arg0) {
     s32 temp_s1;
 
-    WaitSema_2491D8(M2C_FIELD(arg0, s32* , 0x40));
-    temp_s1 = M2C_FIELD(arg0, s32* , 0x44);
-    SignalSema_2491D8(M2C_FIELD(arg0, s32* , 0x40));
+    WaitSema_2491D8(M2C_FIELD_V1(arg0, s32* , 0x40));
+    temp_s1 = M2C_FIELD_V1(arg0, s32* , 0x44);
+    SignalSema_2491D8(M2C_FIELD_V1(arg0, s32* , 0x40));
     return temp_s1;
 }
 

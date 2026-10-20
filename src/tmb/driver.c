@@ -36,13 +36,13 @@ void driverGetHuntNextPoint__6Driver(void* arg0) {
     s32 temp_a0;
     s32 var_v0;
 
-    temp_a0 = M2C_FIELD(arg0, s32* , 0xB8);
-    if (M2C_FIELD(arg0, s32* , 0x2AC) != 0) {
-        var_v0 = driverGetLookAheadPos__6DriverP8_fvectori_Driver(arg0, sp, attractGetGroupTestPointIsIn__15AttractorPointsP8_fvector_Driver(temp_a0, M2C_FIELD(arg0, s32* , 0x160)));
+    temp_a0 = M2C_FIELD_V1(arg0, s32* , 0xB8);
+    if (M2C_FIELD_V1(arg0, s32* , 0x2AC) != 0) {
+        var_v0 = driverGetLookAheadPos__6DriverP8_fvectori_Driver(arg0, sp, attractGetGroupTestPointIsIn__15AttractorPointsP8_fvector_Driver(temp_a0, M2C_FIELD_V1(arg0, s32* , 0x160)));
     } else {
-        var_v0 = driverGetLookAheadPos__6DriverP8_fvectori_Driver(arg0, sp, attractGetGroupTestPointIsIn__15AttractorPointsP8_fvector_Driver(temp_a0, M2C_FIELD(arg0, s32* , 0x164)));
+        var_v0 = driverGetLookAheadPos__6DriverP8_fvectori_Driver(arg0, sp, attractGetGroupTestPointIsIn__15AttractorPointsP8_fvector_Driver(temp_a0, M2C_FIELD_V1(arg0, s32* , 0x164)));
     }
-    driverGetLongRangePoint__6DriverP8_fvectorii_Driver(arg0, sp, M2C_FIELD(arg0, s32* , 0x200), var_v0);
+    driverGetLongRangePoint__6DriverP8_fvectorii_Driver(arg0, sp, M2C_FIELD_V1(arg0, s32* , 0x200), var_v0);
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverGetLookAheadPos__6DriverP8_fvectori);
@@ -71,11 +71,11 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverGetPointI
 void func_00130C00(void* arg0, void* arg1) {
     s32 temp_v1;
 
-    M2C_FIELD(arg0, void** , 0xB4) = arg1;
-    temp_v1 = M2C_FIELD(arg1, s32* , 0x2028);
-    M2C_FIELD(arg0, s32* , 0x160) = (s32) (arg1 + 0x1F30);
-    M2C_FIELD(arg0, s32* , 0x170) = temp_v1;
-    M2C_FIELD(arg0, s32* , 0x164) = (s32) (temp_v1 + 0x10);
+    M2C_FIELD_V1(arg0, void** , 0xB4) = arg1;
+    temp_v1 = M2C_FIELD_V1(arg1, s32* , 0x2028);
+    M2C_FIELD_V1(arg0, s32* , 0x160) = (s32) (arg1 + 0x1F30);
+    M2C_FIELD_V1(arg0, s32* , 0x170) = temp_v1;
+    M2C_FIELD_V1(arg0, s32* , 0x164) = (s32) (temp_v1 + 0x10);
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverInitTurn__6Driver);
@@ -96,5 +96,5 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverMustSnipe
 s32 attractGetSnipePoint__15AttractorPointsi_Driver() __asm__("attractGetSnipePoint__15AttractorPointsi");
 
 void driverGetSnipePoint__6Driver(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0x20C) = attractGetSnipePoint__15AttractorPointsi_Driver(M2C_FIELD(arg0, s32* , 0xB8), M2C_FIELD(arg0, s32* , 0x214));
+    M2C_FIELD_V1(arg0, s32* , 0x20C) = attractGetSnipePoint__15AttractorPointsi_Driver(M2C_FIELD_V1(arg0, s32* , 0xB8), M2C_FIELD_V1(arg0, s32* , 0x214));
 }

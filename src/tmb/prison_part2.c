@@ -32,29 +32,29 @@ void func_0017E218(void* arg0) {
     void* temp_s1;
     void* temp_s1_2;
 
-    if ((M2C_FIELD(arg0, s32* , 0x20) != 0) && (animationIsRunning__FR11_animHandle_17E218(arg0 + 0x20) == 0)) {
-        if (M2C_FIELD(arg0, s32* , 0x50) != 0) {
+    if ((M2C_FIELD_V1(arg0, s32* , 0x20) != 0) && (animationIsRunning__FR11_animHandle_17E218(arg0 + 0x20) == 0)) {
+        if (M2C_FIELD_V1(arg0, s32* , 0x50) != 0) {
             temp_s1 = arg0 + 0x50;
             if (animationIsRunning__FR11_animHandle_17E218(temp_s1) != 0) {
                 animationPause__FR11_animHandle_17E218(temp_s1);
             }
         }
-        if (M2C_FIELD(arg0, s32* , 0x5C) != 0) {
+        if (M2C_FIELD_V1(arg0, s32* , 0x5C) != 0) {
             temp_s1_2 = arg0 + 0x5C;
             if (animationIsRunning__FR11_animHandle_17E218(temp_s1_2) != 0) {
                 animationPause__FR11_animHandle_17E218(temp_s1_2);
             }
         }
-        if (M2C_FIELD(arg0, s32* , 0x68) != 0) {
+        if (M2C_FIELD_V1(arg0, s32* , 0x68) != 0) {
             animationStart__FR11_animHandleb_17E218(arg0 + 0x68, 1);
         }
-        if (M2C_FIELD(arg0, s32* , 0x74) != 0) {
+        if (M2C_FIELD_V1(arg0, s32* , 0x74) != 0) {
             animationStart__FR11_animHandleb_17E218(arg0 + 0x74, 1);
         }
-        if (M2C_FIELD(arg0, s32* , 0xC8) != 0) {
+        if (M2C_FIELD_V1(arg0, s32* , 0xC8) != 0) {
             animationStart__FR11_animHandleb_17E218(arg0 + 0xC8, 1);
         }
-        M2C_FIELD(arg0, s32* , 0xF8) = 5;
+        M2C_FIELD_V1(arg0, s32* , 0xF8) = 5;
         prisonUpdateTransitionPoints__6Prison_17E218(arg0);
     }
 }
@@ -78,9 +78,9 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/prison_part2", prisonUpd
 void startShocking__17ElectrocutionPeds(void* arg0) {
     s32 temp_v1;
 
-    temp_v1 = M2C_FIELD(arg0, s32* , 0xC);
+    temp_v1 = M2C_FIELD_V1(arg0, s32* , 0xC);
     if ((temp_v1 == 0) || (temp_v1 == 3)) {
-        M2C_FIELD(arg0, s32* , 0x14) = 0x262;
+        M2C_FIELD_V1(arg0, s32* , 0x14) = 0x262;
     }
 }
 

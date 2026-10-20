@@ -70,10 +70,10 @@ s32 aiLockingOnHuntCs__7Vehicle(void) {
 
 #include "m2c_macros.h"
 void aiLoseBeads__7Vehicle(void* arg0) {
-    M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x5A8) = 0;
-    if (M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x5B0) != 0) {
-        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2018), s32* , 0x258) = 0;
-        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x5B0) = 0;
+    M2C_FIELD_V1(M2C_FIELD_V1(arg0, void** , 0x2014), s32* , 0x5A8) = 0;
+    if (M2C_FIELD_V1(M2C_FIELD_V1(arg0, void** , 0x2014), s32* , 0x5B0) != 0) {
+        M2C_FIELD_V1(M2C_FIELD_V1(arg0, void** , 0x2018), s32* , 0x258) = 0;
+        M2C_FIELD_V1(M2C_FIELD_V1(arg0, void** , 0x2014), s32* , 0x5B0) = 0;
     }
 }
 
@@ -113,7 +113,7 @@ s32 aiOkToUseWeaponForRearFiring__7Vehiclei(void* arg0, s32 arg1) {
         var_a1 = 1;
         break;
     case 1:
-        var_a1 = M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x610);
+        var_a1 = M2C_FIELD_V1(M2C_FIELD_V1(arg0, void** , 0x2014), s32* , 0x610);
         break;
     }
     return var_a1;
@@ -149,10 +149,10 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_00107920);
 void aiSetAttackState__7Vehicle12_attackState(void* arg0, s32 arg1) {
     void* temp_v1;
 
-    temp_v1 = M2C_FIELD(arg0, void** , 0x2014);
-    if (M2C_FIELD(temp_v1, s32* , 0x414) != arg1) {
-        M2C_FIELD(temp_v1, s32* , 0x414) = arg1;
-        M2C_FIELD(M2C_FIELD(arg0, void** , 0x2014), s32* , 0x488) = 0;
+    temp_v1 = M2C_FIELD_V1(arg0, void** , 0x2014);
+    if (M2C_FIELD_V1(temp_v1, s32* , 0x414) != arg1) {
+        M2C_FIELD_V1(temp_v1, s32* , 0x414) = arg1;
+        M2C_FIELD_V1(M2C_FIELD_V1(arg0, void** , 0x2014), s32* , 0x488) = 0;
     }
 }
 

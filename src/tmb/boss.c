@@ -22,7 +22,7 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/boss", func_00114FE0);
 
 #include "m2c_macros.h"
 void AddEpNode__9FinalBossP9_hierhead(void* arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32* , 0x9C) = arg1;
+    M2C_FIELD_V1(arg0, s32* , 0x9C) = arg1;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/boss", func_001150C8);

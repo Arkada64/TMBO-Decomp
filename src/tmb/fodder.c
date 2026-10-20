@@ -25,7 +25,7 @@ s32 fodderGetBlinkerOnState__7Vehicle(void* arg0) {
     s32 temp_v0;
     s32 var_v1;
 
-    temp_v0 = M2C_FIELD(arg0, s32* , 0x20AC);
+    temp_v0 = M2C_FIELD_V1(arg0, s32* , 0x20AC);
     var_v1 = 1;
     if (temp_v0 != 0) {
         var_v1 = ((temp_v0 ^ 1) != 0) ? 0 : 2;

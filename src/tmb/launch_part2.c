@@ -34,8 +34,8 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/launch_part2", func_0016
 M2C_UNK hierSetSwitch__FP11_hierswitchi_1602A8() __asm__("hierSetSwitch__FP11_hierswitchi");
 
 void func_001602A8(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0x304) = 0;
-    hierSetSwitch__FP11_hierswitchi_1602A8(M2C_FIELD(arg0, s32* , 0x2F0), 0);
+    M2C_FIELD_V1(arg0, s32* , 0x304) = 0;
+    hierSetSwitch__FP11_hierswitchi_1602A8(M2C_FIELD_V1(arg0, s32* , 0x2F0), 0);
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/launch_part2", func_001602D0);

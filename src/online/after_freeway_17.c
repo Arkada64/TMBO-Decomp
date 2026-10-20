@@ -17,7 +17,7 @@ M2C_UNK plightDestroy__FP11_pointlight_1374D8() __asm__("plightDestroy__FP11_poi
 void func_001374D8(void* arg0) {
     s32 temp_a0;
 
-    temp_a0 = M2C_FIELD(arg0, s32* , 0x360);
+    temp_a0 = M2C_FIELD_V1(arg0, s32* , 0x360);
     if (temp_a0 != 0) {
         plightDestroy__FP11_pointlight_1374D8(temp_a0);
     }

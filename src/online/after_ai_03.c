@@ -33,7 +33,7 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_00
 
 #include "m2c_macros.h"
 s32 func_0010A678(void* arg0) {
-    return M2C_FIELD(arg0, s32* , 0xD4);
+    return M2C_FIELD_V1(arg0, s32* , 0xD4);
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A680);
@@ -43,14 +43,14 @@ M2C_UNK func_0028B414_10A748() __asm__("func_0028B414");
 
 void func_0010A748(void* arg0) {
     func_0028B414_10A748();
-    M2C_FIELD(arg0, s32* , 0xD4) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0xD4) = 0;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A770);
 
 #include "m2c_macros.h"
 void func_0010A7D8(void* arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32* , 0xDC) = arg1;
+    M2C_FIELD_V1(arg0, s32* , 0xDC) = arg1;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A7E0);

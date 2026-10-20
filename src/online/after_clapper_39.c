@@ -15,7 +15,7 @@ void func_001818C8(void) {
 
 #include "m2c_macros.h"
 s32 func_001818D0(s32 arg0, s32 arg1) {
-    return M2C_FIELD(((arg1 * 0x7C) + arg0), s32* , 0x34);
+    return M2C_FIELD_V1(((arg1 * 0x7C) + arg0), s32* , 0x34);
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_39", func_001818E8);

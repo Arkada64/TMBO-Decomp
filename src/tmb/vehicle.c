@@ -7,11 +7,11 @@ M2C_UNK shadow2ndOnOff__7Vehiclei_eTypes() __asm__("shadow2ndOnOff__7Vehiclei");
 void vehicleEnable__7Vehicle12VehicleTypes(void* arg0, s32 arg1) {
     s32 temp_a0;
 
-    M2C_FIELD(arg0, s32* , 0x590) = arg1;
-    M2C_FIELD(arg0, s32* , 0x2134) = 0;
-    M2C_FIELD(arg0, s32* , 0x2158) = 0;
-    hierSetCsDrawMe__FP3_csUc_eTypes(M2C_FIELD(arg0, s32* , 0x2028), 1);
-    temp_a0 = M2C_FIELD(arg0, s32* , 0x202C);
+    M2C_FIELD_V1(arg0, s32* , 0x590) = arg1;
+    M2C_FIELD_V1(arg0, s32* , 0x2134) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x2158) = 0;
+    hierSetCsDrawMe__FP3_csUc_eTypes(M2C_FIELD_V1(arg0, s32* , 0x2028), 1);
+    temp_a0 = M2C_FIELD_V1(arg0, s32* , 0x202C);
     if (temp_a0 != 0) {
         hierSetCsDrawMe__FP3_csUc_eTypes(temp_a0, 1);
         shadow2ndOnOff__7Vehiclei_eTypes(arg0, 1);
@@ -26,14 +26,14 @@ void vehicleDisable__7Vehicle(void* arg0) {
     s32 temp_a0;
     s32 temp_a0_2;
 
-    M2C_FIELD(arg0, s32* , 0x590) = 0;
-    hierSetCsDrawMe__FP3_csUc_ehicle(M2C_FIELD(arg0, s32* , 0x2028), 0);
-    temp_a0 = M2C_FIELD(arg0, s32* , 0x202C);
+    M2C_FIELD_V1(arg0, s32* , 0x590) = 0;
+    hierSetCsDrawMe__FP3_csUc_ehicle(M2C_FIELD_V1(arg0, s32* , 0x2028), 0);
+    temp_a0 = M2C_FIELD_V1(arg0, s32* , 0x202C);
     if (temp_a0 != 0) {
         hierSetCsDrawMe__FP3_csUc_ehicle(temp_a0, 0);
         shadow2ndOnOff__7Vehiclei_ehicle(arg0, 0);
     }
-    temp_a0_2 = M2C_FIELD(arg0, s32* , 0x2038);
+    temp_a0_2 = M2C_FIELD_V1(arg0, s32* , 0x2038);
     if (temp_a0_2 != 0) {
         hierSetCsDrawMe__FP3_csUc_ehicle(temp_a0_2, 0);
     }
@@ -77,7 +77,7 @@ M2C_UNK vehicleCheckTraction__7Vehicle_1DDC78() __asm__("vehicleCheckTraction__7
 M2C_UNK vehicleUpdateTurn__7Vehicle_1DDC78() __asm__("vehicleUpdateTurn__7Vehicle");
 
 void func_001DDC78(void* arg0) {
-    if (M2C_FIELD(arg0, s32* , 0x20B4) != 5) {
+    if (M2C_FIELD_V1(arg0, s32* , 0x20B4) != 5) {
         vehicleCheckStun__7Vehicle_1DDC78();
         vehicleCheckTraction__7Vehicle_1DDC78(arg0);
         func_001DDF58_1DDC78(arg0);
@@ -152,7 +152,7 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vehicle", func_001E4500)
 
 #include "m2c_macros.h"
 void vehicleStunCar__7Vehiclei(void* arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32* , 0x474) = arg1;
+    M2C_FIELD_V1(arg0, s32* , 0x474) = arg1;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vehicle", func_001E4690);

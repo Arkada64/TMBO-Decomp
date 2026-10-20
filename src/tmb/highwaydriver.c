@@ -26,12 +26,12 @@ M2C_UNK removeOccupant__Q27Highway8WaypointP7Vehicle_Driver() __asm__("removeOcc
 void disable__13HighwayDriver(void* arg0) {
     s32 temp_a0;
 
-    temp_a0 = M2C_FIELD(arg0, s32* , 0x18);
+    temp_a0 = M2C_FIELD_V1(arg0, s32* , 0x18);
     if (temp_a0 != 0) {
-        removeOccupant__Q27Highway8WaypointP7Vehicle_Driver(temp_a0, M2C_FIELD(arg0, s32* , 0x10));
+        removeOccupant__Q27Highway8WaypointP7Vehicle_Driver(temp_a0, M2C_FIELD_V1(arg0, s32* , 0x10));
     }
-    M2C_FIELD(arg0, s32* , 0x18) = 0;
-    M2C_FIELD(arg0, s32* , 4) = 1;
+    M2C_FIELD_V1(arg0, s32* , 0x18) = 0;
+    M2C_FIELD_V1(arg0, s32* , 4) = 1;
 }
 
 #include "m2c_macros.h"
@@ -41,12 +41,12 @@ M2C_UNK removeOccupant__Q27Highway8WaypointP7Vehicle_ypoint() __asm__("removeOcc
 void changeWaypoints__13HighwayDriverPQ27Highway8Waypoint(void* arg0, s32 arg1) {
     s32 temp_a0;
 
-    temp_a0 = M2C_FIELD(arg0, s32* , 0x18);
+    temp_a0 = M2C_FIELD_V1(arg0, s32* , 0x18);
     if (temp_a0 != 0) {
-        removeOccupant__Q27Highway8WaypointP7Vehicle_ypoint(temp_a0, M2C_FIELD(arg0, s32* , 0x10));
+        removeOccupant__Q27Highway8WaypointP7Vehicle_ypoint(temp_a0, M2C_FIELD_V1(arg0, s32* , 0x10));
     }
-    M2C_FIELD(arg0, s32* , 0x18) = arg1;
-    addOccupant__Q27Highway8WaypointP7Vehicle_ypoint(arg1, M2C_FIELD(arg0, s32* , 0x10));
+    M2C_FIELD_V1(arg0, s32* , 0x18) = arg1;
+    addOccupant__Q27Highway8WaypointP7Vehicle_ypoint(arg1, M2C_FIELD_V1(arg0, s32* , 0x10));
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", func_001430E0);

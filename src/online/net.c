@@ -112,7 +112,7 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00163E00);
 
 #include "m2c_macros.h"
 void func_00163EB8(void* arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32* , 4) = arg1;
+    M2C_FIELD_V1(arg0, s32* , 4) = arg1;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00163EC0);
@@ -155,7 +155,7 @@ M2C_UNK strcpy_164F68() __asm__("strcpy");
 
 void func_00164F68(void* arg0, s32 arg1, s32 arg2) {
     strcpy_164F68(arg0 + 0x525C4, arg0 + 0xC);
-    M2C_FIELD(arg0, s32* , 0x525D8) = arg1;
+    M2C_FIELD_V1(arg0, s32* , 0x525D8) = arg1;
     strcpy_164F68(arg0 + 0x525DC, arg2);
 }
 
@@ -380,8 +380,8 @@ s32 func_0016D638(void* arg0) {
     func_0028B414_16D638();
     func_00259D38_16D638();
     func_0026E4E8_16D638();
-    M2C_FIELD(arg0, s32* , 0x1BBC) = 0;
-    M2C_FIELD(arg0, s32* , 0x1BB8) = 4;
+    M2C_FIELD_V1(arg0, s32* , 0x1BBC) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x1BB8) = 4;
     return 0;
 }
 
@@ -398,12 +398,12 @@ void func_0016D7C0(s32 arg0) {
 
 #include "m2c_macros.h"
 s32 func_0016D7F0(void* arg0) {
-    return M2C_FIELD(arg0, s32* , 0x4258);
+    return M2C_FIELD_V1(arg0, s32* , 0x4258);
 }
 
 #include "m2c_macros.h"
 s32 func_0016D7F8(void* arg0) {
-    return M2C_FIELD(arg0, s32* , 0x4278);
+    return M2C_FIELD_V1(arg0, s32* , 0x4278);
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016D800);
@@ -442,7 +442,7 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016E9E8);
 
 #include "m2c_macros.h"
 void func_0016EB70(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0x768) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x768) = 0;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016EB78);
@@ -703,14 +703,14 @@ M2C_UNK func_00172FE8_173340() __asm__("func_00172FE8");
 s32 func_001734B8_173340() __asm__("func_001734B8");
 
 void func_00173340(void* arg0, s32 arg1, M2C_UNK arg2) {
-    if ((((u32) *M2C_FIELD(arg0, u32** , 0x3148) >> 1) & 0xF) == 4) {
+    if ((((u32) *M2C_FIELD_V1(arg0, u32** , 0x3148) >> 1) & 0xF) == 4) {
         if (func_001734B8_173340(arg0) != 0) {
             func_00172FE8_173340(arg0, arg1, arg2, -1);
         }
     }
-    if ((((u32) *M2C_FIELD(arg0, u32** , 0x3148) >> 1) & 0xF) == 8) {
+    if ((((u32) *M2C_FIELD_V1(arg0, u32** , 0x3148) >> 1) & 0xF) == 8) {
         if (func_001734B8_173340(arg0) != 0) {
-            func_00172FE8_173340(arg0, arg1, arg2, M2C_FIELD(((arg1 * 0x220) + arg0), s32* , 0x14));
+            func_00172FE8_173340(arg0, arg1, arg2, M2C_FIELD_V1(((arg1 * 0x220) + arg0), s32* , 0x14));
         }
     }
 }
@@ -801,7 +801,7 @@ s32 func_00173ED0(s32 arg0, s32 arg1, s32 arg2) {
 
     temp_v0 = netGetDmeTime_173ED0();
     if (temp_v0 != NULL) {
-        M2C_FIELD(M2C_FIELD(temp_v0, void** , 0x1C), s32* , 0x24) = arg2;
+        M2C_FIELD_V1(M2C_FIELD_V1(temp_v0, void** , 0x1C), s32* , 0x24) = arg2;
         return 1;
     }
     return 0;
@@ -815,7 +815,7 @@ s32 func_00173F10(void) {
 
     temp_v0 = netGetDmeTime_173F10();
     if (temp_v0 != NULL) {
-        return M2C_FIELD(M2C_FIELD(temp_v0, void** , 0x1C), s32* , 0x24);
+        return M2C_FIELD_V1(M2C_FIELD_V1(temp_v0, void** , 0x1C), s32* , 0x24);
     }
     return 0;
 }
@@ -828,7 +828,7 @@ s32 func_00173F40(s32 arg0, s32 arg1, s32 arg2) {
 
     temp_v0 = netGetDmeTime_173F40();
     if (temp_v0 != NULL) {
-        M2C_FIELD(M2C_FIELD(temp_v0, void** , 0x1C), s32* , 0x1C) = arg2;
+        M2C_FIELD_V1(M2C_FIELD_V1(temp_v0, void** , 0x1C), s32* , 0x1C) = arg2;
         return 1;
     }
     return 0;
@@ -842,7 +842,7 @@ s32 func_00173F80(s32 arg0, s32 arg1, s32 arg2) {
 
     temp_v0 = netGetDmeTime_173F80();
     if (temp_v0 != NULL) {
-        M2C_FIELD(M2C_FIELD(temp_v0, void** , 0x1C), s32* , 0x20) = arg2;
+        M2C_FIELD_V1(M2C_FIELD_V1(temp_v0, void** , 0x1C), s32* , 0x20) = arg2;
         return 1;
     }
     return 0;
@@ -856,7 +856,7 @@ s32 func_00173FC0(void) {
 
     temp_v0 = netGetDmeTime_173FC0();
     if (temp_v0 != NULL) {
-        return M2C_FIELD(M2C_FIELD(temp_v0, void** , 0x1C), s32* , 0x20);
+        return M2C_FIELD_V1(M2C_FIELD_V1(temp_v0, void** , 0x1C), s32* , 0x20);
     }
     return 0;
 }

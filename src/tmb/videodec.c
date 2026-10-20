@@ -33,7 +33,7 @@ void videoDecEndPut__FP8VideoDeci(s32 arg0) {
 
 #include "m2c_macros.h"
 s32 videoDecReset__FP8VideoDec(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0xA8) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0xA8) = 0;
     return 1;
 }
 
@@ -49,21 +49,21 @@ s32 videoDecDelete__FP8VideoDec(s32 arg0) {
 
 #include "m2c_macros.h"
 s32 videoDecAbort__FP8VideoDec(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0xA8) = 1;
+    M2C_FIELD_V1(arg0, s32* , 0xA8) = 1;
     return 1;
 }
 
 #include "m2c_macros.h"
 s32 videoDecGetState__FP8VideoDec(void* arg0) {
-    return M2C_FIELD(arg0, s32* , 0xA8);
+    return M2C_FIELD_V1(arg0, s32* , 0xA8);
 }
 
 #include "m2c_macros.h"
 s32 videoDecSetState__FP8VideoDecUi(void* arg0, s32 arg1) {
     s32 temp_v0;
 
-    temp_v0 = M2C_FIELD(arg0, s32* , 0xA8);
-    M2C_FIELD(arg0, s32* , 0xA8) = arg1;
+    temp_v0 = M2C_FIELD_V1(arg0, s32* , 0xA8);
+    M2C_FIELD_V1(arg0, s32* , 0xA8) = arg1;
     return temp_v0;
 }
 

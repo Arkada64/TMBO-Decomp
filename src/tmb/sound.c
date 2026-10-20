@@ -116,9 +116,9 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00194D78);
 s32 timerGetFieldCount__Fv_194E48() __asm__("timerGetFieldCount__Fv");
 
 void func_00194E48(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0) = 0;
-    M2C_FIELD(arg0, s32* , 0x1C) = 0;
-    M2C_FIELD(arg0, s32* , 0x24) = timerGetFieldCount__Fv_194E48();
+    M2C_FIELD_V1(arg0, s32* , 0) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x1C) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x24) = timerGetFieldCount__Fv_194E48();
 }
 
 void updateHudSound__8HudSoundP7Vehicle(void) {
@@ -233,15 +233,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00195C90);
 
 #include "m2c_macros.h"
 void initHouseSound__10HouseSound(void* arg0) {
-    M2C_FIELD(arg0, s32* , 4) = 0;
-    M2C_FIELD(arg0, s32* , 0) = 1;
+    M2C_FIELD_V1(arg0, s32* , 4) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0) = 1;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00195DA8);
 
 #include "m2c_macros.h"
 void initTrainSound__10TrainSound(void* arg0) {
-    M2C_FIELD(arg0, s32* , 4) = 0;
+    M2C_FIELD_V1(arg0, s32* , 4) = 0;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00195F48);
@@ -253,10 +253,10 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_001961A8);
 #include "m2c_macros.h"
 void startBuildingFallingSound__20BuildingFallingSoundi(void* arg0, s32 arg1) {
     if (arg1 == 0) {
-        M2C_FIELD(arg0, s32* , 0x10) = 1;
+        M2C_FIELD_V1(arg0, s32* , 0x10) = 1;
         return;
     }
-    M2C_FIELD(arg0, s32* , 0x14) = 1;
+    M2C_FIELD_V1(arg0, s32* , 0x14) = 1;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00196328);
@@ -355,15 +355,15 @@ s32 timerGetFieldCount__Fv_nSound() __asm__("timerGetFieldCount__Fv");
 void initPizzaManSound__13PizzaManSound(void* arg0) {
     s32 temp_v0;
 
-    M2C_FIELD(arg0, s32* , 0) = 0;
-    M2C_FIELD(arg0, s32* , 4) = 0;
-    M2C_FIELD(arg0, s32* , 8) = 0;
-    M2C_FIELD(arg0, s32* , 0xC) = timerGetFieldCount__Fv_nSound();
+    M2C_FIELD_V1(arg0, s32* , 0) = 0;
+    M2C_FIELD_V1(arg0, s32* , 4) = 0;
+    M2C_FIELD_V1(arg0, s32* , 8) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0xC) = timerGetFieldCount__Fv_nSound();
     temp_v0 = mathfRand__Fii_nSound(5, 0xA);
-    M2C_FIELD(arg0, s32* , 0x14) = 0;
-    M2C_FIELD(arg0, s32* , 0x10) = temp_v0;
-    M2C_FIELD(arg0, s32* , 0x18) = timerGetFieldCount__Fv_nSound();
-    M2C_FIELD(arg0, s32* , 0x1C) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x14) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x10) = temp_v0;
+    M2C_FIELD_V1(arg0, s32* , 0x18) = timerGetFieldCount__Fv_nSound();
+    M2C_FIELD_V1(arg0, s32* , 0x1C) = 0;
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", setPizzaManDead__13PizzaManSound);
@@ -429,8 +429,8 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019C758);
 s32 timerGetFieldCount__Fv_19C7A0() __asm__("timerGetFieldCount__Fv");
 
 void func_0019C7A0(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0xC) = 1;
-    M2C_FIELD(arg0, s32* , 0x10) = timerGetFieldCount__Fv_19C7A0();
+    M2C_FIELD_V1(arg0, s32* , 0xC) = 1;
+    M2C_FIELD_V1(arg0, s32* , 0x10) = timerGetFieldCount__Fv_19C7A0();
 }
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", updateTimedFireSound__14TimedFireSound);
@@ -461,9 +461,9 @@ M2C_UNK soundStopSound__FPUi_19CA18() __asm__("soundStopSound__FPUi");
 void func_0019CA18(void* arg0) {
     s32 temp_v1;
 
-    M2C_FIELD(arg0, s32* , 0x1C) = 0;
-    temp_v1 = M2C_FIELD(arg0, s32* , 0x10);
-    M2C_FIELD(arg0, s32* , 0x20) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x1C) = 0;
+    temp_v1 = M2C_FIELD_V1(arg0, s32* , 0x10);
+    M2C_FIELD_V1(arg0, s32* , 0x20) = 0;
     if ((temp_v1 != 0) && (temp_v1 != 0xFFFFFFFF)) {
         snd_SetReverbDepth_19CA18(3, 0, 0);
         soundStopSound__FPUi_19CA18(arg0 + 0x10);
@@ -552,40 +552,40 @@ void initLauncherSound__13LauncherSoundP8Launcher(void* arg0, s32 arg1) {
     s32 temp_v0;
     s32 temp_v0_2;
 
-    M2C_FIELD(arg0, s32* , 0x14) = 0;
-    M2C_FIELD(arg0, s32* , 0x170) = 0;
-    M2C_FIELD(arg0, s32* , 0x18) = 0;
-    M2C_FIELD(arg0, s32* , 0x1C) = 0;
-    M2C_FIELD(arg0, s32* , 0x20) = 0;
-    M2C_FIELD(arg0, s32* , 0x188) = 0;
-    M2C_FIELD(arg0, s32* , 0x158) = 0;
-    M2C_FIELD(arg0, s32* , 0x68) = 0;
-    M2C_FIELD(arg0, s32* , 0x80) = 0;
-    M2C_FIELD(arg0, s32* , 0x98) = 0;
-    M2C_FIELD(arg0, s32* , 0x38) = 0;
-    M2C_FIELD(arg0, s32* , 0x214) = arg1;
-    M2C_FIELD(arg0, s32* , 0) = timerGetFieldCount__Fv_uncher();
+    M2C_FIELD_V1(arg0, s32* , 0x14) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x170) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x18) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x1C) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x20) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x188) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x158) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x68) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x80) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x98) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x38) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x214) = arg1;
+    M2C_FIELD_V1(arg0, s32* , 0) = timerGetFieldCount__Fv_uncher();
     temp_v0 = timerGetFieldCount__Fv_uncher();
-    M2C_FIELD(arg0, s32* , 0x1A0) = 0;
-    M2C_FIELD(arg0, s32* , 0x1B8) = 0;
-    M2C_FIELD(arg0, s32* , 0x1D0) = 0;
-    M2C_FIELD(arg0, s32* , 0x1E8) = 0;
-    M2C_FIELD(arg0, s32* , 0xB0) = 0;
-    M2C_FIELD(arg0, s32* , 0xC8) = 0;
-    M2C_FIELD(arg0, s32* , 0x50) = 0;
-    M2C_FIELD(arg0, s32* , 0xE0) = 0;
-    M2C_FIELD(arg0, s32* , 0xC) = 0;
-    M2C_FIELD(arg0, s32* , 4) = temp_v0;
+    M2C_FIELD_V1(arg0, s32* , 0x1A0) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x1B8) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x1D0) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x1E8) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0xB0) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0xC8) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x50) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0xE0) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0xC) = 0;
+    M2C_FIELD_V1(arg0, s32* , 4) = temp_v0;
     temp_v0_2 = timerGetFieldCount__Fv_uncher();
-    M2C_FIELD(arg0, s32* , 0x10) = 0;
-    M2C_FIELD(arg0, s32* , 0xF8) = 0;
-    M2C_FIELD(arg0, s32* , 0x110) = 0;
-    M2C_FIELD(arg0, s32* , 0x128) = 0;
-    M2C_FIELD(arg0, s32* , 0x140) = 0;
-    M2C_FIELD(arg0, s32* , 0x210) = temp_v0_2;
-    M2C_FIELD(arg0, s32* , 0x204) = timerGetFieldCount__Fv_uncher();
-    M2C_FIELD(arg0, s32* , 0x208) = timerGetFieldCount__Fv_uncher();
-    M2C_FIELD(arg0, s32* , 0x20C) = timerGetFieldCount__Fv_uncher();
+    M2C_FIELD_V1(arg0, s32* , 0x10) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0xF8) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x110) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x128) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x140) = 0;
+    M2C_FIELD_V1(arg0, s32* , 0x210) = temp_v0_2;
+    M2C_FIELD_V1(arg0, s32* , 0x204) = timerGetFieldCount__Fv_uncher();
+    M2C_FIELD_V1(arg0, s32* , 0x208) = timerGetFieldCount__Fv_uncher();
+    M2C_FIELD_V1(arg0, s32* , 0x20C) = timerGetFieldCount__Fv_uncher();
 }
 
 #include "m2c_macros.h"

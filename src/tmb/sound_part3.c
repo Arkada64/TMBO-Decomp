@@ -20,11 +20,11 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A7
 s32 timerGetFieldCount__Fv_dState() __asm__("timerGetFieldCount__Fv");
 
 void setState__14StreamingSound18_ambientSoundState(void* arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32* , 0x40) = arg1;
+    M2C_FIELD_V1(arg0, s32* , 0x40) = arg1;
     if (arg1 == 0) {
-        M2C_FIELD(arg0, s32* , 0xC) = timerGetFieldCount__Fv_dState();
+        M2C_FIELD_V1(arg0, s32* , 0xC) = timerGetFieldCount__Fv_dState();
     } else if (arg1 == 3) {
-        M2C_FIELD(arg0, s32* , 8) = timerGetFieldCount__Fv_dState();
+        M2C_FIELD_V1(arg0, s32* , 8) = timerGetFieldCount__Fv_dState();
     }
 }
 
