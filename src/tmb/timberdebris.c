@@ -39,7 +39,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/timberdebris", func_001A
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/timberdebris", BlowDebris__16TimberDebrisPoolP12DestructiblefP8_fvectorP10TakeHitDat);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/timberdebris", func_001ACA28);
+#include "m2c_macros.h"
+void* func_001ACA28(void* arg0) {
+    if ((M2C_FIELD(arg0, s32* , 0) & 0xFFFC0000) == 0x68280000) {
+        return M2C_FIELD(arg0, void** , 0x20);
+    }
+    return arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/timberdebris", Init__12TimberDebrisP12Destructible);
 
