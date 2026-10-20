@@ -40,9 +40,37 @@ void func_001A6620(s32* arg0) {
     }
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_sound_49", func_001A6688);
+#include "m2c_macros.h"
+void func_001A6688(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    if (M2C_FIELD(arg0, s32* , 8) != arg1) {
+        M2C_FIELD(arg0, s32* , 8) = arg1;
+        M2C_FIELD(arg0, s32* , 4) = (s32) (M2C_FIELD(arg0, s32* , 4) | 1);
+    }
+    if (M2C_FIELD(arg0, s32* , 0xC) != arg2) {
+        M2C_FIELD(arg0, s32* , 0xC) = arg2;
+        M2C_FIELD(arg0, s32* , 4) = (s32) (M2C_FIELD(arg0, s32* , 4) | 4);
+    }
+    if (M2C_FIELD(arg0, s32* , 0x14) != arg3) {
+        M2C_FIELD(arg0, s32* , 0x14) = arg3;
+        M2C_FIELD(arg0, s32* , 4) = (s32) (M2C_FIELD(arg0, s32* , 4) | 0x10);
+    }
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_sound_49", func_001A66E8);
+#include "m2c_macros.h"
+void func_001A66E8(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    if (M2C_FIELD(arg0, s32* , 8) != arg1) {
+        M2C_FIELD(arg0, s32* , 8) = arg1;
+        M2C_FIELD(arg0, s32* , 4) = (s32) (M2C_FIELD(arg0, s32* , 4) | 1);
+    }
+    if (M2C_FIELD(arg0, s32* , 0xC) != arg2) {
+        M2C_FIELD(arg0, s32* , 0xC) = arg2;
+        M2C_FIELD(arg0, s32* , 4) = (s32) (M2C_FIELD(arg0, s32* , 4) | 4);
+    }
+    if (M2C_FIELD(arg0, s32* , 0x10) != arg3) {
+        M2C_FIELD(arg0, s32* , 0x10) = arg3;
+        M2C_FIELD(arg0, s32* , 4) = (s32) (M2C_FIELD(arg0, s32* , 4) | 8);
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_sound_49", func_001A6748);
 
