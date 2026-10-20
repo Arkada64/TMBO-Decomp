@@ -11,13 +11,6 @@ void func_001625F0(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
         func_00166808(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438));
     }
 }
-//@@ func_00162670 m2c
-#include "m2c_macros.h"
-extern M2C_UNK D_00313D70;
-
-void func_00162670(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    strcpy(&D_00313D70, arg3 + 0x15);
-}
 //@@ func_00162698 m2c
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
@@ -245,6 +238,7 @@ extern M2C_UNK D_004F9C28;
 extern M2C_UNK D_004F9C30;
 
 void func_00162F00(void* arg0) {
+    u8 sp[0x100];
     s32 var_a0;
     s32 var_s0;
 
@@ -272,6 +266,7 @@ extern M2C_UNK D_004F9C28;
 extern M2C_UNK D_004F9C30;
 
 void func_00162FA0(s32 arg0) {
+    u8 sp[0x100];
     s32 var_a0;
     s32 var_s0;
 
@@ -379,6 +374,7 @@ extern s32 D_004F9C84;
 extern M2C_UNK func_00163040;
 
 void func_00163278(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s32 temp_a2;
@@ -614,6 +610,7 @@ void func_00163CE0(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
 extern M2C_UNK D_002C1690;
 
 void func_00163D48(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x120];
     M2C_UNK sp18;
 
     func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
@@ -642,6 +639,7 @@ void func_00163DC8(void* arg0) {
 //@@ func_00163E00 m2c
 #include "m2c_macros.h"
 void func_00163E00(s32* arg0, s32 arg1) {
+    u8 sp[0x10];
     s32 sp4;
     s32 sp8;
 
@@ -661,11 +659,6 @@ void func_00163E00(s32* arg0, s32 arg1) {
         } while (*arg0 == 0);
     }
     *arg0 = 0;
-}
-//@@ func_00163EB8 m2c
-#include "m2c_macros.h"
-void func_00163EB8(void* arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32* , 4) = arg1;
 }
 //@@ func_00163EC0 m2c
 #include "m2c_macros.h"
@@ -832,13 +825,6 @@ s32 func_00164B60(void* arg0, s32 arg1, M2C_UNK arg2, M2C_UNK arg3) {
     }
     return 0;
 }
-//@@ func_00164F68 m2c
-#include "m2c_macros.h"
-void func_00164F68(void* arg0, s32 arg1, s32 arg2) {
-    strcpy(arg0 + 0x525C4, arg0 + 0xC);
-    M2C_FIELD(arg0, s32* , 0x525D8) = arg1;
-    strcpy(arg0 + 0x525DC, arg2);
-}
 //@@ func_00164FD8 m2c
 #include "m2c_macros.h"
 M2C_UNK* func_00164FD8(void* arg0) {
@@ -943,6 +929,7 @@ extern M2C_UNK func_001625E8;
 extern M2C_UNK func_001625F0;
 
 void func_001653D8(void) {
+    u8 sp[0x30];
     M2C_UNK sp20;
 
     func_00259A58(sp, &sp20, &func_001625F0, 0x7530, 0x7530);
@@ -953,6 +940,7 @@ extern u16 D_004F9C40;
 extern M2C_UNK func_00162670;
 
 void func_00165430(s32 arg0) {
+    u8 sp[0x30];
     M2C_UNK sp15;
 
     strcpy(&sp15, arg0 + 0xC);
@@ -967,6 +955,7 @@ extern s32 D_00319924;
 extern M2C_UNK func_001626F8;
 
 s32 func_001658E8(s32* arg0) {
+    u8 sp[0x20];
     s32 temp_v0;
 
     func_0025BD88(arg0 + 0xC, 0x35, sp);
@@ -988,6 +977,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_00162778;
 
 s32 func_00165998(s32* arg0) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 temp_s0;
     s32 temp_v0;
@@ -1010,6 +1000,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_001627B0;
 
 s32 func_00165A38(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x70];
     M2C_UNK sp15;
     M2C_UNK sp26;
     M2C_UNK sp46;
@@ -1036,6 +1027,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_001628E0;
 
 s32 func_00165B08(s32* arg0) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 temp_s0;
     s32 temp_v0;
@@ -1058,6 +1050,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_00162918;
 
 s32 func_00165BA8(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x70];
     M2C_UNK sp15;
     s32 sp28;
     M2C_UNK sp2C;
@@ -1086,6 +1079,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_00162950;
 
 s32 func_00165C80(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x70];
     M2C_UNK sp15;
     M2C_UNK sp26;
     M2C_UNK sp46;
@@ -1112,6 +1106,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_00162988;
 
 s32 func_00165D50(s32* arg0, s32 arg1) {
+    u8 sp[0x50];
     M2C_UNK sp15;
     M2C_UNK sp26;
     s32 temp_s0;
@@ -1136,6 +1131,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_001629C0;
 
 s32 func_00165E08(void* arg0, s32 arg1) {
+    u8 sp[0x50];
     M2C_UNK sp15;
     M2C_UNK sp26;
     s32 temp_s0;
@@ -1162,6 +1158,7 @@ s32 func_00165E08(void* arg0, s32 arg1) {
 //@@ func_00165ED0 m2c
 #include "m2c_macros.h"
 void func_00165ED0(s32 arg0, s32 arg1) {
+    u8 sp[0x20];
     strcpy(sp, arg0 + 0xC);
     func_0025A184(sp, arg1);
 }
@@ -1170,6 +1167,7 @@ void func_00165ED0(s32 arg0, s32 arg1) {
 extern M2C_UNK func_00162A00;
 
 s32 func_00165F08(s32* arg0, s32 arg1) {
+    u8 sp[0x70];
     M2C_UNK sp15;
     s32 sp28;
     M2C_UNK sp2C;
@@ -1196,6 +1194,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_00162A38;
 
 s32 func_00165FB0(void* arg0) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s32 temp_s0;
@@ -1221,6 +1220,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_00162AB0;
 
 s32 func_00166060(void* arg0) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s32 temp_s0;
@@ -1245,6 +1245,7 @@ s32 func_00166060(void* arg0) {
 extern M2C_UNK func_00163200;
 
 s32 func_00166110(s32* arg0) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s32 temp_s0;
@@ -1274,6 +1275,7 @@ extern s32 D_004F9C84;
 extern M2C_UNK func_00163278;
 
 void func_00166190(void* arg0, s16 arg1) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s16 sp2C;
@@ -1305,6 +1307,7 @@ void func_00166190(void* arg0, s16 arg1) {
 extern M2C_UNK func_00163560;
 
 void func_00166280(void* arg0, s32 arg1) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s32 temp_s0;
@@ -1323,6 +1326,7 @@ void func_00166280(void* arg0, s32 arg1) {
 extern M2C_UNK func_00163658;
 
 void func_001662F8(void* arg0, s32 arg1) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s32 temp_s0;
@@ -1341,6 +1345,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_00163708;
 
 s32 func_00166368(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0xB0];
     M2C_UNK sp15;
     s32 sp28;
     s32 sp2C;
@@ -1387,6 +1392,7 @@ extern M2C_UNK D_002C1690;
 extern M2C_UNK func_00163778;
 
 s32 func_00166478(s32* arg0, s32 arg1) {
+    u8 sp[0x70];
     M2C_UNK sp15;
     M2C_UNK sp26;
     s32 sp68;
@@ -1413,6 +1419,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_001638C0;
 
 s32 func_00166528(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x80];
     M2C_UNK sp15;
     s32 sp28;
     M2C_UNK sp2C;
@@ -1441,6 +1448,7 @@ extern M2C_UNK D_004F9C48;
 extern M2C_UNK D_004F9C50;
 
 void func_00166600(s32 arg0, s32 arg1) {
+    u8 sp[0x80];
     strcpy(sp, arg0 + 0xC);
     func_0025B9D0(sp, &D_004F9C50, &D_004F9C50, M2C_FIELD(&D_004F9C48, u8* , 4), arg1, M2C_FIELD(&D_004F9C48, s32* , 0), M2C_FIELD(&D_004F9C48, u8* , 4), M2C_FIELD(&D_004F9C50, s32* , 0), M2C_FIELD(&D_004F9C50, u16* , 4), M2C_FIELD(&D_004F9C50, u8* , 6), 0x3E8);
 }
@@ -1450,6 +1458,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_001639F8;
 
 s32 func_00166678(s32* arg0, s32 arg1) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s32 sp2C;
@@ -1476,6 +1485,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_00163A58;
 
 s32 func_00166730(s32* arg0, s32 arg1) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s32 temp_s0;
@@ -1494,16 +1504,12 @@ s32 func_00166730(s32* arg0, s32 arg1) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_001667E0 m2c
-#include "m2c_macros.h"
-void func_001667E0(s32 arg0) {
-    func_0025B938(arg0 + 0x52444);
-}
 //@@ func_00166808 m2c
 #include "m2c_macros.h"
 extern M2C_UNK func_00163B00;
 
 void func_00166808(s32 arg0, s32 arg1) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s32 temp_s0;
@@ -1520,6 +1526,7 @@ extern s32 D_002C1694;
 extern M2C_UNK func_00163CE0;
 
 s32 func_00166868(s32 arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s32 temp_s0;
@@ -1537,16 +1544,12 @@ s32 func_00166868(s32 arg0, s32 arg1, s32 arg2) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00166918 m2c
-#include "m2c_macros.h"
-void func_00166918(s32 arg0) {
-    func_0025B8AC(arg0 + 0x525C4);
-}
 //@@ func_00166940 m2c
 #include "m2c_macros.h"
 extern M2C_UNK func_00163D48;
 
 void func_00166940(s32 arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x30];
     M2C_UNK sp15;
     s32 sp28;
     s32 temp_s0;
@@ -1557,21 +1560,13 @@ void func_00166940(s32 arg0, s32 arg1, s32 arg2) {
     sp28 = arg2;
     func_0025B130(sp, &func_00163D48);
 }
-//@@ func_001669A0 m2c
-#include "m2c_macros.h"
-extern s32 D_002C1698;
-
-void func_001669A0(s32 arg0, s32 arg1) {
-    if ((arg1 == 0xFFFF) && (arg0 != 0)) {
-        D_002C1698 = -1;
-    }
-}
 //@@ netMsgWorldEventHandler m2c
 #include "m2c_macros.h"
 extern void* D_004FA030;
 extern s32 D_004FA038;
 
 s32 netMsgWorldEventHandler(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x20];
     u32* sp10;
     s32 temp_a1;
     s32 temp_v0;
@@ -1942,6 +1937,7 @@ extern M2C_UNK D_004F9D10;
 extern s32 D_004F9D94;
 
 void func_00168F30(s32 arg0, s32 arg1) {
+    u8 sp[0x70];
     s32 sp10;
     M2C_UNK sp44;
     s32 sp54;
@@ -2091,6 +2087,7 @@ extern s32 D_004F9D18;
 extern void* D_004FA030;
 
 void netObjDestroyCB(s32 arg0, s32 arg1) {
+    u8 sp[0x90];
     M2C_UNK sp80;
     f32* temp_a0_2;
     f32* temp_a0_3;
@@ -2798,6 +2795,7 @@ extern void* D_004FA030;
 static M2C_UNK D_004E6BB0;                          /* unable to generate initializer: unknown type; const */
 
 void func_0016C590(s32 arg0, s32 arg1) {
+    u8 sp[0x10];
     s32 temp_s0;
 
     temp_s0 = func_001733F8(&D_003156C0);
@@ -3386,17 +3384,6 @@ s32 func_0016D4F8(void* arg0, s32 arg1) {
         return var_v0;
     }
 }
-//@@ func_0016D638 m2c
-#include "m2c_macros.h"
-s32 func_0016D638(void* arg0) {
-    printf("Taking down the RTime Interface...\n");
-    func_0028B414();
-    func_00259D38();
-    func_0026E4E8();
-    M2C_FIELD(arg0, s32* , 0x1BBC) = 0;
-    M2C_FIELD(arg0, s32* , 0x1BB8) = 4;
-    return 0;
-}
 //@@ func_0016D690 m2c
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
@@ -3433,22 +3420,6 @@ s32 func_0016D690(void* arg0) {
     var_v0 = (temp_v1 >= M2C_FIELD(&D_003156C0, s32* , 0x42C8)) ? -1 : M2C_FIELD(&D_003156C0, s32* , 0x42C8);
     return var_v0;
 }
-//@@ func_0016D7C0 m2c
-#include "m2c_macros.h"
-void func_0016D7C0(s32 arg0) {
-    func_0016D638();
-    func_0016D338(arg0);
-}
-//@@ func_0016D7F0 m2c
-#include "m2c_macros.h"
-s32 func_0016D7F0(void* arg0) {
-    return M2C_FIELD(arg0, s32* , 0x4258);
-}
-//@@ func_0016D7F8 m2c
-#include "m2c_macros.h"
-s32 func_0016D7F8(void* arg0) {
-    return M2C_FIELD(arg0, s32* , 0x4278);
-}
 //@@ func_0016D800 m2c
 #include "m2c_macros.h"
 s32 func_0016D800(void* arg0, s32 arg1) {
@@ -3459,11 +3430,6 @@ s32 func_0016D800(void* arg0, s32 arg1) {
         return 0;
     }
     return (arg1 * 0x68) + temp_v1 + 0x38;
-}
-//@@ func_0016D828 m2c
-#include "m2c_macros.h"
-s32 func_0016D828(void) {
-    return 1;
 }
 //@@ netInitDme m2c
 #include "m2c_macros.h"
@@ -3509,6 +3475,7 @@ extern M2C_UNK netWeaponDestroyCB;
 extern M2C_UNK netWeaponUpdateCB;
 
 s32 netInitDme(void) {
+    u8 sp[0xA50];
     M2C_UNK sp1;
     u8 sp100;
     M2C_UNK sp101;
@@ -3806,6 +3773,7 @@ extern M2C_UNK D_004F9D70;
 extern M2C_UNK D_004F9D78;
 
 void func_0016E6F8(s32 arg0) {
+    u8 sp[0x10];
 loop_1:
     WaitSema(arg0);
     if (D_004F9D64 & 1) {
@@ -3835,6 +3803,7 @@ extern M2C_UNK func_0016E6D8;
 extern M2C_UNK func_0016E6F8;
 
 s32 func_0016E7D0(s32 arg0) {
+    u8 sp[0x50];
     M2C_UNK sp30;
     s32 sp34;
     s32 sp38;
@@ -3860,12 +3829,6 @@ s32 func_0016E7D0(s32 arg0) {
         return -1;
     }
     return -1;
-}
-//@@ func_0016E8B8 m2c
-#include "m2c_macros.h"
-s32 func_0016E8B8(s32 arg0) {
-    func_0016E8E0();
-    return arg0;
 }
 //@@ func_0016E8E0 m2c
 #include "m2c_macros.h"
@@ -3905,11 +3868,6 @@ void* func_0016E9A0(void* arg0) {
     M2C_FIELD(arg0, s32* , 0x80) = -1;
     return arg0;
 }
-//@@ func_0016EB70 m2c
-#include "m2c_macros.h"
-void func_0016EB70(void* arg0) {
-    M2C_FIELD(arg0, s32* , 0x768) = 0;
-}
 //@@ func_0016EB78 m2c
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
@@ -3934,16 +3892,6 @@ void func_0016EB78(void) {
             } while (var_s0 < M2C_FIELD(&D_003156C0, s32* , 0x1980));
         }
         D_004F9DD8 = temp_v0;
-    }
-}
-//@@ func_0016EC18 m2c
-#include "m2c_macros.h"
-extern s32 D_00319924;
-extern M2C_UNK func_00168F30;
-
-void func_0016EC18(void) {
-    if (D_00319924 == 0) {
-        func_002693D8(&func_00168F30);
     }
 }
 //@@ func_0016EC50 m2c
@@ -4045,11 +3993,6 @@ void func_0016EE60(void* arg0, s32 arg1, s32 arg2, M2C_UNK arg3) {
         break;
     }
 }
-//@@ func_0016EF88 m2c
-#include "m2c_macros.h"
-s32 func_0016EF88(s32 arg0) {
-    return arg0 + 0x1218;
-}
 //@@ func_0016EF90 m2c
 #include "m2c_macros.h"
 extern M2C_UNK D_004F9E38;
@@ -4077,6 +4020,7 @@ extern M2C_UNK D_004E79C0;
 extern s32 D_004FA030;
 
 s32 func_0016F058(void* arg0, s32 arg1, M2C_UNK arg2) {
+    u8 sp[0x180];
     M2C_UNK sp1;
     M2C_UNK sp100;
     s32* temp_s2;
@@ -4186,16 +4130,6 @@ s32 func_0016F1C8(s32 arg0, s32 arg1) {
     func_00176EA0(arg0);
     return arg1;
 }
-//@@ func_0016F478 m2c
-#include "m2c_macros.h"
-s32 func_0016F478(s32 arg0, s32 arg1) {
-    return arg1;
-}
-//@@ func_0016F480 m2c
-#include "m2c_macros.h"
-s32 func_0016F480(s32 arg0, s32 arg1) {
-    return arg1;
-}
 //@@ func_0016F718 m2c
 #include "m2c_macros.h"
 extern M2C_UNK D_004E7BC8;
@@ -4216,6 +4150,7 @@ extern M2C_UNK func_0016C480;
 extern M2C_UNK func_0016C590;
 
 s32 func_0016F718(void* arg0, s32 arg1) {
+    u8 sp[0x40];
     M2C_UNK sp20;
     M2C_UNK sp30;
     s32 temp_s2;
@@ -4263,6 +4198,7 @@ extern s32 D_004F9EB4;
 extern s32 D_004F9EB8;
 
 s32 func_0016F910(void* arg0, s32* arg1) {
+    u8 sp[0x10];
     s32 temp_s0;
     s32 temp_s1;
 
@@ -4306,6 +4242,7 @@ extern M2C_UNK D_004E7BC8;
 extern s32 D_004F9EB4;
 
 s32 func_0016FA30(void* arg0) {
+    u8 sp[0x100];
     s32 spF0;
     s32 spF4;
     s32 spF8;
@@ -4393,6 +4330,7 @@ extern M2C_UNK D_004E7E08;
 extern M2C_UNK D_004E7E30;
 
 void func_0016FD68(void* arg0) {
+    u8 sp[0x10];
     if (M2C_FIELD(arg0, s32* , 0x2CF0) >= 0) {
         if (M2C_FIELD(arg0, s32* , 0x2E90) == 0) {
             func_00165ED0(&D_002C1690, 2);
@@ -4453,6 +4391,7 @@ extern s32 D_004F9E50;
 extern M2C_UNK func_00168FB8;
 
 void func_001703E8(M2C_UNK* arg0) {
+    u8 sp[0x50];
     M2C_UNK sp20;
     M2C_UNK sp40;
     s32 sp44;
@@ -4573,6 +4512,7 @@ extern s32 D_004F9D18;
 extern s32 D_004F9DE4;
 
 void func_00170760(s32 arg0, void* arg1) {
+    u8 sp[0x10];
     s32 sp4;
     s16 var_a1;
     s32 temp_a0_2;
@@ -5213,6 +5153,7 @@ block_7:
 //@@ func_00171B78 m2c
 #include "m2c_macros.h"
 void func_00171B78(void* arg0, M2C_UNK arg1) {
+    u8 sp[0xF0];
     M2C_UNK sp18;
     s8 sp27;
     f32 sp30;
@@ -5239,6 +5180,7 @@ void func_00171B78(void* arg0, M2C_UNK arg1) {
 extern s32 D_004F9D80;
 
 void func_00171C08(void* arg0) {
+    u8 sp[0x60];
     s8 sp50;
     s32 temp_a2;
     s32 var_s0;
@@ -5261,6 +5203,7 @@ loop_1:
 extern s32 D_004F9D88;
 
 s32 netSendSessionMsg(void* arg0, s32 arg1, s32* arg2) {
+    u8 sp[0x10];
     s32 temp_v0;
     s32 temp_v0_2;
     s32 temp_v1;
@@ -5317,6 +5260,7 @@ extern s32 D_004F9D98;
 extern s32 D_004FA030;
 
 s32 func_00171F88(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x190];
     s32 sp14;
     s32 sp18;
     s32 sp1C;
@@ -5459,16 +5403,6 @@ s32 func_001722C0(void* arg0) {
     sprintf(temp_s1, "[USER_NAME] %s\n[USER_CAR] %d\n[GAME_NAME] %s\n", arg0 + 0x1998, M2C_FIELD(arg0, s32* , 0x1A34));
     return 1;
 }
-//@@ func_00172320 m2c
-#include "m2c_macros.h"
-s32 func_00172320(s32 arg0) {
-    s32 temp_s1;
-
-    temp_s1 = arg0 + 0x1CC8;
-    memset(temp_s1, 0, 0x1000);
-    sprintf(temp_s1, "[MEDIUS_ACCOUNT] %s\n[MEDIUS_PASSWORD] %s\n", arg0 + 0x14AC, arg0 + 0x14EC);
-    return 1;
-}
 //@@ func_00172A10 m2c
 #include "m2c_macros.h"
 extern s8* D_004FB4F0;
@@ -5505,16 +5439,6 @@ block_8:
         goto loop_5;
     }
     return D_004FB4F0;
-}
-//@@ func_00172A80 m2c
-#include "m2c_macros.h"
-s32 func_00172A80(void) {
-    return 1;
-}
-//@@ func_00172A88 m2c
-#include "m2c_macros.h"
-s32 func_00172A88(void) {
-    return 0;
 }
 //@@ func_00172A90 m2c
 #include "m2c_macros.h"
@@ -5866,23 +5790,10 @@ loop_1:
     }
     M2C_FIELD(temp_v0_2, s8* , 0x1B) = temp_v0;
 }
-//@@ func_00173340 m2c
-#include "m2c_macros.h"
-void func_00173340(void* arg0, s32 arg1, M2C_UNK arg2) {
-    if ((((u32) *M2C_FIELD(arg0, u32** , 0x3148) >> 1) & 0xF) == 4) {
-        if (func_001734B8(arg0) != 0) {
-            func_00172FE8(arg0, arg1, arg2, -1);
-        }
-    }
-    if ((((u32) *M2C_FIELD(arg0, u32** , 0x3148) >> 1) & 0xF) == 8) {
-        if (func_001734B8(arg0) != 0) {
-            func_00172FE8(arg0, arg1, arg2, M2C_FIELD(((arg1 * 0x220) + arg0), s32* , 0x14));
-        }
-    }
-}
 //@@ func_001734B8 m2c
 #include "m2c_macros.h"
 s32 func_001734B8(void* arg0) {
+    u8 sp[0x10];
     s32 var_v0;
 
     var_v0 = 0;
@@ -5894,6 +5805,7 @@ s32 func_001734B8(void* arg0) {
 //@@ func_00173500 m2c
 #include "m2c_macros.h"
 s32 func_00173500(void* arg0) {
+    u8 sp[0x10];
     s32 temp_v0;
 
     temp_v0 = func_001733F8();
@@ -6077,6 +5989,7 @@ s32 func_00173880(void* arg0, void* arg1) {
 extern s32 D_004F9C9C;
 
 void func_00173BE8(s32 arg0, M2C_UNK arg1) {
+    u8 sp[0x50];
     if (D_004F9C9C == 0) {
         netSendGameEvent(arg0, arg1, sp, timerGetCurTics__Fv());
         D_004F9C9C = 1;
@@ -6087,6 +6000,7 @@ void func_00173BE8(s32 arg0, M2C_UNK arg1) {
 extern M2C_UNK D_004E7E70;
 
 void func_00173C50(void* arg0) {
+    u8 sp[0x50];
     netGetMyClientIndex();
     if (func_001734B8(arg0) != 0) {
         M2C_FIELD(arg0, s32* , 0x307C) = (s32) subroutine_arg0;
@@ -6104,6 +6018,7 @@ void func_00173C50(void* arg0) {
 extern s32 D_003188E0;
 
 s32 func_00173D08(void* arg0, s32 arg1) {
+    u8 sp[0x60];
     f32 var_f0;
     s32 temp_a0;
     s32 var_s4;
@@ -7002,6 +6917,7 @@ block_53:
 extern M2C_UNK D_003156C0;
 
 s32 func_00176B10(void* arg0, s32 arg1) {
+    u8 sp[0x10];
     s32 var_s0;
     s32 var_s0_2;
     s32 var_s2;
@@ -7039,6 +6955,7 @@ s32 func_00176B10(void* arg0, s32 arg1) {
 //@@ func_00176C20 m2c
 #include "m2c_macros.h"
 s8 func_00176C20(void* arg0) {
+    u8 sp[0x10];
     s32 var_s0;
     s8 var_s1;
 
@@ -7062,6 +6979,7 @@ extern M2C_UNK D_003156C0;
 extern M2C_UNK D_004E7E70;
 
 s32 func_00176CC8(void* arg0) {
+    u8 sp[0x10];
     s32 temp_s2;
     s32 temp_v0;
     void* temp_a0;
@@ -7186,20 +7104,4 @@ block_17:
             }
         }
     }
-}
-//@@ func_00177078 m2c
-#include "m2c_macros.h"
-extern M2C_UNK D_003156C0;
-
-void func_00177078(s32 arg0, s32 arg1) {
-    if (arg1 == 0xFFFF) {
-        if (arg0 != 0) {
-            func_0016EC50(&D_003156C0);
-        }
-    }
-}
-//@@ func_001770A8 m2c
-#include "m2c_macros.h"
-void func_001770A8(void) {
-    func_00177078(1, 0xFFFF);
 }

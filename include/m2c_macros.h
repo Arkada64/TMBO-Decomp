@@ -6,4 +6,9 @@
 typedef s32 M2C_UNK;
 #define M2C_FIELD(expr, type, offset) (*(type*)((u8*)(expr) + (offset)))
 #define M2C_BITWISE(type, expr) ((type)(expr))
+#ifndef NULL
+#define NULL 0
+#endif
+typedef float f32;
+typedef double f64;
 #endif

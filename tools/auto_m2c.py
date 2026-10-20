@@ -45,6 +45,15 @@ for asmdir, name in items:
         full = ", ".join(nums.get(i, f"s32 arg{i}") for i in range(max(nums) + 1))
         return f"{m.group(1)}({full}) {{"
     body = re.sub(rf"^(.*\b{re.escape(name)})\((.*)\) \{{", fill, body, count=1, flags=re.M)
+    # bare `sp` = address of a local buffer at the bottom of the frame: declare it, sized from
+    # the frame minus the 16-byte register save slots
+    if re.search(r"\bsp\b", body) and not re.search(r"\bsp\[", body):
+        frame = re.search(r"addiu\s+\$29, \$29, -(0x[0-9A-F]+)", t)
+        saves = len(re.findall(r"\bsq\s+\$\d+, 0x[0-9A-F]+\(\$29\)", t))
+        if frame and int(frame.group(1), 16) - 16 * saves > 0:
+            body = re.sub(rf"^(.*\b{re.escape(name)}\(.*\) \{{)$",
+                          lambda m: m.group(1) + f"\n    u8 sp[0x{int(frame.group(1), 16) - 16 * saves:X}];",
+                          body, count=1, flags=re.M)
     blocks.append(f"//@@ {name} m2c\n#include \"m2c_macros.h\"\n" + body + "\n")
     stats["ok"] += 1
 out.write_text("".join(blocks))
