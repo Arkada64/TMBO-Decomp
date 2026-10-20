@@ -29,6 +29,10 @@ for name, codes in variants.items():
         print(f"{name} v{i + 1}: {'MATCH' if ok else 'no' + (' (' + err[0][:120] + ')' if err else '')}", flush=True)
         if ok: break
     if ok: kept.append(name)
-    else: src.write_text(before); failed.append(name)
+    else:
+        # show where the last variant differs (function start is unaffected by later size changes)
+        d = subprocess.run(["python3", "tools/funcdiff.py", name], capture_output=True, text=True).stdout
+        print("\n".join([l for l in d.splitlines() if l.lstrip().startswith(">>")][:10]))
+        src.write_text(before); failed.append(name)
 ok, _ = build_matches()
 print(f"\nkept {len(kept)}: {kept}\nnot matched {len(failed)}: {failed}\nfinal build byte-identical: {ok}")
