@@ -26576,7 +26576,7 @@
         },
         {
           "name": ".rodata",
-          "size": "56",
+          "size": "49",
           "metadata": {
             "virtual_address": "5188592"
           }
