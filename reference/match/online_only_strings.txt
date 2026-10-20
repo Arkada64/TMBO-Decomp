@@ -1,0 +1,331 @@
+0x001054E8: IOPCommandNoWait: BUFFER %d FULL(%d)! Sound stalled waiting
+0x00108618: IOPCommandNoWait: BUFFER %d FULL(%d)! Sound stalled waiting
+0x00109DD0: TM:B Online
+0x00109F48: MSAR->ConnectInfo.aAccessKey | appmgcl.cpp | tuvwxyz{}
+0x0010A380: Back from MGCLCreateGameOnMeRequest\n | Calling MGCLCreateGameOnMeRequest\n | Coming back from the callback %d\n | Waiting for the callback\n
+0x0010A7E0: AHHHHH..... My State = %d\n
+0x0010ABF0: MGCL ERROR: API Call Failed %d\n
+0x0010C520: \PTS\SUBURB.PTS;1
+0x001109A0: 10AttractPed
+0x0011A550: Artifacts Enabled: Setting up %d Artifacts\n
+0x0011A860: Found the collector Teleport Visual\n | Found the collector Visual\n
+0x0011ADE8: Please wait, Network hesitation\n
+0x0011B948: QRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{} | defghijklmnopqrstuvwxyz{} | this is a pass request\n
+0x0011C150: Shake Damage Changing from %d -  | to %d  I have max damage of %d\n
+0x00127188: DB: We should not get here!!!!!!\n  Old Function Being Calle
+0x00127330: DB: Adding an Animation Manager for file %d\n
+0x001274D0: DB: Adding an Animation Manager for file %d\n
+0x001334C0: defghijklmnopqrstuvwxyz{} | tuvwxyz{}
+0x0013A9E0: Setting vehicle %d to AI car %d (%s)\n
+0x0013B228: Axel     | Charger  | CopSUV   | Derby    | Hearse   | Loader
+0x001435D0: \PTS\SUBURB.HPT;1
+0x001475F8:  K:   %3d |  L:   %3d |  T:%3d:%02d | %d/+%d | %d/+0 | %d/-%d
+0x00149D08: %s  %i  | %s (%i)
+0x0014E708:  COMMITTED SUICIDE |  KILLED BY  | UNKNOWN
+0x00161508: cdrom0:\NET\EZNETCNF.IRX;1
+0x00161548: cdrom0:\NET\EZNETCTL.IRX;1
+0x00161868: `abcdefghijklmnopqrstuvwxyz{|}~ | tuvwxyz{}
+0x001626F8: ERROR
+0x00162B20: !!!!     Ping Counter < 0  (%d)  !!!!\n | !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n | 456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmno | VWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}
+0x00162F00: IP:
+0x00162FA0: IP:
+0x00163040: !!!!     Ping Counter < %d (%d)  !!!!\n | !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n | Game %s not found in the current temp list\n | No IP address found for game %s\n
+0x00163200: %d TOTAL GAMES\n
+0x00163278: End of List = %d\n | End of List = %d (Server Error - Aborted List)\n | List Stats: Count:%d, Ready:%d, TimedOut:%d, NoPing:%d, Toss | Reached the end of this page. Games read %d\n | Received a GameListResponse for a game not in this page.\n
+0x00163658: PlayerListHandler() called <<<%s>>>   <<<%s>>>)\n
+0x00163778: ApplicationID %d\n | ApplicationName %s\n | EndOfList %c\n | FindWorldByName response\n | Game World found with id %d\n | MediusWorldID %d\n
+0x00163B00: In GetAndSendWorldReportHandler()\n gameLevel %d\n skillLeve | MEDIUS ERROR: Bad Game Info Returned\n | new stats %s\n | replacing IP addy %s\n
+0x00163EC0: Throwing away No-Info Game %s\n
+0x001641B8: Policy array full. Further policy information not stored\n
+0x00164FD8: Bad Connection or Server Down | Extra TM:B ONLINE Callback Status | TM:B ONLINE Account Already Exists | TM:B ONLINE Account Logged In | TM:B ONLINE Account Not Found | TM:B ONLINE Already Leader Of Clan
+0x00165430: Session Key = %s\n | Trying to request the server version\n
+0x00165498:     Already connected... Disconnecting() so we can try again | Calling Medius Connect\n | Connected to %s:%s #%d \n | MediusConnect did not return an error, but callback != succe | MediusConnect returned an error, %d\n
+0x00165620:     Already connected... Disconnecting() so we can try again | Calling Medius Connect\n | Connected to server successfully\n | MediusConnect did not return an error, but callback != succe | MediusConnect returned an error, %d\n
+0x00166190: Get Available Games - Page:%d PageSize:%d ListSize:%d\n
+0x00166600: BLUE | JUNIOR
+0x00166A68:      This game has been Terminated\n | ------------------------------------------\n | --------------------------------------------\n | >>>>> 4 Setting ConnectionSessionMaster = %d\n | >>>>> 5 Setting ConnectionSessionMaster = %d\n | >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n
+0x00167018: EEK!  I AM NOT READY YET FOR CLIENT %d!!!\n | NETWORK WARNING: NET_AXLE_SPECIAL_DAMAGE ignored because giv | NETWORK WARNING: NET_DS_SPECIAL_DAMAGE ignored because giver
+0x00168B60: Client %d Connecting on Connection %d from IP %s\n
+0x00168C30: NETWORK: Checking for New Session Master\n
+0x00168F30: 0.0.0.0
+0x00169308: NETCALLBACK: Unknown Object Type received %d\n
+0x0016AA50: %s has left the game.
+0x0016C590: --------------------------------------------\n | >>>>> 6 Setting ConnectionSessionMaster = %d\n | I think I am the new session master so tell everyone\n | In HostChangeCallback...\n | NETWORK: Checking for New Session Master\n
+0x0016C748: cdrom0:\NET\NETCNF.IRX;1 | icon=cdrom0:\NET\SYS_NET.ICO
+0x0016C7D0: \nNETINIT: Reading the Network Configuration Files\n |             | ...Done Listing Configurations.\n\n | NETINIT: Configuration #%d\n | NETINIT: Configuration Count = %d\n | NETINIT: Default Configuration = %d\n
+0x0016CA88:     Using a USB Network Adapter\n |     Using the Sony Duel Network Adapter\n |  .0123456789 | NETINIT: Evaluating the Network Configuration %d...\n
+0x0016CB90: ERROR: No Config File on the Mem Card - cannot play a networ
+0x0016CD88: -decode | -no_auto | cdrom0:\NET\AN986.IRX;1 | cdrom0:\NET\CXTMDM.IRX;1 | cdrom0:\NET\DEV9.IRX;1 | cdrom0:\NET\INET.IRX;1
+0x0016D238: (ID=%d:%d) state %d, link %d, Message:[%s]\n | NETINIT: ezNetCtlSetProperties returned %d\n | NETINIT: ezNetCtlUpInterface returned %d\n
+0x0016D338: NETINIT: Taking down the Network Interface...\n | NETINIT: ezNetCtlDownInterface returned %d\n
+0x0016D4F8: Local IP Address: [%s]\n
+0x0016D638: Taking down the RTime Interface...\n
+0x0016D690: (ID=%d:%d) state %d -> %d, link %d, Message:[%s]\n
+0x0016D830:          Build Version  %s\n |          Client Version %s\n | ------------------------------------------------------------ | NETWORK: Initialized Distributed Memory Engine\n | NetArtifactObj | NetFodder
+0x0016E6F8: dev9x: | hdd: | pfs:
+0x0016E8E0: 10.0.0.82 | Blue | Player
+0x0016E9A0: Blue | Default Team
+0x0016E9E8: 0.0.0.0 | 10.0.0.1 | 10.0.0.16 | 10075 | 192.60.22.2 | TM:B ONLINE
+0x0016F058: %s is joining the game. | -----------------------------------------------------------\ | Network: Remote Client (%d) has Joined Game %d (my client ID | Z[]^_abcdefghijklmnopqrstuvwxyz{} | defghijklmnopqrstuvwxyz{}
+0x0016F1C8:   car name           = %d\n |   car netPlayerType  = %d\n |   car typeOfVehicle  = %d\n | -----------------------------------------------------------\ | JUST Cleaned Up mPlayers[%d]\n | Network: Cleaning up Client Car and Client Object.\n
+0x0016F488:    Address Type    = %d\n |    Connection Type = %d\n |    Server          = %s\n |    Server Port     = %d\n |    WorldID         = %d\n | ********************************************\n
+0x0016F718: 	ServerIP              : >>%s<<\n | 	ServerPort            : >>%d<<\n | 	WorldID               : >>%d<<\n | ********************************************\n | --------------------------------------------\n | >>>>> 1 Setting ConnectionSessionMaster = %d\n
+0x0016FA30: ()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abc | ********************************************\n | NETWORK: Connection count = %d, I am NOT the Session Master\ | NETWORK: Connection count = %d, I should be the Session Mast | NETWORK: Got State Info...\n | NETWORK: NetGetMyClientIndex(mConnectionIndex) = %d\n
+0x0016FD68: 	ServerIP              : >>%s<<\n | 	ServerPort            : >>%d<<\n | 	WorldID               : >>%d<<\n | ********************************************\n | NETWORK: Disconnecting from connection %d:\n
+0x0016FE70: 	Connection Index      : >>%d<<\n | 	DataStreamCount       : >>%d<<\n | 	MyName                : >>%s<<\n | 	NetObjectCount        : >>%d<<\n | 	SessionMasterOwnership: >>%d<<\n | ...Returning from NetJoin\n
+0x00170308: 	Connection Index      : >>%d<<\n | 	DataStreamCount       : >>%d<<\n | 	MyName                : >>%s<<\n | 	NetObjectCount        : >>%d<<\n | ********************************************\n | NETWORK: Leaving the Game\n
+0x001703E8: Connection %d Error = %d\n | InitCheckConnectionStatus returned an Error...\n | MGCL Update returned an Error %d - Connection Index %d, NetE | Medius Update returned an Error %d, NetError %d\n | NETWORK: Update Error = %d\n | Update Error - Bad Packet received from the server\n
+0x00170B68: Helicopter
+0x00170D38: Clapper
+0x00170DF0: Blimp | EnvHeli | FerrisWheel | GasTank0 | GasTank1 | LoopTank
+0x001714D0: NetStats
+0x00171818: weapon
+0x00171C90: NETWORK WARNING: Failed to send PREGAME (1) command %d to cl
+0x00171DD0: NETWORK WARNING: Failed to send command %d to client %d NetE
+0x00171E68: NETWORK WARNING: Failed to send SYNC %d to client %d NetErro
+0x00171F88: NETWORK WARNING:  NetGetClientIpAddress Failed %d (%s)\n | NETWORK WARNING: Failed to FINAL SCORE to client %d NetError
+0x001722C0: [USER_NAME] %s\n[USER_CAR] %d\n[GAME_NAME] %s\n
+0x00172320: [MEDIUS_ACCOUNT] %s\n[MEDIUS_PASSWORD] %s\n
+0x00172378:  ,=	 | [AUTO_RECONNECT] | [CLIENT_GATEWAY] | [CLIENT_IP] | [CLIENT_IS_MASTER] | [CLIENT_SUBNET]
+0x00173448: NETWORK:  ERROR:  GetMyClientIndex() RETURNING %d\n | NETWORK: NetGetMyClientIndex returned an error of %d index =
+0x00173C50: --------------------------------------------\n | >>>>> 2 Setting ConnectionSessionMaster = %d\n
+0x00174910: EMPTY
+0x00174BF0: GameData | NetStatsPersistant
+0x00174D78:  S:%d Sp:%d R:%d Rp:%d |  UDP=%d | !!!**** In Network GameOver State = %d ****!!!\n | %sCon%d:Err=%d | AN UNRECOVERABLE NETWORK ERROR | CORRECTLY AND YOUR CABLES ARE CONNECTED.
+0x001756A0: NetStats | VehiclePadFlags
+0x00175AA0: EMPTY
+0x00176C20: GetPlayersJoinedList = 0x%x\n
+0x00176CC8: --------------------------------------------\n | >>>>> 3 Setting ConnectionSessionMaster = %d\n
+0x00178630: 14CorpseStrategy
+0x00178850: \PTS\SUBURB.PED;1
+0x0017BC80: \PTS\SUBURB.PKP;1
+0x00181E98: No configuration set for RigidDebris type %d
+0x001830C8: ULLY CREATED TM:B ONLINE ACCOUNT | ogin.cfg
+0x00184AC8: 5reset
+0x00186730: SUBURB
+0x001877C0: asylum | city | death1 | death2 | death3 | death4
+0x00188248: ------------------------------------------------------------ | SHELL: Loading Local Player Files\n | SHELL: Loading Main Database Files\n | SHELL: Loading Remote Player Files\n | SHELL: Loading Sound files for each vehicle\n | \LVL\%s.NGP;1%s
+0x00188688: SUBURB | host0:suburb.rtx
+0x00188930: SUBURB | host0:suburb.tex
+0x00188AD0: SHELL: My bin slot = %d\n
+0x00188E38: SHELL: Checking to see if the correct car is loaded for clie | SHELL: Client %d mLoadCar is set to %d\n | SHELL: Could not find a car so load it!\n | SHELL: Current Loaded Car = %d\n | SHELL: Looking at player vehicle %d\n | SHELL: Requested Car = %d\n
+0x00188FE8: ------------------------------------------------------------
+0x001890F0: ------------------------------------------------------------ | SHELL: Could not load car in Slot %d, Not enough player info | SHELL: Load Player %d Sound Bank\n | SHELL: Loading Player %d Database File\n | SHELL: Loading Player %d Resident Texture File\n | SHELL: Loading Player %d Texture File\n
+0x00189268: SHELL: Loading Vehicle %s into slot %d\n
+0x00189478: ERROR carShifted = %d (Tanker_Shifted = %d) mySlot = %d\n
+0x00189FC8: SUBURB
+0x00189FF0: SUBURB
+0x0018A008: AN UNRECOVERABLE NETWORK ERROR | HAS OCCURRED.  PLEASE CHECK YOUR | NETWORK CONNECTION.  IF PROBLEMS | PERSIST, PLEASE REBOOT YOUR CONSOLE. | Returning to lobby. | Returning to waiting room.
+0x0018B778: CONTROLLER UNPLUGGED | OFF  | SET VIBRATION %s
+0x0018C7D0:       0 |  DAMAGE |  DONE | CONTACTING HOST TO RE-ENTER GAME ... | DAMAGE | DEATHS
+0x001A2AC0: \SND\
+0x001A2FC8: \SND\
+0x001A33F8: City.bnk | Death1.bnk | Death2.bnk | Death3.bnk | Death4.bnk | Death5.bnk
+0x001A34F0: Axel.bnk | Charger.bnk | Derby.bnk | Dump.bnk | Hearse.bnk | Minion.bnk
+0x001A3698: SpPreaAI.bnk
+0x001A36B8: SpAxel.bnk | SpCharge.bnk | SpDerby.bnk | SpDump.bnk | SpHearse.bnk | SpMinion.bnk
+0x001A3860: Artifact.bnk | Energy.bnk | Explos.bnk | GenEngs.bnk | GenVehic.bnk | GenWeapn.bnk
+0x001A4070: ShellCar.bnk | ShellSFX.bnk | shellmus.bnk
+0x001A5A38: ASYLUM1.VAG | ASYLUM2.VAG | ASYLUM3.VAG | ASYLUMPR.VAG | BOAT.VAG | BURBAM
+0x001A67F0: .VAG;1 | \VAG\
+0x001A6910: .VPK;1 | \VAG\
+0x001B0428: BASCUS-97196
+0x001B22F0: KILLS ONLY
+0x001B2350: HUNT KILLS
+0x001B23A8: POSSESSION
+0x001B2B68: Network is not available. Check your connection. | No case for screen: %d\n | \KBD\LAYOUT1.TXT;1
+0x001B4E08: A CONNECTION TO THE NETWORK COULD | A DIFFERENT NETWORK CONFIGURATION. | A GAME WITH THIS NAME ALREADY EXISTS | A PROBLEM WITH YOUR NETWORK CONNECTION | ADAPTOR START-UP DISC. | AND VERIFY THAT YOUR NETWORK ADAPTOR
+0x001B69A8: 1 AlreadyConnected\n | 2 ERROR %d\n | Error Connecting to Server  | StartMediusAuthenticationServer %s\n
+0x001B6B70: Calling Medius Disconnect\n | Calling Medius Session End\n
+0x001B6BC0: ACCOUNT %s | ACCOUNT %s IS ALREADY LOGGED IN | ACCOUNT NAME %s DOES NOT EXIST | ACCOUNT PASSWORD WAS INCORRECT | ENTER AN EXISTING ACCOUNT NAME | ERROR LOGGING INTO TM:B ONLINE
+0x001B6D88: ERROR EDITING ACCOUNT ON | PASSWORD CHANGED FOR | TM:B ONLINE GAME ACCOUNT. | TM:B ONLINE GAME SERVER.
+0x001B6FB0: ACCOUNT WAS DELETED FROM | ERROR DELETING ACCOUNT FROM | THE TM:B ONLINE GAME SERVER | THE TM:B ONLINE GAME SERVER. | TM:B ONLINE GAME SERVER.
+0x001B7300: Calling ConnectToServer\n | Calling Get Announcements\n | Calling GetServerVersion\n | Calling MGCL Connect\n | Calling Medius Account Logout\n | Calling Medius Disconnect\n
+0x001B77A0: Disconnecting from TM:B ONLINE Server...
+0x001B79C0: AFTER SELECTING A NETWORK CONFIGURATION, THIS | APPLICATION WILL ATTEMPT TO CONNECT TO THE NETWORK | EMPTY
+0x001B7F48:   Loading AN986... |   Loading CTXMDM... |   Loading Dev9... |   Loading EzNetCtl... |   Loading INet... |   Loading INetCtl...
+0x001B8C10: Password = %s\n
+0x001B91B8: ENTER YOUR USER ACCOUNT NAME AND PASSWORD.
+0x001B9780: Error, could not start Authentication Server\n | Logging into account %s...\n | Starting the Medius Login Process...\n
+0x001B99C8: ERROR CONNECTING TO | TM:B ONLINE GAME SERVER.
+0x001B9FB0: \n\n****************************************\n | ****************************************\n | CHECK YOUR NETWORK CONNECTION. | REFRESH LIST | Set up the lobby\n | Setting the Client State to Joined Chat World\n
+0x001BA1C0: %d/%d | CHECK YOUR NETWORK CONNECTION. | Disconnecting from TM:B ONLINE SERVER... | GAME IS CLOSED. | GAME IS NO LONGER AVAILABLE. | GAMES LISTED: %d\n
+0x001BB6E0: ************************************************\n | --------------------------------------------\n | >>>>> 7 Setting ConnectionSessionMaster = %d\n | A NETWORK ERROR OCCURRED WHILE CONNECTING | AND CHANGE IT. | COULD NOT GET GAME INFORMATION.
+0x001BC718: USE ALL
+0x001BC750: Error on CheckGame()\n | GAME IS NO LONGER AVAILABLE. | GAME WORLD NOT FOUND. | No result from CheckGame()\n | UNABLE TO GET TM:B ONLINE GAME. | oading Player %d Texture File\n
+0x001BC9F0: %d/%d | CAR: %s | GETTING GAME INFORMATION | Game Not Found | HUD: %s | MODE: DEATHMATCH
+0x001BD200: abcdefghijklmnopqurstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVW
+0x001BD248: AGAIN USING A DIFFERENT NAME. | ALLOWED.  PLEASE TRY AGAIN USING A | AND CHANGE IT. | CONTAINS AT LEAST ONE ALPHA-NUMERIC CHARACTER. | COULD NOT CONNECT TO THE GAME: | Check if name is valid\n
+0x001BE580: ....Returning from NetConnectP2P successfully!!!!!!\n | ASYNCHRONOUS | COULD NOT CONNECT TO THE GAME: | Calling NetConnectP2P..........\n | Creating new game %s:%s %d\n | Game should be created successfully\n
+0x001BE9F8: %d/%d | COULD NOT CONNECT TO THE GAME: | REFRESH LIST | SUBURB
+0x001BF200: A NETWORK ERROR OCCURRED WHILE CONNECTING | FAILED TO AUTHENTICATE TO THE SERVER | INCOMPATIBLE NETWORK CLIENT VERSION | INCOMPATIBLE NETWORK SERVER VERSION | Logging into LAN game...\n | THE SELECTED GAME IS FULL
+0x001BF5A8: CREDITS.TXT | NO CREDIT FILE FOUND. | TM:B ONLINE
+0x001BFF88:     NAME:  %s | ACCOUNT NAME ALREADY IN USE. ACCOUNT NAMES | AGAIN USING A DIFFERENT NAME. | CONTAIN AT LEAST ONE ALPHA-NUMERIC CHARACTER. | ENTER A NEW ACCOUNT NAME AND PASSWORD WHICH | ERROR CREATING TM:B ONLINE ACCOUNT
+0x001C0A28: EDIT THE ACCOUNT PASSWORD AS DESIRED. PASSWORD | MUST CONTAIN AN ALPHA-NUMERIC CHARACTER. | Updating account %s... | YOU ENTERED AN INVALID PASSWORD.
+0x001C0E30: ARE YOU SURE YOU WANT TO DELETE THIS ACCOUNT? | Deleting account %s...
+0x001C1068: Default Config = %d,  Current Config = %d\n
+0x001C10C0: CHANGES MADE TO THE DEFAULT NETWORK | CONFIGURATION WILL BECOME ACTIVE. | CURRENT OPTION. | PRESS LEFT OR RIGHT TO CHANGE | REBOOT YOUR CONSOLE BEFORE THE | YOU MUST SAVE THE NEW SETTINGS AND
+0x001C1B78: AT LEAST ONE ALPHA-NUMERIC CHARACTER. | ENTER A DEFAULT NAME THAT CONTAINS | PRESS LEFT OR RIGHT TO CHANGE CURRENT OPTION | YOU ENTERED AN INVALID GAME NAME. | YOU ENTERED AN INVALID SCREEN NAME.
+0x001C2DA8:    <                    > | ADJUST BRIGHTNESS | BRIGHTNESS | CONTROL SETTINGS | GAME SETTINGS | PRESS L/R FOR MORE
+0x001C4F98: \SHELL\%s;1
+0x001C4FF0: <EOF> | <EOP>
+0x001C5120: <EOF> | <EOP>
+0x001C5430: LOST CONNECTION TO GAME.
+0x001C5768: * New Chat Message(s) * | DAMAGE LIMIT : %d | ENTRY : ASYNCHRONOUS | ENTRY : SYNCHRONOUS | GAME STARTING IN %d | Game is starting now\n
+0x001C7C28: ASYNCHRONOUS | DEATHMATCH | KILLS ONLY | SYNCHRONOUS | TIME LIMIT: %d,SCORE LIMIT: %d,KILL LIMIT: %d,DAMAGE LIMIT:
+0x001C8838: LAST MAN STANDING | NUMBER OF LIVES: %d,IP: %s
+0x001C9010:     STARTING PREY: %s | ASYNCHRONOUS | HUNT KILLS | MAN HUNT | SYNCHRONOUS | TIME LIMIT: %d,SCORE LIMIT: %d,SCORING: %s,STARTING PREY: ,
+0x001C9BF0:       SCORE LIMIT: %d  |       SCORE LIMIT: %d (0=UNLIMITED) | ASYNCHRONOUS | COLLECTOR | POSSESSION | SYNCHRONOUS
+0x001CAC18: NO HEALTHBAR | NO POINTER | NO RADAR | NORMAL | USE ALL | USE ANY
+0x001CBA08: INVALID MESSAGE: YOU HAVE ENTERED PROFANE TEXT
+0x001CBD18: Game has terminated. | RETURNING TO LOBBY | Sending -I'm Coming In- Message\n | UNABLE TO JOIN TM:B ONLINE GAME
+0x001CC530:       0 | DAMAGE LIMIT : %d | EMPTY | ENTRY : ASYNCHRONOUS | ENTRY : SYNCHRONOUS | KILL LIMIT : %d
+0x001CD7A8: COULD NOT CONNECT TO THE GAME: | INCORRECT PASSWORD | Joining game %s... | THE GAME HOST HAS SET A PASSWORD FOR | THIS GAME.  IN ORDER TO JOIN YOU NEED | TO ENTER THE CORRECT PASSWORD.
+0x001CDE60: Reading Usage Policy...
+0x001CE9B0: lsnb0 | mov/copyrt.pss | mov/cs1_gm.pss | mov/eye_ttl.pss | mov/gm.pss | mov/gm_cs1.pss
+0x001CF9B0: 2ND CONTROLLER REQUIRED | FIND UNLOCK IN | IN _JUNKYARD_ LEVEL | IN _SNOWY ROADS_ LEVEL | NO CONTROLLER IN CONTROLLER PORT 1 | PLAYER 2 CONTROLLER UNPLUGGED
+0x001D0AA0:  !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[ |  !"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^
+0x001D2BA0: IN %s | Network.cfg | Player.cfg
+0x001D2E28: IN %s | Login.cfg
+0x001D47E0:  IN %s | IN %s
+0x001D5E38: Network.cfg | Player.cfg
+0x001D6210: IN %s | Login.cfg | Network.cfg | Player.cfg | X BUTTON - RETRY
+0x001D6858: IN %s | Network.cfg | Player.cfg | X BUTTON - RETRY
+0x001F8828: 989snd.c: RPC collision!\n | snd_BankLoad: Load already in progress!\n
+0x001F8960: snd_BankLoad_CB: Load already in progress!\n
+0x001F8A40: 989snd.c: RPC collision!\n | found (%d)\n | snd_BankLoadByLoc: CD BUSY!\n | snd_BankLoadByLoc: Load already in progress!\n
+0x001F8B78: snd_BankLoadByLoc: CD BUSY!\n | snd_BankLoadByLoc: Load already in progress!\n
+0x001F8CB0: 989snd.c: RPC collision!\n | snd_BankLoad: Load already in progress!\n
+0x001F8DE8: snd_BankLoad_CB: Load already in progress!\n
+0x001F8EC8: 989snd.c: RPC collision!\n | found (%d)\n | snd_BankLoadByLoc: CD BUSY!\n | snd_BankLoadByLoc: Load already in progress!\n
+0x001F9000: 989snd.c: RPC collision!\n | found (%d)\n | snd_BankLoadByLoc: CD BUSY!\n | snd_BankLoadByLoc: Load already in progress!\n
+0x001FE4D0: ogin.cfg
+0x001FEE38: \%s.PTR;1 | \ACAR%s | \PCAR%s
+0x00213FF8: FAILED TO GET CAR CS: slot = %d num = %d\n
+0x0021C8F8: Error%d : sceUsbKbSetLEDMode\n | Error%d : sceUsbKbSync\n
+0x0021CAD8: 7textBox
+0x0021CB18:  !"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^
+0x0021CBD8: 7chatBox | 7textBox
+0x0021CC48:  !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[
+0x0021CC90: 5ipBox | 7textBox
+0x0021CD00:  .0123456789
+0x002201C8: cdrom0:\MOD\MCMAN.IRX;1 | cdrom0:\MOD\MCSERV.IRX;1
+0x00220970: /icon.sys | PS2D | TM:B Online
+0x0023D278: Texture bin allocation overflow addr %x \n
+0x0023D560: ERROR!!! We should not ever get here\n | Texture count at %i\n
+0x0023EC80: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! | ERROR... ERROR... ERROR... ERROR... ERROR... ERROR... ERROR. | TRYING TO LOAD TOO MUCH TEXTURE INTO SPACKLE TEXTURE LOCATIO | This bin start = %x, Max = %x, Next bin start = %x\n | This bin start ID = %x, Max = %x, Next bin start ID = %x\n | We have exceeded the Clut bin space for ResTex File (%d)\n
+0x002404B0: ## texLastUsedCnt possibly went backwards: %u - texBinE[%d][
+0x0024D7C8: sceMcUdCheckNewCard RPC faild\n
+0x00257280: libusbkb : CreateSema Error\n | libusbkb : bind errr\n
+0x00257468: libusbkb.a : DeleteSema() --> error\n | libusbkb.a : RemoveIntcHandler() --> error\n
+0x00257510: sceUsbKbGetInfo: sceSifCallRpc -> %d\n
+0x002575B0: sceUsbKbRead: sceSifCallRpc -> %d\n
+0x00257680: sceUsbKbGetLocation: sceSifCallRpc -> %d\n
+0x00257750: sceUsbKbSetLEDStatus: sceSifCallRpc -> %d\n
+0x00257820: sceUsbKbSetLEDMode: sceSifCallRpc -> %d\n
+0x00258440: Arrangement error!\n
+0x00258648: sceUsbKbRead: sceSifCallRpc -> %d\n
+0x00258728: "%s" module not found (%d)\n | could not bind to eznetcnf service\n | eznetcnf
+0x00258850: %s>  | **** eznetcnf RPC server not currently running\n | ezNetCnfGetCount returned %d\n | libezcnf.c
+0x00258910: %s>  | **** eznetcnf RPC server not currently running\n | ezNetCnfGetCombinationList returned %d\n | libezcnf.c
+0x002589D0: ezNetCnfGetCombination: invalid Combination number (%d)\n | ezNetCnfGetCombination: pList is empty\n
+0x00258A50: ezNetCnfGetDefault: defaultNumber exceeds listLength (%d)\n | ezNetCnfGetDefault: pList is empty\n
+0x00258AD0: %s>  | **** eznetcnf RPC server not currently running\n | ezNetCnfSetDefault returned %d\n | libezcnf.c
+0x00258B98: %s>  | **** eznetcnf RPC server not currently running\n | ezNetCnfGetNetcnfifData returned %d\n | libezcnf.c
+0x00258C70: "%s" module not found (%d)\n | could not bind to eznetctl service\n | eznetctl
+0x00258D98: %s>  | **** eznetctl RPC server not currently running\n | eCtlGetPropertiesAddress returned 0\n | ezNetCtlSetProperties returned %d\n | libezctl.c
+0x00258EB8: %s>  | **** eznetctl RPC server not currently running\n | ezNetCtlSetCombination returned %d\n | libezctl.c
+0x00258F80: %s>  | **** eznetctl RPC server not currently running\n | ezNetCtlGetStatus returned %d\n | libezctl.c
+0x00259020: **** eznetctl RPC server not currently running\n
+0x00259098: **** eznetctl RPC server not currently running\n
+0x00259110: **** eznetctl RPC server not currently running\n
+0x00259188: %s>  | libezctl.c | warning: SIF DMA transfer size %d padded to %d\n
+0x0025995C: Error Registering Message Types in DME %d\n
+0x00259A58: Error Registering Message Types in DME %d\n
+0x00259B20: %.2d.%.2d.%.4s.%.2s.%.2s.%.2s | %.3s | 13:26:18 | JanFebMarAprMayJunJulAugSepOctNovDec | Jun 25 2002
+0x0025A020: DME Net Error %d\n
+0x0025A0D0: DME Net Error %d\n
+0x0025C454: MediusAccountAlreadyExists | MediusAccountLoggedIn | MediusAccountNotFound | MediusAlreadyLeaderOfClan | MediusBeginSessionFailed | MediusChannelNameExists
+0x0025C774: MediusErrorAlreadyConnected | MediusErrorClosing | MediusErrorConnecting | MediusErrorDeviceNotFound | MediusErrorDirectoryNotFound | MediusErrorDisconnecting
+0x00263DF0: %s.%d
+0x00264448: 00:00:00
+0x00264610: %02d:%02d:%02d
+0x002664F0: rt_memory_allocate failed \n
+0x00266530: rt_memory_free failed \n
+0x00266660: %u.%u.%u.%u
+0x00266F50: %.3s | 17:20:23 | JanFebMarAprMayJunJulAugSepOctNovDec | Jul 11 2002 | Time of build: %.2d.%.2d.%.4s.%.2s.%.2s.%.2s
+0x00267080: 1.22.0040 | dme version: 1.22.0040
+0x002672C8: SendPacket error sending message, msg error code = %d\n
+0x00268F20: get local IP failed, msg error code = %d\n | msg client startup failed, msg error code = %d\n
+0x002693D8: 0.0.0.0
+0x00276BD0: %.2d.%.2d.%.4s.%.2s.%.2s.%.2s | %.3s | 09:39:32 | JanFebMarAprMayJunJulAugSepOctNovDec | Jul  2 2002
+0x0027CB20: %u.%u.%u.%u
+0x0027D8E0: %u.%u.%u.%u
+0x0027D928: %.2d.%.2d.%.4s.%.2s.%.2s.%.2s | %.3s | 09:39:34 | JanFebMarAprMayJunJulAugSepOctNovDec | Jul  2 2002
+0x00284248: %.2d.%.2d.%.4s.%.2s.%.2s.%.2s | %.3s | 11:48:29 | JanFebMarAprMayJunJulAugSepOctNovDec | Jun 25 2002
+0x00284FE8:      recvs/sec: %9.2f, %9.2f max\n |      sends/sec: %9.2f, %9.2f max\n | bytes recv/sec: %9.2f, %9.2f max\n | bytes sent/sec: %9.2f, %9.2f max\n
+0x002872D4: ../../../src/RSA.c
+0x00287720: ../../../src/RSA.c
+0x00289640: ../../../src/LargeInt.c
+0x00289CF0: ../../../src/LargeInt.c | nBits == lintGetBits(&primeCandidate)
+0x00289FD4: ../../../src/LargeInt.c
+0x0028B26C: 1.40.0004
+0x0028B3B8: Error Network I/O --- DME Error %d.\n
+0x0028B414: Error closing Report Library --- DME Error %d.\n
+0x0028B484: Error connecting to Medius Server at IP= %s Port= %d World=
+0x0028B644: Error Disconnecting from Medius Server --- DME Error %d.\n
+0x0028B6A4: Error Initializing Medius Communication Library --- DME Erro
+0x0028C594: Error sending Server Report --- DME Error %d.\n
+0x0028C744: %.2d.%.2d.%.4s.%.2s.%.2s.%.2s | %.3s | 14:13:05 | JanFebMarAprMayJunJulAugSepOctNovDec | Jul  3 2002
+0x0028C868: Medius Game Communication Library Version 1.40.0004
+0x0028CDF4: MGCLConnect Failed. NetErrorCode = %d\n
+0x0028CEA0: bind error\n
+0x0028CF60: unbind error\n
+0x0028CFF0: call sceInetName2Address() failed.\n
+0x0028D100: call sceInetAddress2String() failed.\n
+0x0028D1D8: call sceInetAddress2Name() failed.\n
+0x0028D2B0: call sceInetCreate() failed.\n
+0x0028D3B0: call sceInetOpen() failed.\n
+0x0028D438: call sceInetClose() failed.\n
+0x0028D4C0: %s(): invalid count(%d)\n | call sceInetRecv() failed.\n | sceInetRecv
+0x0028D5D0: %s(): invalid count(%d)\n | call sceInetRecvFrom() failed.\n | sceInetRecvFrom
+0x0028D738: call sceInetSend() failed.\n
+0x0028D828: call sceInetSendTo() failed.\n
+0x0028D948: call sceInetClose() failed.\n
+0x0028D9D0: call sceInetControl() failed.\n
+0x0028DAB8: call sceInetGetInterfaceList() failed.\n
+0x0028DB70: call sceInetInterfaceControl() failed.\n
+0x0028DC58: call sceInetGetRoutingTable() failed.\n
+0x0028DD28: call sceInetGetNameServers() failed.\n
+0x0028DDD8: call sceInetChangePriority() failed.\n
+0x0028DE60: call sceInetGetLog() failed.\n
+0x0028DF20: call sceInetAbortLog() failed.\n
+0x0028DFA0: RPC call in reg_handler() failed.\n
+0x0028E020: RPC call in unreg_handler() failed.\n
+0x0028E0A0: RPC call in load_inet_cnf() failed.\n
+0x0028E188: RPC call in set_config() failed.\n
+0x0028E208: RPC call in set_config_only() failed.\n
+0x0028E338: call sceInetInterfaceControl() failed.\n | sceInetInterfaceList() failed.\n
+0x0028E438: RPC call in wait_if_attached() failed.\n
+0x0028E538: RPC call in wait_if_started() failed.\n
+0x0028E5D0: call sceInetInterfaceControl() failed.\n
+0x0028E728: RPC call in up_interface() failed.\n
+0x0028E7B0: RPC call in down_interface() failed.\n
+0x0028E848: %.2d.%.2d.%.4s.%.2s.%.2s.%.2s | %.3s | 16:16:40 | Apr  3 2002 | JanFebMarAprMayJunJulAugSepOctNovDec
+0x0028EC60: Error DMAing data to IOP memory!!!\n
+0x0028EE70: Error DMAing data to IOP memory!!!\n
+0x0028F180: %u.%u.%u.%u
+0x0028F218: %u.%u.%u.%u
+0x00290330: mode must be 0 in this version.\n
+0x002904C0: mode must be 0 in this version.\n
+0x002905E0: %s: receive buffer addr is not 64 byte align. %08x=n | %s: send buffer addr is not 64 byte align. %08x=n | mode must be 0 in this version.\n | sceSifMCallRpc
+0x00291B60: call cdread cmd\n | cdread end\n
+0x00292520: Can't open rom0:ROMVER\n | Can't read rom error\n | rom0:ROMVER
+0x002933B0: asinf
+0x00296340: assertion "%s" failed: file "%s", line %d\n
+0x00299800:                 00000000000000000123456789abcdef | (null) | 00000000000000000123456789abcdef | 0123456789ABCDEF | 0123456789abcdef | STUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}
+0x0029FF18:  !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[ | tuvwxyz{}
+0x002A0590: VWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}
+0x002A09B0: STUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}
+0x002A94D8: FGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}
+0x002A9D00: # TLB over flow (1) | # TLB over flow (2) | # TLB over flow (3) | # TLB spad=0 kernel=1:%d default=%d:%d extended=%d:%d\n
