@@ -68,7 +68,27 @@ void prisonUpdateGatesOpenBridgeDown__6Prison(s32 arg0) {
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/prison_part2", prisonUpdateTransitionPoints__6Prison);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/prison_part2", func_0017E898);
+#include "m2c_macros.h"
+M2C_UNK animationStartReverse__FR11_animHandleb_17E898() __asm__("animationStartReverse__FR11_animHandleb");
+M2C_UNK animationStart__FR11_animHandleb_17E898() __asm__("animationStart__FR11_animHandleb");
+extern s32 D_00317274_17E898 __asm__("D_00317274");
+
+void func_0017E898(void* arg0) {
+    if ((M2C_FIELD(arg0, s32* , 0x68) != 0) && (M2C_FIELD(arg0, s32* , 0xF8) < 4)) {
+        if (M2C_FIELD(arg0, s32* , 0x20) != 0) {
+            animationStartReverse__FR11_animHandleb_17E898(arg0 + 0x20, 1);
+        }
+        if (M2C_FIELD(arg0, s32* , 0x50) != 0) {
+            animationStart__FR11_animHandleb_17E898(arg0 + 0x50, 1);
+        }
+        if (M2C_FIELD(arg0, s32* , 0x5C) != 0) {
+            animationStart__FR11_animHandleb_17E898(arg0 + 0x5C, 1);
+        }
+        if (D_00317274_17E898 != 0) {
+            M2C_FIELD(arg0, s32* , 0xF8) = 4;
+        }
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/prison_part2", func_0017E928);
 
