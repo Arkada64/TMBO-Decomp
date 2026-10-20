@@ -1,6 +1,10 @@
 #include "common.h"
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", addOccupant__12AttractPointP7Vehicle);
+#include "m2c_macros.h"
+void addOccupant__12AttractPointP7Vehicle(void* arg0, void* arg1) {
+    M2C_FIELD(arg1, void** , 0x2024) = (void* ) M2C_FIELD(arg0, void** , 0xC);
+    M2C_FIELD(arg0, void** , 0xC) = arg1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", removeOccupant__12AttractPointP7Vehicle);
 
@@ -30,7 +34,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010BD88)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010BDC0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010BE08);
+#include "m2c_macros.h"
+s32 func_0010BE08(void* arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = M2C_FIELD(arg0, s32* , 0x24C);
+    return (arg1 >= temp_v0) ? 0 : temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010BE18);
 
