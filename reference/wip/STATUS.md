@@ -1,5 +1,17 @@
 # Online decomp: where we left off (2026-10-20)
 
+## Decisions (from the owner)
+- Goal: PC port with Steam multiplayer (P2P, lobby owner hosts, client-side hit detection) plus retail
+  single player, in one moddable package. Full decomp path (not recompilation).
+- **Don't byte-match code that will be replaced in the port** (decided 2026-10-20). Leave it as
+  INCLUDE_ASM (build stays byte-identical) and spend no matching effort on it:
+  - Sony SDK libraries (sdk/*, libgraph, libpad, libmc, libcdvd, libmpeg, eekernel wrappers)
+  - Medius / SCE-RT DME network stack (the `dme*` layer and below) -> replaced by Steamworks
+  - PS2 hardware paths: GS/VU1 rendering and `.vutext` microcode, IOP/989snd sound, pad, memory card, CD/DVD I/O
+  - Network adapter setup (NETCNF/DEV9/INET)
+  Still match: game logic and Incog's own network module (object callbacks, event handlers, send wrappers),
+  since those are kept and modded. When unsure whether a file is "replaced", ask the owner.
+
 ## Toolchain (solved)
 - Online's game code: **SN Systems ProDG ee-gcc 2.95.3-114, `-O2 -G0`**, compiled AND assembled by SN
   (its assembler expands macros differently from GNU as; using GNU as caused mismatches).
