@@ -10,7 +10,17 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/junkyard", JunkyardInitA
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/junkyard", func_00150AE8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/junkyard", JunkyardTunnelDoorTrigger__Fi);
+#include "m2c_macros.h"
+extern s16 D_002C12CC_er__Fi __asm__("D_002C12CC");
+extern s16 D_002C12CE_er__Fi __asm__("D_002C12CE");
+
+void JunkyardTunnelDoorTrigger__Fi(s32 arg0) {
+    if (arg0 != 0) {
+        D_002C12CC_er__Fi = 1;
+        return;
+    }
+    D_002C12CE_er__Fi = 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/junkyard", JunkyardTunnelDoorUpdate__Fv);
 
