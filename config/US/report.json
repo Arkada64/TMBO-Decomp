@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.15149546,
-    "total_code": "1753188",
+    "fuzzy_match_percent": 0.1514958,
+    "total_code": "1753184",
     "matched_code": "2656",
-    "matched_code_percent": 0.15149546,
+    "matched_code_percent": 0.1514958,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -24589,7 +24589,7 @@
     {
       "name": "tmb/hoserInfo",
       "measures": {
-        "total_code": "1504",
+        "total_code": "1500",
         "matched_data_percent": 100.0,
         "total_functions": 10,
         "total_units": 1
@@ -24597,7 +24597,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "1504",
+          "size": "1500",
           "metadata": {
             "virtual_address": "2183016"
           }
@@ -24669,7 +24669,7 @@
         },
         {
           "name": "hoserGetHoserInfo__Fv",
-          "size": "16",
+          "size": "12",
           "metadata": {
             "virtual_address": "2184504"
           }
@@ -50861,10 +50861,10 @@
       "id": "tmb",
       "name": "tmb",
       "measures": {
-        "fuzzy_match_percent": 0.023010822,
-        "total_code": "1112520",
+        "fuzzy_match_percent": 0.023010906,
+        "total_code": "1112516",
         "matched_code": "256",
-        "matched_code_percent": 0.023010822,
+        "matched_code_percent": 0.023010906,
         "matched_data_percent": 100.0,
         "total_functions": 2731,
         "matched_functions": 32,

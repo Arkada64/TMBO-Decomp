@@ -10,7 +10,10 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hoserInfo", func_0021520
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hoserInfo", func_00215320);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hoserInfo", hoserGotoBookmark__FP9HoserInfo);
+#include "m2c_macros.h"
+s32 hoserGotoBookmark__FP9HoserInfo(void) {
+    return 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hoserInfo", hoserNextBookmark__FP9HoserInfo);
 
@@ -18,4 +21,9 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hoserInfo", hoserPrevBoo
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hoserInfo", func_00215468);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hoserInfo", hoserGetHoserInfo__Fv);
+#include "m2c_macros.h"
+extern M2C_UNK D_00610F00_fo__Fv __asm__("D_00610F00");
+
+M2C_UNK* hoserGetHoserInfo__Fv(void) {
+    return &D_00610F00_fo__Fv;
+}
