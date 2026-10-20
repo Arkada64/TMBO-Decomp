@@ -57,7 +57,22 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverCalcLooka
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverCalcNextPointTurn__6Driver);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", func_00130598);
+#include "m2c_macros.h"
+f32 driverCalcDistFromLine__6DriverP8_fvectorT1T1_130598() __asm__("driverCalcDistFromLine__6DriverP8_fvectorT1T1");
+
+void func_00130598(void* arg0, s32 arg1) {
+    s32 var_a2;
+    void* var_a1;
+
+    if (arg1 != 0) {
+        var_a2 = arg0 + 0x10;
+        var_a1 = arg0 + 0x20;
+    } else {
+        var_a1 = arg0 + 0x10;
+        var_a2 = *M2C_FIELD(arg0, s32** , 0xB8) + (M2C_FIELD(arg0, s32* , 0x208) << 5);
+    }
+    M2C_FIELD(arg0, f32* , 0x54) = driverCalcDistFromLine__6DriverP8_fvectorT1T1_130598(arg0, var_a1, var_a2, M2C_FIELD(arg0, s32* , 0x174) + 0x10);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverCalcDistFromLine__6DriverP8_fvectorT1T1);
 
