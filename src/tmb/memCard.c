@@ -96,7 +96,14 @@ s32 func_00221C40(u8* arg0) {
     return (temp_v1 < 0x81U) ? 0 : -1;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", IsAscii__FPc);
+#include "m2c_macros.h"
+#include "m2c_macros.h"
+s32 IsAscii__FPc(u8 *arg0)
+{
+  unsigned long new_var;
+  new_var = (u64) (*arg0);
+  return (new_var >> 7) ^ 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", func_00221C90);
 
