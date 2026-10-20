@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.15149303,
-    "total_code": "1753216",
+    "fuzzy_match_percent": 0.15149337,
+    "total_code": "1753212",
     "matched_code": "2656",
-    "matched_code_percent": 0.15149303,
+    "matched_code_percent": 0.15149337,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -22010,7 +22010,7 @@
     {
       "name": "online/after_animChan_65",
       "measures": {
-        "total_code": "168",
+        "total_code": "164",
         "matched_data_percent": 100.0,
         "total_functions": 4,
         "total_units": 1
@@ -22018,7 +22018,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "168",
+          "size": "164",
           "metadata": {
             "virtual_address": "2089144"
           }
@@ -22048,7 +22048,7 @@
         },
         {
           "name": "func_001FE128",
-          "size": "56",
+          "size": "52",
           "metadata": {
             "virtual_address": "2089256"
           }
@@ -50845,10 +50845,10 @@
       "id": "online",
       "name": "online",
       "measures": {
-        "fuzzy_match_percent": 0.49546644,
-        "total_code": "484392",
+        "fuzzy_match_percent": 0.49547055,
+        "total_code": "484388",
         "matched_code": "2400",
-        "matched_code_percent": 0.4954665,
+        "matched_code_percent": 0.49547058,
         "matched_data_percent": 100.0,
         "total_functions": 1890,
         "matched_functions": 60,
