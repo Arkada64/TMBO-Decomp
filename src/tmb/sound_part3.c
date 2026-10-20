@@ -16,7 +16,17 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", __17SFXStr
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A7570);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", setState__14StreamingSound18_ambientSoundState);
+#include "m2c_macros.h"
+s32 timerGetFieldCount__Fv_dState() __asm__("timerGetFieldCount__Fv");
+
+void setState__14StreamingSound18_ambientSoundState(void* arg0, s32 arg1) {
+    M2C_FIELD(arg0, s32* , 0x40) = arg1;
+    if (arg1 == 0) {
+        M2C_FIELD(arg0, s32* , 0xC) = timerGetFieldCount__Fv_dState();
+    } else if (arg1 == 3) {
+        M2C_FIELD(arg0, s32* , 8) = timerGetFieldCount__Fv_dState();
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", updateSFXStreamingSound__17SFXStreamingSound);
 
@@ -44,12 +54,22 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", playCityLa
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A87B8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A8870);
+#include "m2c_macros.h"
+s32 timerGetFieldCount__Fv_1A8870() __asm__("timerGetFieldCount__Fv");
+
+void func_001A8870(s32* arg0) {
+    *arg0 = timerGetFieldCount__Fv_1A8870();
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", playLightPoleBounceSound__17TimberDebrisSoundP8_fvectorf);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A89C0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A8A28);
+#include "m2c_macros.h"
+s32 timerGetFieldCount__Fv_1A8A28() __asm__("timerGetFieldCount__Fv");
+
+void func_001A8A28(s32* arg0) {
+    *arg0 = timerGetFieldCount__Fv_1A8A28();
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A8A50);
