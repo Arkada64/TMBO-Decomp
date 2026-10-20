@@ -11,7 +11,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_00
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_00109EE0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_00109F20);
+#include "m2c_macros.h"
+extern s32 D_002B8AD4_109F20 __asm__("D_002B8AD4");
+
+void func_00109F20(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    if (M2C_FIELD(arg3, s8* , 0x15) != 0) {
+        D_002B8AD4_109F20 = 3;
+        return;
+    }
+    D_002B8AD4_109F20 = 4;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_00109F48);
 
@@ -21,7 +30,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_00
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A100);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A1F0);
+#include "m2c_macros.h"
+void* func_0010A1F0(void* arg0) {
+    M2C_FIELD(arg0, s32* , 0xD4) = 0;
+    M2C_FIELD(arg0, s32* , 0) = -1;
+    M2C_FIELD(arg0, s32* , 0xD8) = 0;
+    M2C_FIELD(arg0, s32* , 0xE0) = 0;
+    M2C_FIELD(arg0, s32* , 0xE4) = 0;
+    return arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A210);
 
