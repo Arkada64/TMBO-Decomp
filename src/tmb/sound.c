@@ -23,7 +23,80 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", playTowTruckAnim
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", playAnimationSound__14AnimationSoundii);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0018FD00);
+#include "m2c_macros.h"
+M2C_UNK func_001FBCF8_18FD00() __asm__("func_001FBCF8");
+M2C_UNK initCrossFadeLevels__12VehicleSound_18FD00() __asm__("initCrossFadeLevels__12VehicleSound");
+s32 mathfRand__Fii_18FD00() __asm__("mathfRand__Fii");
+s32 timerGetFieldCount__Fv_18FD00() __asm__("timerGetFieldCount__Fv");
+
+void func_0018FD00(void* arg0, void* arg1) {
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
+    s32 temp_v0_4;
+    s32 temp_v0_5;
+    s32 temp_v0_6;
+
+    M2C_FIELD(arg0, void** , 0x184) = arg1;
+    M2C_FIELD(arg0, f32* , 0x158) = (f32) M2C_FIELD(arg1, f32* , 0x320);
+    initCrossFadeLevels__12VehicleSound_18FD00();
+    M2C_FIELD(arg0, s32* , 0x15C) = 0;
+    M2C_FIELD(arg0, s32* , 0x164) = 0;
+    M2C_FIELD(arg0, s32* , 0x160) = 0;
+    M2C_FIELD(arg0, s32* , 0x14) = 0;
+    M2C_FIELD(arg0, s32* , 0xF4) = 0;
+    M2C_FIELD(arg0, s32* , 0xF8) = 0;
+    if (M2C_FIELD(arg1, s32* , 0x20F4) == 0xE0) {
+        func_001FBCF8_18FD00(arg0 + 0x178, 0x12BE, M2C_FIELD(arg1, s32* , 0x20F0), 0);
+    }
+    M2C_FIELD(arg0, s32* , 0x14C) = 0;
+    M2C_FIELD(arg0, s32* , 0x28) = 0;
+    M2C_FIELD(arg0, s32* , 0x24) = 0;
+    M2C_FIELD(arg0, s32* , 0x94) = 0;
+    M2C_FIELD(arg0, s32* , 0x98) = 0;
+    M2C_FIELD(arg0, s32* , 0x9C) = 0;
+    M2C_FIELD(arg0, s32* , 0x20) = 0x3C;
+    M2C_FIELD(arg0, s32* , 0xE0) = timerGetFieldCount__Fv_18FD00();
+    temp_v0 = timerGetFieldCount__Fv_18FD00();
+    M2C_FIELD(arg0, s32* , 0x34) = 0;
+    M2C_FIELD(arg0, s32* , 0x4C) = 0;
+    M2C_FIELD(arg0, s32* , 0x64) = 0;
+    M2C_FIELD(arg0, s32* , 0x7C) = 0;
+    M2C_FIELD(arg0, s32* , 0xE4) = temp_v0;
+    temp_v0_2 = timerGetFieldCount__Fv_18FD00();
+    M2C_FIELD(arg0, s32* , 0xA0) = 0;
+    M2C_FIELD(arg0, s32* , 0xA8) = 0;
+    M2C_FIELD(arg0, s32* , 0xD4) = 0;
+    M2C_FIELD(arg0, s32* , 0xBC) = 0;
+    M2C_FIELD(arg0, s32* , 0xB8) = 0;
+    M2C_FIELD(arg0, s32* , 0x30) = 0;
+    M2C_FIELD(arg0, s32* , 0x18) = temp_v0_2;
+    M2C_FIELD(arg0, s32* , 0x144) = timerGetFieldCount__Fv_18FD00();
+    temp_v0_3 = timerGetFieldCount__Fv_18FD00();
+    M2C_FIELD(arg0, s32* , 0x174) = 0;
+    M2C_FIELD(arg0, s32* , 0xF0) = temp_v0_3;
+    M2C_FIELD(arg0, s32* , 8) = timerGetFieldCount__Fv_18FD00();
+    temp_v0_4 = mathfRand__Fii_18FD00(0x78, 0xF0);
+    M2C_FIELD(arg0, s32* , 0x10) = 0;
+    M2C_FIELD(arg0, s32* , 0x11C) = 0;
+    M2C_FIELD(arg0, s32* , 0xDC) = 1;
+    M2C_FIELD(arg0, s32* , 0xC) = temp_v0_4;
+    temp_v0_5 = timerGetFieldCount__Fv_18FD00();
+    M2C_FIELD(arg0, s32* , 0x154) = 0;
+    M2C_FIELD(arg0, s32* , 0xEC) = 0x12;
+    M2C_FIELD(arg0, s32* , 0x120) = temp_v0_5;
+    M2C_FIELD(arg0, s32* , 0x13C) = timerGetFieldCount__Fv_18FD00();
+    M2C_FIELD(arg0, s32* , 0x140) = timerGetFieldCount__Fv_18FD00();
+    M2C_FIELD(arg0, s32* , 4) = timerGetFieldCount__Fv_18FD00();
+    M2C_FIELD(arg0, s32* , 0x124) = timerGetFieldCount__Fv_18FD00();
+    temp_v0_6 = mathfRand__Fii_18FD00(8, 0x19);
+    M2C_FIELD(arg0, s32* , 0x130) = 0;
+    M2C_FIELD(arg0, s32* , 0x134) = 0;
+    M2C_FIELD(arg0, s32* , 0x128) = temp_v0_6;
+    M2C_FIELD(arg0, s32* , 0x12C) = timerGetFieldCount__Fv_18FD00();
+    M2C_FIELD(arg0, s32* , 0x1C) = timerGetFieldCount__Fv_18FD00();
+    M2C_FIELD(arg0, s32* , 0xD8) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0018FE78);
 
