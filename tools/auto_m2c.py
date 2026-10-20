@@ -68,7 +68,7 @@ for asmdir, name in items:
         room = int(frame.group(1), 16) - 16 * saves if frame else 0
         if room > 0:
             # the right buffer size is unknown; try a few (largest first), fast_match keeps the first MATCH
-            sizes = sorted({room, *range(16, room, 16), 4, 8}, reverse=True)[:6]
+            sizes = [room]   # size variants never helped (see STATUS); keep one to save time
             variants = [re.sub(rf"^(.*\b{re.escape(name)}\(.*\) \{{)$",
                                lambda m, n=n: m.group(1) + f"\n    u8 sp[0x{n:X}];", body, count=1, flags=re.M)
                         for n in sizes]
