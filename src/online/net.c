@@ -159,7 +159,101 @@ void func_00164F68(void* arg0, s32 arg1, s32 arg2) {
     strcpy_164F68(arg0 + 0x525DC, arg2);
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00164FD8);
+#include "m2c_macros.h"
+M2C_UNK* func_00164FD8(void* arg0) {
+    s32 temp_v1;
+
+    temp_v1 = M2C_FIELD(arg0, s32* , 4);
+    switch (temp_v1) {                              /* irregular */
+    case -1000:
+        return "TM:B ONLINE Begin Session Failed";
+    case -999:
+        return "TM:B ONLINE Account Already Exists";
+    case -998:
+        return "TM:B ONLINE Account Not Found";
+    case -997:
+        return "TM:B ONLINE Account Logged In";
+    case -996:
+        return "TM:B ONLINE End Session Failed";
+    case -995:
+        return "TM:B ONLINE Login Failed";
+    case -994:
+        return "TM:B ONLINE Registration Failed";
+    case -993:
+        return "TM:B ONLINE Incorrect Login Step";
+    case -992:
+        return "TM:B ONLINE Already Leader Of Clan";
+    case -991:
+        return "TM:B ONLINE WM Error";
+    case -990:
+        return "TM:B ONLINE Not Clan Leader";
+    case -989:
+        return "TM:B ONLINE Player Not Privileged";
+    case -988:
+        return "TM:B ONLINE DB Error";
+    case -987:
+        return "TM:B ONLINE DME Error";
+    case -986:
+        return "TM:B ONLINE Exceeds Max Worlds";
+    case -985:
+        return "TM:B ONLINE Request Denied";
+    case -984:
+        return "TM:B ONLINE Set Game List Filter Failed";
+    case -983:
+        return "TM:B ONLINE Clear Game List Filter Failed";
+    case -982:
+        return "TM:B ONLINE Get Game List Filter Failed";
+    case -981:
+        return "TM:B ONLINE Num Filters At Max";
+    case -980:
+        return "TM:B ONLINE Filter Not Found";
+    case -979:
+        return "TM:B ONLINE Invalid Request Msg";
+    case -978:
+        return "TM:B ONLINE Invalid Password";
+    case -977:
+        return "TM:B ONLINE Game Not Found";
+    case -976:
+        return "TM:B ONLINE Channel Not Found";
+    case -975:
+        return "TM:B ONLINE Game Name Exists";
+    case -974:
+        return "TM:B ONLINE Channel Name Exists";
+    case -973:
+        return "TM:B ONLINE Game Name Not Found";
+    case -972:
+        return "TM:B ONLINE Player Banned";
+    case -971:
+        return "TM:B ONLINE Clan Not Found";
+    case -970:
+        return "TM:B ONLINE Clan Name In Use";
+    case -969:
+        return "TM:B ONLINE Session Key Invalid";
+    case -968:
+        return "TM:B ONLINE Text String Invalid";
+    case -967:
+        return "TM:B ONLINE Filter Failed";
+    case -966:
+        return "TM:B ONLINE Fail";
+    case 0:
+        return "TM:B ONLINE Success";
+    case 1:
+        return "TM:B ONLINE No Result";
+    case 2:
+        return "TM:B ONLINE Request Accepted";
+    case 3:
+        return "TM:B ONLINE World Created Size Reduced";
+    case 4:
+        return "TM:B ONLINE Pass";
+    case 16777215:
+        return "Extra TM:B ONLINE Callback Status";
+    default:
+        if (M2C_FIELD(arg0, s32* , 4) == -0x32) {
+            return "Bad Connection or Server Down";
+        }
+        return "Unknown Error";
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001653D8);
 
@@ -463,7 +557,40 @@ void func_0016EC48(void) {
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016EC50);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016EE60);
+#include "m2c_macros.h"
+void* func_00213F80_16EE60() __asm__("func_00213F80");
+M2C_UNK hierCsAddToCsList__FP3_cs_16EE60() __asm__("hierCsAddToCsList__FP3_cs");
+M2C_UNK hierSetCsEpNode__FP3_csP9_hierhead_16EE60() __asm__("hierSetCsEpNode__FP3_csP9_hierhead");
+
+void func_0016EE60(void* arg0, s32 arg1, s32 arg2, M2C_UNK arg3) {
+    void* temp_v0;
+    void* temp_v0_2;
+    void* temp_v0_3;
+
+    switch (arg1) {                                 /* irregular */
+    case 0x1E47:
+        temp_v0 = func_00213F80_16EE60();
+        M2C_FIELD(arg0, void** , 0xB790) = temp_v0;
+        M2C_FIELD(temp_v0, s8* , 0xC) = 0;
+        hierSetCsEpNode__FP3_csP9_hierhead_16EE60(M2C_FIELD(arg0, void** , 0xB790), arg3);
+        hierCsAddToCsList__FP3_cs_16EE60(M2C_FIELD(arg0, void** , 0xB790));
+        return;
+    case 0x1E48:
+        temp_v0_2 = func_00213F80_16EE60();
+        M2C_FIELD(arg0, void** , 0xB794) = temp_v0_2;
+        M2C_FIELD(temp_v0_2, s8* , 0xC) = 0;
+        hierSetCsEpNode__FP3_csP9_hierhead_16EE60(M2C_FIELD(arg0, void** , 0xB794), arg3);
+        hierCsAddToCsList__FP3_cs_16EE60(M2C_FIELD(arg0, void** , 0xB794));
+        break;
+    case 0x1E49:
+        temp_v0_3 = func_00213F80_16EE60();
+        M2C_FIELD(arg0, void** , 0xB798) = temp_v0_3;
+        M2C_FIELD(temp_v0_3, s8* , 0xC) = 0;
+        hierSetCsEpNode__FP3_csP9_hierhead_16EE60(M2C_FIELD(arg0, void** , 0xB798), arg3);
+        hierCsAddToCsList__FP3_cs_16EE60(M2C_FIELD(arg0, void** , 0xB798));
+        break;
+    }
+}
 
 char* func_0016EF58(char* base, int slot) {
     return base + (slot * 0x220 + 0x10);
@@ -913,7 +1040,42 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00175588);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001756A0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001759D8);
+#include "m2c_macros.h"
+s32 func_001734B8_1759D8() __asm__("func_001734B8");
+M2C_UNK func_00268260_1759D8() __asm__("func_00268260");
+
+void func_001759D8(s32 arg0, void* arg1) {
+    s32* temp_v0;
+    void* temp_v0_2;
+
+    if (arg1 != NULL) {
+        temp_v0 = M2C_FIELD(arg1, s32** , 0x20D0);
+        if (temp_v0 != NULL) {
+            *temp_v0 = 0;
+            if (func_001734B8_1759D8() != 0) {
+                func_00268260_1759D8(M2C_FIELD(arg1, s32* , 0x20C4));
+            }
+            M2C_FIELD(arg1, s32** , 0x20D0) = NULL;
+            M2C_FIELD(arg1, s32* , 0x20C4) = -1;
+        }
+        temp_v0_2 = M2C_FIELD(arg1, void** , 0x20D4);
+        if (temp_v0_2 != NULL) {
+            M2C_FIELD(temp_v0_2, s32* , 0xC) = 0;
+            if (func_001734B8_1759D8(arg0) != 0) {
+                func_00268260_1759D8(M2C_FIELD(arg1, s32* , 0x20C8));
+            }
+            M2C_FIELD(arg1, void** , 0x20D4) = NULL;
+            M2C_FIELD(arg1, s32* , 0x20C8) = -1;
+        }
+        if (M2C_FIELD(arg1, s32* , 0x20D8) != 0) {
+            if (func_001734B8_1759D8(arg0) != 0) {
+                func_00268260_1759D8(M2C_FIELD(arg1, s32* , 0x20CC));
+            }
+            M2C_FIELD(arg1, s32* , 0x20D8) = 0;
+            M2C_FIELD(arg1, s32* , 0x20CC) = -1;
+        }
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00175AA0);
 
