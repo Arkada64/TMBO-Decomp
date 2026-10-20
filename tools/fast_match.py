@@ -58,11 +58,18 @@ def check(name, code):
 
 blocks = re.split(r"^//@@ (\S+)[^\n]*\n", Path(sys.argv[1]).read_text(), flags=re.M)[1:]
 matched, results, t0 = {}, {}, time.time()
+only = set(os.environ["ONLY_NAMES"].split(",")) if os.environ.get("ONLY_NAMES") else None
+near = {}   # name -> (insns differing, code) for same-size misses
 for name, code in zip(blocks[0::2], blocks[1::2]):
-    if name in matched: continue
+    if name in matched or (only is not None and name not in only): continue
     res = check(name, code)
     results.setdefault(name, []).append(res)
     if res == "MATCH": matched[name] = code
+    elif (m := re.match(r"(\d+) insns differ", res)) and (name not in near or int(m.group(1)) < near[name][0]):
+        near[name] = (int(m.group(1)), code)
+if os.environ.get("NEAR_OUT"):
+    import json
+    Path(os.environ["NEAR_OUT"]).write_text(json.dumps({n: {"diff": d, "code": c} for n, (d, c) in near.items()}))
 Path(sys.argv[2]).write_text("".join(f"//@@ {n}\n{c.rstrip()}\n" for n, c in matched.items()))
 tally = {}
 for rs in results.values():
