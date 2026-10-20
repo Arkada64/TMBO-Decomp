@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.15149476,
-    "total_code": "1753196",
+    "fuzzy_match_percent": 0.1514951,
+    "total_code": "1753192",
     "matched_code": "2656",
-    "matched_code_percent": 0.15149476,
+    "matched_code_percent": 0.1514951,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -5189,7 +5189,7 @@
     {
       "name": "tmb/freewaytrain_part2",
       "measures": {
-        "total_code": "1584",
+        "total_code": "1580",
         "matched_data_percent": 100.0,
         "total_functions": 8,
         "total_units": 1
@@ -5197,7 +5197,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "1584",
+          "size": "1580",
           "metadata": {
             "virtual_address": "1275744"
           }
@@ -5255,7 +5255,7 @@
         },
         {
           "name": "popCar__12FreewayTraini",
-          "size": "72",
+          "size": "68",
           "metadata": {
             "virtual_address": "1277256"
           }
@@ -50861,10 +50861,10 @@
       "id": "tmb",
       "name": "tmb",
       "measures": {
-        "fuzzy_match_percent": 0.023010656,
-        "total_code": "1112528",
+        "fuzzy_match_percent": 0.02301074,
+        "total_code": "1112524",
         "matched_code": "256",
-        "matched_code_percent": 0.023010656,
+        "matched_code_percent": 0.02301074,
         "matched_data_percent": 100.0,
         "total_functions": 2731,
         "matched_functions": 32,

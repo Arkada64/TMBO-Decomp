@@ -12,6 +12,22 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/freewaytrain_part2", ini
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/freewaytrain_part2", initAfter__15FreewayTrainCar);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/freewaytrain_part2", func_00137D20);
+#include "m2c_macros.h"
+M2C_UNK getPos__15FreewayTrainCarP8_fvector_137D20() __asm__("getPos__15FreewayTrainCarP8_fvector");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/freewaytrain_part2", popCar__12FreewayTraini);
+void func_00137D20(s32 arg0, s32 arg1, M2C_UNK arg2) {
+    getPos__15FreewayTrainCarP8_fvector_137D20((arg1 * 0x60) + arg0, arg2);
+}
+
+#include "m2c_macros.h"
+M2C_UNK finishExplosion__15FreewayTrainCarP8_fvectorb_Traini() __asm__("finishExplosion__15FreewayTrainCarP8_fvectorb");
+M2C_UNK getPos__15FreewayTrainCarP8_fvector_Traini() __asm__("getPos__15FreewayTrainCarP8_fvector");
+
+void popCar__12FreewayTraini(s32 arg0, s32 arg1) {
+    u8 sp[0x10];
+    s32 temp_s0;
+
+    temp_s0 = (arg1 * 0x60) + arg0;
+    getPos__15FreewayTrainCarP8_fvector_Traini(temp_s0, sp);
+    finishExplosion__15FreewayTrainCarP8_fvectorb_Traini(temp_s0, sp, 1);
+}
