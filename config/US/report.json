@@ -1,13 +1,13 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.002737826,
+    "fuzzy_match_percent": 0.05475652,
     "total_code": "1753216",
-    "matched_code": "48",
-    "matched_code_percent": 0.002737826,
+    "matched_code": "960",
+    "matched_code_percent": 0.05475652,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
-    "matched_functions": 6,
-    "matched_functions_percent": 0.10964912,
+    "matched_functions": 23,
+    "matched_functions_percent": 0.4203216,
     "complete_data_percent": 100.0,
     "total_units": 405
   },
@@ -7688,21 +7688,21 @@
     {
       "name": "online/net",
       "measures": {
-        "fuzzy_match_percent": 0.056657225,
+        "fuzzy_match_percent": 1.1331445,
         "total_code": "84720",
-        "matched_code": "48",
-        "matched_code_percent": 0.056657225,
+        "matched_code": "960",
+        "matched_code_percent": 1.1331445,
         "matched_data_percent": 100.0,
         "total_functions": 241,
-        "matched_functions": 6,
-        "matched_functions_percent": 2.4896266,
+        "matched_functions": 23,
+        "matched_functions_percent": 9.543569,
         "total_units": 1
       },
       "sections": [
         {
           "name": ".text",
           "size": "84720",
-          "fuzzy_match_percent": 0.056657225,
+          "fuzzy_match_percent": 1.1331445,
           "metadata": {
             "virtual_address": "1451480"
           }
@@ -7981,6 +7981,7 @@
         {
           "name": "func_001641A8",
           "size": "16",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1458600"
           }
@@ -8128,6 +8129,7 @@
         {
           "name": "func_001658C8",
           "size": "32",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1464520"
           }
@@ -8331,6 +8333,7 @@
         {
           "name": "func_001669C8",
           "size": "32",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1468872"
           }
@@ -8338,6 +8341,7 @@
         {
           "name": "netMsgChatHandler",
           "size": "128",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1468904"
           }
@@ -8402,6 +8406,7 @@
         {
           "name": "func_00168D90",
           "size": "80",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1478032"
           }
@@ -8669,6 +8674,7 @@
         {
           "name": "func_0016E6D8",
           "size": "32",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1500888"
           }
@@ -8761,6 +8767,7 @@
         {
           "name": "func_0016EF58",
           "size": "24",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1503064"
           }
@@ -8768,6 +8775,7 @@
         {
           "name": "func_0016EF70",
           "size": "24",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1503088"
           }
@@ -8922,6 +8930,7 @@
         {
           "name": "func_00171B58",
           "size": "32",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1514328"
           }
@@ -9034,6 +9043,7 @@
         {
           "name": "func_00172F48",
           "size": "88",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1519432"
           }
@@ -9076,6 +9086,7 @@
         {
           "name": "func_001733F8",
           "size": "80",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1520632"
           }
@@ -9083,6 +9094,7 @@
         {
           "name": "netGetMyClientIndex",
           "size": "112",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1520712"
           }
@@ -9209,6 +9221,7 @@
         {
           "name": "func_00174218",
           "size": "24",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1524248"
           }
@@ -9216,6 +9229,7 @@
         {
           "name": "func_00174230",
           "size": "24",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1524272"
           }
@@ -9223,6 +9237,7 @@
         {
           "name": "netGetDmeTime",
           "size": "32",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1524296"
           }
@@ -9230,6 +9245,7 @@
         {
           "name": "func_00174268",
           "size": "72",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1524328"
           }
@@ -9391,6 +9407,7 @@
         {
           "name": "func_00177028",
           "size": "80",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1536040"
           }
@@ -49280,14 +49297,14 @@
       "id": "online",
       "name": "online",
       "measures": {
-        "fuzzy_match_percent": 0.00990933,
+        "fuzzy_match_percent": 0.19818659,
         "total_code": "484392",
-        "matched_code": "48",
-        "matched_code_percent": 0.00990933,
+        "matched_code": "960",
+        "matched_code_percent": 0.19818659,
         "matched_data_percent": 100.0,
         "total_functions": 1890,
-        "matched_functions": 6,
-        "matched_functions_percent": 0.31746033,
+        "matched_functions": 23,
+        "matched_functions_percent": 1.2169312,
         "complete_data_percent": 100.0,
         "total_units": 123
       }

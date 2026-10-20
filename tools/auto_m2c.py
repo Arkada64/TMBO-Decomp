@@ -30,18 +30,27 @@ for asmdir, name in items:
     if r.returncode or not r.stdout.strip(): stats["failed"] += 1; continue
     code = r.stdout
     if "M2C_ERROR" in code: stats["error"] += 1; continue
-    lines = []
+    # Every symbol a draft declares gets a private alias bound to the real symbol with an asm label,
+    # so drafts never clash with each other or with existing code in the same file.
+    sfx = name[-6:]
+    lines, aliases = [], {}
     for l in code.splitlines():
-        if "/* extern */" in l and "(" in l: continue                     # function decls
-        m = re.match(r"extern .*?\b(D_[0-9A-F]{8})\b", l)
-        if m and m.group(1) in known: continue                           # declared in header
+        m = re.match(r"^(.*?)\b([A-Za-z_]\w*)(\(.*\));\s*/\* extern \*/$", l)        # function decl
+        d = re.match(r"^extern (.*?)\b([A-Za-z_]\w*)((?:\[[^\]]*\])*);", l)           # data decl
+        if m:
+            aliases[m.group(2)] = f"{m.group(2)}_{sfx}"
+            # unprototyped, like the implicit declarations the earlier matches compiled with
+            l = f'{m.group(1)}{m.group(2)}_{sfx}() __asm__("{m.group(2)}");'
+        elif d:
+            aliases[d.group(2)] = f"{d.group(2)}_{sfx}"
+            l = f'extern {d.group(1)}{d.group(2)}_{sfx}{d.group(3)} __asm__("{d.group(2)}");'
         lines.append(l)
     body = "\n".join(lines).strip()
-    # Globals the original reaches through $gp were declared small-data in Incog's source.
-    # At -G0 GCC only does that for variables placed in .sdata/.sbss, so place them there.
-    gp_syms = set(re.findall(r"%gp_rel\(([A-Za-z_]\w*)", t))
-    body = re.sub(r"^(extern [^;(]*?\b(" + "|".join(map(re.escape, gp_syms)) + r")\b[^;(]*);$",
-                  r'\1 __attribute__((section(".sdata")));', body, flags=re.M) if gp_syms else body
+    decl_end = max(body.find(f"{name}("), 0)
+    head, rest = body[:decl_end], body[decl_end:]
+    for real, alias in aliases.items():
+        rest = re.sub(rf"\b{re.escape(real)}\b", alias, rest)
+    body = head + rest
     # m2c lists only the args it sees used; fill gaps (arg3 alone -> arg0..arg3) so registers line up
     def fill(m):
         params = [p.strip() for p in m.group(2).split(",") if p.strip() and p.strip() != "void"]

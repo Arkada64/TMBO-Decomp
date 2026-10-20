@@ -28,6 +28,7 @@ def check(name, code):
     (WORK / "f.c").write_text(f'#include "{header}"\n{code}')
     obj = WORK / "f.o"; obj.unlink(missing_ok=True)
     r = subprocess.run([f"{R / SN}/bin/ee-gcc.exe", f"-B{SN}/lib/gcc-lib/ee/2.95.3/", "-c", "-O2", "-G0", "-Wa,-G8",
+                        *os.environ.get("FLAGS", "").split(),
                         "-fno-exceptions", "-Iinclude", "-isystem", "include/gcc", str(WORK.relative_to(R) / "f.c"),
                         "-o", str(obj.relative_to(R))], cwd=R, capture_output=True, text=True)
     if r.returncode or not obj.exists(): return "compile error"
