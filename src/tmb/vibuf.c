@@ -41,7 +41,18 @@ s32 func_002491D8(void* arg0) {
     return temp_s1;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vibuf", viBufCount__FP5ViBuf);
+#include "m2c_macros.h"
+M2C_UNK SignalSema_5ViBuf() __asm__("SignalSema");
+M2C_UNK WaitSema_5ViBuf() __asm__("WaitSema");
+
+s32 viBufCount__FP5ViBuf(void* arg0) {
+    s32 temp_s1;
+
+    WaitSema_5ViBuf(M2C_FIELD(arg0, s32* , 0x40));
+    temp_s1 = (M2C_FIELD(arg0, s32* , 0x10) << 0xB) + M2C_FIELD(arg0, s32* , 0x14);
+    SignalSema_5ViBuf(M2C_FIELD(arg0, s32* , 0x40));
+    return temp_s1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vibuf", viBufFlush__FP5ViBuf);
 
