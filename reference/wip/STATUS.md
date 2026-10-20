@@ -28,7 +28,24 @@
 - `netGetMyClientIndex`, `netGetDmeTime`, `func_00174268`, `netMsgChatHandler` (early-return form)
 
 ## Progress
-- 17 of 241 functions in src/online/net.c are matched C (batches in reference/wip/batch1-3.c).
+- 52 of 241 functions in src/online/net.c are matched C, all verified in the real build (commit ffd402a).
+
+## Automatic matching (tools/auto_m2c.py + tools/fast_match.py + tools/batch_try.py)
+- auto_m2c.py: m2c draft per INCLUDE_ASM function. Feeds m2c a fixed copy of the .s (named registers,
+  noreorder header), fills skipped leading args, and gives every declared symbol a private alias
+  (`D_x_<suffix> __asm__("D_x")`, unprototyped function aliases) so drafts never clash in one file.
+- fast_match.py: compiles each draft alone with the full SN toolchain and compares to the disc (~1.5 s each).
+- batch_try.py: puts candidates into the real build one at a time; keeps only byte-identical ones.
+- ALWAYS verify with a real build that succeeded: `rm -f build/*.rom; ninja && cmp ...`. A failed ninja
+  leaves the old ROM behind and `cmp` alone reports a false match (this happened once; commits
+  028b26d..f6ffa26 were reverted by bedcc3f).
+- Restoring an older net.c needs `./configure.py distclean && ./configure.py generate` so the
+  nonmatching .s files for its INCLUDE_ASM functions exist again.
+- Tried and ruled out: `-mno-split-addresses` (breaks matched C), stack-buffer size variants, .sdata
+  attributes (no effect). Remaining misses (fast_match tally): ~78 size mismatch, ~30 differ, ~49 don't
+  compile, 31 where m2c gives up. Known pattern: some originals store globals via SN-assembler macro
+  expansion (`lui $at`/`sw ...($at)`), which C compiled here doesn't reproduce yet (see func_00163DC8,
+  netSendGameEvent). Comparison direction mistakes from m2c in func_00165998/func_00165BA8.
 - Batch workflow: `python3 tools/batch_try.py src/online/net.c <file>` tries variants per function in the
   real build, keeps byte-identical ones, prints `>>` diffs for misses. "subcommand failed" = ninja's sha1
   check, i.e. a mismatch, not a compile error.
