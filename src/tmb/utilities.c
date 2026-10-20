@@ -15,7 +15,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/utilities", func_0024204
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/utilities", func_00242078);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/utilities", getLoadbarPacket__Fv);
+#include "m2c_macros.h"
+extern M2C_UNK D_004CECE0_et__Fv __asm__("D_004CECE0");
+
+M2C_UNK* getLoadbarPacket__Fv(void) {
+    return &D_004CECE0_et__Fv;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/utilities", func_002422F0);
 
