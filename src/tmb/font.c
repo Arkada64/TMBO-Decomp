@@ -39,7 +39,17 @@ void fontSetDefaultSize__Fi(s32 arg0) {
     }
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", fontSetSpacing__Fii);
+#include "m2c_macros.h"
+#include "m2c_macros.h"
+extern M2C_UNK D_00505EF0_g__Fii __asm__("D_00505EF0");
+
+void fontSetSpacing__Fii(s32 arg0, s32 arg1)
+{
+  void *temp_a0;
+  temp_a0 = &D_00505EF0_g__Fii;
+  ;
+  *((s16 *) (((u8 *) ((arg0 << 5) + temp_a0)) + 0xE)) = (s16) ((*((u16 *) (((arg0 << 5) + temp_a0) + 8))) + (arg1 * 0x10));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", fontStringWidth__FiPc);
 
