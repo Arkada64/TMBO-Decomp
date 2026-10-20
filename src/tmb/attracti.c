@@ -10,27 +10,60 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitL
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiCheckGroups__FP8GroupDat);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitSuburbGroups__FP8GroupDat);
+#include "m2c_macros.h"
+s32 attractiInitSuburbGroups__FP8GroupDat(void) {
+    return 0x3A;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitJunkyardGroups__FP8GroupDat);
+#include "m2c_macros.h"
+s32 attractiInitJunkyardGroups__FP8GroupDat(void) {
+    return 0x2E;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitFreewayGroups__FP8GroupDat);
+#include "m2c_macros.h"
+s32 attractiInitFreewayGroups__FP8GroupDat(void) {
+    return 0x3E;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitPrisonGroups__FP8GroupDat);
+#include "m2c_macros.h"
+s32 attractiInitPrisonGroups__FP8GroupDat(void) {
+    return 0x3D;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitRoofbossGroups__FP8GroupDat);
+#include "m2c_macros.h"
+s32 attractiInitRoofbossGroups__FP8GroupDat(void) {
+    return 2;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitRooftopGroups__FP8GroupDat);
+#include "m2c_macros.h"
+s32 attractiInitRooftopGroups__FP8GroupDat(void) {
+    return 0x26;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitCityGroups__FP8GroupDat);
+#include "m2c_macros.h"
+s32 attractiInitCityGroups__FP8GroupDat(void) {
+    return 0x2D;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitLoopGroups__FP8GroupDat);
+#include "m2c_macros.h"
+s32 attractiInitLoopGroups__FP8GroupDat(void) {
+    return 0x13;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitAlpineGroups__FP8GroupDat);
+#include "m2c_macros.h"
+s32 attractiInitAlpineGroups__FP8GroupDat(void) {
+    return 0xB;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitDriveInGroups__FP8GroupDat);
+#include "m2c_macros.h"
+s32 attractiInitDriveInGroups__FP8GroupDat(void) {
+    return 0xE;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitStadiumGroups__FP8GroupDat);
+#include "m2c_macros.h"
+s32 attractiInitStadiumGroups__FP8GroupDat(void) {
+    return 0x1D;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitDefaultGroups__FP8GroupDat);
 
