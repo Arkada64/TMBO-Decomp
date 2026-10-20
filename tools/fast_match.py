@@ -36,9 +36,15 @@ def check(name, code):
     if not sym: return "symbol missing"
     off, size = int(sym[0], 16), int(sym[1], 16)
     a, s = orig(name)
-    if size != s: return f"size {size} vs {s}"
     text = subprocess.run(["mips-linux-gnu-objcopy", "-O", "binary", "-j", ".text", str(obj), "/dev/stdout"],
                           capture_output=True).stdout
+    if size != s:
+        # a lone trailing nop is alignment padding, counted on one side only; compare without it
+        longer = text[off:off + size] if size > s else ROM[a - 0x100000:][:s]
+        if abs(size - s) == 4 and longer[-4:] == b"\0\0\0\0":
+            s = min(size, s)
+        else:
+            return f"size {size} vs {s}"
     mask, sec = {}, False
     for l in subprocess.run(["mips-linux-gnu-readelf", "-rW", str(obj)], capture_output=True, text=True).stdout.splitlines():
         if l.startswith("Relocation section"): sec = "'.rel.text'" in l
@@ -60,4 +66,14 @@ tally = {}
 for rs in results.values():
     k = "MATCH" if "MATCH" in rs else re.sub(r"\d+", "N", rs[-1]); tally[k] = tally.get(k, 0) + 1
 print(f"checked {len(results)} functions in {time.time() - t0:.0f}s: {tally}")
+# size mismatches: how far off (ours - original, in instructions), best variant per function
+deltas = {}
+for n, rs in results.items():
+    ds = [int(m.group(1)) - int(m.group(2)) for r in rs if (m := re.match(r"size (\d+) vs (\d+)", r))]
+    if ds and "MATCH" not in rs: deltas[n] = min(ds, key=abs) // 4
+if deltas:
+    import collections
+    h = collections.Counter(deltas.values())
+    print("size off by (insns, ours-orig):", dict(sorted(h.items())))
+    print("closest:", sorted(deltas.items(), key=lambda kv: abs(kv[1]))[:12])
 print("matched:", list(matched))
