@@ -6,13 +6,25 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", requestScr
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A70B0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", __14StreamingSound);
+#include "m2c_macros.h"
+void* __14StreamingSound(void* arg0) {
+    M2C_FIELD(arg0, s32* , 0x40) = 4;
+    M2C_FIELD(arg0, f32* , 0x24) = 1.0f;
+    return arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A72F0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", updateStreamingSound__14StreamingSound);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", __17SFXStreamingSound);
+#include "m2c_macros.h"
+M2C_UNK __14StreamingSound_gSound() __asm__("__14StreamingSound");
+
+void* __17SFXStreamingSound(void* arg0) {
+    __14StreamingSound_gSound();
+    M2C_FIELD(arg0, f32* , 0x28) = 2.0f;
+    return arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A7570);
 
