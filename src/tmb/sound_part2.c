@@ -6,7 +6,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_0019F
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", triggerSweettoothFoldingInOuttaAmmoSound__13LauncherSoundP7Vehicle);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_0019F208);
+#include "m2c_macros.h"
+M2C_UNK func_001A6620_19F208() __asm__("func_001A6620");
+
+void func_0019F208(s32 arg0) {
+    func_001A6620_19F208(arg0 + 0x68);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_0019F228);
 
@@ -40,13 +45,34 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", updateMini
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", updateTankerTorchSound__13LauncherSoundP7Vehicle);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", terminateMinionTorchSound__13LauncherSound);
+#include "m2c_macros.h"
+M2C_UNK func_001A6620_rSound() __asm__("func_001A6620");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", terminateTankerTorchSound__13LauncherSound);
+void terminateMinionTorchSound__13LauncherSound(s32 arg0) {
+    func_001A6620_rSound(arg0 + 0xB0);
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_0019FFF8);
+#include "m2c_macros.h"
+M2C_UNK func_001A6620_rSound() __asm__("func_001A6620");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", terminateChargerSpecialChargeUpSound__13LauncherSound);
+void terminateTankerTorchSound__13LauncherSound(s32 arg0) {
+    func_001A6620_rSound(arg0 + 0xC8);
+}
+
+#include "m2c_macros.h"
+M2C_UNK func_001A6620_19FFF8() __asm__("func_001A6620");
+
+void func_0019FFF8(s32 arg0) {
+    func_001A6620_19FFF8(arg0 + 0x50);
+}
+
+#include "m2c_macros.h"
+M2C_UNK func_001A6620_rSound() __asm__("func_001A6620");
+
+void terminateChargerSpecialChargeUpSound__13LauncherSound(s32 arg0) {
+    func_001A6620_rSound(arg0 + 0x20);
+    func_001A6620_rSound(arg0 + 0x38);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A0048);
 
@@ -56,7 +82,37 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A0
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A0288);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A02D8);
+#include "m2c_macros.h"
+M2C_UNK func_001FBCF8_1A02D8() __asm__("func_001FBCF8");
+s32 timerGetFieldCount__Fv_1A02D8() __asm__("timerGetFieldCount__Fv");
+extern M2C_UNK D_004FFF00_1A02D8 __asm__("D_004FFF00");
+
+void func_001A02D8(void* arg0) {
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
+
+    M2C_FIELD(arg0, s32* , 0x54) = 0;
+    M2C_FIELD(arg0, s32* , 0x24) = 0;
+    M2C_FIELD(arg0, s32* , 0x3C) = 0;
+    M2C_FIELD(arg0, s32* , 0x20) = 0;
+    temp_v0 = timerGetFieldCount__Fv_1A02D8();
+    M2C_FIELD(arg0, s32* , 0x70) = 0;
+    M2C_FIELD(arg0, s32* , 0x6C) = temp_v0;
+    temp_v0_2 = timerGetFieldCount__Fv_1A02D8();
+    M2C_FIELD(arg0, s32* , 0x64) = 0;
+    M2C_FIELD(arg0, s32* , 0x80) = 0;
+    M2C_FIELD(arg0, s32* , 0x84) = 0;
+    M2C_FIELD(arg0, s32* , 0x68) = temp_v0_2;
+    temp_v0_3 = timerGetFieldCount__Fv_1A02D8();
+    M2C_FIELD(arg0, s32* , 4) = 0;
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    M2C_FIELD(arg0, s32* , 8) = 0;
+    M2C_FIELD(arg0, s32* , 0x78) = 0x3FFF;
+    M2C_FIELD(arg0, s32* , 0x7C) = temp_v0_3;
+    M2C_FIELD(arg0, s32* , 0x74) = timerGetFieldCount__Fv_1A02D8();
+    func_001FBCF8_1A02D8(&D_004FFF00_1A02D8, 0xFDB, 0, 0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A0368);
 
@@ -112,15 +168,28 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2278);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A22F8);
+#include "m2c_macros.h"
+void func_001A22F8(void* arg0) {
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    M2C_FIELD(arg0, s32* , 4) = 0x10;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2308);
+#include "m2c_macros.h"
+void func_001A2308(void* arg0) {
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    M2C_FIELD(arg0, s32* , 4) = 0x11;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2318);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A23A0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2418);
+#include "m2c_macros.h"
+M2C_UNK func_001A9600_1A2418() __asm__("func_001A9600");
+
+void func_001A2418(void) {
+    func_001A9600_1A2418();
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2438);
 
@@ -128,21 +197,62 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", playMachineGunExplosion__14ExplosionSoundP8_fvectoriii);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2960);
+#include "m2c_macros.h"
+s32 func_001A30D8_1A2960() __asm__("func_001A30D8");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2990);
+void func_001A2960(void* arg0) {
+    M2C_FIELD(arg0, s32* , 0) = func_001A30D8_1A2960(M2C_FIELD(arg0, s32* , 4));
+}
+
+#include "m2c_macros.h"
+s32 func_001A30D8_1A2990() __asm__("func_001A30D8");
+
+void func_001A2990(void* arg0) {
+    M2C_FIELD(arg0, s32* , 0) = func_001A30D8_1A2990(M2C_FIELD(arg0, s32* , 8));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A29C0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2A38);
+#include "m2c_macros.h"
+M2C_UNK snd_PlaySoundVolPanPMPB_A_1A2A38() __asm__("snd_PlaySoundVolPanPMPB_A");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2A58);
+void func_001A2A38(s32* arg0) {
+    snd_PlaySoundVolPanPMPB_A_1A2A38(*arg0);
+}
+
+#include "m2c_macros.h"
+s32 func_001A9DE8_1A2A58() __asm__("func_001A9DE8");
+s32 func_001A9E00_1A2A58() __asm__("func_001A9E00");
+M2C_UNK func_001F9150_1A2A58() __asm__("func_001F9150");
+
+void func_001A2A58(s32* arg0) {
+    s32 var_s1;
+
+    var_s1 = 0;
+    if ((*arg0 != 0) && (func_001A9DE8_1A2A58() == 0)) {
+        var_s1 = func_001A9E00_1A2A58(arg0) == 0;
+    }
+    if (var_s1 != 0) {
+        func_001F9150_1A2A58(*arg0);
+    }
+    *arg0 = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2AC0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2C00);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2C48);
+#include "m2c_macros.h"
+M2C_UNK func_001A2A58_1A2C48() __asm__("func_001A2A58");
+
+void func_001A2C48(s32* arg0, s32 arg1) {
+    if (*arg0 == 0) {
+        *arg0 = arg1;
+        func_001A2A58_1A2C48();
+        return;
+    }
+    *arg0 = arg1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2C78);
 
@@ -154,7 +264,20 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A2
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A30D8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A3168);
+#include "m2c_macros.h"
+M2C_UNK func_001FA370_1A3168() __asm__("func_001FA370");
+M2C_UNK func_001FA490_1A3168() __asm__("func_001FA490");
+M2C_UNK sceCdInit_1A3168() __asm__("sceCdInit");
+
+void func_001A3168(void* arg0) {
+    if (M2C_FIELD(arg0, s32* , 0x90) != 0) {
+        func_001FA490_1A3168();
+    }
+    sceCdInit_1A3168(0);
+    if (M2C_FIELD(arg0, s32* , 0x90) != 0) {
+        func_001FA370_1A3168(5, 0xA000, 0, 1);
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A31C0);
 
@@ -174,7 +297,14 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A3
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A3D48);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A3E78);
+#include "m2c_macros.h"
+M2C_UNK func_001A9590_1A3E78() __asm__("func_001A9590");
+M2C_UNK func_001F9720_1A3E78() __asm__("func_001F9720");
+
+void func_001A3E78(void) {
+    func_001F9720_1A3E78();
+    func_001A9590_1A3E78();
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A3EA0);
 
