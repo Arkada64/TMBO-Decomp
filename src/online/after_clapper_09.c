@@ -4,7 +4,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", fu
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_00119118);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_001192E8);
+#include "m2c_macros.h"
+M2C_UNK func_00119318_1192E8() __asm__("func_00119318");
+M2C_UNK func_001A22F8_1192E8() __asm__("func_001A22F8");
+
+s32 func_001192E8(s32 arg0) {
+    func_00119318_1192E8();
+    func_001A22F8_1192E8(arg0 + 0x70);
+    return arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_00119318);
 
@@ -26,7 +34,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", fu
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_0011A550);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_0011A860);
+#include "m2c_macros.h"
+M2C_UNK printf_11A860() __asm__("printf");
+
+void func_0011A860(void* arg0, s32 arg1, s32 arg2) {
+    if (arg1 == 0x1E15) {
+        printf_11A860("Found the collector Visual\n");
+        M2C_FIELD(arg0, s32* , 0x9E4) = arg2;
+    }
+    if (arg1 == 0x1E16) {
+        printf_11A860("Found the collector Teleport Visual\n");
+        M2C_FIELD(arg0, s32* , 0x9E8) = arg2;
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_0011A8D0);
 
@@ -38,7 +58,10 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", fu
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_0011AEF8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_0011B0B0);
+#include "m2c_macros.h"
+s32 func_0011B0B0(void) {
+    return 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_0011B0B8);
 
