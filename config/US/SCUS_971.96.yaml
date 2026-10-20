@@ -1,5 +1,5 @@
 name: SCUS_971.96
-sha1: 2d49dbee93c42ef168ad4a8e86c9cc685c669232
+sha1: 70989e025ae31f45e0476ce82e03e63b46143542
 options:
   platform: ps2
   compiler: EEGCC
@@ -23,8 +23,8 @@ options:
   use_legacy_include_asm: False
   section_order: [".text", ".data", ".rodata", ".sdata", ".sbss", ".bss"]
   auto_link_sections: []
-  create_undefined_funcs_auto: False
-  create_undefined_syms_auto: False
+  create_undefined_funcs_auto: True
+  create_undefined_syms_auto: True
   do_c_func_detection: True
   string_encoding: ASCII
   data_string_encoding: ASCII
@@ -34,6 +34,9 @@ options:
   subalign: null
   migrate_rodata_to_functions: True
   named_regs_for_c_funcs: False
+  # binutils >= 2.4x with -mabi=eabi names $8-$15 as a4-a7,t0-t3 (n32 style).
+  # o32 names ($t0=$8) would silently assemble to the wrong registers.
+  mips_abi_gpr: n32
   use_gp_rel_macro_nonmatching: False
   disassemble_all: True
 
