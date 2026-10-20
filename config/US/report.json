@@ -1,8 +1,13 @@
 {
   "measures": {
+    "fuzzy_match_percent": 0.002737826,
     "total_code": "1753216",
+    "matched_code": "48",
+    "matched_code_percent": 0.002737826,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
+    "matched_functions": 6,
+    "matched_functions_percent": 0.10964912,
     "complete_data_percent": 100.0,
     "total_units": 405
   },
@@ -7683,15 +7688,21 @@
     {
       "name": "online/net",
       "measures": {
+        "fuzzy_match_percent": 0.056657225,
         "total_code": "84720",
+        "matched_code": "48",
+        "matched_code_percent": 0.056657225,
         "matched_data_percent": 100.0,
         "total_functions": 241,
+        "matched_functions": 6,
+        "matched_functions_percent": 2.4896266,
         "total_units": 1
       },
       "sections": [
         {
           "name": ".text",
           "size": "84720",
+          "fuzzy_match_percent": 0.056657225,
           "metadata": {
             "virtual_address": "1451480"
           }
@@ -7708,6 +7719,7 @@
         {
           "name": "func_001625D8",
           "size": "8",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1451480"
           }
@@ -7715,6 +7727,7 @@
         {
           "name": "func_001625E0",
           "size": "8",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1451488"
           }
@@ -7722,6 +7735,7 @@
         {
           "name": "func_001625E8",
           "size": "8",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1451496"
           }
@@ -8366,6 +8380,7 @@
         {
           "name": "func_00168B58",
           "size": "8",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1477464"
           }
@@ -8485,6 +8500,7 @@
         {
           "name": "netStatsUpdateCB",
           "size": "8",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1490680"
           }
@@ -8723,6 +8739,7 @@
         {
           "name": "func_0016EC48",
           "size": "8",
+          "fuzzy_match_percent": 100.0,
           "metadata": {
             "virtual_address": "1502280"
           }
@@ -49263,9 +49280,14 @@
       "id": "online",
       "name": "online",
       "measures": {
+        "fuzzy_match_percent": 0.00990933,
         "total_code": "484392",
+        "matched_code": "48",
+        "matched_code_percent": 0.00990933,
         "matched_data_percent": 100.0,
         "total_functions": 1890,
+        "matched_functions": 6,
+        "matched_functions_percent": 0.31746033,
         "complete_data_percent": 100.0,
         "total_units": 123
       }

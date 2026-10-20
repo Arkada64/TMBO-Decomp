@@ -17,3 +17,6 @@ permuter_settings.toml
 *.rom
 ctx*
 logs/
+tools/compilers/
+tools/ee-gcc2.96/
+tools/*.tar.*
