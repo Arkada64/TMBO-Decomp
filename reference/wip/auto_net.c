@@ -1,4 +1,4 @@
-//@@ func_001625F0 m2c
+//@@ func_001625F0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002B8A00;
 extern M2C_UNK D_002C1690;
@@ -11,7 +11,7 @@ void func_001625F0(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
         func_00166808(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438));
     }
 }
-//@@ func_00162698 m2c
+//@@ func_00162698 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 
@@ -24,7 +24,7 @@ void func_00162698(s32 arg0) {
     }
     M2C_FIELD(&D_002C1690, s32* , 0) = 1;
 }
-//@@ func_001626F8 m2c
+//@@ func_001626F8 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1690;
 extern M2C_UNK D_004F9C20;
@@ -38,7 +38,7 @@ void func_001626F8(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     }
     D_002C1690 = 1;
 }
-//@@ func_00162778 m2c
+//@@ func_00162778 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1690;
 
@@ -46,7 +46,7 @@ void func_00162778(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
     D_002C1690 = 1;
 }
-//@@ func_001628E0 m2c
+//@@ func_001628E0 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1690;
 
@@ -54,7 +54,7 @@ void func_001628E0(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
     D_002C1690 = 1;
 }
-//@@ func_00162918 m2c
+//@@ func_00162918 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1690;
 
@@ -62,7 +62,7 @@ void func_00162918(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
     D_002C1690 = 1;
 }
-//@@ func_00162950 m2c
+//@@ func_00162950 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1690;
 
@@ -70,7 +70,7 @@ void func_00162950(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
     D_002C1690 = 1;
 }
-//@@ func_00162988 m2c
+//@@ func_00162988 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1690;
 
@@ -78,7 +78,7 @@ void func_00162988(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
     D_002C1690 = 1;
 }
-//@@ func_001629C0 m2c
+//@@ func_001629C0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 
@@ -87,7 +87,7 @@ void func_001629C0(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x1C));
     M2C_FIELD(&D_002C1690, s32* , 0) = 1;
 }
-//@@ func_00162A00 m2c
+//@@ func_00162A00 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1690;
 
@@ -95,7 +95,7 @@ void func_00162A00(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x58));
     D_002C1690 = 1;
 }
-//@@ func_00162A38 m2c
+//@@ func_00162A38 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1690;
 
@@ -113,7 +113,7 @@ void func_00162A38(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
         D_002C1690 = 1;
     }
 }
-//@@ func_00162AB0 m2c
+//@@ func_00162AB0 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1690;
 
@@ -126,7 +126,7 @@ void func_00162AB0(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
         D_002C1690 = 1;
     }
 }
-//@@ func_00162B20 m2c
+//@@ func_00162B20 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK D_00301690;
@@ -232,7 +232,7 @@ block_28:
         }
     }
 }
-//@@ func_00162F00 m2c
+//@@ func_00162F00 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_004F9C28;
 extern M2C_UNK D_004F9C30;
@@ -260,7 +260,147 @@ loop_2:
         }
     }
 }
-//@@ func_00162FA0 m2c
+//@@ func_00162F00 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C28;
+extern M2C_UNK D_004F9C30;
+
+void func_00162F00(void* arg0) {
+    u8 sp[0xF0];
+    s32 var_a0;
+    s32 var_s0;
+
+    strcpy(sp);
+    var_s0 = func_00299350(sp, &D_004F9C28);
+    if (var_s0 != 0) {
+        var_a0 = var_s0;
+loop_2:
+        if (func_00298010(var_a0, &D_004F9C30, 3) == 0) {
+            strcpy(arg0, var_s0 + 4);
+            return;
+        }
+        var_s0 = func_00299350(NULL, &D_004F9C28);
+        var_a0 = var_s0;
+        if (var_s0 == 0) {
+
+        } else {
+            goto loop_2;
+        }
+    }
+}
+//@@ func_00162F00 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C28;
+extern M2C_UNK D_004F9C30;
+
+void func_00162F00(void* arg0) {
+    u8 sp[0xE0];
+    s32 var_a0;
+    s32 var_s0;
+
+    strcpy(sp);
+    var_s0 = func_00299350(sp, &D_004F9C28);
+    if (var_s0 != 0) {
+        var_a0 = var_s0;
+loop_2:
+        if (func_00298010(var_a0, &D_004F9C30, 3) == 0) {
+            strcpy(arg0, var_s0 + 4);
+            return;
+        }
+        var_s0 = func_00299350(NULL, &D_004F9C28);
+        var_a0 = var_s0;
+        if (var_s0 == 0) {
+
+        } else {
+            goto loop_2;
+        }
+    }
+}
+//@@ func_00162F00 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C28;
+extern M2C_UNK D_004F9C30;
+
+void func_00162F00(void* arg0) {
+    u8 sp[0xD0];
+    s32 var_a0;
+    s32 var_s0;
+
+    strcpy(sp);
+    var_s0 = func_00299350(sp, &D_004F9C28);
+    if (var_s0 != 0) {
+        var_a0 = var_s0;
+loop_2:
+        if (func_00298010(var_a0, &D_004F9C30, 3) == 0) {
+            strcpy(arg0, var_s0 + 4);
+            return;
+        }
+        var_s0 = func_00299350(NULL, &D_004F9C28);
+        var_a0 = var_s0;
+        if (var_s0 == 0) {
+
+        } else {
+            goto loop_2;
+        }
+    }
+}
+//@@ func_00162F00 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C28;
+extern M2C_UNK D_004F9C30;
+
+void func_00162F00(void* arg0) {
+    u8 sp[0xC0];
+    s32 var_a0;
+    s32 var_s0;
+
+    strcpy(sp);
+    var_s0 = func_00299350(sp, &D_004F9C28);
+    if (var_s0 != 0) {
+        var_a0 = var_s0;
+loop_2:
+        if (func_00298010(var_a0, &D_004F9C30, 3) == 0) {
+            strcpy(arg0, var_s0 + 4);
+            return;
+        }
+        var_s0 = func_00299350(NULL, &D_004F9C28);
+        var_a0 = var_s0;
+        if (var_s0 == 0) {
+
+        } else {
+            goto loop_2;
+        }
+    }
+}
+//@@ func_00162F00 m2c5
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C28;
+extern M2C_UNK D_004F9C30;
+
+void func_00162F00(void* arg0) {
+    u8 sp[0xB0];
+    s32 var_a0;
+    s32 var_s0;
+
+    strcpy(sp);
+    var_s0 = func_00299350(sp, &D_004F9C28);
+    if (var_s0 != 0) {
+        var_a0 = var_s0;
+loop_2:
+        if (func_00298010(var_a0, &D_004F9C30, 3) == 0) {
+            strcpy(arg0, var_s0 + 4);
+            return;
+        }
+        var_s0 = func_00299350(NULL, &D_004F9C28);
+        var_a0 = var_s0;
+        if (var_s0 == 0) {
+
+        } else {
+            goto loop_2;
+        }
+    }
+}
+//@@ func_00162FA0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_004F9C28;
 extern M2C_UNK D_004F9C30;
@@ -288,7 +428,147 @@ loop_2:
         }
     }
 }
-//@@ func_00163040 m2c
+//@@ func_00162FA0 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C28;
+extern M2C_UNK D_004F9C30;
+
+void func_00162FA0(s32 arg0) {
+    u8 sp[0xF0];
+    s32 var_a0;
+    s32 var_s0;
+
+    strcpy(sp);
+    var_s0 = func_00299350(sp, &D_004F9C28);
+    if (var_s0 != 0) {
+        var_a0 = var_s0;
+loop_2:
+        if (func_00298010(var_a0, &D_004F9C30, 3) == 0) {
+            strcpy(var_s0 + 4, arg0);
+            return;
+        }
+        var_s0 = func_00299350(NULL, &D_004F9C28);
+        var_a0 = var_s0;
+        if (var_s0 == 0) {
+
+        } else {
+            goto loop_2;
+        }
+    }
+}
+//@@ func_00162FA0 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C28;
+extern M2C_UNK D_004F9C30;
+
+void func_00162FA0(s32 arg0) {
+    u8 sp[0xE0];
+    s32 var_a0;
+    s32 var_s0;
+
+    strcpy(sp);
+    var_s0 = func_00299350(sp, &D_004F9C28);
+    if (var_s0 != 0) {
+        var_a0 = var_s0;
+loop_2:
+        if (func_00298010(var_a0, &D_004F9C30, 3) == 0) {
+            strcpy(var_s0 + 4, arg0);
+            return;
+        }
+        var_s0 = func_00299350(NULL, &D_004F9C28);
+        var_a0 = var_s0;
+        if (var_s0 == 0) {
+
+        } else {
+            goto loop_2;
+        }
+    }
+}
+//@@ func_00162FA0 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C28;
+extern M2C_UNK D_004F9C30;
+
+void func_00162FA0(s32 arg0) {
+    u8 sp[0xD0];
+    s32 var_a0;
+    s32 var_s0;
+
+    strcpy(sp);
+    var_s0 = func_00299350(sp, &D_004F9C28);
+    if (var_s0 != 0) {
+        var_a0 = var_s0;
+loop_2:
+        if (func_00298010(var_a0, &D_004F9C30, 3) == 0) {
+            strcpy(var_s0 + 4, arg0);
+            return;
+        }
+        var_s0 = func_00299350(NULL, &D_004F9C28);
+        var_a0 = var_s0;
+        if (var_s0 == 0) {
+
+        } else {
+            goto loop_2;
+        }
+    }
+}
+//@@ func_00162FA0 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C28;
+extern M2C_UNK D_004F9C30;
+
+void func_00162FA0(s32 arg0) {
+    u8 sp[0xC0];
+    s32 var_a0;
+    s32 var_s0;
+
+    strcpy(sp);
+    var_s0 = func_00299350(sp, &D_004F9C28);
+    if (var_s0 != 0) {
+        var_a0 = var_s0;
+loop_2:
+        if (func_00298010(var_a0, &D_004F9C30, 3) == 0) {
+            strcpy(var_s0 + 4, arg0);
+            return;
+        }
+        var_s0 = func_00299350(NULL, &D_004F9C28);
+        var_a0 = var_s0;
+        if (var_s0 == 0) {
+
+        } else {
+            goto loop_2;
+        }
+    }
+}
+//@@ func_00162FA0 m2c5
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C28;
+extern M2C_UNK D_004F9C30;
+
+void func_00162FA0(s32 arg0) {
+    u8 sp[0xB0];
+    s32 var_a0;
+    s32 var_s0;
+
+    strcpy(sp);
+    var_s0 = func_00299350(sp, &D_004F9C28);
+    if (var_s0 != 0) {
+        var_a0 = var_s0;
+loop_2:
+        if (func_00298010(var_a0, &D_004F9C30, 3) == 0) {
+            strcpy(var_s0 + 4, arg0);
+            return;
+        }
+        var_s0 = func_00299350(NULL, &D_004F9C28);
+        var_a0 = var_s0;
+        if (var_s0 == 0) {
+
+        } else {
+            goto loop_2;
+        }
+    }
+}
+//@@ func_00163040 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK D_004E58D0;
@@ -345,7 +625,7 @@ block_15:
         }
     }
 }
-//@@ func_00163200 m2c
+//@@ func_00163200 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 
@@ -356,7 +636,7 @@ void func_00163200(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x1C));
     M2C_FIELD(&D_002C1690, s32* , 0) = 1;
 }
-//@@ func_00163278 m2c
+//@@ func_00163278 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK D_00313EE0;
@@ -430,7 +710,303 @@ void func_00163278(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
         }
     }
 }
-//@@ func_00163560 m2c
+//@@ func_00163278 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+extern M2C_UNK D_00313EE0;
+extern s32 D_004F9C5C;
+extern s32 D_004F9C60;
+extern s32 D_004F9C64;
+extern s32 D_004F9C68;
+extern s32 D_004F9C6C;
+extern s32 D_004F9C70;
+extern s32 D_004F9C74;
+extern s32 D_004F9C78;
+extern s32 D_004F9C7C;
+extern s32 D_004F9C80;
+extern s32 D_004F9C84;
+extern M2C_UNK func_00163040;
+
+void func_00163278(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_a2;
+    s32 temp_a3;
+    s32 temp_a3_2;
+    s32 temp_t6;
+
+    func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
+    if (strcmp(arg3, &D_00313EE0) != 0) {
+        printf("Received a GameListResponse for a game not in this page.\n");
+    } else {
+        if (M2C_FIELD(arg3, s32* , 0x18) == 0) {
+            temp_a3 = M2C_FIELD(arg3, s32* , 0x60);
+            if (temp_a3 != 0) {
+                D_004F9C5C += 1;
+                func_001644D0(&D_002C1690, M2C_FIELD(arg3, s32* , 0x1C), arg3 + 0x20, temp_a3);
+                func_0025BD88(&D_002C1690 + 0x11, 0x1C, sp);
+                strcpy(&sp15, &D_002C1690 + 0xC);
+                sp28 = M2C_FIELD(arg3, s32* , 0x1C);
+                func_0025B1D0(sp, &func_00163040);
+            }
+        }
+        if (M2C_FIELD(arg3, s8* , 0x6C) != 0) {
+            printf("Reached the end of this page. Games read %d\n", D_004F9C5C);
+            D_004F9C84 = 1;
+        }
+        if (M2C_FIELD(arg3, s32* , 0x18) < 0) {
+            M2C_FIELD(&D_002C1690, s32* , 0x41AB0) = 1;
+            temp_a3_2 = D_004F9C7C + D_004F9C68;
+            temp_a2 = D_004F9C80 + D_004F9C6C;
+            D_004F9C74 += D_004F9C60;
+            D_004F9C78 += D_004F9C64;
+            D_004F9C7C = temp_a3_2;
+            D_004F9C80 = temp_a2;
+            D_004F9C70 += D_004F9C5C;
+            M2C_FIELD(&D_002C1690, s32* , 0x406A4) = 1;
+            D_004F9C5C = 0;
+            printf("End of List = %d (Server Error - Aborted List)\n", 1, temp_a2, temp_a3_2);
+            printf("List Stats: Count:%d, Ready:%d, TimedOut:%d, NoPing:%d, Tossed:%d\n", D_004F9C70, D_004F9C74, D_004F9C78);
+        }
+        temp_t6 = M2C_FIELD(arg3, s32* , 0x18);
+        if (temp_t6 == 1) {
+            M2C_FIELD(&D_002C1690, s32* , 0x41AB0) = temp_t6;
+            D_004F9C7C += D_004F9C68;
+            D_004F9C70 += D_004F9C5C;
+            D_004F9C74 += D_004F9C60;
+            D_004F9C78 += D_004F9C64;
+            D_004F9C80 += D_004F9C6C;
+            M2C_FIELD(&D_002C1690, s32* , 0x406A4) = temp_t6;
+            D_004F9C5C = 0;
+            printf("End of List = %d\n", 1, D_004F9C64, D_004F9C68);
+            printf("List Stats: Count:%d, Ready:%d, TimedOut:%d, NoPing:%d, Tossed:%d\n", D_004F9C70, D_004F9C74, D_004F9C78);
+        }
+    }
+}
+//@@ func_00163278 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+extern M2C_UNK D_00313EE0;
+extern s32 D_004F9C5C;
+extern s32 D_004F9C60;
+extern s32 D_004F9C64;
+extern s32 D_004F9C68;
+extern s32 D_004F9C6C;
+extern s32 D_004F9C70;
+extern s32 D_004F9C74;
+extern s32 D_004F9C78;
+extern s32 D_004F9C7C;
+extern s32 D_004F9C80;
+extern s32 D_004F9C84;
+extern M2C_UNK func_00163040;
+
+void func_00163278(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_a2;
+    s32 temp_a3;
+    s32 temp_a3_2;
+    s32 temp_t6;
+
+    func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
+    if (strcmp(arg3, &D_00313EE0) != 0) {
+        printf("Received a GameListResponse for a game not in this page.\n");
+    } else {
+        if (M2C_FIELD(arg3, s32* , 0x18) == 0) {
+            temp_a3 = M2C_FIELD(arg3, s32* , 0x60);
+            if (temp_a3 != 0) {
+                D_004F9C5C += 1;
+                func_001644D0(&D_002C1690, M2C_FIELD(arg3, s32* , 0x1C), arg3 + 0x20, temp_a3);
+                func_0025BD88(&D_002C1690 + 0x11, 0x1C, sp);
+                strcpy(&sp15, &D_002C1690 + 0xC);
+                sp28 = M2C_FIELD(arg3, s32* , 0x1C);
+                func_0025B1D0(sp, &func_00163040);
+            }
+        }
+        if (M2C_FIELD(arg3, s8* , 0x6C) != 0) {
+            printf("Reached the end of this page. Games read %d\n", D_004F9C5C);
+            D_004F9C84 = 1;
+        }
+        if (M2C_FIELD(arg3, s32* , 0x18) < 0) {
+            M2C_FIELD(&D_002C1690, s32* , 0x41AB0) = 1;
+            temp_a3_2 = D_004F9C7C + D_004F9C68;
+            temp_a2 = D_004F9C80 + D_004F9C6C;
+            D_004F9C74 += D_004F9C60;
+            D_004F9C78 += D_004F9C64;
+            D_004F9C7C = temp_a3_2;
+            D_004F9C80 = temp_a2;
+            D_004F9C70 += D_004F9C5C;
+            M2C_FIELD(&D_002C1690, s32* , 0x406A4) = 1;
+            D_004F9C5C = 0;
+            printf("End of List = %d (Server Error - Aborted List)\n", 1, temp_a2, temp_a3_2);
+            printf("List Stats: Count:%d, Ready:%d, TimedOut:%d, NoPing:%d, Tossed:%d\n", D_004F9C70, D_004F9C74, D_004F9C78);
+        }
+        temp_t6 = M2C_FIELD(arg3, s32* , 0x18);
+        if (temp_t6 == 1) {
+            M2C_FIELD(&D_002C1690, s32* , 0x41AB0) = temp_t6;
+            D_004F9C7C += D_004F9C68;
+            D_004F9C70 += D_004F9C5C;
+            D_004F9C74 += D_004F9C60;
+            D_004F9C78 += D_004F9C64;
+            D_004F9C80 += D_004F9C6C;
+            M2C_FIELD(&D_002C1690, s32* , 0x406A4) = temp_t6;
+            D_004F9C5C = 0;
+            printf("End of List = %d\n", 1, D_004F9C64, D_004F9C68);
+            printf("List Stats: Count:%d, Ready:%d, TimedOut:%d, NoPing:%d, Tossed:%d\n", D_004F9C70, D_004F9C74, D_004F9C78);
+        }
+    }
+}
+//@@ func_00163278 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+extern M2C_UNK D_00313EE0;
+extern s32 D_004F9C5C;
+extern s32 D_004F9C60;
+extern s32 D_004F9C64;
+extern s32 D_004F9C68;
+extern s32 D_004F9C6C;
+extern s32 D_004F9C70;
+extern s32 D_004F9C74;
+extern s32 D_004F9C78;
+extern s32 D_004F9C7C;
+extern s32 D_004F9C80;
+extern s32 D_004F9C84;
+extern M2C_UNK func_00163040;
+
+void func_00163278(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_a2;
+    s32 temp_a3;
+    s32 temp_a3_2;
+    s32 temp_t6;
+
+    func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
+    if (strcmp(arg3, &D_00313EE0) != 0) {
+        printf("Received a GameListResponse for a game not in this page.\n");
+    } else {
+        if (M2C_FIELD(arg3, s32* , 0x18) == 0) {
+            temp_a3 = M2C_FIELD(arg3, s32* , 0x60);
+            if (temp_a3 != 0) {
+                D_004F9C5C += 1;
+                func_001644D0(&D_002C1690, M2C_FIELD(arg3, s32* , 0x1C), arg3 + 0x20, temp_a3);
+                func_0025BD88(&D_002C1690 + 0x11, 0x1C, sp);
+                strcpy(&sp15, &D_002C1690 + 0xC);
+                sp28 = M2C_FIELD(arg3, s32* , 0x1C);
+                func_0025B1D0(sp, &func_00163040);
+            }
+        }
+        if (M2C_FIELD(arg3, s8* , 0x6C) != 0) {
+            printf("Reached the end of this page. Games read %d\n", D_004F9C5C);
+            D_004F9C84 = 1;
+        }
+        if (M2C_FIELD(arg3, s32* , 0x18) < 0) {
+            M2C_FIELD(&D_002C1690, s32* , 0x41AB0) = 1;
+            temp_a3_2 = D_004F9C7C + D_004F9C68;
+            temp_a2 = D_004F9C80 + D_004F9C6C;
+            D_004F9C74 += D_004F9C60;
+            D_004F9C78 += D_004F9C64;
+            D_004F9C7C = temp_a3_2;
+            D_004F9C80 = temp_a2;
+            D_004F9C70 += D_004F9C5C;
+            M2C_FIELD(&D_002C1690, s32* , 0x406A4) = 1;
+            D_004F9C5C = 0;
+            printf("End of List = %d (Server Error - Aborted List)\n", 1, temp_a2, temp_a3_2);
+            printf("List Stats: Count:%d, Ready:%d, TimedOut:%d, NoPing:%d, Tossed:%d\n", D_004F9C70, D_004F9C74, D_004F9C78);
+        }
+        temp_t6 = M2C_FIELD(arg3, s32* , 0x18);
+        if (temp_t6 == 1) {
+            M2C_FIELD(&D_002C1690, s32* , 0x41AB0) = temp_t6;
+            D_004F9C7C += D_004F9C68;
+            D_004F9C70 += D_004F9C5C;
+            D_004F9C74 += D_004F9C60;
+            D_004F9C78 += D_004F9C64;
+            D_004F9C80 += D_004F9C6C;
+            M2C_FIELD(&D_002C1690, s32* , 0x406A4) = temp_t6;
+            D_004F9C5C = 0;
+            printf("End of List = %d\n", 1, D_004F9C64, D_004F9C68);
+            printf("List Stats: Count:%d, Ready:%d, TimedOut:%d, NoPing:%d, Tossed:%d\n", D_004F9C70, D_004F9C74, D_004F9C78);
+        }
+    }
+}
+//@@ func_00163278 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+extern M2C_UNK D_00313EE0;
+extern s32 D_004F9C5C;
+extern s32 D_004F9C60;
+extern s32 D_004F9C64;
+extern s32 D_004F9C68;
+extern s32 D_004F9C6C;
+extern s32 D_004F9C70;
+extern s32 D_004F9C74;
+extern s32 D_004F9C78;
+extern s32 D_004F9C7C;
+extern s32 D_004F9C80;
+extern s32 D_004F9C84;
+extern M2C_UNK func_00163040;
+
+void func_00163278(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_a2;
+    s32 temp_a3;
+    s32 temp_a3_2;
+    s32 temp_t6;
+
+    func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
+    if (strcmp(arg3, &D_00313EE0) != 0) {
+        printf("Received a GameListResponse for a game not in this page.\n");
+    } else {
+        if (M2C_FIELD(arg3, s32* , 0x18) == 0) {
+            temp_a3 = M2C_FIELD(arg3, s32* , 0x60);
+            if (temp_a3 != 0) {
+                D_004F9C5C += 1;
+                func_001644D0(&D_002C1690, M2C_FIELD(arg3, s32* , 0x1C), arg3 + 0x20, temp_a3);
+                func_0025BD88(&D_002C1690 + 0x11, 0x1C, sp);
+                strcpy(&sp15, &D_002C1690 + 0xC);
+                sp28 = M2C_FIELD(arg3, s32* , 0x1C);
+                func_0025B1D0(sp, &func_00163040);
+            }
+        }
+        if (M2C_FIELD(arg3, s8* , 0x6C) != 0) {
+            printf("Reached the end of this page. Games read %d\n", D_004F9C5C);
+            D_004F9C84 = 1;
+        }
+        if (M2C_FIELD(arg3, s32* , 0x18) < 0) {
+            M2C_FIELD(&D_002C1690, s32* , 0x41AB0) = 1;
+            temp_a3_2 = D_004F9C7C + D_004F9C68;
+            temp_a2 = D_004F9C80 + D_004F9C6C;
+            D_004F9C74 += D_004F9C60;
+            D_004F9C78 += D_004F9C64;
+            D_004F9C7C = temp_a3_2;
+            D_004F9C80 = temp_a2;
+            D_004F9C70 += D_004F9C5C;
+            M2C_FIELD(&D_002C1690, s32* , 0x406A4) = 1;
+            D_004F9C5C = 0;
+            printf("End of List = %d (Server Error - Aborted List)\n", 1, temp_a2, temp_a3_2);
+            printf("List Stats: Count:%d, Ready:%d, TimedOut:%d, NoPing:%d, Tossed:%d\n", D_004F9C70, D_004F9C74, D_004F9C78);
+        }
+        temp_t6 = M2C_FIELD(arg3, s32* , 0x18);
+        if (temp_t6 == 1) {
+            M2C_FIELD(&D_002C1690, s32* , 0x41AB0) = temp_t6;
+            D_004F9C7C += D_004F9C68;
+            D_004F9C70 += D_004F9C5C;
+            D_004F9C74 += D_004F9C60;
+            D_004F9C78 += D_004F9C64;
+            D_004F9C80 += D_004F9C6C;
+            M2C_FIELD(&D_002C1690, s32* , 0x406A4) = temp_t6;
+            D_004F9C5C = 0;
+            printf("End of List = %d\n", 1, D_004F9C64, D_004F9C68);
+            printf("List Stats: Count:%d, Ready:%d, TimedOut:%d, NoPing:%d, Tossed:%d\n", D_004F9C70, D_004F9C74, D_004F9C78);
+        }
+    }
+}
+//@@ func_00163560 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK func_00163658;
@@ -450,7 +1026,7 @@ void func_00163560(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
         func_0025B090(&sp30, &func_00163658);
     }
 }
-//@@ func_00163658 m2c
+//@@ func_00163658 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 
@@ -469,7 +1045,7 @@ void func_00163658(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
         }
     }
 }
-//@@ func_00163708 m2c
+//@@ func_00163708 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK D_00313D6C;
@@ -482,7 +1058,7 @@ void func_00163708(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_00266D78(&D_00313D6C);
     M2C_FIELD(&D_002C1690, s32* , 0) = 1;
 }
-//@@ func_00163778 m2c
+//@@ func_00163778 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 
@@ -512,7 +1088,7 @@ void func_00163778(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
         M2C_FIELD(&D_002C1690, s32* , 0) = 1;
     }
 }
-//@@ func_001639F8 m2c
+//@@ func_001639F8 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 
@@ -521,7 +1097,7 @@ void func_001639F8(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     M2C_FIELD(&D_002C1690, s32* , 0x51AEC) = (s32) M2C_FIELD(arg3, s32* , 0x24);
     M2C_FIELD(&D_002C1690, s32* , 0) = 1;
 }
-//@@ func_00163A58 m2c
+//@@ func_00163A58 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 
@@ -530,7 +1106,7 @@ void func_00163A58(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_00164E60(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438), M2C_FIELD(arg3, s32* , 0x30), arg3 + 0x134, M2C_FIELD(arg3, s32* , 0x178), M2C_FIELD(arg3, s32* , 0x17C), M2C_FIELD(arg3, s32* , 0x180), M2C_FIELD(arg3, s32* , 0x184));
     M2C_FIELD(&D_002C1690, s32* , 0) = 1;
 }
-//@@ func_00163B00 m2c
+//@@ func_00163B00 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 static M2C_UNK D_004E5BD8;                          /* unable to generate initializer: unknown type; const */
@@ -596,7 +1172,7 @@ void func_00163B00(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_0025B938(&sp130, temp_a1_2, temp_a2, temp_a3);
     M2C_FIELD(&D_002C1690, s32* , 0) = 1;
 }
-//@@ func_00163CE0 m2c
+//@@ func_00163CE0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 
@@ -605,7 +1181,7 @@ void func_00163CE0(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_00164F68(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438), arg3 + 0x48);
     M2C_FIELD(&D_002C1690, s32* , 0) = 1;
 }
-//@@ func_00163D48 m2c
+//@@ func_00163D48 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 
@@ -619,7 +1195,77 @@ void func_00163D48(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
     func_0025B8AC(sp);
     M2C_FIELD(&D_002C1690, s32* , 0) = 1;
 }
-//@@ func_00163DC8 m2c
+//@@ func_00163D48 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+
+void func_00163D48(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x110];
+    M2C_UNK sp18;
+
+    func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
+    strcpy(sp, &D_002C1690 + 0xC);
+    strcpy(&sp18, arg3 + 0x48, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+    func_0025B8AC(sp);
+    M2C_FIELD(&D_002C1690, s32* , 0) = 1;
+}
+//@@ func_00163D48 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+
+void func_00163D48(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x100];
+    M2C_UNK sp18;
+
+    func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
+    strcpy(sp, &D_002C1690 + 0xC);
+    strcpy(&sp18, arg3 + 0x48, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+    func_0025B8AC(sp);
+    M2C_FIELD(&D_002C1690, s32* , 0) = 1;
+}
+//@@ func_00163D48 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+
+void func_00163D48(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0xF0];
+    M2C_UNK sp18;
+
+    func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
+    strcpy(sp, &D_002C1690 + 0xC);
+    strcpy(&sp18, arg3 + 0x48, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+    func_0025B8AC(sp);
+    M2C_FIELD(&D_002C1690, s32* , 0) = 1;
+}
+//@@ func_00163D48 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+
+void func_00163D48(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0xE0];
+    M2C_UNK sp18;
+
+    func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
+    strcpy(sp, &D_002C1690 + 0xC);
+    strcpy(&sp18, arg3 + 0x48, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+    func_0025B8AC(sp);
+    M2C_FIELD(&D_002C1690, s32* , 0) = 1;
+}
+//@@ func_00163D48 m2c5
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+
+void func_00163D48(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0xD0];
+    M2C_UNK sp18;
+
+    func_00163EB8(&D_002C1690, M2C_FIELD(arg3, s32* , 0x18));
+    strcpy(sp, &D_002C1690 + 0xC);
+    strcpy(&sp18, arg3 + 0x48, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+    func_0025B8AC(sp);
+    M2C_FIELD(&D_002C1690, s32* , 0) = 1;
+}
+//@@ func_00163DC8 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9C70;
 extern s32 D_004F9C74;
@@ -636,7 +1282,7 @@ void func_00163DC8(void* arg0) {
     D_004F9C7C = 0;
     D_004F9C80 = 0;
 }
-//@@ func_00163E00 m2c
+//@@ func_00163E00 m2c0
 #include "m2c_macros.h"
 void func_00163E00(s32* arg0, s32 arg1) {
     u8 sp[0x10];
@@ -660,7 +1306,55 @@ void func_00163E00(s32* arg0, s32 arg1) {
     }
     *arg0 = 0;
 }
-//@@ func_00163EC0 m2c
+//@@ func_00163E00 m2c1
+#include "m2c_macros.h"
+void func_00163E00(s32* arg0, s32 arg1) {
+    u8 sp[0x8];
+    s32 sp4;
+    s32 sp8;
+
+    func_00266D78(sp);
+    sp8 = subroutine_arg0;
+    if (*arg0 == 0) {
+        do {
+            func_00266D78(&sp4);
+            if ((sp4 - sp8) >= 0x33) {
+                func_0025A020();
+                func_00266D78(&sp8);
+            }
+            if (arg1 < (sp4 - subroutine_arg0)) {
+                *arg0 = 1;
+                func_00163EB8(arg0, -0x32);
+            }
+        } while (*arg0 == 0);
+    }
+    *arg0 = 0;
+}
+//@@ func_00163E00 m2c2
+#include "m2c_macros.h"
+void func_00163E00(s32* arg0, s32 arg1) {
+    u8 sp[0x4];
+    s32 sp4;
+    s32 sp8;
+
+    func_00266D78(sp);
+    sp8 = subroutine_arg0;
+    if (*arg0 == 0) {
+        do {
+            func_00266D78(&sp4);
+            if ((sp4 - sp8) >= 0x33) {
+                func_0025A020();
+                func_00266D78(&sp8);
+            }
+            if (arg1 < (sp4 - subroutine_arg0)) {
+                *arg0 = 1;
+                func_00163EB8(arg0, -0x32);
+            }
+        } while (*arg0 == 0);
+    }
+    *arg0 = 0;
+}
+//@@ func_00163EC0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK D_00301690;
@@ -730,7 +1424,7 @@ s32 func_00163EC0(void* arg0, s32 arg1, s32 arg2) {
     }
     return var_v0;
 }
-//@@ func_001641B8 m2c
+//@@ func_001641B8 m2c0
 #include "m2c_macros.h"
 void func_001641B8(void* arg0, s32 arg1) {
     s32 temp_s0;
@@ -743,7 +1437,7 @@ void func_001641B8(void* arg0, s32 arg1) {
     strcpy(M2C_FIELD(arg0, s32* , 0x1E64), arg1);
     M2C_FIELD(arg0, s32* , 0x1E64) = (s32) (M2C_FIELD(arg0, s32* , 0x1E64) + strlen(arg1));
 }
-//@@ func_00164240 m2c
+//@@ func_00164240 m2c0
 #include "m2c_macros.h"
 s32 func_00164240(void* arg0) {
     s32 temp_v1;
@@ -756,7 +1450,7 @@ s32 func_00164240(void* arg0) {
     }
     return 0;
 }
-//@@ func_00164750 m2c
+//@@ func_00164750 m2c0
 #include "m2c_macros.h"
 s32 func_00164750(void* arg0, s32 arg1) {
     s32 temp_a2;
@@ -806,7 +1500,7 @@ s32 func_00164750(void* arg0, s32 arg1) {
     M2C_FIELD(arg0, s32* , 0x406A8) = (s32) (M2C_FIELD(arg0, s32* , 0x406A8) - 1);
     return 1;
 }
-//@@ func_00164B60 m2c
+//@@ func_00164B60 m2c0
 #include "m2c_macros.h"
 s32 func_00164B60(void* arg0, s32 arg1, M2C_UNK arg2, M2C_UNK arg3) {
     s32 temp_a2;
@@ -825,7 +1519,7 @@ s32 func_00164B60(void* arg0, s32 arg1, M2C_UNK arg2, M2C_UNK arg3) {
     }
     return 0;
 }
-//@@ func_00164FD8 m2c
+//@@ func_00164FD8 m2c0
 #include "m2c_macros.h"
 M2C_UNK* func_00164FD8(void* arg0) {
     s32 temp_v1;
@@ -921,7 +1615,7 @@ M2C_UNK* func_00164FD8(void* arg0) {
         return "Unknown Error";
     }
 }
-//@@ func_001653D8 m2c
+//@@ func_001653D8 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK func_001625D8;
 extern M2C_UNK func_001625E0;
@@ -934,7 +1628,59 @@ void func_001653D8(void) {
 
     func_00259A58(sp, &sp20, &func_001625F0, 0x7530, 0x7530);
 }
-//@@ func_00165430 m2c
+//@@ func_001653D8 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK func_001625D8;
+extern M2C_UNK func_001625E0;
+extern M2C_UNK func_001625E8;
+extern M2C_UNK func_001625F0;
+
+void func_001653D8(void) {
+    u8 sp[0x20];
+    M2C_UNK sp20;
+
+    func_00259A58(sp, &sp20, &func_001625F0, 0x7530, 0x7530);
+}
+//@@ func_001653D8 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK func_001625D8;
+extern M2C_UNK func_001625E0;
+extern M2C_UNK func_001625E8;
+extern M2C_UNK func_001625F0;
+
+void func_001653D8(void) {
+    u8 sp[0x10];
+    M2C_UNK sp20;
+
+    func_00259A58(sp, &sp20, &func_001625F0, 0x7530, 0x7530);
+}
+//@@ func_001653D8 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK func_001625D8;
+extern M2C_UNK func_001625E0;
+extern M2C_UNK func_001625E8;
+extern M2C_UNK func_001625F0;
+
+void func_001653D8(void) {
+    u8 sp[0x8];
+    M2C_UNK sp20;
+
+    func_00259A58(sp, &sp20, &func_001625F0, 0x7530, 0x7530);
+}
+//@@ func_001653D8 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK func_001625D8;
+extern M2C_UNK func_001625E0;
+extern M2C_UNK func_001625E8;
+extern M2C_UNK func_001625F0;
+
+void func_001653D8(void) {
+    u8 sp[0x4];
+    M2C_UNK sp20;
+
+    func_00259A58(sp, &sp20, &func_001625F0, 0x7530, 0x7530);
+}
+//@@ func_00165430 m2c0
 #include "m2c_macros.h"
 extern u16 D_004F9C40;
 extern M2C_UNK func_00162670;
@@ -948,7 +1694,63 @@ void func_00165430(s32 arg0) {
     printf("Session Key = %s\n", &sp15);
     func_00259C6C(sp, &func_00162670);
 }
-//@@ func_001658E8 m2c
+//@@ func_00165430 m2c1
+#include "m2c_macros.h"
+extern u16 D_004F9C40;
+extern M2C_UNK func_00162670;
+
+void func_00165430(s32 arg0) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+
+    strcpy(&sp15, arg0 + 0xC);
+    printf("Trying to request the server version\n");
+    printf("Session Key = %s\n", &sp15);
+    func_00259C6C(sp, &func_00162670);
+}
+//@@ func_00165430 m2c2
+#include "m2c_macros.h"
+extern u16 D_004F9C40;
+extern M2C_UNK func_00162670;
+
+void func_00165430(s32 arg0) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+
+    strcpy(&sp15, arg0 + 0xC);
+    printf("Trying to request the server version\n");
+    printf("Session Key = %s\n", &sp15);
+    func_00259C6C(sp, &func_00162670);
+}
+//@@ func_00165430 m2c3
+#include "m2c_macros.h"
+extern u16 D_004F9C40;
+extern M2C_UNK func_00162670;
+
+void func_00165430(s32 arg0) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+
+    strcpy(&sp15, arg0 + 0xC);
+    printf("Trying to request the server version\n");
+    printf("Session Key = %s\n", &sp15);
+    func_00259C6C(sp, &func_00162670);
+}
+//@@ func_00165430 m2c4
+#include "m2c_macros.h"
+extern u16 D_004F9C40;
+extern M2C_UNK func_00162670;
+
+void func_00165430(s32 arg0) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+
+    strcpy(&sp15, arg0 + 0xC);
+    printf("Trying to request the server version\n");
+    printf("Session Key = %s\n", &sp15);
+    func_00259C6C(sp, &func_00162670);
+}
+//@@ func_001658E8 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern s32 D_00319924;
@@ -971,7 +1773,76 @@ s32 func_001658E8(s32* arg0) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00165998 m2c
+//@@ func_001658E8 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern s32 D_00319924;
+extern M2C_UNK func_001626F8;
+
+s32 func_001658E8(s32* arg0) {
+    u8 sp[0x10];
+    s32 temp_v0;
+
+    func_0025BD88(arg0 + 0xC, 0x35, sp);
+    if (D_00319924 != 0) {
+
+    }
+    *arg0 = 0;
+    temp_v0 = func_0025A208(sp, &func_001626F8);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_001658E8 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern s32 D_00319924;
+extern M2C_UNK func_001626F8;
+
+s32 func_001658E8(s32* arg0) {
+    u8 sp[0x8];
+    s32 temp_v0;
+
+    func_0025BD88(arg0 + 0xC, 0x35, sp);
+    if (D_00319924 != 0) {
+
+    }
+    *arg0 = 0;
+    temp_v0 = func_0025A208(sp, &func_001626F8);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_001658E8 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern s32 D_00319924;
+extern M2C_UNK func_001626F8;
+
+s32 func_001658E8(s32* arg0) {
+    u8 sp[0x4];
+    s32 temp_v0;
+
+    func_0025BD88(arg0 + 0xC, 0x35, sp);
+    if (D_00319924 != 0) {
+
+    }
+    *arg0 = 0;
+    temp_v0 = func_0025A208(sp, &func_001626F8);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165998 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_00162778;
@@ -994,7 +1865,99 @@ s32 func_00165998(s32* arg0) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00165A38 m2c
+//@@ func_00165998 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162778;
+
+s32 func_00165998(s32* arg0) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x36, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    temp_v0 = func_0025A2A0(sp, &func_00162778);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165998 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162778;
+
+s32 func_00165998(s32* arg0) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x36, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    temp_v0 = func_0025A2A0(sp, &func_00162778);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165998 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162778;
+
+s32 func_00165998(s32* arg0) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x36, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    temp_v0 = func_0025A2A0(sp, &func_00162778);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165998 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162778;
+
+s32 func_00165998(s32* arg0) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x36, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    temp_v0 = func_0025A2A0(sp, &func_00162778);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165A38 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_001627B0;
@@ -1021,7 +1984,142 @@ s32 func_00165A38(s32* arg0, s32 arg1, s32 arg2) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00165B08 m2c
+//@@ func_00165A38 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001627B0;
+
+s32 func_00165A38(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x60];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    M2C_UNK sp46;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 3, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    strcpy(&sp46, arg2);
+    *arg0 = 0;
+    temp_v0 = func_0025A344(sp, &func_001627B0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165A38 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001627B0;
+
+s32 func_00165A38(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x50];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    M2C_UNK sp46;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 3, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    strcpy(&sp46, arg2);
+    *arg0 = 0;
+    temp_v0 = func_0025A344(sp, &func_001627B0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165A38 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001627B0;
+
+s32 func_00165A38(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x40];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    M2C_UNK sp46;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 3, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    strcpy(&sp46, arg2);
+    *arg0 = 0;
+    temp_v0 = func_0025A344(sp, &func_001627B0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165A38 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001627B0;
+
+s32 func_00165A38(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x30];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    M2C_UNK sp46;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 3, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    strcpy(&sp46, arg2);
+    *arg0 = 0;
+    temp_v0 = func_0025A344(sp, &func_001627B0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165A38 m2c5
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001627B0;
+
+s32 func_00165A38(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    M2C_UNK sp46;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 3, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    strcpy(&sp46, arg2);
+    *arg0 = 0;
+    temp_v0 = func_0025A344(sp, &func_001627B0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165B08 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_001628E0;
@@ -1044,7 +2142,99 @@ s32 func_00165B08(s32* arg0) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00165BA8 m2c
+//@@ func_00165B08 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001628E0;
+
+s32 func_00165B08(s32* arg0) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 4, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    temp_v0 = func_0025A3FC(sp, &func_001628E0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165B08 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001628E0;
+
+s32 func_00165B08(s32* arg0) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 4, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    temp_v0 = func_0025A3FC(sp, &func_001628E0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165B08 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001628E0;
+
+s32 func_00165B08(s32* arg0) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 4, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    temp_v0 = func_0025A3FC(sp, &func_001628E0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165B08 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001628E0;
+
+s32 func_00165B08(s32* arg0) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 4, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    temp_v0 = func_0025A3FC(sp, &func_001628E0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165BA8 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_00162918;
@@ -1073,7 +2263,152 @@ s32 func_00165BA8(s32* arg0, s32 arg1, s32 arg2) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00165C80 m2c
+//@@ func_00165BA8 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162918;
+
+s32 func_00165BA8(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x60];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    M2C_UNK sp4C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 5, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 1;
+    strcpy(&sp2C, arg1);
+    strcpy(&sp4C, arg2);
+    *arg0 = 0;
+    temp_v0 = func_0025A53C(sp, &func_00162918);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165BA8 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162918;
+
+s32 func_00165BA8(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x50];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    M2C_UNK sp4C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 5, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 1;
+    strcpy(&sp2C, arg1);
+    strcpy(&sp4C, arg2);
+    *arg0 = 0;
+    temp_v0 = func_0025A53C(sp, &func_00162918);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165BA8 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162918;
+
+s32 func_00165BA8(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x40];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    M2C_UNK sp4C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 5, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 1;
+    strcpy(&sp2C, arg1);
+    strcpy(&sp4C, arg2);
+    *arg0 = 0;
+    temp_v0 = func_0025A53C(sp, &func_00162918);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165BA8 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162918;
+
+s32 func_00165BA8(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x30];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    M2C_UNK sp4C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 5, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 1;
+    strcpy(&sp2C, arg1);
+    strcpy(&sp4C, arg2);
+    *arg0 = 0;
+    temp_v0 = func_0025A53C(sp, &func_00162918);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165BA8 m2c5
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162918;
+
+s32 func_00165BA8(s32* arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    M2C_UNK sp4C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 5, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 1;
+    strcpy(&sp2C, arg1);
+    strcpy(&sp4C, arg2);
+    *arg0 = 0;
+    temp_v0 = func_0025A53C(sp, &func_00162918);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165C80 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_00162950;
@@ -1100,7 +2435,142 @@ s32 func_00165C80(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00165D50 m2c
+//@@ func_00165C80 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162950;
+
+s32 func_00165C80(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x60];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    M2C_UNK sp46;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 7, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg2);
+    strcpy(&sp46, arg3);
+    *arg0 = 0;
+    temp_v0 = func_0025A5F4(sp, &func_00162950);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165C80 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162950;
+
+s32 func_00165C80(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x50];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    M2C_UNK sp46;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 7, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg2);
+    strcpy(&sp46, arg3);
+    *arg0 = 0;
+    temp_v0 = func_0025A5F4(sp, &func_00162950);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165C80 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162950;
+
+s32 func_00165C80(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x40];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    M2C_UNK sp46;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 7, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg2);
+    strcpy(&sp46, arg3);
+    *arg0 = 0;
+    temp_v0 = func_0025A5F4(sp, &func_00162950);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165C80 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162950;
+
+s32 func_00165C80(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x30];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    M2C_UNK sp46;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 7, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg2);
+    strcpy(&sp46, arg3);
+    *arg0 = 0;
+    temp_v0 = func_0025A5F4(sp, &func_00162950);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165C80 m2c5
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162950;
+
+s32 func_00165C80(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    M2C_UNK sp46;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 7, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg2);
+    strcpy(&sp46, arg3);
+    *arg0 = 0;
+    temp_v0 = func_0025A5F4(sp, &func_00162950);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165D50 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_00162988;
@@ -1125,7 +2595,132 @@ s32 func_00165D50(s32* arg0, s32 arg1) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00165E08 m2c
+//@@ func_00165D50 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162988;
+
+s32 func_00165D50(s32* arg0, s32 arg1) {
+    u8 sp[0x40];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    *arg0 = 0;
+    temp_v0 = func_0025A888(sp, &func_00162988);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165D50 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162988;
+
+s32 func_00165D50(s32* arg0, s32 arg1) {
+    u8 sp[0x30];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    *arg0 = 0;
+    temp_v0 = func_0025A888(sp, &func_00162988);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165D50 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162988;
+
+s32 func_00165D50(s32* arg0, s32 arg1) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    *arg0 = 0;
+    temp_v0 = func_0025A888(sp, &func_00162988);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165D50 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162988;
+
+s32 func_00165D50(s32* arg0, s32 arg1) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    *arg0 = 0;
+    temp_v0 = func_0025A888(sp, &func_00162988);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165D50 m2c5
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162988;
+
+s32 func_00165D50(s32* arg0, s32 arg1) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    *arg0 = 0;
+    temp_v0 = func_0025A888(sp, &func_00162988);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165E08 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_001629C0;
@@ -1155,14 +2750,185 @@ s32 func_00165E08(void* arg0, s32 arg1) {
     func_00163EB8(arg0, 0xFFFFFF);
     return temp_v0;
 }
-//@@ func_00165ED0 m2c
+//@@ func_00165E08 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001629C0;
+
+s32 func_00165E08(void* arg0, s32 arg1) {
+    u8 sp[0x40];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 1, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    temp_v0 = func_0025C088(sp, &func_001629C0);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+        if (D_002C1694 >= 0) {
+            return 0;
+        }
+        M2C_FIELD(arg0, s32* , 0x60) = -1;
+        return 0xFFFFFF;
+    }
+    M2C_FIELD(arg0, s32* , 0x60) = -1;
+    func_00163EB8(arg0, 0xFFFFFF);
+    return temp_v0;
+}
+//@@ func_00165E08 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001629C0;
+
+s32 func_00165E08(void* arg0, s32 arg1) {
+    u8 sp[0x30];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 1, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    temp_v0 = func_0025C088(sp, &func_001629C0);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+        if (D_002C1694 >= 0) {
+            return 0;
+        }
+        M2C_FIELD(arg0, s32* , 0x60) = -1;
+        return 0xFFFFFF;
+    }
+    M2C_FIELD(arg0, s32* , 0x60) = -1;
+    func_00163EB8(arg0, 0xFFFFFF);
+    return temp_v0;
+}
+//@@ func_00165E08 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001629C0;
+
+s32 func_00165E08(void* arg0, s32 arg1) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 1, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    temp_v0 = func_0025C088(sp, &func_001629C0);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+        if (D_002C1694 >= 0) {
+            return 0;
+        }
+        M2C_FIELD(arg0, s32* , 0x60) = -1;
+        return 0xFFFFFF;
+    }
+    M2C_FIELD(arg0, s32* , 0x60) = -1;
+    func_00163EB8(arg0, 0xFFFFFF);
+    return temp_v0;
+}
+//@@ func_00165E08 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001629C0;
+
+s32 func_00165E08(void* arg0, s32 arg1) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 1, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    temp_v0 = func_0025C088(sp, &func_001629C0);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+        if (D_002C1694 >= 0) {
+            return 0;
+        }
+        M2C_FIELD(arg0, s32* , 0x60) = -1;
+        return 0xFFFFFF;
+    }
+    M2C_FIELD(arg0, s32* , 0x60) = -1;
+    func_00163EB8(arg0, 0xFFFFFF);
+    return temp_v0;
+}
+//@@ func_00165E08 m2c5
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001629C0;
+
+s32 func_00165E08(void* arg0, s32 arg1) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 1, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    temp_v0 = func_0025C088(sp, &func_001629C0);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+        if (D_002C1694 >= 0) {
+            return 0;
+        }
+        M2C_FIELD(arg0, s32* , 0x60) = -1;
+        return 0xFFFFFF;
+    }
+    M2C_FIELD(arg0, s32* , 0x60) = -1;
+    func_00163EB8(arg0, 0xFFFFFF);
+    return temp_v0;
+}
+//@@ func_00165ED0 m2c0
 #include "m2c_macros.h"
 void func_00165ED0(s32 arg0, s32 arg1) {
     u8 sp[0x20];
     strcpy(sp, arg0 + 0xC);
     func_0025A184(sp, arg1);
 }
-//@@ func_00165F08 m2c
+//@@ func_00165ED0 m2c1
+#include "m2c_macros.h"
+void func_00165ED0(s32 arg0, s32 arg1) {
+    u8 sp[0x10];
+    strcpy(sp, arg0 + 0xC);
+    func_0025A184(sp, arg1);
+}
+//@@ func_00165ED0 m2c2
+#include "m2c_macros.h"
+void func_00165ED0(s32 arg0, s32 arg1) {
+    u8 sp[0x8];
+    strcpy(sp, arg0 + 0xC);
+    func_0025A184(sp, arg1);
+}
+//@@ func_00165ED0 m2c3
+#include "m2c_macros.h"
+void func_00165ED0(s32 arg0, s32 arg1) {
+    u8 sp[0x4];
+    strcpy(sp, arg0 + 0xC);
+    func_0025A184(sp, arg1);
+}
+//@@ func_00165F08 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK func_00162A00;
 
@@ -1188,7 +2954,137 @@ s32 func_00165F08(s32* arg0, s32 arg1) {
     func_00163E00(arg0, 0xC350);
     return 0;
 }
-//@@ func_00165FB0 m2c
+//@@ func_00165F08 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK func_00162A00;
+
+s32 func_00165F08(s32* arg0, s32 arg1) {
+    u8 sp[0x60];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x5A, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 0;
+    strcpy(&sp2C, arg1);
+    *arg0 = 0;
+    temp_v0 = func_0025AA6C(sp, &func_00162A00);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return 0;
+}
+//@@ func_00165F08 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK func_00162A00;
+
+s32 func_00165F08(s32* arg0, s32 arg1) {
+    u8 sp[0x50];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x5A, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 0;
+    strcpy(&sp2C, arg1);
+    *arg0 = 0;
+    temp_v0 = func_0025AA6C(sp, &func_00162A00);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return 0;
+}
+//@@ func_00165F08 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK func_00162A00;
+
+s32 func_00165F08(s32* arg0, s32 arg1) {
+    u8 sp[0x40];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x5A, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 0;
+    strcpy(&sp2C, arg1);
+    *arg0 = 0;
+    temp_v0 = func_0025AA6C(sp, &func_00162A00);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return 0;
+}
+//@@ func_00165F08 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK func_00162A00;
+
+s32 func_00165F08(s32* arg0, s32 arg1) {
+    u8 sp[0x30];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x5A, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 0;
+    strcpy(&sp2C, arg1);
+    *arg0 = 0;
+    temp_v0 = func_0025AA6C(sp, &func_00162A00);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return 0;
+}
+//@@ func_00165F08 m2c5
+#include "m2c_macros.h"
+extern M2C_UNK func_00162A00;
+
+s32 func_00165F08(s32* arg0, s32 arg1) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x5A, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 0;
+    strcpy(&sp2C, arg1);
+    *arg0 = 0;
+    temp_v0 = func_0025AA6C(sp, &func_00162A00);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return 0;
+}
+//@@ func_00165FB0 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_00162A38;
@@ -1214,7 +3110,111 @@ s32 func_00165FB0(void* arg0) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00166060 m2c
+//@@ func_00165FB0 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162A38;
+
+s32 func_00165FB0(void* arg0) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x1E64) = (s32) (arg0 + 0x64);
+    func_0025BD88(temp_s0, 0x24, sp);
+    strcpy(&sp15, temp_s0);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp28 = 0;
+    temp_v0 = func_0025B80C(sp, &func_00162A38);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165FB0 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162A38;
+
+s32 func_00165FB0(void* arg0) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x1E64) = (s32) (arg0 + 0x64);
+    func_0025BD88(temp_s0, 0x24, sp);
+    strcpy(&sp15, temp_s0);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp28 = 0;
+    temp_v0 = func_0025B80C(sp, &func_00162A38);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165FB0 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162A38;
+
+s32 func_00165FB0(void* arg0) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x1E64) = (s32) (arg0 + 0x64);
+    func_0025BD88(temp_s0, 0x24, sp);
+    strcpy(&sp15, temp_s0);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp28 = 0;
+    temp_v0 = func_0025B80C(sp, &func_00162A38);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00165FB0 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162A38;
+
+s32 func_00165FB0(void* arg0) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x1E64) = (s32) (arg0 + 0x64);
+    func_0025BD88(temp_s0, 0x24, sp);
+    strcpy(&sp15, temp_s0);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp28 = 0;
+    temp_v0 = func_0025B80C(sp, &func_00162A38);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166060 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_00162AB0;
@@ -1240,7 +3240,111 @@ s32 func_00166060(void* arg0) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00166110 m2c
+//@@ func_00166060 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162AB0;
+
+s32 func_00166060(void* arg0) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x1E68) = 0;
+    func_0025BD88(temp_s0, 0x18, sp);
+    strcpy(&sp15, temp_s0);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp28 = 0x272F;
+    temp_v0 = func_0025BA68(sp, &func_00162AB0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166060 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162AB0;
+
+s32 func_00166060(void* arg0) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x1E68) = 0;
+    func_0025BD88(temp_s0, 0x18, sp);
+    strcpy(&sp15, temp_s0);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp28 = 0x272F;
+    temp_v0 = func_0025BA68(sp, &func_00162AB0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166060 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162AB0;
+
+s32 func_00166060(void* arg0) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x1E68) = 0;
+    func_0025BD88(temp_s0, 0x18, sp);
+    strcpy(&sp15, temp_s0);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp28 = 0x272F;
+    temp_v0 = func_0025BA68(sp, &func_00162AB0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166060 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00162AB0;
+
+s32 func_00166060(void* arg0) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x1E68) = 0;
+    func_0025BD88(temp_s0, 0x18, sp);
+    strcpy(&sp15, temp_s0);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp28 = 0x272F;
+    temp_v0 = func_0025BA68(sp, &func_00162AB0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166110 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK func_00163200;
 
@@ -1262,7 +3366,95 @@ s32 func_00166110(s32* arg0) {
     }
     return temp_v0;
 }
-//@@ func_00166190 m2c
+//@@ func_00166110 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK func_00163200;
+
+s32 func_00166110(s32* arg0) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x61, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = 0x272F;
+    temp_v0 = func_0025C93C(sp, &func_00163200);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+    }
+    return temp_v0;
+}
+//@@ func_00166110 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK func_00163200;
+
+s32 func_00166110(s32* arg0) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x61, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = 0x272F;
+    temp_v0 = func_0025C93C(sp, &func_00163200);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+    }
+    return temp_v0;
+}
+//@@ func_00166110 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK func_00163200;
+
+s32 func_00166110(s32* arg0) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x61, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = 0x272F;
+    temp_v0 = func_0025C93C(sp, &func_00163200);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+    }
+    return temp_v0;
+}
+//@@ func_00166110 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK func_00163200;
+
+s32 func_00166110(s32* arg0) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x61, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = 0x272F;
+    temp_v0 = func_0025C93C(sp, &func_00163200);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+    }
+    return temp_v0;
+}
+//@@ func_00166190 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_00313EE0;
 extern s32 D_004F9C58;
@@ -1302,7 +3494,167 @@ void func_00166190(void* arg0, s16 arg1) {
     func_00266D78(arg0 + 0x406A0);
     func_0025AEB0(sp, &func_00163278);
 }
-//@@ func_00166280 m2c
+//@@ func_00166190 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_00313EE0;
+extern s32 D_004F9C58;
+extern s32 D_004F9C5C;
+extern s32 D_004F9C60;
+extern s32 D_004F9C64;
+extern s32 D_004F9C68;
+extern s32 D_004F9C6C;
+extern s32 D_004F9C84;
+extern M2C_UNK func_00163278;
+
+void func_00166190(void* arg0, s16 arg1) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s16 sp2C;
+    s16 sp2E;
+    void* temp_s1;
+
+    printf("Get Available Games - Page:%d PageSize:%d ListSize:%d\n\0BASCUS-97196\0\0\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789", 0x28, 0x200);
+    temp_s1 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x406A4) = 0;
+    M2C_FIELD(arg0, s32* , 0x406A8) = 0;
+    D_004F9C58 = 0;
+    D_004F9C6C = 0;
+    D_004F9C68 = 0;
+    D_004F9C64 = 0;
+    D_004F9C60 = 0;
+    D_004F9C5C = 0;
+    D_004F9C84 = 0;
+    func_0025BD88(temp_s1, 0x20, sp);
+    strcpy(&D_00313EE0, sp);
+    strcpy(&sp15, temp_s1);
+    sp2C = arg1;
+    sp28 = 0x272F;
+    sp2E = 0x28;
+    func_00266D78(arg0 + 0x406A0);
+    func_0025AEB0(sp, &func_00163278);
+}
+//@@ func_00166190 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_00313EE0;
+extern s32 D_004F9C58;
+extern s32 D_004F9C5C;
+extern s32 D_004F9C60;
+extern s32 D_004F9C64;
+extern s32 D_004F9C68;
+extern s32 D_004F9C6C;
+extern s32 D_004F9C84;
+extern M2C_UNK func_00163278;
+
+void func_00166190(void* arg0, s16 arg1) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s16 sp2C;
+    s16 sp2E;
+    void* temp_s1;
+
+    printf("Get Available Games - Page:%d PageSize:%d ListSize:%d\n\0BASCUS-97196\0\0\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789", 0x28, 0x200);
+    temp_s1 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x406A4) = 0;
+    M2C_FIELD(arg0, s32* , 0x406A8) = 0;
+    D_004F9C58 = 0;
+    D_004F9C6C = 0;
+    D_004F9C68 = 0;
+    D_004F9C64 = 0;
+    D_004F9C60 = 0;
+    D_004F9C5C = 0;
+    D_004F9C84 = 0;
+    func_0025BD88(temp_s1, 0x20, sp);
+    strcpy(&D_00313EE0, sp);
+    strcpy(&sp15, temp_s1);
+    sp2C = arg1;
+    sp28 = 0x272F;
+    sp2E = 0x28;
+    func_00266D78(arg0 + 0x406A0);
+    func_0025AEB0(sp, &func_00163278);
+}
+//@@ func_00166190 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_00313EE0;
+extern s32 D_004F9C58;
+extern s32 D_004F9C5C;
+extern s32 D_004F9C60;
+extern s32 D_004F9C64;
+extern s32 D_004F9C68;
+extern s32 D_004F9C6C;
+extern s32 D_004F9C84;
+extern M2C_UNK func_00163278;
+
+void func_00166190(void* arg0, s16 arg1) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s16 sp2C;
+    s16 sp2E;
+    void* temp_s1;
+
+    printf("Get Available Games - Page:%d PageSize:%d ListSize:%d\n\0BASCUS-97196\0\0\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789", 0x28, 0x200);
+    temp_s1 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x406A4) = 0;
+    M2C_FIELD(arg0, s32* , 0x406A8) = 0;
+    D_004F9C58 = 0;
+    D_004F9C6C = 0;
+    D_004F9C68 = 0;
+    D_004F9C64 = 0;
+    D_004F9C60 = 0;
+    D_004F9C5C = 0;
+    D_004F9C84 = 0;
+    func_0025BD88(temp_s1, 0x20, sp);
+    strcpy(&D_00313EE0, sp);
+    strcpy(&sp15, temp_s1);
+    sp2C = arg1;
+    sp28 = 0x272F;
+    sp2E = 0x28;
+    func_00266D78(arg0 + 0x406A0);
+    func_0025AEB0(sp, &func_00163278);
+}
+//@@ func_00166190 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_00313EE0;
+extern s32 D_004F9C58;
+extern s32 D_004F9C5C;
+extern s32 D_004F9C60;
+extern s32 D_004F9C64;
+extern s32 D_004F9C68;
+extern s32 D_004F9C6C;
+extern s32 D_004F9C84;
+extern M2C_UNK func_00163278;
+
+void func_00166190(void* arg0, s16 arg1) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s16 sp2C;
+    s16 sp2E;
+    void* temp_s1;
+
+    printf("Get Available Games - Page:%d PageSize:%d ListSize:%d\n\0BASCUS-97196\0\0\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789", 0x28, 0x200);
+    temp_s1 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x406A4) = 0;
+    M2C_FIELD(arg0, s32* , 0x406A8) = 0;
+    D_004F9C58 = 0;
+    D_004F9C6C = 0;
+    D_004F9C68 = 0;
+    D_004F9C64 = 0;
+    D_004F9C60 = 0;
+    D_004F9C5C = 0;
+    D_004F9C84 = 0;
+    func_0025BD88(temp_s1, 0x20, sp);
+    strcpy(&D_00313EE0, sp);
+    strcpy(&sp15, temp_s1);
+    sp2C = arg1;
+    sp28 = 0x272F;
+    sp2E = 0x28;
+    func_00266D78(arg0 + 0x406A0);
+    func_0025AEB0(sp, &func_00163278);
+}
+//@@ func_00166280 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK func_00163560;
 
@@ -1321,7 +3673,83 @@ void func_00166280(void* arg0, s32 arg1) {
     sp28 = M2C_FIELD(arg0, s32* , 0x51B0C);
     func_0025B1D0(sp, &func_00163560);
 }
-//@@ func_001662F8 m2c
+//@@ func_00166280 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK func_00163560;
+
+void func_00166280(void* arg0, s32 arg1) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x51B0C) = arg1;
+    M2C_FIELD(arg0, s32* , 0x51B10) = 0;
+    M2C_FIELD(arg0, s32* , 0x51B14) = 0;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = M2C_FIELD(arg0, s32* , 0x51B0C);
+    func_0025B1D0(sp, &func_00163560);
+}
+//@@ func_00166280 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK func_00163560;
+
+void func_00166280(void* arg0, s32 arg1) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x51B0C) = arg1;
+    M2C_FIELD(arg0, s32* , 0x51B10) = 0;
+    M2C_FIELD(arg0, s32* , 0x51B14) = 0;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = M2C_FIELD(arg0, s32* , 0x51B0C);
+    func_0025B1D0(sp, &func_00163560);
+}
+//@@ func_00166280 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK func_00163560;
+
+void func_00166280(void* arg0, s32 arg1) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x51B0C) = arg1;
+    M2C_FIELD(arg0, s32* , 0x51B10) = 0;
+    M2C_FIELD(arg0, s32* , 0x51B14) = 0;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = M2C_FIELD(arg0, s32* , 0x51B0C);
+    func_0025B1D0(sp, &func_00163560);
+}
+//@@ func_00166280 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK func_00163560;
+
+void func_00166280(void* arg0, s32 arg1) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x51B0C) = arg1;
+    M2C_FIELD(arg0, s32* , 0x51B10) = 0;
+    M2C_FIELD(arg0, s32* , 0x51B14) = 0;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = M2C_FIELD(arg0, s32* , 0x51B0C);
+    func_0025B1D0(sp, &func_00163560);
+}
+//@@ func_001662F8 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK func_00163658;
 
@@ -1339,7 +3767,79 @@ void func_001662F8(void* arg0, s32 arg1) {
     sp28 = arg1;
     func_0025B090(sp, &func_00163658);
 }
-//@@ func_00166368 m2c
+//@@ func_001662F8 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK func_00163658;
+
+void func_001662F8(void* arg0, s32 arg1) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x51B14) = 0;
+    M2C_FIELD(arg0, s32* , 0x51B10) = 0;
+    func_0025BD88(temp_s0, 0x1F, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    func_0025B090(sp, &func_00163658);
+}
+//@@ func_001662F8 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK func_00163658;
+
+void func_001662F8(void* arg0, s32 arg1) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x51B14) = 0;
+    M2C_FIELD(arg0, s32* , 0x51B10) = 0;
+    func_0025BD88(temp_s0, 0x1F, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    func_0025B090(sp, &func_00163658);
+}
+//@@ func_001662F8 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK func_00163658;
+
+void func_001662F8(void* arg0, s32 arg1) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x51B14) = 0;
+    M2C_FIELD(arg0, s32* , 0x51B10) = 0;
+    func_0025BD88(temp_s0, 0x1F, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    func_0025B090(sp, &func_00163658);
+}
+//@@ func_001662F8 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK func_00163658;
+
+void func_001662F8(void* arg0, s32 arg1) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    M2C_FIELD(arg0, s32* , 0x51B14) = 0;
+    M2C_FIELD(arg0, s32* , 0x51B10) = 0;
+    func_0025BD88(temp_s0, 0x1F, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    func_0025B090(sp, &func_00163658);
+}
+//@@ func_00166368 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_00163708;
@@ -1386,7 +3886,242 @@ s32 func_00166368(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
     }
     return var_v0;
 }
-//@@ func_00166478 m2c
+//@@ func_00166368 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163708;
+
+s32 func_00166368(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0xA0];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 sp2C;
+    s32 sp30;
+    s32 sp34;
+    M2C_UNK sp38;
+    M2C_UNK sp78;
+    s32 sp98;
+    s32 sp9C;
+    s32 spA0;
+    s32 spA4;
+    s32 spA8;
+    s32 spAC;
+    s32 temp_s0;
+    s32 var_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x10, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 0x272F;
+    sp30 = 8;
+    sp34 = arg3;
+    sp2C = 1;
+    strcpy(&sp38, arg1);
+    strcpy(&sp78, arg2);
+    M2C_FIELD(arg0, s32* , 0x52440) = 0;
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp98 = 1;
+    sp9C = -1;
+    spAC = 0;
+    spA0 = 0;
+    spA4 = 0;
+    spA8 = 0;
+    var_v0 = func_0025A9B4(sp, &func_00163708);
+    if (var_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+        var_v0 = (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+    }
+    return var_v0;
+}
+//@@ func_00166368 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163708;
+
+s32 func_00166368(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x90];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 sp2C;
+    s32 sp30;
+    s32 sp34;
+    M2C_UNK sp38;
+    M2C_UNK sp78;
+    s32 sp98;
+    s32 sp9C;
+    s32 spA0;
+    s32 spA4;
+    s32 spA8;
+    s32 spAC;
+    s32 temp_s0;
+    s32 var_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x10, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 0x272F;
+    sp30 = 8;
+    sp34 = arg3;
+    sp2C = 1;
+    strcpy(&sp38, arg1);
+    strcpy(&sp78, arg2);
+    M2C_FIELD(arg0, s32* , 0x52440) = 0;
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp98 = 1;
+    sp9C = -1;
+    spAC = 0;
+    spA0 = 0;
+    spA4 = 0;
+    spA8 = 0;
+    var_v0 = func_0025A9B4(sp, &func_00163708);
+    if (var_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+        var_v0 = (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+    }
+    return var_v0;
+}
+//@@ func_00166368 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163708;
+
+s32 func_00166368(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x80];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 sp2C;
+    s32 sp30;
+    s32 sp34;
+    M2C_UNK sp38;
+    M2C_UNK sp78;
+    s32 sp98;
+    s32 sp9C;
+    s32 spA0;
+    s32 spA4;
+    s32 spA8;
+    s32 spAC;
+    s32 temp_s0;
+    s32 var_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x10, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 0x272F;
+    sp30 = 8;
+    sp34 = arg3;
+    sp2C = 1;
+    strcpy(&sp38, arg1);
+    strcpy(&sp78, arg2);
+    M2C_FIELD(arg0, s32* , 0x52440) = 0;
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp98 = 1;
+    sp9C = -1;
+    spAC = 0;
+    spA0 = 0;
+    spA4 = 0;
+    spA8 = 0;
+    var_v0 = func_0025A9B4(sp, &func_00163708);
+    if (var_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+        var_v0 = (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+    }
+    return var_v0;
+}
+//@@ func_00166368 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163708;
+
+s32 func_00166368(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x70];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 sp2C;
+    s32 sp30;
+    s32 sp34;
+    M2C_UNK sp38;
+    M2C_UNK sp78;
+    s32 sp98;
+    s32 sp9C;
+    s32 spA0;
+    s32 spA4;
+    s32 spA8;
+    s32 spAC;
+    s32 temp_s0;
+    s32 var_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x10, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 0x272F;
+    sp30 = 8;
+    sp34 = arg3;
+    sp2C = 1;
+    strcpy(&sp38, arg1);
+    strcpy(&sp78, arg2);
+    M2C_FIELD(arg0, s32* , 0x52440) = 0;
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp98 = 1;
+    sp9C = -1;
+    spAC = 0;
+    spA0 = 0;
+    spA4 = 0;
+    spA8 = 0;
+    var_v0 = func_0025A9B4(sp, &func_00163708);
+    if (var_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+        var_v0 = (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+    }
+    return var_v0;
+}
+//@@ func_00166368 m2c5
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163708;
+
+s32 func_00166368(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x60];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 sp2C;
+    s32 sp30;
+    s32 sp34;
+    M2C_UNK sp38;
+    M2C_UNK sp78;
+    s32 sp98;
+    s32 sp9C;
+    s32 spA0;
+    s32 spA4;
+    s32 spA8;
+    s32 spAC;
+    s32 temp_s0;
+    s32 var_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x10, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = 0x272F;
+    sp30 = 8;
+    sp34 = arg3;
+    sp2C = 1;
+    strcpy(&sp38, arg1);
+    strcpy(&sp78, arg2);
+    M2C_FIELD(arg0, s32* , 0x52440) = 0;
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    sp98 = 1;
+    sp9C = -1;
+    spAC = 0;
+    spA0 = 0;
+    spA4 = 0;
+    spA8 = 0;
+    var_v0 = func_0025A9B4(sp, &func_00163708);
+    if (var_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+        var_v0 = (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+    }
+    return var_v0;
+}
+//@@ func_00166478 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern M2C_UNK func_00163778;
@@ -1413,7 +4148,142 @@ s32 func_00166478(s32* arg0, s32 arg1) {
     }
     return temp_v0;
 }
-//@@ func_00166528 m2c
+//@@ func_00166478 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+extern M2C_UNK func_00163778;
+
+s32 func_00166478(s32* arg0, s32 arg1) {
+    u8 sp[0x60];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 sp68;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    strcpy(arg0 + 0x1D);
+    func_0025BD88(temp_s0, 0x15, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    sp68 = 2;
+    func_00163EB8(&D_002C1690, 1);
+    *arg0 = 0;
+    temp_v0 = func_0025B3BC(sp, &func_00163778);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+    }
+    return temp_v0;
+}
+//@@ func_00166478 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+extern M2C_UNK func_00163778;
+
+s32 func_00166478(s32* arg0, s32 arg1) {
+    u8 sp[0x50];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 sp68;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    strcpy(arg0 + 0x1D);
+    func_0025BD88(temp_s0, 0x15, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    sp68 = 2;
+    func_00163EB8(&D_002C1690, 1);
+    *arg0 = 0;
+    temp_v0 = func_0025B3BC(sp, &func_00163778);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+    }
+    return temp_v0;
+}
+//@@ func_00166478 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+extern M2C_UNK func_00163778;
+
+s32 func_00166478(s32* arg0, s32 arg1) {
+    u8 sp[0x40];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 sp68;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    strcpy(arg0 + 0x1D);
+    func_0025BD88(temp_s0, 0x15, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    sp68 = 2;
+    func_00163EB8(&D_002C1690, 1);
+    *arg0 = 0;
+    temp_v0 = func_0025B3BC(sp, &func_00163778);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+    }
+    return temp_v0;
+}
+//@@ func_00166478 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+extern M2C_UNK func_00163778;
+
+s32 func_00166478(s32* arg0, s32 arg1) {
+    u8 sp[0x30];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 sp68;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    strcpy(arg0 + 0x1D);
+    func_0025BD88(temp_s0, 0x15, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    sp68 = 2;
+    func_00163EB8(&D_002C1690, 1);
+    *arg0 = 0;
+    temp_v0 = func_0025B3BC(sp, &func_00163778);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+    }
+    return temp_v0;
+}
+//@@ func_00166478 m2c5
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+extern M2C_UNK func_00163778;
+
+s32 func_00166478(s32* arg0, s32 arg1) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    M2C_UNK sp26;
+    s32 sp68;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    strcpy(arg0 + 0x1D);
+    func_0025BD88(temp_s0, 0x15, sp);
+    strcpy(&sp15, temp_s0);
+    strcpy(&sp26, arg1);
+    sp68 = 2;
+    func_00163EB8(&D_002C1690, 1);
+    *arg0 = 0;
+    temp_v0 = func_0025B3BC(sp, &func_00163778);
+    if (temp_v0 == 0) {
+        func_00163E00(arg0, 0xC350);
+    }
+    return temp_v0;
+}
+//@@ func_00166528 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_001638C0;
@@ -1442,7 +4312,152 @@ s32 func_00166528(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00166600 m2c
+//@@ func_00166528 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001638C0;
+
+s32 func_00166528(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x70];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    s32 sp4C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x2A, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    strcpy(&sp2C, arg2);
+    *arg0 = 0;
+    sp4C = arg3;
+    temp_v0 = func_0025ACF0(sp, &func_001638C0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166528 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001638C0;
+
+s32 func_00166528(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x60];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    s32 sp4C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x2A, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    strcpy(&sp2C, arg2);
+    *arg0 = 0;
+    sp4C = arg3;
+    temp_v0 = func_0025ACF0(sp, &func_001638C0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166528 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001638C0;
+
+s32 func_00166528(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x50];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    s32 sp4C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x2A, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    strcpy(&sp2C, arg2);
+    *arg0 = 0;
+    sp4C = arg3;
+    temp_v0 = func_0025ACF0(sp, &func_001638C0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166528 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001638C0;
+
+s32 func_00166528(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x40];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    s32 sp4C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x2A, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    strcpy(&sp2C, arg2);
+    *arg0 = 0;
+    sp4C = arg3;
+    temp_v0 = func_0025ACF0(sp, &func_001638C0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166528 m2c5
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001638C0;
+
+s32 func_00166528(s32* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x30];
+    M2C_UNK sp15;
+    s32 sp28;
+    M2C_UNK sp2C;
+    s32 sp4C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x2A, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    strcpy(&sp2C, arg2);
+    *arg0 = 0;
+    sp4C = arg3;
+    temp_v0 = func_0025ACF0(sp, &func_001638C0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166600 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_004F9C48;
 extern M2C_UNK D_004F9C50;
@@ -1452,7 +4467,57 @@ void func_00166600(s32 arg0, s32 arg1) {
     strcpy(sp, arg0 + 0xC);
     func_0025B9D0(sp, &D_004F9C50, &D_004F9C50, M2C_FIELD(&D_004F9C48, u8* , 4), arg1, M2C_FIELD(&D_004F9C48, s32* , 0), M2C_FIELD(&D_004F9C48, u8* , 4), M2C_FIELD(&D_004F9C50, s32* , 0), M2C_FIELD(&D_004F9C50, u16* , 4), M2C_FIELD(&D_004F9C50, u8* , 6), 0x3E8);
 }
-//@@ func_00166678 m2c
+//@@ func_00166600 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C48;
+extern M2C_UNK D_004F9C50;
+
+void func_00166600(s32 arg0, s32 arg1) {
+    u8 sp[0x70];
+    strcpy(sp, arg0 + 0xC);
+    func_0025B9D0(sp, &D_004F9C50, &D_004F9C50, M2C_FIELD(&D_004F9C48, u8* , 4), arg1, M2C_FIELD(&D_004F9C48, s32* , 0), M2C_FIELD(&D_004F9C48, u8* , 4), M2C_FIELD(&D_004F9C50, s32* , 0), M2C_FIELD(&D_004F9C50, u16* , 4), M2C_FIELD(&D_004F9C50, u8* , 6), 0x3E8);
+}
+//@@ func_00166600 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C48;
+extern M2C_UNK D_004F9C50;
+
+void func_00166600(s32 arg0, s32 arg1) {
+    u8 sp[0x60];
+    strcpy(sp, arg0 + 0xC);
+    func_0025B9D0(sp, &D_004F9C50, &D_004F9C50, M2C_FIELD(&D_004F9C48, u8* , 4), arg1, M2C_FIELD(&D_004F9C48, s32* , 0), M2C_FIELD(&D_004F9C48, u8* , 4), M2C_FIELD(&D_004F9C50, s32* , 0), M2C_FIELD(&D_004F9C50, u16* , 4), M2C_FIELD(&D_004F9C50, u8* , 6), 0x3E8);
+}
+//@@ func_00166600 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C48;
+extern M2C_UNK D_004F9C50;
+
+void func_00166600(s32 arg0, s32 arg1) {
+    u8 sp[0x50];
+    strcpy(sp, arg0 + 0xC);
+    func_0025B9D0(sp, &D_004F9C50, &D_004F9C50, M2C_FIELD(&D_004F9C48, u8* , 4), arg1, M2C_FIELD(&D_004F9C48, s32* , 0), M2C_FIELD(&D_004F9C48, u8* , 4), M2C_FIELD(&D_004F9C50, s32* , 0), M2C_FIELD(&D_004F9C50, u16* , 4), M2C_FIELD(&D_004F9C50, u8* , 6), 0x3E8);
+}
+//@@ func_00166600 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C48;
+extern M2C_UNK D_004F9C50;
+
+void func_00166600(s32 arg0, s32 arg1) {
+    u8 sp[0x40];
+    strcpy(sp, arg0 + 0xC);
+    func_0025B9D0(sp, &D_004F9C50, &D_004F9C50, M2C_FIELD(&D_004F9C48, u8* , 4), arg1, M2C_FIELD(&D_004F9C48, s32* , 0), M2C_FIELD(&D_004F9C48, u8* , 4), M2C_FIELD(&D_004F9C50, s32* , 0), M2C_FIELD(&D_004F9C50, u16* , 4), M2C_FIELD(&D_004F9C50, u8* , 6), 0x3E8);
+}
+//@@ func_00166600 m2c5
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9C48;
+extern M2C_UNK D_004F9C50;
+
+void func_00166600(s32 arg0, s32 arg1) {
+    u8 sp[0x30];
+    strcpy(sp, arg0 + 0xC);
+    func_0025B9D0(sp, &D_004F9C50, &D_004F9C50, M2C_FIELD(&D_004F9C48, u8* , 4), arg1, M2C_FIELD(&D_004F9C48, s32* , 0), M2C_FIELD(&D_004F9C48, u8* , 4), M2C_FIELD(&D_004F9C50, s32* , 0), M2C_FIELD(&D_004F9C50, u16* , 4), M2C_FIELD(&D_004F9C50, u8* , 6), 0x3E8);
+}
+//@@ func_00166678 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_001639F8;
@@ -1479,7 +4544,115 @@ s32 func_00166678(s32* arg0, s32 arg1) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00166730 m2c
+//@@ func_00166678 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001639F8;
+
+s32 func_00166678(s32* arg0, s32 arg1) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 sp2C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0xFFFFFF, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = arg1;
+    sp2C = 0;
+    temp_v0 = func_0025BF48(sp, &func_001639F8);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166678 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001639F8;
+
+s32 func_00166678(s32* arg0, s32 arg1) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 sp2C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0xFFFFFF, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = arg1;
+    sp2C = 0;
+    temp_v0 = func_0025BF48(sp, &func_001639F8);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166678 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001639F8;
+
+s32 func_00166678(s32* arg0, s32 arg1) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 sp2C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0xFFFFFF, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = arg1;
+    sp2C = 0;
+    temp_v0 = func_0025BF48(sp, &func_001639F8);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166678 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_001639F8;
+
+s32 func_00166678(s32* arg0, s32 arg1) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 sp2C;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0xFFFFFF, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = arg1;
+    sp2C = 0;
+    temp_v0 = func_0025BF48(sp, &func_001639F8);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166730 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_00163A58;
@@ -1504,7 +4677,107 @@ s32 func_00166730(s32* arg0, s32 arg1) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00166808 m2c
+//@@ func_00166730 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163A58;
+
+s32 func_00166730(s32* arg0, s32 arg1) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = arg1;
+    temp_v0 = func_0025B1D0(sp, &func_00163A58);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166730 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163A58;
+
+s32 func_00166730(s32* arg0, s32 arg1) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = arg1;
+    temp_v0 = func_0025B1D0(sp, &func_00163A58);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166730 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163A58;
+
+s32 func_00166730(s32* arg0, s32 arg1) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = arg1;
+    temp_v0 = func_0025B1D0(sp, &func_00163A58);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166730 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163A58;
+
+s32 func_00166730(s32* arg0, s32 arg1) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    *arg0 = 0;
+    sp28 = arg1;
+    temp_v0 = func_0025B1D0(sp, &func_00163A58);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166808 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK func_00163B00;
 
@@ -1520,7 +4793,71 @@ void func_00166808(s32 arg0, s32 arg1) {
     sp28 = arg1;
     func_0025B1D0(sp, &func_00163B00);
 }
-//@@ func_00166868 m2c
+//@@ func_00166808 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK func_00163B00;
+
+void func_00166808(s32 arg0, s32 arg1) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    func_0025B1D0(sp, &func_00163B00);
+}
+//@@ func_00166808 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK func_00163B00;
+
+void func_00166808(s32 arg0, s32 arg1) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    func_0025B1D0(sp, &func_00163B00);
+}
+//@@ func_00166808 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK func_00163B00;
+
+void func_00166808(s32 arg0, s32 arg1) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    func_0025B1D0(sp, &func_00163B00);
+}
+//@@ func_00166808 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK func_00163B00;
+
+void func_00166808(s32 arg0, s32 arg1) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x1C, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg1;
+    func_0025B1D0(sp, &func_00163B00);
+}
+//@@ func_00166868 m2c0
 #include "m2c_macros.h"
 extern s32 D_002C1694;
 extern M2C_UNK func_00163CE0;
@@ -1544,7 +4881,103 @@ s32 func_00166868(s32 arg0, s32 arg1, s32 arg2) {
     func_00163E00(arg0, 0xC350);
     return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
 }
-//@@ func_00166940 m2c
+//@@ func_00166868 m2c1
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163CE0;
+
+s32 func_00166868(s32 arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x23, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg2;
+    temp_v0 = func_0025B130(sp, &func_00163CE0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166868 m2c2
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163CE0;
+
+s32 func_00166868(s32 arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x23, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg2;
+    temp_v0 = func_0025B130(sp, &func_00163CE0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166868 m2c3
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163CE0;
+
+s32 func_00166868(s32 arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x23, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg2;
+    temp_v0 = func_0025B130(sp, &func_00163CE0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166868 m2c4
+#include "m2c_macros.h"
+extern s32 D_002C1694;
+extern M2C_UNK func_00163CE0;
+
+s32 func_00166868(s32 arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x23, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg2;
+    temp_v0 = func_0025B130(sp, &func_00163CE0);
+    if (temp_v0 != 0) {
+        func_00163EB8(arg0, 0xFFFFFF);
+        return temp_v0;
+    }
+    func_00163E00(arg0, 0xC350);
+    return (D_002C1694 >= 0) ? 0 : 0xFFFFFF;
+}
+//@@ func_00166940 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK func_00163D48;
 
@@ -1560,7 +4993,71 @@ void func_00166940(s32 arg0, s32 arg1, s32 arg2) {
     sp28 = arg2;
     func_0025B130(sp, &func_00163D48);
 }
-//@@ netMsgWorldEventHandler m2c
+//@@ func_00166940 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK func_00163D48;
+
+void func_00166940(s32 arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x20];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x23, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg2;
+    func_0025B130(sp, &func_00163D48);
+}
+//@@ func_00166940 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK func_00163D48;
+
+void func_00166940(s32 arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x10];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x23, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg2;
+    func_0025B130(sp, &func_00163D48);
+}
+//@@ func_00166940 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK func_00163D48;
+
+void func_00166940(s32 arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x8];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x23, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg2;
+    func_0025B130(sp, &func_00163D48);
+}
+//@@ func_00166940 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK func_00163D48;
+
+void func_00166940(s32 arg0, s32 arg1, s32 arg2) {
+    u8 sp[0x4];
+    M2C_UNK sp15;
+    s32 sp28;
+    s32 temp_s0;
+
+    temp_s0 = arg0 + 0xC;
+    func_0025BD88(temp_s0, 0x23, sp);
+    strcpy(&sp15, temp_s0);
+    sp28 = arg2;
+    func_0025B130(sp, &func_00163D48);
+}
+//@@ netMsgWorldEventHandler m2c0
 #include "m2c_macros.h"
 extern void* D_004FA030;
 extern s32 D_004FA038;
@@ -1744,7 +5241,559 @@ loop_18:
 block_59:
     return 0xC0;
 }
-//@@ netMsgRosterHandler m2c
+//@@ netMsgWorldEventHandler m2c1
+#include "m2c_macros.h"
+extern void* D_004FA030;
+extern s32 D_004FA038;
+
+s32 netMsgWorldEventHandler(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x10];
+    u32* sp10;
+    s32 temp_a1;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
+    s32 temp_v1;
+    s32 temp_v1_2;
+    s32 var_a2;
+    s32 var_s0;
+    s32 var_s0_2;
+    s32 var_s1;
+    s32 var_s3;
+    s32 var_s3_2;
+    s32 var_v1;
+    s32 var_v1_2;
+    u32 temp_v1_3;
+    u32 temp_v1_4;
+    u32* temp_a1_3;
+    u32* var_fp;
+    u32* var_s6;
+    u32* var_s7;
+    void* temp_a0;
+    void* temp_a1_2;
+    void* temp_a2;
+
+    var_fp = NULL;
+    var_s7 = NULL;
+    var_s6 = NULL;
+    var_s1 = 0;
+    sp10 = NULL;
+    if (arg2 != 0x100) {
+        temp_v1 = M2C_FIELD(arg3, s32* , 0);
+        if (temp_v1 != 0x28) {
+            if (temp_v1 < 0x29) {
+                if (temp_v1 != 0x22) {
+                    return 0xC0;
+                }
+                var_s3 = 0;
+                var_v1 = 1;
+loop_8:
+                var_s0 = 7;
+                if (var_v1 != 0) {
+                    var_a2 = var_s1 * 0x18;
+loop_10:
+                    temp_a1 = 1 << var_s0;
+                    var_s1 += 1;
+                    var_s0 -= 1;
+                    temp_a0 = M2C_FIELD((D_004FA030 + 0x80000 + var_a2), void** , 0x63A0);
+                    var_a2 += 0x18;
+                    M2C_FIELD(temp_a0, s8* , 0xC) = (s8) ((*(arg3 + 4 + var_s3) & temp_a1) != 0);
+                    if (var_s0 >= 0) {
+                        if (var_s1 < 0x69) {
+                            goto loop_10;
+                        }
+                    }
+                }
+                var_s3 += 1;
+                temp_v0 = var_s1 < 0x69;
+                if (var_s3 < 0xE) {
+                    var_v1 = temp_v0;
+                    if (temp_v0 == 0) {
+
+                    } else {
+                        goto loop_8;
+                    }
+                }
+                goto block_59;
+            }
+            if (temp_v1 != 0x2A) {
+                return 0xC0;
+            }
+            if (M2C_FIELD(arg3, s32* , 4) != 0) {
+                M2C_FIELD(D_004FA030, s32* , 0x9651C) = 1;
+                M2C_FIELD(M2C_FIELD(D_004FA030, void** , 0x96580), s8* , 0xC) = 0;
+                hierSetSwitch__FP11_hierswitchi(M2C_FIELD(D_004FA030, s32* , 0x96604), 1, (void* )0x90000);
+            }
+            goto block_59;
+        }
+        var_s3_2 = 0;
+        var_v1_2 = 1;
+loop_16:
+        var_s0_2 = 7;
+        if (var_v1_2 != 0) {
+            temp_v1_2 = D_004FA038;
+loop_18:
+            temp_v0_2 = var_s1 << 6;
+            temp_a1_2 = temp_v1_2 + temp_v0_2;
+            temp_a2 = M2C_FIELD(temp_a1_2, void** , 0x10);
+            if (temp_a2 != NULL) {
+                if ((M2C_FIELD((arg3 + var_s3_2), u8* , 4) & (1 << var_s0_2)) > 0) {
+                    M2C_FIELD(temp_a1_2, s32* , 4) = -1;
+                    M2C_FIELD(temp_a2, s8* , 8) = 1;
+                    temp_v1_3 = (u32) *M2C_FIELD((D_004FA038 + temp_v0_2), u32** , 0x10) >> 0x12;
+                    switch (temp_v1_3) {
+                    case 0x179F:
+                        M2C_FIELD(D_004FA030, s32* , 0x967B8) = 1;
+                        M2C_FIELD(D_004FA030, s32* , 0x967B4) = 1;
+                        hierSetSwitch__FP11_hierswitchi(M2C_FIELD(D_004FA030, s32* , 0x96800), 1, temp_a2, 1);
+                        break;
+                    case 0x177F:
+                        func_001FBCF8(sp, 0x271D, 0, 1);
+                        animationStart__FR11_animHandleb(sp, 1);
+                        break;
+                    case 0x1793:
+                        M2C_FIELD(D_004FA030, s32* , 0x96658) = 1;
+                        break;
+                    case 0x178F:
+                        M2C_FIELD(D_004FA030, s32* , 0x96664) = 1;
+                        break;
+                    case 0x1790:
+                        M2C_FIELD(D_004FA030, s32* , 0x96668) = 1;
+                        break;
+                    case 0x1791:
+                        M2C_FIELD(D_004FA030, s32* , 0x9666C) = 1;
+                        break;
+                    case 0x1792:
+                        M2C_FIELD(D_004FA030, s32* , 0x96670) = 1;
+                        break;
+                    case 0x17B3:
+                        func_001FBCF8(sp, 0x2909, 0, 1);
+                        animationStart__FR11_animHandleb(sp, 1);
+                        break;
+                    }
+                } else {
+                default:
+                }
+                temp_a1_3 = M2C_FIELD((D_004FA038 + temp_v0_2), u32** , 0x10);
+                temp_v1_4 = (u32) *temp_a1_3 >> 0x12;
+                switch (temp_v1_4) {                /* switch 1; irregular */
+                case 0x178F:                        /* switch 1 */
+                    var_s6 = temp_a1_3;
+                    break;
+                case 0x1792:                        /* switch 1 */
+                    sp10 = temp_a1_3;
+                    break;
+                case 0x1790:                        /* switch 1 */
+                    var_s7 = temp_a1_3;
+                    break;
+                case 0x1791:                        /* switch 1 */
+                    var_fp = temp_a1_3;
+                    break;
+                }
+            }
+            var_s1 += 1;
+            var_s0_2 -= 1;
+            if ((var_s0_2 >= 0) && (var_s1 < 0x5DC)) {
+                goto loop_18;
+            }
+        }
+        var_s3_2 += 1;
+        temp_v0_3 = var_s1 < 0x5DC;
+        if (var_s3_2 < 0xBC) {
+            var_v1_2 = temp_v0_3;
+            if (temp_v0_3 != 0) {
+                goto loop_16;
+            }
+        }
+        if (M2C_FIELD(D_004FA030, s32* , 0x96658) != 0) {
+            if (var_s6 != NULL) {
+                M2C_FIELD(var_s6, s8* , 8) = 1;
+            }
+            if (var_s7 != NULL) {
+                M2C_FIELD(var_s7, s8* , 8) = 1;
+            }
+            if (var_fp != NULL) {
+                M2C_FIELD(var_fp, s8* , 8) = 1;
+            }
+            if (sp10 != NULL) {
+                M2C_FIELD(sp10, s8* , 8) = 1;
+            }
+        }
+        /* Duplicate return node #60. Try simplifying control flow for better match */
+        return 0xC0;
+    }
+block_59:
+    return 0xC0;
+}
+//@@ netMsgWorldEventHandler m2c2
+#include "m2c_macros.h"
+extern void* D_004FA030;
+extern s32 D_004FA038;
+
+s32 netMsgWorldEventHandler(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x8];
+    u32* sp10;
+    s32 temp_a1;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
+    s32 temp_v1;
+    s32 temp_v1_2;
+    s32 var_a2;
+    s32 var_s0;
+    s32 var_s0_2;
+    s32 var_s1;
+    s32 var_s3;
+    s32 var_s3_2;
+    s32 var_v1;
+    s32 var_v1_2;
+    u32 temp_v1_3;
+    u32 temp_v1_4;
+    u32* temp_a1_3;
+    u32* var_fp;
+    u32* var_s6;
+    u32* var_s7;
+    void* temp_a0;
+    void* temp_a1_2;
+    void* temp_a2;
+
+    var_fp = NULL;
+    var_s7 = NULL;
+    var_s6 = NULL;
+    var_s1 = 0;
+    sp10 = NULL;
+    if (arg2 != 0x100) {
+        temp_v1 = M2C_FIELD(arg3, s32* , 0);
+        if (temp_v1 != 0x28) {
+            if (temp_v1 < 0x29) {
+                if (temp_v1 != 0x22) {
+                    return 0xC0;
+                }
+                var_s3 = 0;
+                var_v1 = 1;
+loop_8:
+                var_s0 = 7;
+                if (var_v1 != 0) {
+                    var_a2 = var_s1 * 0x18;
+loop_10:
+                    temp_a1 = 1 << var_s0;
+                    var_s1 += 1;
+                    var_s0 -= 1;
+                    temp_a0 = M2C_FIELD((D_004FA030 + 0x80000 + var_a2), void** , 0x63A0);
+                    var_a2 += 0x18;
+                    M2C_FIELD(temp_a0, s8* , 0xC) = (s8) ((*(arg3 + 4 + var_s3) & temp_a1) != 0);
+                    if (var_s0 >= 0) {
+                        if (var_s1 < 0x69) {
+                            goto loop_10;
+                        }
+                    }
+                }
+                var_s3 += 1;
+                temp_v0 = var_s1 < 0x69;
+                if (var_s3 < 0xE) {
+                    var_v1 = temp_v0;
+                    if (temp_v0 == 0) {
+
+                    } else {
+                        goto loop_8;
+                    }
+                }
+                goto block_59;
+            }
+            if (temp_v1 != 0x2A) {
+                return 0xC0;
+            }
+            if (M2C_FIELD(arg3, s32* , 4) != 0) {
+                M2C_FIELD(D_004FA030, s32* , 0x9651C) = 1;
+                M2C_FIELD(M2C_FIELD(D_004FA030, void** , 0x96580), s8* , 0xC) = 0;
+                hierSetSwitch__FP11_hierswitchi(M2C_FIELD(D_004FA030, s32* , 0x96604), 1, (void* )0x90000);
+            }
+            goto block_59;
+        }
+        var_s3_2 = 0;
+        var_v1_2 = 1;
+loop_16:
+        var_s0_2 = 7;
+        if (var_v1_2 != 0) {
+            temp_v1_2 = D_004FA038;
+loop_18:
+            temp_v0_2 = var_s1 << 6;
+            temp_a1_2 = temp_v1_2 + temp_v0_2;
+            temp_a2 = M2C_FIELD(temp_a1_2, void** , 0x10);
+            if (temp_a2 != NULL) {
+                if ((M2C_FIELD((arg3 + var_s3_2), u8* , 4) & (1 << var_s0_2)) > 0) {
+                    M2C_FIELD(temp_a1_2, s32* , 4) = -1;
+                    M2C_FIELD(temp_a2, s8* , 8) = 1;
+                    temp_v1_3 = (u32) *M2C_FIELD((D_004FA038 + temp_v0_2), u32** , 0x10) >> 0x12;
+                    switch (temp_v1_3) {
+                    case 0x179F:
+                        M2C_FIELD(D_004FA030, s32* , 0x967B8) = 1;
+                        M2C_FIELD(D_004FA030, s32* , 0x967B4) = 1;
+                        hierSetSwitch__FP11_hierswitchi(M2C_FIELD(D_004FA030, s32* , 0x96800), 1, temp_a2, 1);
+                        break;
+                    case 0x177F:
+                        func_001FBCF8(sp, 0x271D, 0, 1);
+                        animationStart__FR11_animHandleb(sp, 1);
+                        break;
+                    case 0x1793:
+                        M2C_FIELD(D_004FA030, s32* , 0x96658) = 1;
+                        break;
+                    case 0x178F:
+                        M2C_FIELD(D_004FA030, s32* , 0x96664) = 1;
+                        break;
+                    case 0x1790:
+                        M2C_FIELD(D_004FA030, s32* , 0x96668) = 1;
+                        break;
+                    case 0x1791:
+                        M2C_FIELD(D_004FA030, s32* , 0x9666C) = 1;
+                        break;
+                    case 0x1792:
+                        M2C_FIELD(D_004FA030, s32* , 0x96670) = 1;
+                        break;
+                    case 0x17B3:
+                        func_001FBCF8(sp, 0x2909, 0, 1);
+                        animationStart__FR11_animHandleb(sp, 1);
+                        break;
+                    }
+                } else {
+                default:
+                }
+                temp_a1_3 = M2C_FIELD((D_004FA038 + temp_v0_2), u32** , 0x10);
+                temp_v1_4 = (u32) *temp_a1_3 >> 0x12;
+                switch (temp_v1_4) {                /* switch 1; irregular */
+                case 0x178F:                        /* switch 1 */
+                    var_s6 = temp_a1_3;
+                    break;
+                case 0x1792:                        /* switch 1 */
+                    sp10 = temp_a1_3;
+                    break;
+                case 0x1790:                        /* switch 1 */
+                    var_s7 = temp_a1_3;
+                    break;
+                case 0x1791:                        /* switch 1 */
+                    var_fp = temp_a1_3;
+                    break;
+                }
+            }
+            var_s1 += 1;
+            var_s0_2 -= 1;
+            if ((var_s0_2 >= 0) && (var_s1 < 0x5DC)) {
+                goto loop_18;
+            }
+        }
+        var_s3_2 += 1;
+        temp_v0_3 = var_s1 < 0x5DC;
+        if (var_s3_2 < 0xBC) {
+            var_v1_2 = temp_v0_3;
+            if (temp_v0_3 != 0) {
+                goto loop_16;
+            }
+        }
+        if (M2C_FIELD(D_004FA030, s32* , 0x96658) != 0) {
+            if (var_s6 != NULL) {
+                M2C_FIELD(var_s6, s8* , 8) = 1;
+            }
+            if (var_s7 != NULL) {
+                M2C_FIELD(var_s7, s8* , 8) = 1;
+            }
+            if (var_fp != NULL) {
+                M2C_FIELD(var_fp, s8* , 8) = 1;
+            }
+            if (sp10 != NULL) {
+                M2C_FIELD(sp10, s8* , 8) = 1;
+            }
+        }
+        /* Duplicate return node #60. Try simplifying control flow for better match */
+        return 0xC0;
+    }
+block_59:
+    return 0xC0;
+}
+//@@ netMsgWorldEventHandler m2c3
+#include "m2c_macros.h"
+extern void* D_004FA030;
+extern s32 D_004FA038;
+
+s32 netMsgWorldEventHandler(s32 arg0, s32 arg1, s32 arg2, void* arg3) {
+    u8 sp[0x4];
+    u32* sp10;
+    s32 temp_a1;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
+    s32 temp_v1;
+    s32 temp_v1_2;
+    s32 var_a2;
+    s32 var_s0;
+    s32 var_s0_2;
+    s32 var_s1;
+    s32 var_s3;
+    s32 var_s3_2;
+    s32 var_v1;
+    s32 var_v1_2;
+    u32 temp_v1_3;
+    u32 temp_v1_4;
+    u32* temp_a1_3;
+    u32* var_fp;
+    u32* var_s6;
+    u32* var_s7;
+    void* temp_a0;
+    void* temp_a1_2;
+    void* temp_a2;
+
+    var_fp = NULL;
+    var_s7 = NULL;
+    var_s6 = NULL;
+    var_s1 = 0;
+    sp10 = NULL;
+    if (arg2 != 0x100) {
+        temp_v1 = M2C_FIELD(arg3, s32* , 0);
+        if (temp_v1 != 0x28) {
+            if (temp_v1 < 0x29) {
+                if (temp_v1 != 0x22) {
+                    return 0xC0;
+                }
+                var_s3 = 0;
+                var_v1 = 1;
+loop_8:
+                var_s0 = 7;
+                if (var_v1 != 0) {
+                    var_a2 = var_s1 * 0x18;
+loop_10:
+                    temp_a1 = 1 << var_s0;
+                    var_s1 += 1;
+                    var_s0 -= 1;
+                    temp_a0 = M2C_FIELD((D_004FA030 + 0x80000 + var_a2), void** , 0x63A0);
+                    var_a2 += 0x18;
+                    M2C_FIELD(temp_a0, s8* , 0xC) = (s8) ((*(arg3 + 4 + var_s3) & temp_a1) != 0);
+                    if (var_s0 >= 0) {
+                        if (var_s1 < 0x69) {
+                            goto loop_10;
+                        }
+                    }
+                }
+                var_s3 += 1;
+                temp_v0 = var_s1 < 0x69;
+                if (var_s3 < 0xE) {
+                    var_v1 = temp_v0;
+                    if (temp_v0 == 0) {
+
+                    } else {
+                        goto loop_8;
+                    }
+                }
+                goto block_59;
+            }
+            if (temp_v1 != 0x2A) {
+                return 0xC0;
+            }
+            if (M2C_FIELD(arg3, s32* , 4) != 0) {
+                M2C_FIELD(D_004FA030, s32* , 0x9651C) = 1;
+                M2C_FIELD(M2C_FIELD(D_004FA030, void** , 0x96580), s8* , 0xC) = 0;
+                hierSetSwitch__FP11_hierswitchi(M2C_FIELD(D_004FA030, s32* , 0x96604), 1, (void* )0x90000);
+            }
+            goto block_59;
+        }
+        var_s3_2 = 0;
+        var_v1_2 = 1;
+loop_16:
+        var_s0_2 = 7;
+        if (var_v1_2 != 0) {
+            temp_v1_2 = D_004FA038;
+loop_18:
+            temp_v0_2 = var_s1 << 6;
+            temp_a1_2 = temp_v1_2 + temp_v0_2;
+            temp_a2 = M2C_FIELD(temp_a1_2, void** , 0x10);
+            if (temp_a2 != NULL) {
+                if ((M2C_FIELD((arg3 + var_s3_2), u8* , 4) & (1 << var_s0_2)) > 0) {
+                    M2C_FIELD(temp_a1_2, s32* , 4) = -1;
+                    M2C_FIELD(temp_a2, s8* , 8) = 1;
+                    temp_v1_3 = (u32) *M2C_FIELD((D_004FA038 + temp_v0_2), u32** , 0x10) >> 0x12;
+                    switch (temp_v1_3) {
+                    case 0x179F:
+                        M2C_FIELD(D_004FA030, s32* , 0x967B8) = 1;
+                        M2C_FIELD(D_004FA030, s32* , 0x967B4) = 1;
+                        hierSetSwitch__FP11_hierswitchi(M2C_FIELD(D_004FA030, s32* , 0x96800), 1, temp_a2, 1);
+                        break;
+                    case 0x177F:
+                        func_001FBCF8(sp, 0x271D, 0, 1);
+                        animationStart__FR11_animHandleb(sp, 1);
+                        break;
+                    case 0x1793:
+                        M2C_FIELD(D_004FA030, s32* , 0x96658) = 1;
+                        break;
+                    case 0x178F:
+                        M2C_FIELD(D_004FA030, s32* , 0x96664) = 1;
+                        break;
+                    case 0x1790:
+                        M2C_FIELD(D_004FA030, s32* , 0x96668) = 1;
+                        break;
+                    case 0x1791:
+                        M2C_FIELD(D_004FA030, s32* , 0x9666C) = 1;
+                        break;
+                    case 0x1792:
+                        M2C_FIELD(D_004FA030, s32* , 0x96670) = 1;
+                        break;
+                    case 0x17B3:
+                        func_001FBCF8(sp, 0x2909, 0, 1);
+                        animationStart__FR11_animHandleb(sp, 1);
+                        break;
+                    }
+                } else {
+                default:
+                }
+                temp_a1_3 = M2C_FIELD((D_004FA038 + temp_v0_2), u32** , 0x10);
+                temp_v1_4 = (u32) *temp_a1_3 >> 0x12;
+                switch (temp_v1_4) {                /* switch 1; irregular */
+                case 0x178F:                        /* switch 1 */
+                    var_s6 = temp_a1_3;
+                    break;
+                case 0x1792:                        /* switch 1 */
+                    sp10 = temp_a1_3;
+                    break;
+                case 0x1790:                        /* switch 1 */
+                    var_s7 = temp_a1_3;
+                    break;
+                case 0x1791:                        /* switch 1 */
+                    var_fp = temp_a1_3;
+                    break;
+                }
+            }
+            var_s1 += 1;
+            var_s0_2 -= 1;
+            if ((var_s0_2 >= 0) && (var_s1 < 0x5DC)) {
+                goto loop_18;
+            }
+        }
+        var_s3_2 += 1;
+        temp_v0_3 = var_s1 < 0x5DC;
+        if (var_s3_2 < 0xBC) {
+            var_v1_2 = temp_v0_3;
+            if (temp_v0_3 != 0) {
+                goto loop_16;
+            }
+        }
+        if (M2C_FIELD(D_004FA030, s32* , 0x96658) != 0) {
+            if (var_s6 != NULL) {
+                M2C_FIELD(var_s6, s8* , 8) = 1;
+            }
+            if (var_s7 != NULL) {
+                M2C_FIELD(var_s7, s8* , 8) = 1;
+            }
+            if (var_fp != NULL) {
+                M2C_FIELD(var_fp, s8* , 8) = 1;
+            }
+            if (sp10 != NULL) {
+                M2C_FIELD(sp10, s8* , 8) = 1;
+            }
+        }
+        /* Duplicate return node #60. Try simplifying control flow for better match */
+        return 0xC0;
+    }
+block_59:
+    return 0xC0;
+}
+//@@ netMsgRosterHandler m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_00318416;
@@ -1818,7 +5867,7 @@ s32 netMsgRosterHandler(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     }
     return 0x180;
 }
-//@@ func_00168B60 m2c
+//@@ func_00168B60 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_003156D0;
@@ -1838,7 +5887,7 @@ void func_00168B60(s32 arg0, s32 arg1, M2C_UNK arg2) {
         }
     }
 }
-//@@ func_00168C30 m2c
+//@@ func_00168C30 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_004E6A00;
@@ -1875,7 +5924,7 @@ void func_00168C30(s32 arg0, s32 arg1) {
         func_0016EF90(&D_003156C0, arg1);
     }
 }
-//@@ func_00168DE0 m2c
+//@@ func_00168DE0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_003186FC;
@@ -1931,7 +5980,7 @@ void func_00168DE0(s32 arg0, s32 arg1) {
         }
     }
 }
-//@@ func_00168F30 m2c
+//@@ func_00168F30 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_004F9D10;
 extern s32 D_004F9D94;
@@ -1950,7 +5999,102 @@ void func_00168F30(s32 arg0, s32 arg1) {
         dmeSendMsg(0, sp, 2, D_004F9D94);
     }
 }
-//@@ func_00168FB8 m2c
+//@@ func_00168F30 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9D10;
+extern s32 D_004F9D94;
+
+void func_00168F30(s32 arg0, s32 arg1) {
+    u8 sp[0x60];
+    s32 sp10;
+    M2C_UNK sp44;
+    s32 sp54;
+
+    if (strcmp(&D_004F9D10, arg0) != 0) {
+        func_002665A0(sp, arg0);
+        sp10 = 1;
+        strcpy(&sp44, arg0);
+        sp54 = arg1;
+        dmeSendMsg(0, sp, 2, D_004F9D94);
+    }
+}
+//@@ func_00168F30 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9D10;
+extern s32 D_004F9D94;
+
+void func_00168F30(s32 arg0, s32 arg1) {
+    u8 sp[0x50];
+    s32 sp10;
+    M2C_UNK sp44;
+    s32 sp54;
+
+    if (strcmp(&D_004F9D10, arg0) != 0) {
+        func_002665A0(sp, arg0);
+        sp10 = 1;
+        strcpy(&sp44, arg0);
+        sp54 = arg1;
+        dmeSendMsg(0, sp, 2, D_004F9D94);
+    }
+}
+//@@ func_00168F30 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9D10;
+extern s32 D_004F9D94;
+
+void func_00168F30(s32 arg0, s32 arg1) {
+    u8 sp[0x40];
+    s32 sp10;
+    M2C_UNK sp44;
+    s32 sp54;
+
+    if (strcmp(&D_004F9D10, arg0) != 0) {
+        func_002665A0(sp, arg0);
+        sp10 = 1;
+        strcpy(&sp44, arg0);
+        sp54 = arg1;
+        dmeSendMsg(0, sp, 2, D_004F9D94);
+    }
+}
+//@@ func_00168F30 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9D10;
+extern s32 D_004F9D94;
+
+void func_00168F30(s32 arg0, s32 arg1) {
+    u8 sp[0x30];
+    s32 sp10;
+    M2C_UNK sp44;
+    s32 sp54;
+
+    if (strcmp(&D_004F9D10, arg0) != 0) {
+        func_002665A0(sp, arg0);
+        sp10 = 1;
+        strcpy(&sp44, arg0);
+        sp54 = arg1;
+        dmeSendMsg(0, sp, 2, D_004F9D94);
+    }
+}
+//@@ func_00168F30 m2c5
+#include "m2c_macros.h"
+extern M2C_UNK D_004F9D10;
+extern s32 D_004F9D94;
+
+void func_00168F30(s32 arg0, s32 arg1) {
+    u8 sp[0x20];
+    s32 sp10;
+    M2C_UNK sp44;
+    s32 sp54;
+
+    if (strcmp(&D_004F9D10, arg0) != 0) {
+        func_002665A0(sp, arg0);
+        sp10 = 1;
+        strcpy(&sp44, arg0);
+        sp54 = arg1;
+        dmeSendMsg(0, sp, 2, D_004F9D94);
+    }
+}
+//@@ func_00168FB8 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 
@@ -1970,7 +6114,7 @@ void func_00168FB8(s32 arg0, M2C_UNK arg1, s32 arg2) {
         } while ((s32) var_s0 < (s32) (&D_003156C0 + 0x1100));
     }
 }
-//@@ func_00169050 m2c
+//@@ func_00169050 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 
@@ -1995,7 +6139,7 @@ void func_00169050(s32 arg0, M2C_UNK arg1, s32 arg2) {
         }
     }
 }
-//@@ func_001690F0 m2c
+//@@ func_001690F0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern s32 D_004FA030;
@@ -2048,7 +6192,7 @@ block_12:
     }
     return var_v0;
 }
-//@@ func_00169230 m2c
+//@@ func_00169230 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern s32 D_004FA030;
@@ -2078,7 +6222,7 @@ void* func_00169230(s32 arg0) {
     }
     return var_v0;
 }
-//@@ netObjDestroyCB m2c
+//@@ netObjDestroyCB m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern s32 D_004F9CA4;
@@ -2229,7 +6373,762 @@ loop_23:
         }
     }
 }
-//@@ netWeaponCreateCB m2c
+//@@ netObjDestroyCB m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_003156C0;
+extern s32 D_004F9CA4;
+extern s32 D_004F9CAC;
+extern s32 D_004F9D18;
+extern void* D_004FA030;
+
+void netObjDestroyCB(s32 arg0, s32 arg1) {
+    u8 sp[0x80];
+    M2C_UNK sp80;
+    f32* temp_a0_2;
+    f32* temp_a0_3;
+    f32* var_t0;
+    s32 temp_a1;
+    s32 temp_a1_5;
+    s32 temp_a1_7;
+    s32 temp_v1_3;
+    s32 var_a0_2;
+    s32 var_t1;
+    s32* temp_a0_4;
+    s32* temp_v1_2;
+    s32* var_a3;
+    u8 temp_a0;
+    void* temp_a1_2;
+    void* temp_a1_3;
+    void* temp_a1_4;
+    void* temp_a1_6;
+    void* temp_s0;
+    void* temp_s0_2;
+    void* temp_s0_3;
+    void* temp_s0_4;
+    void* temp_v0;
+    void* temp_v1;
+    void* var_a0;
+    void* var_a2;
+
+    temp_v1 = netGetDmeTime(&D_003156C0);
+    if (arg0 != 0x100) {
+        if (arg1 == M2C_FIELD(&D_003156C0, s32* , 0x2F00)) {
+            M2C_FIELD(&D_003156C0, s32* , 0x2F04) = 0;
+            M2C_FIELD(&D_003156C0, s32* , 0x2F00) = -1;
+        } else if (temp_v1 != NULL) {
+            temp_a0 = M2C_FIELD(temp_v1, u8* , 0);
+            if (temp_a0 == D_004F9CA4) {
+                temp_s0 = M2C_FIELD(temp_v1, void** , 0x1C);
+                if (M2C_FIELD(temp_s0, s32* , 4) != -1) {
+                    var_a0 = D_004FA030;
+                    if (M2C_FIELD(&D_003156C0, s32* , 0x2F04) != 0) {
+                        var_a0 = D_004FA030;
+                        if (func_001734B8(&D_003156C0) != 0) {
+                            var_a2 = D_004FA030;
+                            var_t1 = 0;
+                            var_t0 = temp_s0 + 0x30;
+                            var_a3 = temp_s0 + 0x10;
+                            do {
+                                temp_a1 = var_t1 * 4;
+                                temp_v1_2 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x40 + temp_a1;
+                                *temp_v1_2 += *var_a3;
+                                temp_a0_2 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + temp_a1;
+                                *temp_a0_2 += *var_t0;
+                                temp_a1_2 = M2C_FIELD(var_a2, void** , 0x20D8);
+                                var_t1 += 1;
+                                if (temp_a1_2 != NULL) {
+                                    temp_a0_3 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x20 + (M2C_FIELD(temp_a1_2, s32* , 4) * 4);
+                                    *temp_a0_3 += M2C_FIELD((temp_a1_2 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), f32* , 0x30);
+                                    temp_a1_3 = M2C_FIELD(var_a2, void** , 0x20D8);
+                                    temp_a0_4 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x60 + (M2C_FIELD(temp_a1_3, s32* , 4) * 4);
+                                    *temp_a0_4 += M2C_FIELD((temp_a1_3 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x10);
+                                }
+                                var_a2 += 0x31B0;
+                                var_t0 += 4;
+                                var_a3 += 4;
+                            } while (var_t1 < 8);
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x40) = 0;
+                            *(M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)) = 0;
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x60) = 0;
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x20) = 0;
+                            M2C_FIELD((&D_003156C0 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x303C) = 0;
+                            var_a0 = D_004FA030;
+                        }
+                    }
+                    temp_a1_4 = var_a0 + 0x18D80;
+                    do {
+                        temp_v1_3 = M2C_FIELD(var_a0, s32* , 0x20D8);
+                        if (temp_v1_3 != 0) {
+                            M2C_FIELD((temp_v1_3 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x30) = 0;
+                            M2C_FIELD((M2C_FIELD(var_a0, s32* , 0x20D8) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x10) = 0;
+                        }
+                        var_a0 += 0x31B0;
+                    } while ((s32) var_a0 < (s32) temp_a1_4);
+                }
+                if (M2C_FIELD(temp_s0, s32* , 0) <= 0xFFFE) {
+                    M2C_FIELD(((arg0 * 0x220) + &D_003156C0), s32* , 0x220) = 0;
+                }
+                if (M2C_FIELD(D_004FA030, s32* , 0x20D8) == temp_s0) {
+                    M2C_FIELD(D_004FA030, s32* , 0x20D8) = 0;
+                } else {
+                    var_a0_2 = 1;
+loop_23:
+                    if (var_a0_2 < 8) {
+                        temp_v0 = (var_a0_2 * 0x31B0) + D_004FA030;
+                        var_a0_2 += 1;
+                        if (M2C_FIELD(temp_v0, s32* , 0x20D8) == temp_s0) {
+                            M2C_FIELD(temp_v0, s32* , 0x20D8) = 0;
+                        } else {
+                            goto loop_23;
+                        }
+                    }
+                }
+            } else if (temp_a0 == D_004F9CAC) {
+                M2C_FIELD(&D_003156C0, void** , 0x3148) = (void* ) (&D_003156C0 + 0x3080);
+            } else if ((temp_a0 == D_004F9D18) && (temp_s0_2 = M2C_FIELD(temp_v1, void** , 0x1C), (temp_s0_2 != NULL)) && (temp_a1_5 = M2C_FIELD(temp_s0_2, s32* , 0), (temp_a1_5 != 0))) {
+                if ((u32) (M2C_FIELD(temp_a1_5, s32* , 0x20B4) - 4) < 2U) {
+                    if (arg0 != *M2C_FIELD(&D_003156C0, s32** , 4)) {
+                        func_0013EED0(D_004FA030, temp_a1_5);
+                        func_001759D8(&D_003156C0, M2C_FIELD(temp_s0_2, s32* , 0));
+                    }
+                } else {
+                    if (func_001734B8(&D_003156C0, temp_a1_5) != 0) {
+                        temp_s0_3 = (arg0 * 0x220) + &D_003156C0;
+                        temp_a1_6 = M2C_FIELD(temp_s0_3, void** , 0xB0);
+                        if (temp_a1_6 != NULL) {
+                            temp_a1_7 = M2C_FIELD(temp_a1_6, s32* , 0x20E0);
+                            if (temp_a1_7 != -1) {
+                                func_00181AA8(&D_003156C0 + 0x3234, temp_a1_7, 0);
+                            }
+                            if (M2C_FIELD(&D_003156C0, s32* , 0x3870) != 0) {
+                                func_0011B308(&D_003156C0 + 0x386C, M2C_FIELD(temp_s0_3, void** , 0xB0));
+                            }
+                        }
+                    }
+                    temp_s0_4 = &D_003156C0 + 0x56C0;
+                    func_00264A60(&sp80, M2C_FIELD(temp_s0_4, s32* , 0x2CF0), arg0);
+                    if (M2C_FIELD(temp_s0_4, s32* , 0x1BB4) == 0xB) {
+                        func_001A9240();
+                    }
+                    sprintf(sp, "%s has left the game.", (arg0 * 0x220) + (temp_s0_4 + 0x18));
+                    func_0014EDA0(sp);
+                    AddMessage__3Hudiii(D_004FA030 + 0x97B50, 0xF9, 2, 0);
+                    func_0016F1C8(temp_s0_4, arg0);
+                    if (M2C_FIELD(temp_s0_4, s32* , 0x3220) != 0) {
+                        if (M2C_FIELD(M2C_FIELD(temp_s0_4, void** , 0x3148), u8* , 0x24) == 0) {
+                            func_00174D78(temp_s0_4, 0, 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+//@@ netObjDestroyCB m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_003156C0;
+extern s32 D_004F9CA4;
+extern s32 D_004F9CAC;
+extern s32 D_004F9D18;
+extern void* D_004FA030;
+
+void netObjDestroyCB(s32 arg0, s32 arg1) {
+    u8 sp[0x70];
+    M2C_UNK sp80;
+    f32* temp_a0_2;
+    f32* temp_a0_3;
+    f32* var_t0;
+    s32 temp_a1;
+    s32 temp_a1_5;
+    s32 temp_a1_7;
+    s32 temp_v1_3;
+    s32 var_a0_2;
+    s32 var_t1;
+    s32* temp_a0_4;
+    s32* temp_v1_2;
+    s32* var_a3;
+    u8 temp_a0;
+    void* temp_a1_2;
+    void* temp_a1_3;
+    void* temp_a1_4;
+    void* temp_a1_6;
+    void* temp_s0;
+    void* temp_s0_2;
+    void* temp_s0_3;
+    void* temp_s0_4;
+    void* temp_v0;
+    void* temp_v1;
+    void* var_a0;
+    void* var_a2;
+
+    temp_v1 = netGetDmeTime(&D_003156C0);
+    if (arg0 != 0x100) {
+        if (arg1 == M2C_FIELD(&D_003156C0, s32* , 0x2F00)) {
+            M2C_FIELD(&D_003156C0, s32* , 0x2F04) = 0;
+            M2C_FIELD(&D_003156C0, s32* , 0x2F00) = -1;
+        } else if (temp_v1 != NULL) {
+            temp_a0 = M2C_FIELD(temp_v1, u8* , 0);
+            if (temp_a0 == D_004F9CA4) {
+                temp_s0 = M2C_FIELD(temp_v1, void** , 0x1C);
+                if (M2C_FIELD(temp_s0, s32* , 4) != -1) {
+                    var_a0 = D_004FA030;
+                    if (M2C_FIELD(&D_003156C0, s32* , 0x2F04) != 0) {
+                        var_a0 = D_004FA030;
+                        if (func_001734B8(&D_003156C0) != 0) {
+                            var_a2 = D_004FA030;
+                            var_t1 = 0;
+                            var_t0 = temp_s0 + 0x30;
+                            var_a3 = temp_s0 + 0x10;
+                            do {
+                                temp_a1 = var_t1 * 4;
+                                temp_v1_2 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x40 + temp_a1;
+                                *temp_v1_2 += *var_a3;
+                                temp_a0_2 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + temp_a1;
+                                *temp_a0_2 += *var_t0;
+                                temp_a1_2 = M2C_FIELD(var_a2, void** , 0x20D8);
+                                var_t1 += 1;
+                                if (temp_a1_2 != NULL) {
+                                    temp_a0_3 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x20 + (M2C_FIELD(temp_a1_2, s32* , 4) * 4);
+                                    *temp_a0_3 += M2C_FIELD((temp_a1_2 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), f32* , 0x30);
+                                    temp_a1_3 = M2C_FIELD(var_a2, void** , 0x20D8);
+                                    temp_a0_4 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x60 + (M2C_FIELD(temp_a1_3, s32* , 4) * 4);
+                                    *temp_a0_4 += M2C_FIELD((temp_a1_3 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x10);
+                                }
+                                var_a2 += 0x31B0;
+                                var_t0 += 4;
+                                var_a3 += 4;
+                            } while (var_t1 < 8);
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x40) = 0;
+                            *(M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)) = 0;
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x60) = 0;
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x20) = 0;
+                            M2C_FIELD((&D_003156C0 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x303C) = 0;
+                            var_a0 = D_004FA030;
+                        }
+                    }
+                    temp_a1_4 = var_a0 + 0x18D80;
+                    do {
+                        temp_v1_3 = M2C_FIELD(var_a0, s32* , 0x20D8);
+                        if (temp_v1_3 != 0) {
+                            M2C_FIELD((temp_v1_3 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x30) = 0;
+                            M2C_FIELD((M2C_FIELD(var_a0, s32* , 0x20D8) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x10) = 0;
+                        }
+                        var_a0 += 0x31B0;
+                    } while ((s32) var_a0 < (s32) temp_a1_4);
+                }
+                if (M2C_FIELD(temp_s0, s32* , 0) <= 0xFFFE) {
+                    M2C_FIELD(((arg0 * 0x220) + &D_003156C0), s32* , 0x220) = 0;
+                }
+                if (M2C_FIELD(D_004FA030, s32* , 0x20D8) == temp_s0) {
+                    M2C_FIELD(D_004FA030, s32* , 0x20D8) = 0;
+                } else {
+                    var_a0_2 = 1;
+loop_23:
+                    if (var_a0_2 < 8) {
+                        temp_v0 = (var_a0_2 * 0x31B0) + D_004FA030;
+                        var_a0_2 += 1;
+                        if (M2C_FIELD(temp_v0, s32* , 0x20D8) == temp_s0) {
+                            M2C_FIELD(temp_v0, s32* , 0x20D8) = 0;
+                        } else {
+                            goto loop_23;
+                        }
+                    }
+                }
+            } else if (temp_a0 == D_004F9CAC) {
+                M2C_FIELD(&D_003156C0, void** , 0x3148) = (void* ) (&D_003156C0 + 0x3080);
+            } else if ((temp_a0 == D_004F9D18) && (temp_s0_2 = M2C_FIELD(temp_v1, void** , 0x1C), (temp_s0_2 != NULL)) && (temp_a1_5 = M2C_FIELD(temp_s0_2, s32* , 0), (temp_a1_5 != 0))) {
+                if ((u32) (M2C_FIELD(temp_a1_5, s32* , 0x20B4) - 4) < 2U) {
+                    if (arg0 != *M2C_FIELD(&D_003156C0, s32** , 4)) {
+                        func_0013EED0(D_004FA030, temp_a1_5);
+                        func_001759D8(&D_003156C0, M2C_FIELD(temp_s0_2, s32* , 0));
+                    }
+                } else {
+                    if (func_001734B8(&D_003156C0, temp_a1_5) != 0) {
+                        temp_s0_3 = (arg0 * 0x220) + &D_003156C0;
+                        temp_a1_6 = M2C_FIELD(temp_s0_3, void** , 0xB0);
+                        if (temp_a1_6 != NULL) {
+                            temp_a1_7 = M2C_FIELD(temp_a1_6, s32* , 0x20E0);
+                            if (temp_a1_7 != -1) {
+                                func_00181AA8(&D_003156C0 + 0x3234, temp_a1_7, 0);
+                            }
+                            if (M2C_FIELD(&D_003156C0, s32* , 0x3870) != 0) {
+                                func_0011B308(&D_003156C0 + 0x386C, M2C_FIELD(temp_s0_3, void** , 0xB0));
+                            }
+                        }
+                    }
+                    temp_s0_4 = &D_003156C0 + 0x56C0;
+                    func_00264A60(&sp80, M2C_FIELD(temp_s0_4, s32* , 0x2CF0), arg0);
+                    if (M2C_FIELD(temp_s0_4, s32* , 0x1BB4) == 0xB) {
+                        func_001A9240();
+                    }
+                    sprintf(sp, "%s has left the game.", (arg0 * 0x220) + (temp_s0_4 + 0x18));
+                    func_0014EDA0(sp);
+                    AddMessage__3Hudiii(D_004FA030 + 0x97B50, 0xF9, 2, 0);
+                    func_0016F1C8(temp_s0_4, arg0);
+                    if (M2C_FIELD(temp_s0_4, s32* , 0x3220) != 0) {
+                        if (M2C_FIELD(M2C_FIELD(temp_s0_4, void** , 0x3148), u8* , 0x24) == 0) {
+                            func_00174D78(temp_s0_4, 0, 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+//@@ netObjDestroyCB m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_003156C0;
+extern s32 D_004F9CA4;
+extern s32 D_004F9CAC;
+extern s32 D_004F9D18;
+extern void* D_004FA030;
+
+void netObjDestroyCB(s32 arg0, s32 arg1) {
+    u8 sp[0x60];
+    M2C_UNK sp80;
+    f32* temp_a0_2;
+    f32* temp_a0_3;
+    f32* var_t0;
+    s32 temp_a1;
+    s32 temp_a1_5;
+    s32 temp_a1_7;
+    s32 temp_v1_3;
+    s32 var_a0_2;
+    s32 var_t1;
+    s32* temp_a0_4;
+    s32* temp_v1_2;
+    s32* var_a3;
+    u8 temp_a0;
+    void* temp_a1_2;
+    void* temp_a1_3;
+    void* temp_a1_4;
+    void* temp_a1_6;
+    void* temp_s0;
+    void* temp_s0_2;
+    void* temp_s0_3;
+    void* temp_s0_4;
+    void* temp_v0;
+    void* temp_v1;
+    void* var_a0;
+    void* var_a2;
+
+    temp_v1 = netGetDmeTime(&D_003156C0);
+    if (arg0 != 0x100) {
+        if (arg1 == M2C_FIELD(&D_003156C0, s32* , 0x2F00)) {
+            M2C_FIELD(&D_003156C0, s32* , 0x2F04) = 0;
+            M2C_FIELD(&D_003156C0, s32* , 0x2F00) = -1;
+        } else if (temp_v1 != NULL) {
+            temp_a0 = M2C_FIELD(temp_v1, u8* , 0);
+            if (temp_a0 == D_004F9CA4) {
+                temp_s0 = M2C_FIELD(temp_v1, void** , 0x1C);
+                if (M2C_FIELD(temp_s0, s32* , 4) != -1) {
+                    var_a0 = D_004FA030;
+                    if (M2C_FIELD(&D_003156C0, s32* , 0x2F04) != 0) {
+                        var_a0 = D_004FA030;
+                        if (func_001734B8(&D_003156C0) != 0) {
+                            var_a2 = D_004FA030;
+                            var_t1 = 0;
+                            var_t0 = temp_s0 + 0x30;
+                            var_a3 = temp_s0 + 0x10;
+                            do {
+                                temp_a1 = var_t1 * 4;
+                                temp_v1_2 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x40 + temp_a1;
+                                *temp_v1_2 += *var_a3;
+                                temp_a0_2 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + temp_a1;
+                                *temp_a0_2 += *var_t0;
+                                temp_a1_2 = M2C_FIELD(var_a2, void** , 0x20D8);
+                                var_t1 += 1;
+                                if (temp_a1_2 != NULL) {
+                                    temp_a0_3 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x20 + (M2C_FIELD(temp_a1_2, s32* , 4) * 4);
+                                    *temp_a0_3 += M2C_FIELD((temp_a1_2 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), f32* , 0x30);
+                                    temp_a1_3 = M2C_FIELD(var_a2, void** , 0x20D8);
+                                    temp_a0_4 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x60 + (M2C_FIELD(temp_a1_3, s32* , 4) * 4);
+                                    *temp_a0_4 += M2C_FIELD((temp_a1_3 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x10);
+                                }
+                                var_a2 += 0x31B0;
+                                var_t0 += 4;
+                                var_a3 += 4;
+                            } while (var_t1 < 8);
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x40) = 0;
+                            *(M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)) = 0;
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x60) = 0;
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x20) = 0;
+                            M2C_FIELD((&D_003156C0 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x303C) = 0;
+                            var_a0 = D_004FA030;
+                        }
+                    }
+                    temp_a1_4 = var_a0 + 0x18D80;
+                    do {
+                        temp_v1_3 = M2C_FIELD(var_a0, s32* , 0x20D8);
+                        if (temp_v1_3 != 0) {
+                            M2C_FIELD((temp_v1_3 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x30) = 0;
+                            M2C_FIELD((M2C_FIELD(var_a0, s32* , 0x20D8) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x10) = 0;
+                        }
+                        var_a0 += 0x31B0;
+                    } while ((s32) var_a0 < (s32) temp_a1_4);
+                }
+                if (M2C_FIELD(temp_s0, s32* , 0) <= 0xFFFE) {
+                    M2C_FIELD(((arg0 * 0x220) + &D_003156C0), s32* , 0x220) = 0;
+                }
+                if (M2C_FIELD(D_004FA030, s32* , 0x20D8) == temp_s0) {
+                    M2C_FIELD(D_004FA030, s32* , 0x20D8) = 0;
+                } else {
+                    var_a0_2 = 1;
+loop_23:
+                    if (var_a0_2 < 8) {
+                        temp_v0 = (var_a0_2 * 0x31B0) + D_004FA030;
+                        var_a0_2 += 1;
+                        if (M2C_FIELD(temp_v0, s32* , 0x20D8) == temp_s0) {
+                            M2C_FIELD(temp_v0, s32* , 0x20D8) = 0;
+                        } else {
+                            goto loop_23;
+                        }
+                    }
+                }
+            } else if (temp_a0 == D_004F9CAC) {
+                M2C_FIELD(&D_003156C0, void** , 0x3148) = (void* ) (&D_003156C0 + 0x3080);
+            } else if ((temp_a0 == D_004F9D18) && (temp_s0_2 = M2C_FIELD(temp_v1, void** , 0x1C), (temp_s0_2 != NULL)) && (temp_a1_5 = M2C_FIELD(temp_s0_2, s32* , 0), (temp_a1_5 != 0))) {
+                if ((u32) (M2C_FIELD(temp_a1_5, s32* , 0x20B4) - 4) < 2U) {
+                    if (arg0 != *M2C_FIELD(&D_003156C0, s32** , 4)) {
+                        func_0013EED0(D_004FA030, temp_a1_5);
+                        func_001759D8(&D_003156C0, M2C_FIELD(temp_s0_2, s32* , 0));
+                    }
+                } else {
+                    if (func_001734B8(&D_003156C0, temp_a1_5) != 0) {
+                        temp_s0_3 = (arg0 * 0x220) + &D_003156C0;
+                        temp_a1_6 = M2C_FIELD(temp_s0_3, void** , 0xB0);
+                        if (temp_a1_6 != NULL) {
+                            temp_a1_7 = M2C_FIELD(temp_a1_6, s32* , 0x20E0);
+                            if (temp_a1_7 != -1) {
+                                func_00181AA8(&D_003156C0 + 0x3234, temp_a1_7, 0);
+                            }
+                            if (M2C_FIELD(&D_003156C0, s32* , 0x3870) != 0) {
+                                func_0011B308(&D_003156C0 + 0x386C, M2C_FIELD(temp_s0_3, void** , 0xB0));
+                            }
+                        }
+                    }
+                    temp_s0_4 = &D_003156C0 + 0x56C0;
+                    func_00264A60(&sp80, M2C_FIELD(temp_s0_4, s32* , 0x2CF0), arg0);
+                    if (M2C_FIELD(temp_s0_4, s32* , 0x1BB4) == 0xB) {
+                        func_001A9240();
+                    }
+                    sprintf(sp, "%s has left the game.", (arg0 * 0x220) + (temp_s0_4 + 0x18));
+                    func_0014EDA0(sp);
+                    AddMessage__3Hudiii(D_004FA030 + 0x97B50, 0xF9, 2, 0);
+                    func_0016F1C8(temp_s0_4, arg0);
+                    if (M2C_FIELD(temp_s0_4, s32* , 0x3220) != 0) {
+                        if (M2C_FIELD(M2C_FIELD(temp_s0_4, void** , 0x3148), u8* , 0x24) == 0) {
+                            func_00174D78(temp_s0_4, 0, 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+//@@ netObjDestroyCB m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_003156C0;
+extern s32 D_004F9CA4;
+extern s32 D_004F9CAC;
+extern s32 D_004F9D18;
+extern void* D_004FA030;
+
+void netObjDestroyCB(s32 arg0, s32 arg1) {
+    u8 sp[0x50];
+    M2C_UNK sp80;
+    f32* temp_a0_2;
+    f32* temp_a0_3;
+    f32* var_t0;
+    s32 temp_a1;
+    s32 temp_a1_5;
+    s32 temp_a1_7;
+    s32 temp_v1_3;
+    s32 var_a0_2;
+    s32 var_t1;
+    s32* temp_a0_4;
+    s32* temp_v1_2;
+    s32* var_a3;
+    u8 temp_a0;
+    void* temp_a1_2;
+    void* temp_a1_3;
+    void* temp_a1_4;
+    void* temp_a1_6;
+    void* temp_s0;
+    void* temp_s0_2;
+    void* temp_s0_3;
+    void* temp_s0_4;
+    void* temp_v0;
+    void* temp_v1;
+    void* var_a0;
+    void* var_a2;
+
+    temp_v1 = netGetDmeTime(&D_003156C0);
+    if (arg0 != 0x100) {
+        if (arg1 == M2C_FIELD(&D_003156C0, s32* , 0x2F00)) {
+            M2C_FIELD(&D_003156C0, s32* , 0x2F04) = 0;
+            M2C_FIELD(&D_003156C0, s32* , 0x2F00) = -1;
+        } else if (temp_v1 != NULL) {
+            temp_a0 = M2C_FIELD(temp_v1, u8* , 0);
+            if (temp_a0 == D_004F9CA4) {
+                temp_s0 = M2C_FIELD(temp_v1, void** , 0x1C);
+                if (M2C_FIELD(temp_s0, s32* , 4) != -1) {
+                    var_a0 = D_004FA030;
+                    if (M2C_FIELD(&D_003156C0, s32* , 0x2F04) != 0) {
+                        var_a0 = D_004FA030;
+                        if (func_001734B8(&D_003156C0) != 0) {
+                            var_a2 = D_004FA030;
+                            var_t1 = 0;
+                            var_t0 = temp_s0 + 0x30;
+                            var_a3 = temp_s0 + 0x10;
+                            do {
+                                temp_a1 = var_t1 * 4;
+                                temp_v1_2 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x40 + temp_a1;
+                                *temp_v1_2 += *var_a3;
+                                temp_a0_2 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + temp_a1;
+                                *temp_a0_2 += *var_t0;
+                                temp_a1_2 = M2C_FIELD(var_a2, void** , 0x20D8);
+                                var_t1 += 1;
+                                if (temp_a1_2 != NULL) {
+                                    temp_a0_3 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x20 + (M2C_FIELD(temp_a1_2, s32* , 4) * 4);
+                                    *temp_a0_3 += M2C_FIELD((temp_a1_2 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), f32* , 0x30);
+                                    temp_a1_3 = M2C_FIELD(var_a2, void** , 0x20D8);
+                                    temp_a0_4 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x60 + (M2C_FIELD(temp_a1_3, s32* , 4) * 4);
+                                    *temp_a0_4 += M2C_FIELD((temp_a1_3 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x10);
+                                }
+                                var_a2 += 0x31B0;
+                                var_t0 += 4;
+                                var_a3 += 4;
+                            } while (var_t1 < 8);
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x40) = 0;
+                            *(M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)) = 0;
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x60) = 0;
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x20) = 0;
+                            M2C_FIELD((&D_003156C0 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x303C) = 0;
+                            var_a0 = D_004FA030;
+                        }
+                    }
+                    temp_a1_4 = var_a0 + 0x18D80;
+                    do {
+                        temp_v1_3 = M2C_FIELD(var_a0, s32* , 0x20D8);
+                        if (temp_v1_3 != 0) {
+                            M2C_FIELD((temp_v1_3 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x30) = 0;
+                            M2C_FIELD((M2C_FIELD(var_a0, s32* , 0x20D8) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x10) = 0;
+                        }
+                        var_a0 += 0x31B0;
+                    } while ((s32) var_a0 < (s32) temp_a1_4);
+                }
+                if (M2C_FIELD(temp_s0, s32* , 0) <= 0xFFFE) {
+                    M2C_FIELD(((arg0 * 0x220) + &D_003156C0), s32* , 0x220) = 0;
+                }
+                if (M2C_FIELD(D_004FA030, s32* , 0x20D8) == temp_s0) {
+                    M2C_FIELD(D_004FA030, s32* , 0x20D8) = 0;
+                } else {
+                    var_a0_2 = 1;
+loop_23:
+                    if (var_a0_2 < 8) {
+                        temp_v0 = (var_a0_2 * 0x31B0) + D_004FA030;
+                        var_a0_2 += 1;
+                        if (M2C_FIELD(temp_v0, s32* , 0x20D8) == temp_s0) {
+                            M2C_FIELD(temp_v0, s32* , 0x20D8) = 0;
+                        } else {
+                            goto loop_23;
+                        }
+                    }
+                }
+            } else if (temp_a0 == D_004F9CAC) {
+                M2C_FIELD(&D_003156C0, void** , 0x3148) = (void* ) (&D_003156C0 + 0x3080);
+            } else if ((temp_a0 == D_004F9D18) && (temp_s0_2 = M2C_FIELD(temp_v1, void** , 0x1C), (temp_s0_2 != NULL)) && (temp_a1_5 = M2C_FIELD(temp_s0_2, s32* , 0), (temp_a1_5 != 0))) {
+                if ((u32) (M2C_FIELD(temp_a1_5, s32* , 0x20B4) - 4) < 2U) {
+                    if (arg0 != *M2C_FIELD(&D_003156C0, s32** , 4)) {
+                        func_0013EED0(D_004FA030, temp_a1_5);
+                        func_001759D8(&D_003156C0, M2C_FIELD(temp_s0_2, s32* , 0));
+                    }
+                } else {
+                    if (func_001734B8(&D_003156C0, temp_a1_5) != 0) {
+                        temp_s0_3 = (arg0 * 0x220) + &D_003156C0;
+                        temp_a1_6 = M2C_FIELD(temp_s0_3, void** , 0xB0);
+                        if (temp_a1_6 != NULL) {
+                            temp_a1_7 = M2C_FIELD(temp_a1_6, s32* , 0x20E0);
+                            if (temp_a1_7 != -1) {
+                                func_00181AA8(&D_003156C0 + 0x3234, temp_a1_7, 0);
+                            }
+                            if (M2C_FIELD(&D_003156C0, s32* , 0x3870) != 0) {
+                                func_0011B308(&D_003156C0 + 0x386C, M2C_FIELD(temp_s0_3, void** , 0xB0));
+                            }
+                        }
+                    }
+                    temp_s0_4 = &D_003156C0 + 0x56C0;
+                    func_00264A60(&sp80, M2C_FIELD(temp_s0_4, s32* , 0x2CF0), arg0);
+                    if (M2C_FIELD(temp_s0_4, s32* , 0x1BB4) == 0xB) {
+                        func_001A9240();
+                    }
+                    sprintf(sp, "%s has left the game.", (arg0 * 0x220) + (temp_s0_4 + 0x18));
+                    func_0014EDA0(sp);
+                    AddMessage__3Hudiii(D_004FA030 + 0x97B50, 0xF9, 2, 0);
+                    func_0016F1C8(temp_s0_4, arg0);
+                    if (M2C_FIELD(temp_s0_4, s32* , 0x3220) != 0) {
+                        if (M2C_FIELD(M2C_FIELD(temp_s0_4, void** , 0x3148), u8* , 0x24) == 0) {
+                            func_00174D78(temp_s0_4, 0, 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+//@@ netObjDestroyCB m2c5
+#include "m2c_macros.h"
+extern M2C_UNK D_003156C0;
+extern s32 D_004F9CA4;
+extern s32 D_004F9CAC;
+extern s32 D_004F9D18;
+extern void* D_004FA030;
+
+void netObjDestroyCB(s32 arg0, s32 arg1) {
+    u8 sp[0x40];
+    M2C_UNK sp80;
+    f32* temp_a0_2;
+    f32* temp_a0_3;
+    f32* var_t0;
+    s32 temp_a1;
+    s32 temp_a1_5;
+    s32 temp_a1_7;
+    s32 temp_v1_3;
+    s32 var_a0_2;
+    s32 var_t1;
+    s32* temp_a0_4;
+    s32* temp_v1_2;
+    s32* var_a3;
+    u8 temp_a0;
+    void* temp_a1_2;
+    void* temp_a1_3;
+    void* temp_a1_4;
+    void* temp_a1_6;
+    void* temp_s0;
+    void* temp_s0_2;
+    void* temp_s0_3;
+    void* temp_s0_4;
+    void* temp_v0;
+    void* temp_v1;
+    void* var_a0;
+    void* var_a2;
+
+    temp_v1 = netGetDmeTime(&D_003156C0);
+    if (arg0 != 0x100) {
+        if (arg1 == M2C_FIELD(&D_003156C0, s32* , 0x2F00)) {
+            M2C_FIELD(&D_003156C0, s32* , 0x2F04) = 0;
+            M2C_FIELD(&D_003156C0, s32* , 0x2F00) = -1;
+        } else if (temp_v1 != NULL) {
+            temp_a0 = M2C_FIELD(temp_v1, u8* , 0);
+            if (temp_a0 == D_004F9CA4) {
+                temp_s0 = M2C_FIELD(temp_v1, void** , 0x1C);
+                if (M2C_FIELD(temp_s0, s32* , 4) != -1) {
+                    var_a0 = D_004FA030;
+                    if (M2C_FIELD(&D_003156C0, s32* , 0x2F04) != 0) {
+                        var_a0 = D_004FA030;
+                        if (func_001734B8(&D_003156C0) != 0) {
+                            var_a2 = D_004FA030;
+                            var_t1 = 0;
+                            var_t0 = temp_s0 + 0x30;
+                            var_a3 = temp_s0 + 0x10;
+                            do {
+                                temp_a1 = var_t1 * 4;
+                                temp_v1_2 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x40 + temp_a1;
+                                *temp_v1_2 += *var_a3;
+                                temp_a0_2 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + temp_a1;
+                                *temp_a0_2 += *var_t0;
+                                temp_a1_2 = M2C_FIELD(var_a2, void** , 0x20D8);
+                                var_t1 += 1;
+                                if (temp_a1_2 != NULL) {
+                                    temp_a0_3 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x20 + (M2C_FIELD(temp_a1_2, s32* , 4) * 4);
+                                    *temp_a0_3 += M2C_FIELD((temp_a1_2 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), f32* , 0x30);
+                                    temp_a1_3 = M2C_FIELD(var_a2, void** , 0x20D8);
+                                    temp_a0_4 = M2C_FIELD(&D_003156C0, s32* , 0x2F04) + 0x60 + (M2C_FIELD(temp_a1_3, s32* , 4) * 4);
+                                    *temp_a0_4 += M2C_FIELD((temp_a1_3 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x10);
+                                }
+                                var_a2 += 0x31B0;
+                                var_t0 += 4;
+                                var_a3 += 4;
+                            } while (var_t1 < 8);
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x40) = 0;
+                            *(M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)) = 0;
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x60) = 0;
+                            M2C_FIELD((M2C_FIELD(&D_003156C0, s32* , 0x2F04) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x20) = 0;
+                            M2C_FIELD((&D_003156C0 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x303C) = 0;
+                            var_a0 = D_004FA030;
+                        }
+                    }
+                    temp_a1_4 = var_a0 + 0x18D80;
+                    do {
+                        temp_v1_3 = M2C_FIELD(var_a0, s32* , 0x20D8);
+                        if (temp_v1_3 != 0) {
+                            M2C_FIELD((temp_v1_3 + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x30) = 0;
+                            M2C_FIELD((M2C_FIELD(var_a0, s32* , 0x20D8) + (M2C_FIELD(temp_s0, s32* , 4) * 4)), s32* , 0x10) = 0;
+                        }
+                        var_a0 += 0x31B0;
+                    } while ((s32) var_a0 < (s32) temp_a1_4);
+                }
+                if (M2C_FIELD(temp_s0, s32* , 0) <= 0xFFFE) {
+                    M2C_FIELD(((arg0 * 0x220) + &D_003156C0), s32* , 0x220) = 0;
+                }
+                if (M2C_FIELD(D_004FA030, s32* , 0x20D8) == temp_s0) {
+                    M2C_FIELD(D_004FA030, s32* , 0x20D8) = 0;
+                } else {
+                    var_a0_2 = 1;
+loop_23:
+                    if (var_a0_2 < 8) {
+                        temp_v0 = (var_a0_2 * 0x31B0) + D_004FA030;
+                        var_a0_2 += 1;
+                        if (M2C_FIELD(temp_v0, s32* , 0x20D8) == temp_s0) {
+                            M2C_FIELD(temp_v0, s32* , 0x20D8) = 0;
+                        } else {
+                            goto loop_23;
+                        }
+                    }
+                }
+            } else if (temp_a0 == D_004F9CAC) {
+                M2C_FIELD(&D_003156C0, void** , 0x3148) = (void* ) (&D_003156C0 + 0x3080);
+            } else if ((temp_a0 == D_004F9D18) && (temp_s0_2 = M2C_FIELD(temp_v1, void** , 0x1C), (temp_s0_2 != NULL)) && (temp_a1_5 = M2C_FIELD(temp_s0_2, s32* , 0), (temp_a1_5 != 0))) {
+                if ((u32) (M2C_FIELD(temp_a1_5, s32* , 0x20B4) - 4) < 2U) {
+                    if (arg0 != *M2C_FIELD(&D_003156C0, s32** , 4)) {
+                        func_0013EED0(D_004FA030, temp_a1_5);
+                        func_001759D8(&D_003156C0, M2C_FIELD(temp_s0_2, s32* , 0));
+                    }
+                } else {
+                    if (func_001734B8(&D_003156C0, temp_a1_5) != 0) {
+                        temp_s0_3 = (arg0 * 0x220) + &D_003156C0;
+                        temp_a1_6 = M2C_FIELD(temp_s0_3, void** , 0xB0);
+                        if (temp_a1_6 != NULL) {
+                            temp_a1_7 = M2C_FIELD(temp_a1_6, s32* , 0x20E0);
+                            if (temp_a1_7 != -1) {
+                                func_00181AA8(&D_003156C0 + 0x3234, temp_a1_7, 0);
+                            }
+                            if (M2C_FIELD(&D_003156C0, s32* , 0x3870) != 0) {
+                                func_0011B308(&D_003156C0 + 0x386C, M2C_FIELD(temp_s0_3, void** , 0xB0));
+                            }
+                        }
+                    }
+                    temp_s0_4 = &D_003156C0 + 0x56C0;
+                    func_00264A60(&sp80, M2C_FIELD(temp_s0_4, s32* , 0x2CF0), arg0);
+                    if (M2C_FIELD(temp_s0_4, s32* , 0x1BB4) == 0xB) {
+                        func_001A9240();
+                    }
+                    sprintf(sp, "%s has left the game.", (arg0 * 0x220) + (temp_s0_4 + 0x18));
+                    func_0014EDA0(sp);
+                    AddMessage__3Hudiii(D_004FA030 + 0x97B50, 0xF9, 2, 0);
+                    func_0016F1C8(temp_s0_4, arg0);
+                    if (M2C_FIELD(temp_s0_4, s32* , 0x3220) != 0) {
+                        if (M2C_FIELD(M2C_FIELD(temp_s0_4, void** , 0x3148), u8* , 0x24) == 0) {
+                            func_00174D78(temp_s0_4, 0, 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+//@@ netWeaponCreateCB m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern void* D_004FA030;
@@ -2420,7 +7319,7 @@ block_23:
         }
     }
 }
-//@@ netWeaponUpdateCB m2c
+//@@ netWeaponUpdateCB m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern void* D_004FA030;
@@ -2472,7 +7371,7 @@ block_13:
         }
     }
 }
-//@@ netWeaponDestroyCB m2c
+//@@ netWeaponDestroyCB m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern void* D_004FA030;
@@ -2540,7 +7439,7 @@ block_15:
         }
     }
 }
-//@@ netGameDataUpdateCB m2c
+//@@ netGameDataUpdateCB m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_003188F4;
@@ -2577,7 +7476,7 @@ void netGameDataUpdateCB(s32 arg0, s32 arg1, s32 arg2) {
         func_00176580(&D_003156C0);
     }
 }
-//@@ netPadFlagsUpdateCB m2c
+//@@ netPadFlagsUpdateCB m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 
@@ -2740,14 +7639,14 @@ void netPadFlagsUpdateCB(s32 arg0) {
         }
     }
 }
-//@@ func_0016C480 m2c
+//@@ func_0016C480 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9EB0;
 
 void func_0016C480(s32 arg0, s32 arg1, s32 arg2) {
     D_004F9EB0 = arg2;
 }
-//@@ func_0016C488 m2c
+//@@ func_0016C488 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern s32 D_004FA030;
@@ -2785,7 +7684,7 @@ void func_0016C488(void) {
     M2C_FIELD(M2C_FIELD(M2C_FIELD(&D_003156C0, void** , 4), void** , 0xA0), s32* , 0x590) = 1;
     func_001D6F78(M2C_FIELD(M2C_FIELD(&D_003156C0, void** , 4), void** , 0xA0), 1, var_a2);
 }
-//@@ func_0016C590 m2c
+//@@ func_0016C590 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002B8A00;
 extern M2C_UNK D_003156C0;
@@ -2832,13 +7731,107 @@ void func_0016C590(s32 arg0, s32 arg1) {
     }
     M2C_FIELD(M2C_FIELD(&D_003156C0, void** , 0x3148), s8* , 0x24) = func_00176B10(&D_003156C0, 0);
 }
-//@@ func_0016C738 m2c
+//@@ func_0016C590 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_002B8A00;
+extern M2C_UNK D_003156C0;
+extern M2C_UNK D_004E6500;
+extern M2C_UNK D_004E6A00;
+extern void* D_004FA030;
+static M2C_UNK D_004E6BB0;                          /* unable to generate initializer: unknown type; const */
+
+void func_0016C590(s32 arg0, s32 arg1) {
+    u8 sp[0x8];
+    s32 temp_s0;
+
+    temp_s0 = func_001733F8(&D_003156C0);
+    printf("In HostChangeCallback...\n");
+    switch (temp_s0) {                              /* irregular */
+    case 1:
+        if (func_00176B10(&D_003156C0, 1) <= 0) {
+            printf(&D_004E6A00, &D_003156C0);
+            if (func_00176CC8(&D_003156C0) != 0) {
+                printf(&D_004E6BB0);
+                M2C_FIELD(&D_003156C0, s32* , 0x1BB0) = temp_s0;
+                func_00174988(&D_003156C0, -1);
+            }
+        }
+        if ((arg1 == *M2C_FIELD(&D_003156C0, s32** , 4)) && (M2C_FIELD(D_004FA030, s32* , 0x9FD9C) != 0) && (M2C_FIELD(&D_003156C0, s32* , 0x3230) == 0)) {
+            func_00171F88(&D_003156C0, &D_003156C0);
+        }
+        break;
+    case 2:
+        func_00266DE0(&D_003156C0 + 0x307C, M2C_FIELD(&D_003156C0, s32* , 0x2CF0));
+        printf(&D_004E6500);
+        printf(">>>>> 6 Setting ConnectionSessionMaster = %d\n\0BASCUS-97196\0\0\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789", M2C_FIELD(&D_003156C0, M2C_UNK** , 0x307C));
+        printf(&D_004E6500);
+        break;
+    }
+    if (M2C_FIELD(&D_003156C0, s32* , 0x2E90) == 0) {
+        if (M2C_FIELD(&D_003156C0, s32* , 0x1BB4) > 0) {
+            if (arg1 == netGetMyClientIndex(&D_003156C0, 0)) {
+                M2C_FIELD(&D_002B8A00, s32* , 0xE0) = 1;
+                func_00266EB0(sp, M2C_FIELD(&D_003156C0, s32* , 0x2CF0));
+                M2C_FIELD(&D_002B8A00, s32* , 0xEC) = (s32) subroutine_arg0;
+            }
+        }
+    }
+    M2C_FIELD(M2C_FIELD(&D_003156C0, void** , 0x3148), s8* , 0x24) = func_00176B10(&D_003156C0, 0);
+}
+//@@ func_0016C590 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_002B8A00;
+extern M2C_UNK D_003156C0;
+extern M2C_UNK D_004E6500;
+extern M2C_UNK D_004E6A00;
+extern void* D_004FA030;
+static M2C_UNK D_004E6BB0;                          /* unable to generate initializer: unknown type; const */
+
+void func_0016C590(s32 arg0, s32 arg1) {
+    u8 sp[0x4];
+    s32 temp_s0;
+
+    temp_s0 = func_001733F8(&D_003156C0);
+    printf("In HostChangeCallback...\n");
+    switch (temp_s0) {                              /* irregular */
+    case 1:
+        if (func_00176B10(&D_003156C0, 1) <= 0) {
+            printf(&D_004E6A00, &D_003156C0);
+            if (func_00176CC8(&D_003156C0) != 0) {
+                printf(&D_004E6BB0);
+                M2C_FIELD(&D_003156C0, s32* , 0x1BB0) = temp_s0;
+                func_00174988(&D_003156C0, -1);
+            }
+        }
+        if ((arg1 == *M2C_FIELD(&D_003156C0, s32** , 4)) && (M2C_FIELD(D_004FA030, s32* , 0x9FD9C) != 0) && (M2C_FIELD(&D_003156C0, s32* , 0x3230) == 0)) {
+            func_00171F88(&D_003156C0, &D_003156C0);
+        }
+        break;
+    case 2:
+        func_00266DE0(&D_003156C0 + 0x307C, M2C_FIELD(&D_003156C0, s32* , 0x2CF0));
+        printf(&D_004E6500);
+        printf(">>>>> 6 Setting ConnectionSessionMaster = %d\n\0BASCUS-97196\0\0\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789", M2C_FIELD(&D_003156C0, M2C_UNK** , 0x307C));
+        printf(&D_004E6500);
+        break;
+    }
+    if (M2C_FIELD(&D_003156C0, s32* , 0x2E90) == 0) {
+        if (M2C_FIELD(&D_003156C0, s32* , 0x1BB4) > 0) {
+            if (arg1 == netGetMyClientIndex(&D_003156C0, 0)) {
+                M2C_FIELD(&D_002B8A00, s32* , 0xE0) = 1;
+                func_00266EB0(sp, M2C_FIELD(&D_003156C0, s32* , 0x2CF0));
+                M2C_FIELD(&D_002B8A00, s32* , 0xEC) = (s32) subroutine_arg0;
+            }
+        }
+    }
+    M2C_FIELD(M2C_FIELD(&D_003156C0, void** , 0x3148), s8* , 0x24) = func_00176B10(&D_003156C0, 0);
+}
+//@@ func_0016C738 m2c0
 #include "m2c_macros.h"
 void func_0016C738(void* arg0) {
     M2C_FIELD(arg0, s8* , 0x14) = 0;
     M2C_FIELD(arg0, s8* , 4) = 0;
 }
-//@@ func_0016C748 m2c
+//@@ func_0016C748 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_004E6D30;
 extern M2C_UNK D_004F9D38;
@@ -2863,7 +7856,7 @@ void func_0016C748(void* arg0) {
     func_0016E7D0(0);
     func_00161598(&D_004F9D38, "cdrom0:\\NET\\NETCNF.IRX;1", 0x3A, &D_004E6D30);
 }
-//@@ func_0016C7D0 m2c
+//@@ func_0016C7D0 m2c0
 #include "m2c_macros.h"
 extern s32 D_00313F40;
 extern M2C_UNK D_00313F70;
@@ -2955,7 +7948,7 @@ block_17:
         printf("...Done Listing Configurations.\n\n");
     }
 }
-//@@ func_0016CA88 m2c
+//@@ func_0016CA88 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_004F9D48;
@@ -2991,7 +7984,7 @@ s32 func_0016CA88(void* arg0, s32 arg1) {
     }
     return -1;
 }
-//@@ func_0016CB90 m2c
+//@@ func_0016CB90 m2c0
 #include "m2c_macros.h"
 s32 func_0016CB90(void* arg0, s32 arg1) {
     s32 temp_a0;
@@ -3081,7 +8074,7 @@ block_32:
     }
     return var_v0;
 }
-//@@ func_0016CD88 m2c
+//@@ func_0016CD88 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_004F9D38;
@@ -3221,7 +8214,7 @@ block_57:
     }
     return var_s0;
 }
-//@@ func_0016D238 m2c
+//@@ func_0016D238 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_00319980;
 extern s32 D_00319984;
@@ -3258,7 +8251,7 @@ s32 func_0016D238(void* arg0, s32 arg1) {
     }
     return var_v0;
 }
-//@@ func_0016D338 m2c
+//@@ func_0016D338 m2c0
 #include "m2c_macros.h"
 extern s32 D_00319984;
 
@@ -3276,7 +8269,7 @@ s32 func_0016D338(void* arg0) {
     M2C_FIELD(arg0, s32* , 0x428C) = 0;
     return temp_s1;
 }
-//@@ func_0016D3B0 m2c
+//@@ func_0016D3B0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_00319980;
 extern s32 D_004F9D58;
@@ -3325,7 +8318,7 @@ s32 func_0016D3B0(void* arg0) {
     M2C_FIELD(arg0, s32* , 0x1BC4) = 6;
     return var_v0;
 }
-//@@ func_0016D4F8 m2c
+//@@ func_0016D4F8 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002B8A00;
 extern M2C_UNK D_002C1690;
@@ -3384,7 +8377,7 @@ s32 func_0016D4F8(void* arg0, s32 arg1) {
         return var_v0;
     }
 }
-//@@ func_0016D690 m2c
+//@@ func_0016D690 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_00319980;
@@ -3420,7 +8413,7 @@ s32 func_0016D690(void* arg0) {
     var_v0 = (temp_v1 >= M2C_FIELD(&D_003156C0, s32* , 0x42C8)) ? -1 : M2C_FIELD(&D_003156C0, s32* , 0x42C8);
     return var_v0;
 }
-//@@ func_0016D800 m2c
+//@@ func_0016D800 m2c0
 #include "m2c_macros.h"
 s32 func_0016D800(void* arg0, s32 arg1) {
     s32 temp_v1;
@@ -3431,7 +8424,7 @@ s32 func_0016D800(void* arg0, s32 arg1) {
     }
     return (arg1 * 0x68) + temp_v1 + 0x38;
 }
-//@@ netInitDme m2c
+//@@ netInitDme m2c0
 #include "m2c_macros.h"
 extern s32 D_00319924;
 extern u8 D_004E72A0;
@@ -3765,7 +8758,1677 @@ s32 netInitDme(void) {
     }
     return var_v0;
 }
-//@@ func_0016E6F8 m2c
+//@@ netInitDme m2c1
+#include "m2c_macros.h"
+extern s32 D_00319924;
+extern u8 D_004E72A0;
+extern s32 D_004F9CA0;
+extern s32 D_004F9CA4;
+extern s32 D_004F9CA8;
+extern s32 D_004F9CAC;
+extern s32 D_004F9CB0;
+extern s32 D_004F9CB4;
+extern M2C_UNK D_004F9CB8;
+extern M2C_UNK D_004F9CBC;
+extern M2C_UNK D_004F9CC0;
+extern M2C_UNK D_004F9CC4;
+extern M2C_UNK D_004F9CC8;
+extern M2C_UNK D_004F9CCC;
+extern M2C_UNK D_004F9CD0;
+extern M2C_UNK D_004F9CD4;
+extern s32 D_004F9D18;
+extern s32 D_004F9D24;
+extern s32 D_004F9D80;
+extern s32 D_004F9D88;
+extern s32 D_004F9D90;
+extern s32 D_004F9D94;
+extern s32 D_004F9D98;
+extern M2C_UNK func_0016C590;
+extern M2C_UNK netFodderUpdateCB;
+extern M2C_UNK netGameDataUpdateCB;
+extern M2C_UNK netMsgChatHandler;
+extern M2C_UNK netMsgGameEventHandler;
+extern M2C_UNK netMsgPlayerInfoHandler;
+extern M2C_UNK netMsgRosterHandler;
+extern M2C_UNK netMsgSessionHandler;
+extern M2C_UNK netMsgWorldEventHandler;
+extern M2C_UNK netObjCreateCB;
+extern M2C_UNK netObjDestroyCB;
+extern M2C_UNK netObjUpdateVehicleCB;
+extern M2C_UNK netPadFlagsUpdateCB;
+extern M2C_UNK netStatsUpdateCB;
+extern M2C_UNK netWeaponCreateCB;
+extern M2C_UNK netWeaponDestroyCB;
+extern M2C_UNK netWeaponUpdateCB;
+
+s32 netInitDme(void) {
+    u8 sp[0xA40];
+    M2C_UNK sp1;
+    u8 sp100;
+    M2C_UNK sp101;
+    M2C_UNK sp200;
+    s32 sp204;
+    s32 sp208;
+    M2C_UNK sp220;
+    s32 sp240;
+    s32 sp244;
+    s64 sp248;
+    s8 sp250;
+    s32 sp260;
+    s32 sp264;
+    s64 sp268;
+    s8 sp270;
+    s32 sp280;
+    s32 sp284;
+    s64 sp288;
+    s8 sp290;
+    s32 sp2A0;
+    s32 sp2A4;
+    s64 sp2A8;
+    s8 sp2B0;
+    s32 sp2C0;
+    s32 sp2C4;
+    s64 sp2C8;
+    s8 sp2D0;
+    M2C_UNK sp2DC;
+    M2C_UNK sp2E4;
+    M2C_UNK sp2E8;
+    M2C_UNK sp2F4;
+    M2C_UNK sp300;
+    M2C_UNK sp30C;
+    M2C_UNK sp30E;
+    M2C_UNK sp310;
+    M2C_UNK sp312;
+    M2C_UNK sp314;
+    M2C_UNK sp316;
+    M2C_UNK sp318;
+    M2C_UNK sp319;
+    M2C_UNK sp31A;
+    M2C_UNK sp31B;
+    M2C_UNK sp320;
+    M2C_UNK sp348;
+    M2C_UNK sp34C;
+    M2C_UNK sp350;
+    M2C_UNK sp354;
+    M2C_UNK sp360;
+    M2C_UNK sp368;
+    M2C_UNK sp36C;
+    M2C_UNK sp370;
+    M2C_UNK sp378;
+    M2C_UNK sp380;
+    M2C_UNK sp390;
+    M2C_UNK sp394;
+    M2C_UNK sp398;
+    M2C_UNK sp39C;
+    M2C_UNK sp3A0;
+    M2C_UNK sp3C0;
+    M2C_UNK sp3DC;
+    M2C_UNK sp3E0;
+    M2C_UNK sp3E4;
+    M2C_UNK sp400;
+    M2C_UNK sp414;
+    M2C_UNK sp464;
+    M2C_UNK sp46E;
+    M2C_UNK sp470;
+    M2C_UNK sp474;
+    M2C_UNK sp478;
+    M2C_UNK sp47B;
+    M2C_UNK sp47C;
+    M2C_UNK sp480;
+    M2C_UNK sp485;
+    M2C_UNK sp486;
+    M2C_UNK sp488;
+    M2C_UNK sp48C;
+    M2C_UNK sp490;
+    M2C_UNK sp494;
+    M2C_UNK sp498;
+    M2C_UNK sp49A;
+    M2C_UNK sp49B;
+    M2C_UNK sp49C;
+    M2C_UNK sp4A0;
+    M2C_UNK sp55C;
+    M2C_UNK sp55E;
+    M2C_UNK sp55F;
+    M2C_UNK sp560;
+    M2C_UNK sp570;
+    M2C_UNK sp57C;
+    M2C_UNK sp580;
+    M2C_UNK sp584;
+    M2C_UNK sp590;
+    M2C_UNK sp610;
+    M2C_UNK sp614;
+    M2C_UNK sp620;
+    M2C_UNK sp660;
+    M2C_UNK sp670;
+    M2C_UNK sp750;
+    M2C_UNK sp754;
+    M2C_UNK sp810;
+    M2C_UNK sp814;
+    M2C_UNK sp870;
+    M2C_UNK sp9F0;
+    M2C_UNK sp9F4;
+    M2C_UNK spA40;
+    s32 spA44;
+    s32* spA48;
+    M2C_UNK* temp_s0_2;
+    s32 var_v0;
+    s32 var_v0_2;
+    u8 temp_s0;
+
+    temp_s0 = D_004E72A0;
+    memset(&sp1, 0, 0xFF);
+    sp100 = temp_s0;
+    memset(&sp101, 0, 0xFF);
+    func_00268ED0(&sp200);
+    sp208 = 0x272F;
+    sp204 = 0x40;
+    func_00268F20(&sp200, &sp220);
+    func_00269318(0x2000, 0x2000);
+    var_v0 = -1;
+    if (func_00266F50(sp) == 0) {
+        var_v0 = -1;
+        if (func_00267080(&sp100) == 0) {
+            temp_s0_2 = "-----------------------------------------------------------------\n";
+            printf(temp_s0_2);
+            printf("NETWORK: Initialized Distributed Memory Engine\n");
+            printf("         Build Version  %s\n", sp);
+            printf("         Client Version %s\n", &sp100);
+            printf(temp_s0_2);
+            var_v0_2 = 0x12C;
+            if (D_00319924 == 0) {
+                var_v0_2 = 0xC8;
+            }
+            sp2C0 = var_v0_2;
+            sp2C8 = (((((0xFEE6 << 0x11) | 0xCCCC) << 0x10) | 0xCCCC) << 0xD) | 0x199A;
+            sp248 = 0;
+            sp240 = 0x85;
+            sp268 = 0;
+            sp250 = 0x10;
+            sp288 = 0;
+            sp260 = 0x43;
+            sp2A8 = 0;
+            sp280 = 0x7D0;
+            sp2A0 = 0x1388;
+            sp2B0 = 0x40;
+            sp2D0 = 0x10;
+            sp270 = 0x40;
+            sp290 = 0x40;
+            sp2A4 = 1;
+            sp2C4 = 1;
+            sp244 = 1;
+            sp264 = 1;
+            sp284 = 1;
+            dmeObjLayoutBegin(0x85, 0, 0x43, 0x7D0);
+            spA48 = &sp2C0;
+            dmeObjLayoutAddField(&spA40, 4, 1, 1);
+            dmeObjRegisterType(&D_004F9D18, "NetVehicle", 0x38);
+            dmeObjSetCallbacks(D_004F9D18, &netObjCreateCB, &netObjUpdateVehicleCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 4, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp31B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp31A, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp319, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp318, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp316, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp314, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp312, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp310, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp30E, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp30C, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp300, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2F4, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2E8, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2E4, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2DC, 1, 1);
+            dmeObjRegisterType(&D_004F9D24, "NetWeapon", 0x4C);
+            dmeObjSetCallbacks(D_004F9D24, &netWeaponCreateCB, &netWeaponUpdateCB, &netWeaponDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&D_004F9CD0, &sp370 - &sp36C, 0xC, 0xD);
+            dmeObjLayoutAddField(&D_004F9CD4, &sp370 - &sp360, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp354, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp350, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp34C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp348, 4, 4);
+            dmeObjRegisterType(&D_004F9CA0, "NetFodder", 0x2C);
+            dmeObjSetCallbacks(D_004F9CA0, &netObjCreateCB, &netFodderUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp39C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp398, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp394, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp390, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp370, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp350, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp34C, 4, 4);
+            dmeObjRegisterType(&D_004F9CA4, "NetStats", 0x58);
+            dmeObjSetCallbacks(D_004F9CA4, &netObjCreateCB, &netStatsUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3E0, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3C0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3A0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp380, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp378, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp370, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp368, 4, 4);
+            dmeObjRegisterType(&D_004F9CA8, "NetPersistantStats", 0xA0);
+            dmeObjSetCallbacks(D_004F9CA8, &netObjCreateCB, &netStatsUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49C, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49A, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp498, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp494, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp490, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp48C, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp488, 2, 3);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp485, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp480, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp47C, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp47B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp478, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp474, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp470, 2, 3);
+            dmeObjLayoutAddField(&D_004F9CB8, &sp4A0 - &sp46E, 1, 0);
+            dmeObjLayoutAddField(&D_004F9CBC, &sp4A0 - &sp464, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CC0, &sp4A0 - &sp414, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CCC, &sp4A0 - &sp3E4, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CC8, &sp4A0 - &sp486, 1, 0);
+            dmeObjLayoutAddField(&D_004F9CC4, &sp4A0 - &sp3DC, 1, 0);
+            dmeObjRegisterType(&D_004F9CAC, "NetGameData", 0xC8);
+            dmeObjSetCallbacks(D_004F9CAC, &netObjCreateCB, &netGameDataUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp560, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55F, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55E, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55C, 2, 2);
+            dmeObjRegisterType(&D_004F9CB0, "NetVehiclePadFlagsObj", 0x18);
+            dmeObjSetCallbacks(D_004F9CB0, &netObjCreateCB, &netPadFlagsUpdateCB, &netObjDestroyCB);
+            func_001192E8(&sp590);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp584, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp580, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp57C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp570, 4, 4);
+            dmeObjRegisterType(&D_004F9CB4, "NetArtifactObj\0BASCUS-97196\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789", 0x7C);
+            dmeObjSetCallbacks(D_004F9CB4, &netObjCreateCB, &netObjUpdateVehicleCB, &netObjDestroyCB);
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp610, &sp610, 4, 1);
+            dmeMsgLayoutAddField(&sp610, &sp614, 4, 1);
+            dmeMsgLayoutAddField(&sp610, &sp620, 0x40, 1);
+            dmeMsgRegister(&spA44, &netMsgGameEventHandler);
+            D_004F9D84 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp660, &sp660, 4, 1);
+            dmeMsgLayoutAddField(&sp660, &sp670, 0xE0, 1);
+            dmeMsgRegister(&spA44, &netMsgSessionHandler);
+            D_004F9D88 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp750, &sp750, 4, 1);
+            dmeMsgLayoutAddField(&sp750, &sp754, 0xBC, 1);
+            dmeMsgRegister(&spA44, &netMsgWorldEventHandler);
+            D_004F9D90 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp810, &sp810, 4, 1);
+            dmeMsgLayoutAddField(&sp810, &sp814, 0x5C, 1);
+            dmeMsgRegister(&spA44, &netMsgPlayerInfoHandler);
+            D_004F9D94 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp870, &sp870, 0x30, 8);
+            dmeMsgRegister(&spA44, &netMsgRosterHandler);
+            D_004F9D98 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp9F0, &sp9F0, 4, 4);
+            dmeMsgLayoutAddField(&sp9F0, &sp9F4, 0x44, 0x44);
+            dmeMsgRegister(&spA44, &netMsgChatHandler);
+            D_004F9D80 = spA44;
+            func_00266478(&func_0016C590);
+            var_v0 = 1;
+        }
+    }
+    return var_v0;
+}
+//@@ netInitDme m2c2
+#include "m2c_macros.h"
+extern s32 D_00319924;
+extern u8 D_004E72A0;
+extern s32 D_004F9CA0;
+extern s32 D_004F9CA4;
+extern s32 D_004F9CA8;
+extern s32 D_004F9CAC;
+extern s32 D_004F9CB0;
+extern s32 D_004F9CB4;
+extern M2C_UNK D_004F9CB8;
+extern M2C_UNK D_004F9CBC;
+extern M2C_UNK D_004F9CC0;
+extern M2C_UNK D_004F9CC4;
+extern M2C_UNK D_004F9CC8;
+extern M2C_UNK D_004F9CCC;
+extern M2C_UNK D_004F9CD0;
+extern M2C_UNK D_004F9CD4;
+extern s32 D_004F9D18;
+extern s32 D_004F9D24;
+extern s32 D_004F9D80;
+extern s32 D_004F9D88;
+extern s32 D_004F9D90;
+extern s32 D_004F9D94;
+extern s32 D_004F9D98;
+extern M2C_UNK func_0016C590;
+extern M2C_UNK netFodderUpdateCB;
+extern M2C_UNK netGameDataUpdateCB;
+extern M2C_UNK netMsgChatHandler;
+extern M2C_UNK netMsgGameEventHandler;
+extern M2C_UNK netMsgPlayerInfoHandler;
+extern M2C_UNK netMsgRosterHandler;
+extern M2C_UNK netMsgSessionHandler;
+extern M2C_UNK netMsgWorldEventHandler;
+extern M2C_UNK netObjCreateCB;
+extern M2C_UNK netObjDestroyCB;
+extern M2C_UNK netObjUpdateVehicleCB;
+extern M2C_UNK netPadFlagsUpdateCB;
+extern M2C_UNK netStatsUpdateCB;
+extern M2C_UNK netWeaponCreateCB;
+extern M2C_UNK netWeaponDestroyCB;
+extern M2C_UNK netWeaponUpdateCB;
+
+s32 netInitDme(void) {
+    u8 sp[0xA30];
+    M2C_UNK sp1;
+    u8 sp100;
+    M2C_UNK sp101;
+    M2C_UNK sp200;
+    s32 sp204;
+    s32 sp208;
+    M2C_UNK sp220;
+    s32 sp240;
+    s32 sp244;
+    s64 sp248;
+    s8 sp250;
+    s32 sp260;
+    s32 sp264;
+    s64 sp268;
+    s8 sp270;
+    s32 sp280;
+    s32 sp284;
+    s64 sp288;
+    s8 sp290;
+    s32 sp2A0;
+    s32 sp2A4;
+    s64 sp2A8;
+    s8 sp2B0;
+    s32 sp2C0;
+    s32 sp2C4;
+    s64 sp2C8;
+    s8 sp2D0;
+    M2C_UNK sp2DC;
+    M2C_UNK sp2E4;
+    M2C_UNK sp2E8;
+    M2C_UNK sp2F4;
+    M2C_UNK sp300;
+    M2C_UNK sp30C;
+    M2C_UNK sp30E;
+    M2C_UNK sp310;
+    M2C_UNK sp312;
+    M2C_UNK sp314;
+    M2C_UNK sp316;
+    M2C_UNK sp318;
+    M2C_UNK sp319;
+    M2C_UNK sp31A;
+    M2C_UNK sp31B;
+    M2C_UNK sp320;
+    M2C_UNK sp348;
+    M2C_UNK sp34C;
+    M2C_UNK sp350;
+    M2C_UNK sp354;
+    M2C_UNK sp360;
+    M2C_UNK sp368;
+    M2C_UNK sp36C;
+    M2C_UNK sp370;
+    M2C_UNK sp378;
+    M2C_UNK sp380;
+    M2C_UNK sp390;
+    M2C_UNK sp394;
+    M2C_UNK sp398;
+    M2C_UNK sp39C;
+    M2C_UNK sp3A0;
+    M2C_UNK sp3C0;
+    M2C_UNK sp3DC;
+    M2C_UNK sp3E0;
+    M2C_UNK sp3E4;
+    M2C_UNK sp400;
+    M2C_UNK sp414;
+    M2C_UNK sp464;
+    M2C_UNK sp46E;
+    M2C_UNK sp470;
+    M2C_UNK sp474;
+    M2C_UNK sp478;
+    M2C_UNK sp47B;
+    M2C_UNK sp47C;
+    M2C_UNK sp480;
+    M2C_UNK sp485;
+    M2C_UNK sp486;
+    M2C_UNK sp488;
+    M2C_UNK sp48C;
+    M2C_UNK sp490;
+    M2C_UNK sp494;
+    M2C_UNK sp498;
+    M2C_UNK sp49A;
+    M2C_UNK sp49B;
+    M2C_UNK sp49C;
+    M2C_UNK sp4A0;
+    M2C_UNK sp55C;
+    M2C_UNK sp55E;
+    M2C_UNK sp55F;
+    M2C_UNK sp560;
+    M2C_UNK sp570;
+    M2C_UNK sp57C;
+    M2C_UNK sp580;
+    M2C_UNK sp584;
+    M2C_UNK sp590;
+    M2C_UNK sp610;
+    M2C_UNK sp614;
+    M2C_UNK sp620;
+    M2C_UNK sp660;
+    M2C_UNK sp670;
+    M2C_UNK sp750;
+    M2C_UNK sp754;
+    M2C_UNK sp810;
+    M2C_UNK sp814;
+    M2C_UNK sp870;
+    M2C_UNK sp9F0;
+    M2C_UNK sp9F4;
+    M2C_UNK spA40;
+    s32 spA44;
+    s32* spA48;
+    M2C_UNK* temp_s0_2;
+    s32 var_v0;
+    s32 var_v0_2;
+    u8 temp_s0;
+
+    temp_s0 = D_004E72A0;
+    memset(&sp1, 0, 0xFF);
+    sp100 = temp_s0;
+    memset(&sp101, 0, 0xFF);
+    func_00268ED0(&sp200);
+    sp208 = 0x272F;
+    sp204 = 0x40;
+    func_00268F20(&sp200, &sp220);
+    func_00269318(0x2000, 0x2000);
+    var_v0 = -1;
+    if (func_00266F50(sp) == 0) {
+        var_v0 = -1;
+        if (func_00267080(&sp100) == 0) {
+            temp_s0_2 = "-----------------------------------------------------------------\n";
+            printf(temp_s0_2);
+            printf("NETWORK: Initialized Distributed Memory Engine\n");
+            printf("         Build Version  %s\n", sp);
+            printf("         Client Version %s\n", &sp100);
+            printf(temp_s0_2);
+            var_v0_2 = 0x12C;
+            if (D_00319924 == 0) {
+                var_v0_2 = 0xC8;
+            }
+            sp2C0 = var_v0_2;
+            sp2C8 = (((((0xFEE6 << 0x11) | 0xCCCC) << 0x10) | 0xCCCC) << 0xD) | 0x199A;
+            sp248 = 0;
+            sp240 = 0x85;
+            sp268 = 0;
+            sp250 = 0x10;
+            sp288 = 0;
+            sp260 = 0x43;
+            sp2A8 = 0;
+            sp280 = 0x7D0;
+            sp2A0 = 0x1388;
+            sp2B0 = 0x40;
+            sp2D0 = 0x10;
+            sp270 = 0x40;
+            sp290 = 0x40;
+            sp2A4 = 1;
+            sp2C4 = 1;
+            sp244 = 1;
+            sp264 = 1;
+            sp284 = 1;
+            dmeObjLayoutBegin(0x85, 0, 0x43, 0x7D0);
+            spA48 = &sp2C0;
+            dmeObjLayoutAddField(&spA40, 4, 1, 1);
+            dmeObjRegisterType(&D_004F9D18, "NetVehicle", 0x38);
+            dmeObjSetCallbacks(D_004F9D18, &netObjCreateCB, &netObjUpdateVehicleCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 4, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp31B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp31A, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp319, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp318, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp316, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp314, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp312, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp310, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp30E, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp30C, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp300, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2F4, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2E8, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2E4, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2DC, 1, 1);
+            dmeObjRegisterType(&D_004F9D24, "NetWeapon", 0x4C);
+            dmeObjSetCallbacks(D_004F9D24, &netWeaponCreateCB, &netWeaponUpdateCB, &netWeaponDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&D_004F9CD0, &sp370 - &sp36C, 0xC, 0xD);
+            dmeObjLayoutAddField(&D_004F9CD4, &sp370 - &sp360, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp354, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp350, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp34C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp348, 4, 4);
+            dmeObjRegisterType(&D_004F9CA0, "NetFodder", 0x2C);
+            dmeObjSetCallbacks(D_004F9CA0, &netObjCreateCB, &netFodderUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp39C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp398, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp394, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp390, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp370, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp350, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp34C, 4, 4);
+            dmeObjRegisterType(&D_004F9CA4, "NetStats", 0x58);
+            dmeObjSetCallbacks(D_004F9CA4, &netObjCreateCB, &netStatsUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3E0, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3C0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3A0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp380, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp378, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp370, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp368, 4, 4);
+            dmeObjRegisterType(&D_004F9CA8, "NetPersistantStats", 0xA0);
+            dmeObjSetCallbacks(D_004F9CA8, &netObjCreateCB, &netStatsUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49C, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49A, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp498, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp494, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp490, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp48C, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp488, 2, 3);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp485, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp480, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp47C, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp47B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp478, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp474, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp470, 2, 3);
+            dmeObjLayoutAddField(&D_004F9CB8, &sp4A0 - &sp46E, 1, 0);
+            dmeObjLayoutAddField(&D_004F9CBC, &sp4A0 - &sp464, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CC0, &sp4A0 - &sp414, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CCC, &sp4A0 - &sp3E4, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CC8, &sp4A0 - &sp486, 1, 0);
+            dmeObjLayoutAddField(&D_004F9CC4, &sp4A0 - &sp3DC, 1, 0);
+            dmeObjRegisterType(&D_004F9CAC, "NetGameData", 0xC8);
+            dmeObjSetCallbacks(D_004F9CAC, &netObjCreateCB, &netGameDataUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp560, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55F, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55E, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55C, 2, 2);
+            dmeObjRegisterType(&D_004F9CB0, "NetVehiclePadFlagsObj", 0x18);
+            dmeObjSetCallbacks(D_004F9CB0, &netObjCreateCB, &netPadFlagsUpdateCB, &netObjDestroyCB);
+            func_001192E8(&sp590);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp584, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp580, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp57C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp570, 4, 4);
+            dmeObjRegisterType(&D_004F9CB4, "NetArtifactObj\0BASCUS-97196\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789", 0x7C);
+            dmeObjSetCallbacks(D_004F9CB4, &netObjCreateCB, &netObjUpdateVehicleCB, &netObjDestroyCB);
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp610, &sp610, 4, 1);
+            dmeMsgLayoutAddField(&sp610, &sp614, 4, 1);
+            dmeMsgLayoutAddField(&sp610, &sp620, 0x40, 1);
+            dmeMsgRegister(&spA44, &netMsgGameEventHandler);
+            D_004F9D84 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp660, &sp660, 4, 1);
+            dmeMsgLayoutAddField(&sp660, &sp670, 0xE0, 1);
+            dmeMsgRegister(&spA44, &netMsgSessionHandler);
+            D_004F9D88 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp750, &sp750, 4, 1);
+            dmeMsgLayoutAddField(&sp750, &sp754, 0xBC, 1);
+            dmeMsgRegister(&spA44, &netMsgWorldEventHandler);
+            D_004F9D90 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp810, &sp810, 4, 1);
+            dmeMsgLayoutAddField(&sp810, &sp814, 0x5C, 1);
+            dmeMsgRegister(&spA44, &netMsgPlayerInfoHandler);
+            D_004F9D94 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp870, &sp870, 0x30, 8);
+            dmeMsgRegister(&spA44, &netMsgRosterHandler);
+            D_004F9D98 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp9F0, &sp9F0, 4, 4);
+            dmeMsgLayoutAddField(&sp9F0, &sp9F4, 0x44, 0x44);
+            dmeMsgRegister(&spA44, &netMsgChatHandler);
+            D_004F9D80 = spA44;
+            func_00266478(&func_0016C590);
+            var_v0 = 1;
+        }
+    }
+    return var_v0;
+}
+//@@ netInitDme m2c3
+#include "m2c_macros.h"
+extern s32 D_00319924;
+extern u8 D_004E72A0;
+extern s32 D_004F9CA0;
+extern s32 D_004F9CA4;
+extern s32 D_004F9CA8;
+extern s32 D_004F9CAC;
+extern s32 D_004F9CB0;
+extern s32 D_004F9CB4;
+extern M2C_UNK D_004F9CB8;
+extern M2C_UNK D_004F9CBC;
+extern M2C_UNK D_004F9CC0;
+extern M2C_UNK D_004F9CC4;
+extern M2C_UNK D_004F9CC8;
+extern M2C_UNK D_004F9CCC;
+extern M2C_UNK D_004F9CD0;
+extern M2C_UNK D_004F9CD4;
+extern s32 D_004F9D18;
+extern s32 D_004F9D24;
+extern s32 D_004F9D80;
+extern s32 D_004F9D88;
+extern s32 D_004F9D90;
+extern s32 D_004F9D94;
+extern s32 D_004F9D98;
+extern M2C_UNK func_0016C590;
+extern M2C_UNK netFodderUpdateCB;
+extern M2C_UNK netGameDataUpdateCB;
+extern M2C_UNK netMsgChatHandler;
+extern M2C_UNK netMsgGameEventHandler;
+extern M2C_UNK netMsgPlayerInfoHandler;
+extern M2C_UNK netMsgRosterHandler;
+extern M2C_UNK netMsgSessionHandler;
+extern M2C_UNK netMsgWorldEventHandler;
+extern M2C_UNK netObjCreateCB;
+extern M2C_UNK netObjDestroyCB;
+extern M2C_UNK netObjUpdateVehicleCB;
+extern M2C_UNK netPadFlagsUpdateCB;
+extern M2C_UNK netStatsUpdateCB;
+extern M2C_UNK netWeaponCreateCB;
+extern M2C_UNK netWeaponDestroyCB;
+extern M2C_UNK netWeaponUpdateCB;
+
+s32 netInitDme(void) {
+    u8 sp[0xA20];
+    M2C_UNK sp1;
+    u8 sp100;
+    M2C_UNK sp101;
+    M2C_UNK sp200;
+    s32 sp204;
+    s32 sp208;
+    M2C_UNK sp220;
+    s32 sp240;
+    s32 sp244;
+    s64 sp248;
+    s8 sp250;
+    s32 sp260;
+    s32 sp264;
+    s64 sp268;
+    s8 sp270;
+    s32 sp280;
+    s32 sp284;
+    s64 sp288;
+    s8 sp290;
+    s32 sp2A0;
+    s32 sp2A4;
+    s64 sp2A8;
+    s8 sp2B0;
+    s32 sp2C0;
+    s32 sp2C4;
+    s64 sp2C8;
+    s8 sp2D0;
+    M2C_UNK sp2DC;
+    M2C_UNK sp2E4;
+    M2C_UNK sp2E8;
+    M2C_UNK sp2F4;
+    M2C_UNK sp300;
+    M2C_UNK sp30C;
+    M2C_UNK sp30E;
+    M2C_UNK sp310;
+    M2C_UNK sp312;
+    M2C_UNK sp314;
+    M2C_UNK sp316;
+    M2C_UNK sp318;
+    M2C_UNK sp319;
+    M2C_UNK sp31A;
+    M2C_UNK sp31B;
+    M2C_UNK sp320;
+    M2C_UNK sp348;
+    M2C_UNK sp34C;
+    M2C_UNK sp350;
+    M2C_UNK sp354;
+    M2C_UNK sp360;
+    M2C_UNK sp368;
+    M2C_UNK sp36C;
+    M2C_UNK sp370;
+    M2C_UNK sp378;
+    M2C_UNK sp380;
+    M2C_UNK sp390;
+    M2C_UNK sp394;
+    M2C_UNK sp398;
+    M2C_UNK sp39C;
+    M2C_UNK sp3A0;
+    M2C_UNK sp3C0;
+    M2C_UNK sp3DC;
+    M2C_UNK sp3E0;
+    M2C_UNK sp3E4;
+    M2C_UNK sp400;
+    M2C_UNK sp414;
+    M2C_UNK sp464;
+    M2C_UNK sp46E;
+    M2C_UNK sp470;
+    M2C_UNK sp474;
+    M2C_UNK sp478;
+    M2C_UNK sp47B;
+    M2C_UNK sp47C;
+    M2C_UNK sp480;
+    M2C_UNK sp485;
+    M2C_UNK sp486;
+    M2C_UNK sp488;
+    M2C_UNK sp48C;
+    M2C_UNK sp490;
+    M2C_UNK sp494;
+    M2C_UNK sp498;
+    M2C_UNK sp49A;
+    M2C_UNK sp49B;
+    M2C_UNK sp49C;
+    M2C_UNK sp4A0;
+    M2C_UNK sp55C;
+    M2C_UNK sp55E;
+    M2C_UNK sp55F;
+    M2C_UNK sp560;
+    M2C_UNK sp570;
+    M2C_UNK sp57C;
+    M2C_UNK sp580;
+    M2C_UNK sp584;
+    M2C_UNK sp590;
+    M2C_UNK sp610;
+    M2C_UNK sp614;
+    M2C_UNK sp620;
+    M2C_UNK sp660;
+    M2C_UNK sp670;
+    M2C_UNK sp750;
+    M2C_UNK sp754;
+    M2C_UNK sp810;
+    M2C_UNK sp814;
+    M2C_UNK sp870;
+    M2C_UNK sp9F0;
+    M2C_UNK sp9F4;
+    M2C_UNK spA40;
+    s32 spA44;
+    s32* spA48;
+    M2C_UNK* temp_s0_2;
+    s32 var_v0;
+    s32 var_v0_2;
+    u8 temp_s0;
+
+    temp_s0 = D_004E72A0;
+    memset(&sp1, 0, 0xFF);
+    sp100 = temp_s0;
+    memset(&sp101, 0, 0xFF);
+    func_00268ED0(&sp200);
+    sp208 = 0x272F;
+    sp204 = 0x40;
+    func_00268F20(&sp200, &sp220);
+    func_00269318(0x2000, 0x2000);
+    var_v0 = -1;
+    if (func_00266F50(sp) == 0) {
+        var_v0 = -1;
+        if (func_00267080(&sp100) == 0) {
+            temp_s0_2 = "-----------------------------------------------------------------\n";
+            printf(temp_s0_2);
+            printf("NETWORK: Initialized Distributed Memory Engine\n");
+            printf("         Build Version  %s\n", sp);
+            printf("         Client Version %s\n", &sp100);
+            printf(temp_s0_2);
+            var_v0_2 = 0x12C;
+            if (D_00319924 == 0) {
+                var_v0_2 = 0xC8;
+            }
+            sp2C0 = var_v0_2;
+            sp2C8 = (((((0xFEE6 << 0x11) | 0xCCCC) << 0x10) | 0xCCCC) << 0xD) | 0x199A;
+            sp248 = 0;
+            sp240 = 0x85;
+            sp268 = 0;
+            sp250 = 0x10;
+            sp288 = 0;
+            sp260 = 0x43;
+            sp2A8 = 0;
+            sp280 = 0x7D0;
+            sp2A0 = 0x1388;
+            sp2B0 = 0x40;
+            sp2D0 = 0x10;
+            sp270 = 0x40;
+            sp290 = 0x40;
+            sp2A4 = 1;
+            sp2C4 = 1;
+            sp244 = 1;
+            sp264 = 1;
+            sp284 = 1;
+            dmeObjLayoutBegin(0x85, 0, 0x43, 0x7D0);
+            spA48 = &sp2C0;
+            dmeObjLayoutAddField(&spA40, 4, 1, 1);
+            dmeObjRegisterType(&D_004F9D18, "NetVehicle", 0x38);
+            dmeObjSetCallbacks(D_004F9D18, &netObjCreateCB, &netObjUpdateVehicleCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 4, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp31B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp31A, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp319, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp318, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp316, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp314, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp312, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp310, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp30E, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp30C, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp300, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2F4, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2E8, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2E4, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2DC, 1, 1);
+            dmeObjRegisterType(&D_004F9D24, "NetWeapon", 0x4C);
+            dmeObjSetCallbacks(D_004F9D24, &netWeaponCreateCB, &netWeaponUpdateCB, &netWeaponDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&D_004F9CD0, &sp370 - &sp36C, 0xC, 0xD);
+            dmeObjLayoutAddField(&D_004F9CD4, &sp370 - &sp360, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp354, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp350, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp34C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp348, 4, 4);
+            dmeObjRegisterType(&D_004F9CA0, "NetFodder", 0x2C);
+            dmeObjSetCallbacks(D_004F9CA0, &netObjCreateCB, &netFodderUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp39C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp398, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp394, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp390, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp370, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp350, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp34C, 4, 4);
+            dmeObjRegisterType(&D_004F9CA4, "NetStats", 0x58);
+            dmeObjSetCallbacks(D_004F9CA4, &netObjCreateCB, &netStatsUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3E0, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3C0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3A0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp380, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp378, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp370, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp368, 4, 4);
+            dmeObjRegisterType(&D_004F9CA8, "NetPersistantStats", 0xA0);
+            dmeObjSetCallbacks(D_004F9CA8, &netObjCreateCB, &netStatsUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49C, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49A, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp498, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp494, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp490, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp48C, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp488, 2, 3);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp485, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp480, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp47C, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp47B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp478, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp474, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp470, 2, 3);
+            dmeObjLayoutAddField(&D_004F9CB8, &sp4A0 - &sp46E, 1, 0);
+            dmeObjLayoutAddField(&D_004F9CBC, &sp4A0 - &sp464, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CC0, &sp4A0 - &sp414, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CCC, &sp4A0 - &sp3E4, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CC8, &sp4A0 - &sp486, 1, 0);
+            dmeObjLayoutAddField(&D_004F9CC4, &sp4A0 - &sp3DC, 1, 0);
+            dmeObjRegisterType(&D_004F9CAC, "NetGameData", 0xC8);
+            dmeObjSetCallbacks(D_004F9CAC, &netObjCreateCB, &netGameDataUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp560, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55F, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55E, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55C, 2, 2);
+            dmeObjRegisterType(&D_004F9CB0, "NetVehiclePadFlagsObj", 0x18);
+            dmeObjSetCallbacks(D_004F9CB0, &netObjCreateCB, &netPadFlagsUpdateCB, &netObjDestroyCB);
+            func_001192E8(&sp590);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp584, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp580, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp57C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp570, 4, 4);
+            dmeObjRegisterType(&D_004F9CB4, "NetArtifactObj\0BASCUS-97196\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789", 0x7C);
+            dmeObjSetCallbacks(D_004F9CB4, &netObjCreateCB, &netObjUpdateVehicleCB, &netObjDestroyCB);
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp610, &sp610, 4, 1);
+            dmeMsgLayoutAddField(&sp610, &sp614, 4, 1);
+            dmeMsgLayoutAddField(&sp610, &sp620, 0x40, 1);
+            dmeMsgRegister(&spA44, &netMsgGameEventHandler);
+            D_004F9D84 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp660, &sp660, 4, 1);
+            dmeMsgLayoutAddField(&sp660, &sp670, 0xE0, 1);
+            dmeMsgRegister(&spA44, &netMsgSessionHandler);
+            D_004F9D88 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp750, &sp750, 4, 1);
+            dmeMsgLayoutAddField(&sp750, &sp754, 0xBC, 1);
+            dmeMsgRegister(&spA44, &netMsgWorldEventHandler);
+            D_004F9D90 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp810, &sp810, 4, 1);
+            dmeMsgLayoutAddField(&sp810, &sp814, 0x5C, 1);
+            dmeMsgRegister(&spA44, &netMsgPlayerInfoHandler);
+            D_004F9D94 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp870, &sp870, 0x30, 8);
+            dmeMsgRegister(&spA44, &netMsgRosterHandler);
+            D_004F9D98 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp9F0, &sp9F0, 4, 4);
+            dmeMsgLayoutAddField(&sp9F0, &sp9F4, 0x44, 0x44);
+            dmeMsgRegister(&spA44, &netMsgChatHandler);
+            D_004F9D80 = spA44;
+            func_00266478(&func_0016C590);
+            var_v0 = 1;
+        }
+    }
+    return var_v0;
+}
+//@@ netInitDme m2c4
+#include "m2c_macros.h"
+extern s32 D_00319924;
+extern u8 D_004E72A0;
+extern s32 D_004F9CA0;
+extern s32 D_004F9CA4;
+extern s32 D_004F9CA8;
+extern s32 D_004F9CAC;
+extern s32 D_004F9CB0;
+extern s32 D_004F9CB4;
+extern M2C_UNK D_004F9CB8;
+extern M2C_UNK D_004F9CBC;
+extern M2C_UNK D_004F9CC0;
+extern M2C_UNK D_004F9CC4;
+extern M2C_UNK D_004F9CC8;
+extern M2C_UNK D_004F9CCC;
+extern M2C_UNK D_004F9CD0;
+extern M2C_UNK D_004F9CD4;
+extern s32 D_004F9D18;
+extern s32 D_004F9D24;
+extern s32 D_004F9D80;
+extern s32 D_004F9D88;
+extern s32 D_004F9D90;
+extern s32 D_004F9D94;
+extern s32 D_004F9D98;
+extern M2C_UNK func_0016C590;
+extern M2C_UNK netFodderUpdateCB;
+extern M2C_UNK netGameDataUpdateCB;
+extern M2C_UNK netMsgChatHandler;
+extern M2C_UNK netMsgGameEventHandler;
+extern M2C_UNK netMsgPlayerInfoHandler;
+extern M2C_UNK netMsgRosterHandler;
+extern M2C_UNK netMsgSessionHandler;
+extern M2C_UNK netMsgWorldEventHandler;
+extern M2C_UNK netObjCreateCB;
+extern M2C_UNK netObjDestroyCB;
+extern M2C_UNK netObjUpdateVehicleCB;
+extern M2C_UNK netPadFlagsUpdateCB;
+extern M2C_UNK netStatsUpdateCB;
+extern M2C_UNK netWeaponCreateCB;
+extern M2C_UNK netWeaponDestroyCB;
+extern M2C_UNK netWeaponUpdateCB;
+
+s32 netInitDme(void) {
+    u8 sp[0xA10];
+    M2C_UNK sp1;
+    u8 sp100;
+    M2C_UNK sp101;
+    M2C_UNK sp200;
+    s32 sp204;
+    s32 sp208;
+    M2C_UNK sp220;
+    s32 sp240;
+    s32 sp244;
+    s64 sp248;
+    s8 sp250;
+    s32 sp260;
+    s32 sp264;
+    s64 sp268;
+    s8 sp270;
+    s32 sp280;
+    s32 sp284;
+    s64 sp288;
+    s8 sp290;
+    s32 sp2A0;
+    s32 sp2A4;
+    s64 sp2A8;
+    s8 sp2B0;
+    s32 sp2C0;
+    s32 sp2C4;
+    s64 sp2C8;
+    s8 sp2D0;
+    M2C_UNK sp2DC;
+    M2C_UNK sp2E4;
+    M2C_UNK sp2E8;
+    M2C_UNK sp2F4;
+    M2C_UNK sp300;
+    M2C_UNK sp30C;
+    M2C_UNK sp30E;
+    M2C_UNK sp310;
+    M2C_UNK sp312;
+    M2C_UNK sp314;
+    M2C_UNK sp316;
+    M2C_UNK sp318;
+    M2C_UNK sp319;
+    M2C_UNK sp31A;
+    M2C_UNK sp31B;
+    M2C_UNK sp320;
+    M2C_UNK sp348;
+    M2C_UNK sp34C;
+    M2C_UNK sp350;
+    M2C_UNK sp354;
+    M2C_UNK sp360;
+    M2C_UNK sp368;
+    M2C_UNK sp36C;
+    M2C_UNK sp370;
+    M2C_UNK sp378;
+    M2C_UNK sp380;
+    M2C_UNK sp390;
+    M2C_UNK sp394;
+    M2C_UNK sp398;
+    M2C_UNK sp39C;
+    M2C_UNK sp3A0;
+    M2C_UNK sp3C0;
+    M2C_UNK sp3DC;
+    M2C_UNK sp3E0;
+    M2C_UNK sp3E4;
+    M2C_UNK sp400;
+    M2C_UNK sp414;
+    M2C_UNK sp464;
+    M2C_UNK sp46E;
+    M2C_UNK sp470;
+    M2C_UNK sp474;
+    M2C_UNK sp478;
+    M2C_UNK sp47B;
+    M2C_UNK sp47C;
+    M2C_UNK sp480;
+    M2C_UNK sp485;
+    M2C_UNK sp486;
+    M2C_UNK sp488;
+    M2C_UNK sp48C;
+    M2C_UNK sp490;
+    M2C_UNK sp494;
+    M2C_UNK sp498;
+    M2C_UNK sp49A;
+    M2C_UNK sp49B;
+    M2C_UNK sp49C;
+    M2C_UNK sp4A0;
+    M2C_UNK sp55C;
+    M2C_UNK sp55E;
+    M2C_UNK sp55F;
+    M2C_UNK sp560;
+    M2C_UNK sp570;
+    M2C_UNK sp57C;
+    M2C_UNK sp580;
+    M2C_UNK sp584;
+    M2C_UNK sp590;
+    M2C_UNK sp610;
+    M2C_UNK sp614;
+    M2C_UNK sp620;
+    M2C_UNK sp660;
+    M2C_UNK sp670;
+    M2C_UNK sp750;
+    M2C_UNK sp754;
+    M2C_UNK sp810;
+    M2C_UNK sp814;
+    M2C_UNK sp870;
+    M2C_UNK sp9F0;
+    M2C_UNK sp9F4;
+    M2C_UNK spA40;
+    s32 spA44;
+    s32* spA48;
+    M2C_UNK* temp_s0_2;
+    s32 var_v0;
+    s32 var_v0_2;
+    u8 temp_s0;
+
+    temp_s0 = D_004E72A0;
+    memset(&sp1, 0, 0xFF);
+    sp100 = temp_s0;
+    memset(&sp101, 0, 0xFF);
+    func_00268ED0(&sp200);
+    sp208 = 0x272F;
+    sp204 = 0x40;
+    func_00268F20(&sp200, &sp220);
+    func_00269318(0x2000, 0x2000);
+    var_v0 = -1;
+    if (func_00266F50(sp) == 0) {
+        var_v0 = -1;
+        if (func_00267080(&sp100) == 0) {
+            temp_s0_2 = "-----------------------------------------------------------------\n";
+            printf(temp_s0_2);
+            printf("NETWORK: Initialized Distributed Memory Engine\n");
+            printf("         Build Version  %s\n", sp);
+            printf("         Client Version %s\n", &sp100);
+            printf(temp_s0_2);
+            var_v0_2 = 0x12C;
+            if (D_00319924 == 0) {
+                var_v0_2 = 0xC8;
+            }
+            sp2C0 = var_v0_2;
+            sp2C8 = (((((0xFEE6 << 0x11) | 0xCCCC) << 0x10) | 0xCCCC) << 0xD) | 0x199A;
+            sp248 = 0;
+            sp240 = 0x85;
+            sp268 = 0;
+            sp250 = 0x10;
+            sp288 = 0;
+            sp260 = 0x43;
+            sp2A8 = 0;
+            sp280 = 0x7D0;
+            sp2A0 = 0x1388;
+            sp2B0 = 0x40;
+            sp2D0 = 0x10;
+            sp270 = 0x40;
+            sp290 = 0x40;
+            sp2A4 = 1;
+            sp2C4 = 1;
+            sp244 = 1;
+            sp264 = 1;
+            sp284 = 1;
+            dmeObjLayoutBegin(0x85, 0, 0x43, 0x7D0);
+            spA48 = &sp2C0;
+            dmeObjLayoutAddField(&spA40, 4, 1, 1);
+            dmeObjRegisterType(&D_004F9D18, "NetVehicle", 0x38);
+            dmeObjSetCallbacks(D_004F9D18, &netObjCreateCB, &netObjUpdateVehicleCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 4, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp31B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp31A, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp319, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp318, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp316, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp314, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp312, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp310, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp30E, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp30C, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp300, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2F4, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2E8, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2E4, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2DC, 1, 1);
+            dmeObjRegisterType(&D_004F9D24, "NetWeapon", 0x4C);
+            dmeObjSetCallbacks(D_004F9D24, &netWeaponCreateCB, &netWeaponUpdateCB, &netWeaponDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&D_004F9CD0, &sp370 - &sp36C, 0xC, 0xD);
+            dmeObjLayoutAddField(&D_004F9CD4, &sp370 - &sp360, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp354, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp350, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp34C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp348, 4, 4);
+            dmeObjRegisterType(&D_004F9CA0, "NetFodder", 0x2C);
+            dmeObjSetCallbacks(D_004F9CA0, &netObjCreateCB, &netFodderUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp39C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp398, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp394, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp390, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp370, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp350, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp34C, 4, 4);
+            dmeObjRegisterType(&D_004F9CA4, "NetStats", 0x58);
+            dmeObjSetCallbacks(D_004F9CA4, &netObjCreateCB, &netStatsUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3E0, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3C0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3A0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp380, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp378, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp370, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp368, 4, 4);
+            dmeObjRegisterType(&D_004F9CA8, "NetPersistantStats", 0xA0);
+            dmeObjSetCallbacks(D_004F9CA8, &netObjCreateCB, &netStatsUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49C, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49A, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp498, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp494, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp490, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp48C, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp488, 2, 3);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp485, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp480, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp47C, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp47B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp478, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp474, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp470, 2, 3);
+            dmeObjLayoutAddField(&D_004F9CB8, &sp4A0 - &sp46E, 1, 0);
+            dmeObjLayoutAddField(&D_004F9CBC, &sp4A0 - &sp464, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CC0, &sp4A0 - &sp414, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CCC, &sp4A0 - &sp3E4, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CC8, &sp4A0 - &sp486, 1, 0);
+            dmeObjLayoutAddField(&D_004F9CC4, &sp4A0 - &sp3DC, 1, 0);
+            dmeObjRegisterType(&D_004F9CAC, "NetGameData", 0xC8);
+            dmeObjSetCallbacks(D_004F9CAC, &netObjCreateCB, &netGameDataUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp560, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55F, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55E, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55C, 2, 2);
+            dmeObjRegisterType(&D_004F9CB0, "NetVehiclePadFlagsObj", 0x18);
+            dmeObjSetCallbacks(D_004F9CB0, &netObjCreateCB, &netPadFlagsUpdateCB, &netObjDestroyCB);
+            func_001192E8(&sp590);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp584, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp580, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp57C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp570, 4, 4);
+            dmeObjRegisterType(&D_004F9CB4, "NetArtifactObj\0BASCUS-97196\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789", 0x7C);
+            dmeObjSetCallbacks(D_004F9CB4, &netObjCreateCB, &netObjUpdateVehicleCB, &netObjDestroyCB);
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp610, &sp610, 4, 1);
+            dmeMsgLayoutAddField(&sp610, &sp614, 4, 1);
+            dmeMsgLayoutAddField(&sp610, &sp620, 0x40, 1);
+            dmeMsgRegister(&spA44, &netMsgGameEventHandler);
+            D_004F9D84 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp660, &sp660, 4, 1);
+            dmeMsgLayoutAddField(&sp660, &sp670, 0xE0, 1);
+            dmeMsgRegister(&spA44, &netMsgSessionHandler);
+            D_004F9D88 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp750, &sp750, 4, 1);
+            dmeMsgLayoutAddField(&sp750, &sp754, 0xBC, 1);
+            dmeMsgRegister(&spA44, &netMsgWorldEventHandler);
+            D_004F9D90 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp810, &sp810, 4, 1);
+            dmeMsgLayoutAddField(&sp810, &sp814, 0x5C, 1);
+            dmeMsgRegister(&spA44, &netMsgPlayerInfoHandler);
+            D_004F9D94 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp870, &sp870, 0x30, 8);
+            dmeMsgRegister(&spA44, &netMsgRosterHandler);
+            D_004F9D98 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp9F0, &sp9F0, 4, 4);
+            dmeMsgLayoutAddField(&sp9F0, &sp9F4, 0x44, 0x44);
+            dmeMsgRegister(&spA44, &netMsgChatHandler);
+            D_004F9D80 = spA44;
+            func_00266478(&func_0016C590);
+            var_v0 = 1;
+        }
+    }
+    return var_v0;
+}
+//@@ netInitDme m2c5
+#include "m2c_macros.h"
+extern s32 D_00319924;
+extern u8 D_004E72A0;
+extern s32 D_004F9CA0;
+extern s32 D_004F9CA4;
+extern s32 D_004F9CA8;
+extern s32 D_004F9CAC;
+extern s32 D_004F9CB0;
+extern s32 D_004F9CB4;
+extern M2C_UNK D_004F9CB8;
+extern M2C_UNK D_004F9CBC;
+extern M2C_UNK D_004F9CC0;
+extern M2C_UNK D_004F9CC4;
+extern M2C_UNK D_004F9CC8;
+extern M2C_UNK D_004F9CCC;
+extern M2C_UNK D_004F9CD0;
+extern M2C_UNK D_004F9CD4;
+extern s32 D_004F9D18;
+extern s32 D_004F9D24;
+extern s32 D_004F9D80;
+extern s32 D_004F9D88;
+extern s32 D_004F9D90;
+extern s32 D_004F9D94;
+extern s32 D_004F9D98;
+extern M2C_UNK func_0016C590;
+extern M2C_UNK netFodderUpdateCB;
+extern M2C_UNK netGameDataUpdateCB;
+extern M2C_UNK netMsgChatHandler;
+extern M2C_UNK netMsgGameEventHandler;
+extern M2C_UNK netMsgPlayerInfoHandler;
+extern M2C_UNK netMsgRosterHandler;
+extern M2C_UNK netMsgSessionHandler;
+extern M2C_UNK netMsgWorldEventHandler;
+extern M2C_UNK netObjCreateCB;
+extern M2C_UNK netObjDestroyCB;
+extern M2C_UNK netObjUpdateVehicleCB;
+extern M2C_UNK netPadFlagsUpdateCB;
+extern M2C_UNK netStatsUpdateCB;
+extern M2C_UNK netWeaponCreateCB;
+extern M2C_UNK netWeaponDestroyCB;
+extern M2C_UNK netWeaponUpdateCB;
+
+s32 netInitDme(void) {
+    u8 sp[0xA00];
+    M2C_UNK sp1;
+    u8 sp100;
+    M2C_UNK sp101;
+    M2C_UNK sp200;
+    s32 sp204;
+    s32 sp208;
+    M2C_UNK sp220;
+    s32 sp240;
+    s32 sp244;
+    s64 sp248;
+    s8 sp250;
+    s32 sp260;
+    s32 sp264;
+    s64 sp268;
+    s8 sp270;
+    s32 sp280;
+    s32 sp284;
+    s64 sp288;
+    s8 sp290;
+    s32 sp2A0;
+    s32 sp2A4;
+    s64 sp2A8;
+    s8 sp2B0;
+    s32 sp2C0;
+    s32 sp2C4;
+    s64 sp2C8;
+    s8 sp2D0;
+    M2C_UNK sp2DC;
+    M2C_UNK sp2E4;
+    M2C_UNK sp2E8;
+    M2C_UNK sp2F4;
+    M2C_UNK sp300;
+    M2C_UNK sp30C;
+    M2C_UNK sp30E;
+    M2C_UNK sp310;
+    M2C_UNK sp312;
+    M2C_UNK sp314;
+    M2C_UNK sp316;
+    M2C_UNK sp318;
+    M2C_UNK sp319;
+    M2C_UNK sp31A;
+    M2C_UNK sp31B;
+    M2C_UNK sp320;
+    M2C_UNK sp348;
+    M2C_UNK sp34C;
+    M2C_UNK sp350;
+    M2C_UNK sp354;
+    M2C_UNK sp360;
+    M2C_UNK sp368;
+    M2C_UNK sp36C;
+    M2C_UNK sp370;
+    M2C_UNK sp378;
+    M2C_UNK sp380;
+    M2C_UNK sp390;
+    M2C_UNK sp394;
+    M2C_UNK sp398;
+    M2C_UNK sp39C;
+    M2C_UNK sp3A0;
+    M2C_UNK sp3C0;
+    M2C_UNK sp3DC;
+    M2C_UNK sp3E0;
+    M2C_UNK sp3E4;
+    M2C_UNK sp400;
+    M2C_UNK sp414;
+    M2C_UNK sp464;
+    M2C_UNK sp46E;
+    M2C_UNK sp470;
+    M2C_UNK sp474;
+    M2C_UNK sp478;
+    M2C_UNK sp47B;
+    M2C_UNK sp47C;
+    M2C_UNK sp480;
+    M2C_UNK sp485;
+    M2C_UNK sp486;
+    M2C_UNK sp488;
+    M2C_UNK sp48C;
+    M2C_UNK sp490;
+    M2C_UNK sp494;
+    M2C_UNK sp498;
+    M2C_UNK sp49A;
+    M2C_UNK sp49B;
+    M2C_UNK sp49C;
+    M2C_UNK sp4A0;
+    M2C_UNK sp55C;
+    M2C_UNK sp55E;
+    M2C_UNK sp55F;
+    M2C_UNK sp560;
+    M2C_UNK sp570;
+    M2C_UNK sp57C;
+    M2C_UNK sp580;
+    M2C_UNK sp584;
+    M2C_UNK sp590;
+    M2C_UNK sp610;
+    M2C_UNK sp614;
+    M2C_UNK sp620;
+    M2C_UNK sp660;
+    M2C_UNK sp670;
+    M2C_UNK sp750;
+    M2C_UNK sp754;
+    M2C_UNK sp810;
+    M2C_UNK sp814;
+    M2C_UNK sp870;
+    M2C_UNK sp9F0;
+    M2C_UNK sp9F4;
+    M2C_UNK spA40;
+    s32 spA44;
+    s32* spA48;
+    M2C_UNK* temp_s0_2;
+    s32 var_v0;
+    s32 var_v0_2;
+    u8 temp_s0;
+
+    temp_s0 = D_004E72A0;
+    memset(&sp1, 0, 0xFF);
+    sp100 = temp_s0;
+    memset(&sp101, 0, 0xFF);
+    func_00268ED0(&sp200);
+    sp208 = 0x272F;
+    sp204 = 0x40;
+    func_00268F20(&sp200, &sp220);
+    func_00269318(0x2000, 0x2000);
+    var_v0 = -1;
+    if (func_00266F50(sp) == 0) {
+        var_v0 = -1;
+        if (func_00267080(&sp100) == 0) {
+            temp_s0_2 = "-----------------------------------------------------------------\n";
+            printf(temp_s0_2);
+            printf("NETWORK: Initialized Distributed Memory Engine\n");
+            printf("         Build Version  %s\n", sp);
+            printf("         Client Version %s\n", &sp100);
+            printf(temp_s0_2);
+            var_v0_2 = 0x12C;
+            if (D_00319924 == 0) {
+                var_v0_2 = 0xC8;
+            }
+            sp2C0 = var_v0_2;
+            sp2C8 = (((((0xFEE6 << 0x11) | 0xCCCC) << 0x10) | 0xCCCC) << 0xD) | 0x199A;
+            sp248 = 0;
+            sp240 = 0x85;
+            sp268 = 0;
+            sp250 = 0x10;
+            sp288 = 0;
+            sp260 = 0x43;
+            sp2A8 = 0;
+            sp280 = 0x7D0;
+            sp2A0 = 0x1388;
+            sp2B0 = 0x40;
+            sp2D0 = 0x10;
+            sp270 = 0x40;
+            sp290 = 0x40;
+            sp2A4 = 1;
+            sp2C4 = 1;
+            sp244 = 1;
+            sp264 = 1;
+            sp284 = 1;
+            dmeObjLayoutBegin(0x85, 0, 0x43, 0x7D0);
+            spA48 = &sp2C0;
+            dmeObjLayoutAddField(&spA40, 4, 1, 1);
+            dmeObjRegisterType(&D_004F9D18, "NetVehicle", 0x38);
+            dmeObjSetCallbacks(D_004F9D18, &netObjCreateCB, &netObjUpdateVehicleCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 4, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp31B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp31A, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp319, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp318, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp316, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp314, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp312, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp310, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp30E, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp30C, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp300, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2F4, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2E8, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2E4, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp320 - &sp2DC, 1, 1);
+            dmeObjRegisterType(&D_004F9D24, "NetWeapon", 0x4C);
+            dmeObjSetCallbacks(D_004F9D24, &netWeaponCreateCB, &netWeaponUpdateCB, &netWeaponDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&D_004F9CD0, &sp370 - &sp36C, 0xC, 0xD);
+            dmeObjLayoutAddField(&D_004F9CD4, &sp370 - &sp360, 0xC, 0xD);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp354, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp350, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp34C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp370 - &sp348, 4, 4);
+            dmeObjRegisterType(&D_004F9CA0, "NetFodder", 0x2C);
+            dmeObjSetCallbacks(D_004F9CA0, &netObjCreateCB, &netFodderUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp39C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp398, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp394, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp390, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp370, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp350, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp3A0 - &sp34C, 4, 4);
+            dmeObjRegisterType(&D_004F9CA4, "NetStats", 0x58);
+            dmeObjSetCallbacks(D_004F9CA4, &netObjCreateCB, &netStatsUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3E0, 4, 6);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3C0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp3A0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp380, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp378, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp370, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp400 - &sp368, 4, 4);
+            dmeObjRegisterType(&D_004F9CA8, "NetPersistantStats", 0xA0);
+            dmeObjSetCallbacks(D_004F9CA8, &netObjCreateCB, &netStatsUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49C, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp49A, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp498, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp494, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp490, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp48C, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp488, 2, 3);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp485, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp480, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp47C, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp47B, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp478, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp474, 4, 5);
+            dmeObjLayoutAddField(&spA40, &sp4A0 - &sp470, 2, 3);
+            dmeObjLayoutAddField(&D_004F9CB8, &sp4A0 - &sp46E, 1, 0);
+            dmeObjLayoutAddField(&D_004F9CBC, &sp4A0 - &sp464, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CC0, &sp4A0 - &sp414, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CCC, &sp4A0 - &sp3E4, 1, 1);
+            dmeObjLayoutAddField(&D_004F9CC8, &sp4A0 - &sp486, 1, 0);
+            dmeObjLayoutAddField(&D_004F9CC4, &sp4A0 - &sp3DC, 1, 0);
+            dmeObjRegisterType(&D_004F9CAC, "NetGameData", 0xC8);
+            dmeObjSetCallbacks(D_004F9CAC, &netObjCreateCB, &netGameDataUpdateCB, &netObjDestroyCB);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 1, 1);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp560, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55F, 1, 0);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55E, 2, 2);
+            dmeObjLayoutAddField(&spA40, &sp570 - &sp55C, 2, 2);
+            dmeObjRegisterType(&D_004F9CB0, "NetVehiclePadFlagsObj", 0x18);
+            dmeObjSetCallbacks(D_004F9CB0, &netObjCreateCB, &netPadFlagsUpdateCB, &netObjDestroyCB);
+            func_001192E8(&sp590);
+            dmeObjLayoutBegin();
+            dmeObjLayoutAddField(&spA40, 0, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp584, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp580, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp57C, 4, 4);
+            dmeObjLayoutAddField(&spA40, &sp590 - &sp570, 4, 4);
+            dmeObjRegisterType(&D_004F9CB4, "NetArtifactObj\0BASCUS-97196\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789", 0x7C);
+            dmeObjSetCallbacks(D_004F9CB4, &netObjCreateCB, &netObjUpdateVehicleCB, &netObjDestroyCB);
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp610, &sp610, 4, 1);
+            dmeMsgLayoutAddField(&sp610, &sp614, 4, 1);
+            dmeMsgLayoutAddField(&sp610, &sp620, 0x40, 1);
+            dmeMsgRegister(&spA44, &netMsgGameEventHandler);
+            D_004F9D84 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp660, &sp660, 4, 1);
+            dmeMsgLayoutAddField(&sp660, &sp670, 0xE0, 1);
+            dmeMsgRegister(&spA44, &netMsgSessionHandler);
+            D_004F9D88 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp750, &sp750, 4, 1);
+            dmeMsgLayoutAddField(&sp750, &sp754, 0xBC, 1);
+            dmeMsgRegister(&spA44, &netMsgWorldEventHandler);
+            D_004F9D90 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp810, &sp810, 4, 1);
+            dmeMsgLayoutAddField(&sp810, &sp814, 0x5C, 1);
+            dmeMsgRegister(&spA44, &netMsgPlayerInfoHandler);
+            D_004F9D94 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp870, &sp870, 0x30, 8);
+            dmeMsgRegister(&spA44, &netMsgRosterHandler);
+            D_004F9D98 = spA44;
+            dmeMsgLayoutBegin();
+            dmeMsgLayoutAddField(&sp9F0, &sp9F0, 4, 4);
+            dmeMsgLayoutAddField(&sp9F0, &sp9F4, 0x44, 0x44);
+            dmeMsgRegister(&spA44, &netMsgChatHandler);
+            D_004F9D80 = spA44;
+            func_00266478(&func_0016C590);
+            var_v0 = 1;
+        }
+    }
+    return var_v0;
+}
+//@@ func_0016E6F8 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9D64;
 extern M2C_UNK D_004F9D68;
@@ -3794,7 +10457,65 @@ loop_7:
     } while (subroutine_arg0 != 0);
     goto loop_1;
 }
-//@@ func_0016E7D0 m2c
+//@@ func_0016E6F8 m2c1
+#include "m2c_macros.h"
+extern s32 D_004F9D64;
+extern M2C_UNK D_004F9D68;
+extern M2C_UNK D_004F9D70;
+extern M2C_UNK D_004F9D78;
+
+void func_0016E6F8(s32 arg0) {
+    u8 sp[0x8];
+loop_1:
+    WaitSema(arg0);
+    if (D_004F9D64 & 1) {
+        func_002A7AF8(&D_004F9D68, 0x5003, 0, 0);
+        do {
+
+        } while (func_002A7AF8(&D_004F9D70, 0x4806, 0, 0) < 0);
+    } else {
+        do {
+
+        } while (func_002A7AF8(&D_004F9D78, 0x4402, 0, 0) < 0);
+    }
+    do {
+loop_7:
+        if (func_00291E90(sp) == 0) {
+            goto loop_7;
+        }
+    } while (subroutine_arg0 != 0);
+    goto loop_1;
+}
+//@@ func_0016E6F8 m2c2
+#include "m2c_macros.h"
+extern s32 D_004F9D64;
+extern M2C_UNK D_004F9D68;
+extern M2C_UNK D_004F9D70;
+extern M2C_UNK D_004F9D78;
+
+void func_0016E6F8(s32 arg0) {
+    u8 sp[0x4];
+loop_1:
+    WaitSema(arg0);
+    if (D_004F9D64 & 1) {
+        func_002A7AF8(&D_004F9D68, 0x5003, 0, 0);
+        do {
+
+        } while (func_002A7AF8(&D_004F9D70, 0x4806, 0, 0) < 0);
+    } else {
+        do {
+
+        } while (func_002A7AF8(&D_004F9D78, 0x4402, 0, 0) < 0);
+    }
+    do {
+loop_7:
+        if (func_00291E90(sp) == 0) {
+            goto loop_7;
+        }
+    } while (subroutine_arg0 != 0);
+    goto loop_1;
+}
+//@@ func_0016E7D0 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9D64;
 extern M2C_UNK D_004FDD60;
@@ -3830,7 +10551,187 @@ s32 func_0016E7D0(s32 arg0) {
     }
     return -1;
 }
-//@@ func_0016E8E0 m2c
+//@@ func_0016E7D0 m2c1
+#include "m2c_macros.h"
+extern s32 D_004F9D64;
+extern M2C_UNK D_004FDD60;
+extern M2C_UNK D_005015F0;
+extern M2C_UNK func_0016E6D8;
+extern M2C_UNK func_0016E6F8;
+
+s32 func_0016E7D0(s32 arg0) {
+    u8 sp[0x40];
+    M2C_UNK sp30;
+    s32 sp34;
+    s32 sp38;
+    s32 sp44;
+    s32 temp_v0;
+    s32 temp_v0_2;
+
+    sp38 = 0;
+    sp34 = 1;
+    sp44 = 0;
+    temp_v0 = CreateSema(&sp30);
+    if (temp_v0 != -1) {
+        ChangeThreadPriority(GetThreadId(), 2);
+        temp_v0_2 = CreateThread(sp, &D_004FDD60, &D_005015F0, &D_005015F0, 1);
+        if (temp_v0_2 != -1) {
+            StartThread(temp_v0_2, temp_v0);
+            func_00290D20(&func_0016E6D8, temp_v0);
+            D_004F9D64 = arg0;
+            return temp_v0;
+        }
+        DeleteSema(temp_v0);
+        /* Duplicate return node #4. Try simplifying control flow for better match */
+        return -1;
+    }
+    return -1;
+}
+//@@ func_0016E7D0 m2c2
+#include "m2c_macros.h"
+extern s32 D_004F9D64;
+extern M2C_UNK D_004FDD60;
+extern M2C_UNK D_005015F0;
+extern M2C_UNK func_0016E6D8;
+extern M2C_UNK func_0016E6F8;
+
+s32 func_0016E7D0(s32 arg0) {
+    u8 sp[0x30];
+    M2C_UNK sp30;
+    s32 sp34;
+    s32 sp38;
+    s32 sp44;
+    s32 temp_v0;
+    s32 temp_v0_2;
+
+    sp38 = 0;
+    sp34 = 1;
+    sp44 = 0;
+    temp_v0 = CreateSema(&sp30);
+    if (temp_v0 != -1) {
+        ChangeThreadPriority(GetThreadId(), 2);
+        temp_v0_2 = CreateThread(sp, &D_004FDD60, &D_005015F0, &D_005015F0, 1);
+        if (temp_v0_2 != -1) {
+            StartThread(temp_v0_2, temp_v0);
+            func_00290D20(&func_0016E6D8, temp_v0);
+            D_004F9D64 = arg0;
+            return temp_v0;
+        }
+        DeleteSema(temp_v0);
+        /* Duplicate return node #4. Try simplifying control flow for better match */
+        return -1;
+    }
+    return -1;
+}
+//@@ func_0016E7D0 m2c3
+#include "m2c_macros.h"
+extern s32 D_004F9D64;
+extern M2C_UNK D_004FDD60;
+extern M2C_UNK D_005015F0;
+extern M2C_UNK func_0016E6D8;
+extern M2C_UNK func_0016E6F8;
+
+s32 func_0016E7D0(s32 arg0) {
+    u8 sp[0x20];
+    M2C_UNK sp30;
+    s32 sp34;
+    s32 sp38;
+    s32 sp44;
+    s32 temp_v0;
+    s32 temp_v0_2;
+
+    sp38 = 0;
+    sp34 = 1;
+    sp44 = 0;
+    temp_v0 = CreateSema(&sp30);
+    if (temp_v0 != -1) {
+        ChangeThreadPriority(GetThreadId(), 2);
+        temp_v0_2 = CreateThread(sp, &D_004FDD60, &D_005015F0, &D_005015F0, 1);
+        if (temp_v0_2 != -1) {
+            StartThread(temp_v0_2, temp_v0);
+            func_00290D20(&func_0016E6D8, temp_v0);
+            D_004F9D64 = arg0;
+            return temp_v0;
+        }
+        DeleteSema(temp_v0);
+        /* Duplicate return node #4. Try simplifying control flow for better match */
+        return -1;
+    }
+    return -1;
+}
+//@@ func_0016E7D0 m2c4
+#include "m2c_macros.h"
+extern s32 D_004F9D64;
+extern M2C_UNK D_004FDD60;
+extern M2C_UNK D_005015F0;
+extern M2C_UNK func_0016E6D8;
+extern M2C_UNK func_0016E6F8;
+
+s32 func_0016E7D0(s32 arg0) {
+    u8 sp[0x10];
+    M2C_UNK sp30;
+    s32 sp34;
+    s32 sp38;
+    s32 sp44;
+    s32 temp_v0;
+    s32 temp_v0_2;
+
+    sp38 = 0;
+    sp34 = 1;
+    sp44 = 0;
+    temp_v0 = CreateSema(&sp30);
+    if (temp_v0 != -1) {
+        ChangeThreadPriority(GetThreadId(), 2);
+        temp_v0_2 = CreateThread(sp, &D_004FDD60, &D_005015F0, &D_005015F0, 1);
+        if (temp_v0_2 != -1) {
+            StartThread(temp_v0_2, temp_v0);
+            func_00290D20(&func_0016E6D8, temp_v0);
+            D_004F9D64 = arg0;
+            return temp_v0;
+        }
+        DeleteSema(temp_v0);
+        /* Duplicate return node #4. Try simplifying control flow for better match */
+        return -1;
+    }
+    return -1;
+}
+//@@ func_0016E7D0 m2c5
+#include "m2c_macros.h"
+extern s32 D_004F9D64;
+extern M2C_UNK D_004FDD60;
+extern M2C_UNK D_005015F0;
+extern M2C_UNK func_0016E6D8;
+extern M2C_UNK func_0016E6F8;
+
+s32 func_0016E7D0(s32 arg0) {
+    u8 sp[0x8];
+    M2C_UNK sp30;
+    s32 sp34;
+    s32 sp38;
+    s32 sp44;
+    s32 temp_v0;
+    s32 temp_v0_2;
+
+    sp38 = 0;
+    sp34 = 1;
+    sp44 = 0;
+    temp_v0 = CreateSema(&sp30);
+    if (temp_v0 != -1) {
+        ChangeThreadPriority(GetThreadId(), 2);
+        temp_v0_2 = CreateThread(sp, &D_004FDD60, &D_005015F0, &D_005015F0, 1);
+        if (temp_v0_2 != -1) {
+            StartThread(temp_v0_2, temp_v0);
+            func_00290D20(&func_0016E6D8, temp_v0);
+            D_004F9D64 = arg0;
+            return temp_v0;
+        }
+        DeleteSema(temp_v0);
+        /* Duplicate return node #4. Try simplifying control flow for better match */
+        return -1;
+    }
+    return -1;
+}
+//@@ func_0016E8E0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_004F9DA8;
 extern M2C_UNK D_004F9DB0;
@@ -3858,7 +10759,7 @@ void func_0016E8E0(void* arg0) {
     M2C_FIELD(arg0, s32* , 0x20C) = 0;
     M2C_FIELD(arg0, s32* , 0x210) = 0;
 }
-//@@ func_0016E9A0 m2c
+//@@ func_0016E9A0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_004F9DB0;
 
@@ -3868,7 +10769,7 @@ void* func_0016E9A0(void* arg0) {
     M2C_FIELD(arg0, s32* , 0x80) = -1;
     return arg0;
 }
-//@@ func_0016EB78 m2c
+//@@ func_0016EB78 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern s32 D_004F9DD8;
@@ -3894,7 +10795,7 @@ void func_0016EB78(void) {
         D_004F9DD8 = temp_v0;
     }
 }
-//@@ func_0016EC50 m2c
+//@@ func_0016EC50 m2c0
 #include "m2c_macros.h"
 void* func_0016EC50(void* arg0) {
     s32 var_s0;
@@ -3962,7 +10863,7 @@ void* func_0016EC50(void* arg0) {
     func_00174860(arg0);
     return arg0;
 }
-//@@ func_0016EE60 m2c
+//@@ func_0016EE60 m2c0
 #include "m2c_macros.h"
 void func_0016EE60(void* arg0, s32 arg1, s32 arg2, M2C_UNK arg3) {
     void* temp_v0;
@@ -3993,7 +10894,7 @@ void func_0016EE60(void* arg0, s32 arg1, s32 arg2, M2C_UNK arg3) {
         break;
     }
 }
-//@@ func_0016EF90 m2c
+//@@ func_0016EF90 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_004F9E38;
 
@@ -4012,7 +10913,7 @@ void func_0016EF90(s32 arg0, s32 arg1) {
     strcpy(temp_v1_2 + 0xD4, &D_004F9E38, temp_v1_2);
     M2C_FIELD(((arg1 * 0x220) + arg0), s32* , 0x214) = 0;
 }
-//@@ func_0016F058 m2c
+//@@ func_0016F058 m2c0
 #include "m2c_macros.h"
 extern void* D_003156C4;
 extern u8 D_004E79B8;
@@ -4045,7 +10946,172 @@ s32 func_0016F058(void* arg0, s32 arg1, M2C_UNK arg2) {
     }
     return arg1;
 }
-//@@ func_0016F1C8 m2c
+//@@ func_0016F058 m2c1
+#include "m2c_macros.h"
+extern void* D_003156C4;
+extern u8 D_004E79B8;
+extern M2C_UNK D_004E79C0;
+extern s32 D_004FA030;
+
+s32 func_0016F058(void* arg0, s32 arg1, M2C_UNK arg2) {
+    u8 sp[0x170];
+    M2C_UNK sp1;
+    M2C_UNK sp100;
+    s32* temp_s2;
+    void* temp_s1;
+
+    memset(&sp1, 0, 0xFF);
+    func_00267080(sp);
+    printf(&D_004E79C0);
+    temp_s2 = M2C_FIELD(arg0, s32** , 4);
+    func_00264448();
+    printf("Network: Remote Client (%d) has Joined Game %d (my client ID = %d) DME >>%s<< DME TIME >>%s<<\n", arg1, arg2, *temp_s2);
+    printf(&D_004E79C0);
+    M2C_FIELD(((arg1 * 0x220) + arg0), s32* , 0x10) = arg1;
+    temp_s1 = arg0 + ((arg1 * 0x220) + 0x10) + 8;
+    func_0014ECE8(arg1, temp_s1);
+    func_0014ED08(arg1, temp_s1);
+    if (M2C_FIELD(arg0, s32* , 0x1BB4) == 0xB) {
+        func_001A9208();
+        sprintf(&sp100, "%s is joining the game.", temp_s1);
+        func_0014EDA0(&sp100);
+        AddMessage__3Hudiii(D_004FA030 + ((M2C_FIELD(M2C_FIELD(D_003156C4, void** , 0xA0), s32* , 0x210C) * 0xA20) + 0x97B50), 0xF9, 2, 0);
+    }
+    return arg1;
+}
+//@@ func_0016F058 m2c2
+#include "m2c_macros.h"
+extern void* D_003156C4;
+extern u8 D_004E79B8;
+extern M2C_UNK D_004E79C0;
+extern s32 D_004FA030;
+
+s32 func_0016F058(void* arg0, s32 arg1, M2C_UNK arg2) {
+    u8 sp[0x160];
+    M2C_UNK sp1;
+    M2C_UNK sp100;
+    s32* temp_s2;
+    void* temp_s1;
+
+    memset(&sp1, 0, 0xFF);
+    func_00267080(sp);
+    printf(&D_004E79C0);
+    temp_s2 = M2C_FIELD(arg0, s32** , 4);
+    func_00264448();
+    printf("Network: Remote Client (%d) has Joined Game %d (my client ID = %d) DME >>%s<< DME TIME >>%s<<\n", arg1, arg2, *temp_s2);
+    printf(&D_004E79C0);
+    M2C_FIELD(((arg1 * 0x220) + arg0), s32* , 0x10) = arg1;
+    temp_s1 = arg0 + ((arg1 * 0x220) + 0x10) + 8;
+    func_0014ECE8(arg1, temp_s1);
+    func_0014ED08(arg1, temp_s1);
+    if (M2C_FIELD(arg0, s32* , 0x1BB4) == 0xB) {
+        func_001A9208();
+        sprintf(&sp100, "%s is joining the game.", temp_s1);
+        func_0014EDA0(&sp100);
+        AddMessage__3Hudiii(D_004FA030 + ((M2C_FIELD(M2C_FIELD(D_003156C4, void** , 0xA0), s32* , 0x210C) * 0xA20) + 0x97B50), 0xF9, 2, 0);
+    }
+    return arg1;
+}
+//@@ func_0016F058 m2c3
+#include "m2c_macros.h"
+extern void* D_003156C4;
+extern u8 D_004E79B8;
+extern M2C_UNK D_004E79C0;
+extern s32 D_004FA030;
+
+s32 func_0016F058(void* arg0, s32 arg1, M2C_UNK arg2) {
+    u8 sp[0x150];
+    M2C_UNK sp1;
+    M2C_UNK sp100;
+    s32* temp_s2;
+    void* temp_s1;
+
+    memset(&sp1, 0, 0xFF);
+    func_00267080(sp);
+    printf(&D_004E79C0);
+    temp_s2 = M2C_FIELD(arg0, s32** , 4);
+    func_00264448();
+    printf("Network: Remote Client (%d) has Joined Game %d (my client ID = %d) DME >>%s<< DME TIME >>%s<<\n", arg1, arg2, *temp_s2);
+    printf(&D_004E79C0);
+    M2C_FIELD(((arg1 * 0x220) + arg0), s32* , 0x10) = arg1;
+    temp_s1 = arg0 + ((arg1 * 0x220) + 0x10) + 8;
+    func_0014ECE8(arg1, temp_s1);
+    func_0014ED08(arg1, temp_s1);
+    if (M2C_FIELD(arg0, s32* , 0x1BB4) == 0xB) {
+        func_001A9208();
+        sprintf(&sp100, "%s is joining the game.", temp_s1);
+        func_0014EDA0(&sp100);
+        AddMessage__3Hudiii(D_004FA030 + ((M2C_FIELD(M2C_FIELD(D_003156C4, void** , 0xA0), s32* , 0x210C) * 0xA20) + 0x97B50), 0xF9, 2, 0);
+    }
+    return arg1;
+}
+//@@ func_0016F058 m2c4
+#include "m2c_macros.h"
+extern void* D_003156C4;
+extern u8 D_004E79B8;
+extern M2C_UNK D_004E79C0;
+extern s32 D_004FA030;
+
+s32 func_0016F058(void* arg0, s32 arg1, M2C_UNK arg2) {
+    u8 sp[0x140];
+    M2C_UNK sp1;
+    M2C_UNK sp100;
+    s32* temp_s2;
+    void* temp_s1;
+
+    memset(&sp1, 0, 0xFF);
+    func_00267080(sp);
+    printf(&D_004E79C0);
+    temp_s2 = M2C_FIELD(arg0, s32** , 4);
+    func_00264448();
+    printf("Network: Remote Client (%d) has Joined Game %d (my client ID = %d) DME >>%s<< DME TIME >>%s<<\n", arg1, arg2, *temp_s2);
+    printf(&D_004E79C0);
+    M2C_FIELD(((arg1 * 0x220) + arg0), s32* , 0x10) = arg1;
+    temp_s1 = arg0 + ((arg1 * 0x220) + 0x10) + 8;
+    func_0014ECE8(arg1, temp_s1);
+    func_0014ED08(arg1, temp_s1);
+    if (M2C_FIELD(arg0, s32* , 0x1BB4) == 0xB) {
+        func_001A9208();
+        sprintf(&sp100, "%s is joining the game.", temp_s1);
+        func_0014EDA0(&sp100);
+        AddMessage__3Hudiii(D_004FA030 + ((M2C_FIELD(M2C_FIELD(D_003156C4, void** , 0xA0), s32* , 0x210C) * 0xA20) + 0x97B50), 0xF9, 2, 0);
+    }
+    return arg1;
+}
+//@@ func_0016F058 m2c5
+#include "m2c_macros.h"
+extern void* D_003156C4;
+extern u8 D_004E79B8;
+extern M2C_UNK D_004E79C0;
+extern s32 D_004FA030;
+
+s32 func_0016F058(void* arg0, s32 arg1, M2C_UNK arg2) {
+    u8 sp[0x130];
+    M2C_UNK sp1;
+    M2C_UNK sp100;
+    s32* temp_s2;
+    void* temp_s1;
+
+    memset(&sp1, 0, 0xFF);
+    func_00267080(sp);
+    printf(&D_004E79C0);
+    temp_s2 = M2C_FIELD(arg0, s32** , 4);
+    func_00264448();
+    printf("Network: Remote Client (%d) has Joined Game %d (my client ID = %d) DME >>%s<< DME TIME >>%s<<\n", arg1, arg2, *temp_s2);
+    printf(&D_004E79C0);
+    M2C_FIELD(((arg1 * 0x220) + arg0), s32* , 0x10) = arg1;
+    temp_s1 = arg0 + ((arg1 * 0x220) + 0x10) + 8;
+    func_0014ECE8(arg1, temp_s1);
+    func_0014ED08(arg1, temp_s1);
+    if (M2C_FIELD(arg0, s32* , 0x1BB4) == 0xB) {
+        func_001A9208();
+        sprintf(&sp100, "%s is joining the game.", temp_s1);
+        func_0014EDA0(&sp100);
+        AddMessage__3Hudiii(D_004FA030 + ((M2C_FIELD(M2C_FIELD(D_003156C4, void** , 0xA0), s32* , 0x210C) * 0xA20) + 0x97B50), 0xF9, 2, 0);
+    }
+    return arg1;
+}
+//@@ func_0016F1C8 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_004E79C0;
@@ -4130,7 +11196,7 @@ s32 func_0016F1C8(s32 arg0, s32 arg1) {
     func_00176EA0(arg0);
     return arg1;
 }
-//@@ func_0016F718 m2c
+//@@ func_0016F718 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_004E7BC8;
 extern M2C_UNK D_004E7D38;
@@ -4191,7 +11257,312 @@ loop_4:
     printf(&D_004E7ED0);
     return D_004F9EB0;
 }
-//@@ func_0016F910 m2c
+//@@ func_0016F718 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_004E7BC8;
+extern M2C_UNK D_004E7D38;
+extern M2C_UNK D_004E7DE0;
+extern M2C_UNK D_004E7E08;
+extern M2C_UNK D_004E7E30;
+extern M2C_UNK D_004E7E58;
+extern M2C_UNK D_004E7E70;
+extern M2C_UNK D_004E7EA0;
+extern M2C_UNK D_004E7ED0;
+extern s32 D_004F9EB0;
+extern s32 D_004F9EB4;
+extern M2C_UNK D_004F9EB8;
+extern M2C_UNK func_00168B60;
+extern M2C_UNK func_00168C30;
+extern M2C_UNK func_0016C480;
+extern M2C_UNK func_0016C590;
+
+s32 func_0016F718(void* arg0, s32 arg1) {
+    u8 sp[0x30];
+    M2C_UNK sp20;
+    M2C_UNK sp30;
+    s32 temp_s2;
+    s32 var_s2;
+
+    temp_s2 = arg0 + 0x1258;
+    func_00266478(&func_0016C590);
+    D_004F9EB4 = 2;
+    D_004F9EB0 = 0;
+    func_00266D78(&D_004F9EB8);
+    printf(&D_004E7BC8);
+    printf("NETWORK: Attempting to connect to Peer 2 Peer Server:\n");
+    printf(&D_004E7DE0, temp_s2);
+    printf(&D_004E7E08, M2C_FIELD(arg0, s32* , 0x1298));
+    printf(&D_004E7E30, M2C_FIELD(arg0, s32* , 0x129C));
+    if (arg1 != 0) {
+        func_0026A4F8(sp);
+        var_s2 = func_0026A550(sp, &sp20, &func_00168C30, M2C_FIELD(arg0, s32* , 0x2DFC));
+        printf(&D_004E7E58, var_s2);
+        M2C_FIELD(arg0, s32* , 0x2CF0) = sp28;
+loop_4:
+        if (func_0016F910(arg0, &sp30) == 2) {
+            func_001703E8(arg0);
+            goto loop_4;
+        }
+        M2C_FIELD(arg0, s32* , 0x307C) = netGetMyClientIndex(arg0);
+        printf(&D_004E7E70);
+        printf(&D_004E7EA0, M2C_FIELD(arg0, s32* , 0x307C));
+        printf(&D_004E7E70);
+    } else {
+        var_s2 = func_002697C0(arg0 + 0x2CF0, 0, temp_s2, &func_0016C480);
+    }
+    if (var_s2 != 0) {
+        D_004F9EB0 = 1;
+        func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+    }
+    printf(&D_004E7D38, M2C_FIELD(arg0, s32* , 0x2CF0));
+    printf(&D_004E7ED0);
+    return D_004F9EB0;
+}
+//@@ func_0016F718 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_004E7BC8;
+extern M2C_UNK D_004E7D38;
+extern M2C_UNK D_004E7DE0;
+extern M2C_UNK D_004E7E08;
+extern M2C_UNK D_004E7E30;
+extern M2C_UNK D_004E7E58;
+extern M2C_UNK D_004E7E70;
+extern M2C_UNK D_004E7EA0;
+extern M2C_UNK D_004E7ED0;
+extern s32 D_004F9EB0;
+extern s32 D_004F9EB4;
+extern M2C_UNK D_004F9EB8;
+extern M2C_UNK func_00168B60;
+extern M2C_UNK func_00168C30;
+extern M2C_UNK func_0016C480;
+extern M2C_UNK func_0016C590;
+
+s32 func_0016F718(void* arg0, s32 arg1) {
+    u8 sp[0x20];
+    M2C_UNK sp20;
+    M2C_UNK sp30;
+    s32 temp_s2;
+    s32 var_s2;
+
+    temp_s2 = arg0 + 0x1258;
+    func_00266478(&func_0016C590);
+    D_004F9EB4 = 2;
+    D_004F9EB0 = 0;
+    func_00266D78(&D_004F9EB8);
+    printf(&D_004E7BC8);
+    printf("NETWORK: Attempting to connect to Peer 2 Peer Server:\n");
+    printf(&D_004E7DE0, temp_s2);
+    printf(&D_004E7E08, M2C_FIELD(arg0, s32* , 0x1298));
+    printf(&D_004E7E30, M2C_FIELD(arg0, s32* , 0x129C));
+    if (arg1 != 0) {
+        func_0026A4F8(sp);
+        var_s2 = func_0026A550(sp, &sp20, &func_00168C30, M2C_FIELD(arg0, s32* , 0x2DFC));
+        printf(&D_004E7E58, var_s2);
+        M2C_FIELD(arg0, s32* , 0x2CF0) = sp28;
+loop_4:
+        if (func_0016F910(arg0, &sp30) == 2) {
+            func_001703E8(arg0);
+            goto loop_4;
+        }
+        M2C_FIELD(arg0, s32* , 0x307C) = netGetMyClientIndex(arg0);
+        printf(&D_004E7E70);
+        printf(&D_004E7EA0, M2C_FIELD(arg0, s32* , 0x307C));
+        printf(&D_004E7E70);
+    } else {
+        var_s2 = func_002697C0(arg0 + 0x2CF0, 0, temp_s2, &func_0016C480);
+    }
+    if (var_s2 != 0) {
+        D_004F9EB0 = 1;
+        func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+    }
+    printf(&D_004E7D38, M2C_FIELD(arg0, s32* , 0x2CF0));
+    printf(&D_004E7ED0);
+    return D_004F9EB0;
+}
+//@@ func_0016F718 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_004E7BC8;
+extern M2C_UNK D_004E7D38;
+extern M2C_UNK D_004E7DE0;
+extern M2C_UNK D_004E7E08;
+extern M2C_UNK D_004E7E30;
+extern M2C_UNK D_004E7E58;
+extern M2C_UNK D_004E7E70;
+extern M2C_UNK D_004E7EA0;
+extern M2C_UNK D_004E7ED0;
+extern s32 D_004F9EB0;
+extern s32 D_004F9EB4;
+extern M2C_UNK D_004F9EB8;
+extern M2C_UNK func_00168B60;
+extern M2C_UNK func_00168C30;
+extern M2C_UNK func_0016C480;
+extern M2C_UNK func_0016C590;
+
+s32 func_0016F718(void* arg0, s32 arg1) {
+    u8 sp[0x10];
+    M2C_UNK sp20;
+    M2C_UNK sp30;
+    s32 temp_s2;
+    s32 var_s2;
+
+    temp_s2 = arg0 + 0x1258;
+    func_00266478(&func_0016C590);
+    D_004F9EB4 = 2;
+    D_004F9EB0 = 0;
+    func_00266D78(&D_004F9EB8);
+    printf(&D_004E7BC8);
+    printf("NETWORK: Attempting to connect to Peer 2 Peer Server:\n");
+    printf(&D_004E7DE0, temp_s2);
+    printf(&D_004E7E08, M2C_FIELD(arg0, s32* , 0x1298));
+    printf(&D_004E7E30, M2C_FIELD(arg0, s32* , 0x129C));
+    if (arg1 != 0) {
+        func_0026A4F8(sp);
+        var_s2 = func_0026A550(sp, &sp20, &func_00168C30, M2C_FIELD(arg0, s32* , 0x2DFC));
+        printf(&D_004E7E58, var_s2);
+        M2C_FIELD(arg0, s32* , 0x2CF0) = sp28;
+loop_4:
+        if (func_0016F910(arg0, &sp30) == 2) {
+            func_001703E8(arg0);
+            goto loop_4;
+        }
+        M2C_FIELD(arg0, s32* , 0x307C) = netGetMyClientIndex(arg0);
+        printf(&D_004E7E70);
+        printf(&D_004E7EA0, M2C_FIELD(arg0, s32* , 0x307C));
+        printf(&D_004E7E70);
+    } else {
+        var_s2 = func_002697C0(arg0 + 0x2CF0, 0, temp_s2, &func_0016C480);
+    }
+    if (var_s2 != 0) {
+        D_004F9EB0 = 1;
+        func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+    }
+    printf(&D_004E7D38, M2C_FIELD(arg0, s32* , 0x2CF0));
+    printf(&D_004E7ED0);
+    return D_004F9EB0;
+}
+//@@ func_0016F718 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_004E7BC8;
+extern M2C_UNK D_004E7D38;
+extern M2C_UNK D_004E7DE0;
+extern M2C_UNK D_004E7E08;
+extern M2C_UNK D_004E7E30;
+extern M2C_UNK D_004E7E58;
+extern M2C_UNK D_004E7E70;
+extern M2C_UNK D_004E7EA0;
+extern M2C_UNK D_004E7ED0;
+extern s32 D_004F9EB0;
+extern s32 D_004F9EB4;
+extern M2C_UNK D_004F9EB8;
+extern M2C_UNK func_00168B60;
+extern M2C_UNK func_00168C30;
+extern M2C_UNK func_0016C480;
+extern M2C_UNK func_0016C590;
+
+s32 func_0016F718(void* arg0, s32 arg1) {
+    u8 sp[0x8];
+    M2C_UNK sp20;
+    M2C_UNK sp30;
+    s32 temp_s2;
+    s32 var_s2;
+
+    temp_s2 = arg0 + 0x1258;
+    func_00266478(&func_0016C590);
+    D_004F9EB4 = 2;
+    D_004F9EB0 = 0;
+    func_00266D78(&D_004F9EB8);
+    printf(&D_004E7BC8);
+    printf("NETWORK: Attempting to connect to Peer 2 Peer Server:\n");
+    printf(&D_004E7DE0, temp_s2);
+    printf(&D_004E7E08, M2C_FIELD(arg0, s32* , 0x1298));
+    printf(&D_004E7E30, M2C_FIELD(arg0, s32* , 0x129C));
+    if (arg1 != 0) {
+        func_0026A4F8(sp);
+        var_s2 = func_0026A550(sp, &sp20, &func_00168C30, M2C_FIELD(arg0, s32* , 0x2DFC));
+        printf(&D_004E7E58, var_s2);
+        M2C_FIELD(arg0, s32* , 0x2CF0) = sp28;
+loop_4:
+        if (func_0016F910(arg0, &sp30) == 2) {
+            func_001703E8(arg0);
+            goto loop_4;
+        }
+        M2C_FIELD(arg0, s32* , 0x307C) = netGetMyClientIndex(arg0);
+        printf(&D_004E7E70);
+        printf(&D_004E7EA0, M2C_FIELD(arg0, s32* , 0x307C));
+        printf(&D_004E7E70);
+    } else {
+        var_s2 = func_002697C0(arg0 + 0x2CF0, 0, temp_s2, &func_0016C480);
+    }
+    if (var_s2 != 0) {
+        D_004F9EB0 = 1;
+        func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+    }
+    printf(&D_004E7D38, M2C_FIELD(arg0, s32* , 0x2CF0));
+    printf(&D_004E7ED0);
+    return D_004F9EB0;
+}
+//@@ func_0016F718 m2c5
+#include "m2c_macros.h"
+extern M2C_UNK D_004E7BC8;
+extern M2C_UNK D_004E7D38;
+extern M2C_UNK D_004E7DE0;
+extern M2C_UNK D_004E7E08;
+extern M2C_UNK D_004E7E30;
+extern M2C_UNK D_004E7E58;
+extern M2C_UNK D_004E7E70;
+extern M2C_UNK D_004E7EA0;
+extern M2C_UNK D_004E7ED0;
+extern s32 D_004F9EB0;
+extern s32 D_004F9EB4;
+extern M2C_UNK D_004F9EB8;
+extern M2C_UNK func_00168B60;
+extern M2C_UNK func_00168C30;
+extern M2C_UNK func_0016C480;
+extern M2C_UNK func_0016C590;
+
+s32 func_0016F718(void* arg0, s32 arg1) {
+    u8 sp[0x4];
+    M2C_UNK sp20;
+    M2C_UNK sp30;
+    s32 temp_s2;
+    s32 var_s2;
+
+    temp_s2 = arg0 + 0x1258;
+    func_00266478(&func_0016C590);
+    D_004F9EB4 = 2;
+    D_004F9EB0 = 0;
+    func_00266D78(&D_004F9EB8);
+    printf(&D_004E7BC8);
+    printf("NETWORK: Attempting to connect to Peer 2 Peer Server:\n");
+    printf(&D_004E7DE0, temp_s2);
+    printf(&D_004E7E08, M2C_FIELD(arg0, s32* , 0x1298));
+    printf(&D_004E7E30, M2C_FIELD(arg0, s32* , 0x129C));
+    if (arg1 != 0) {
+        func_0026A4F8(sp);
+        var_s2 = func_0026A550(sp, &sp20, &func_00168C30, M2C_FIELD(arg0, s32* , 0x2DFC));
+        printf(&D_004E7E58, var_s2);
+        M2C_FIELD(arg0, s32* , 0x2CF0) = sp28;
+loop_4:
+        if (func_0016F910(arg0, &sp30) == 2) {
+            func_001703E8(arg0);
+            goto loop_4;
+        }
+        M2C_FIELD(arg0, s32* , 0x307C) = netGetMyClientIndex(arg0);
+        printf(&D_004E7E70);
+        printf(&D_004E7EA0, M2C_FIELD(arg0, s32* , 0x307C));
+        printf(&D_004E7E70);
+    } else {
+        var_s2 = func_002697C0(arg0 + 0x2CF0, 0, temp_s2, &func_0016C480);
+    }
+    if (var_s2 != 0) {
+        D_004F9EB0 = 1;
+        func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+    }
+    printf(&D_004E7D38, M2C_FIELD(arg0, s32* , 0x2CF0));
+    printf(&D_004E7ED0);
+    return D_004F9EB0;
+}
+//@@ func_0016F910 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9EB0;
 extern s32 D_004F9EB4;
@@ -4235,7 +11606,95 @@ s32 func_0016F910(void* arg0, s32* arg1) {
     *arg1 = D_004F9EB0;
     return D_004F9EB4;
 }
-//@@ func_0016FA30 m2c
+//@@ func_0016F910 m2c1
+#include "m2c_macros.h"
+extern s32 D_004F9EB0;
+extern s32 D_004F9EB4;
+extern s32 D_004F9EB8;
+
+s32 func_0016F910(void* arg0, s32* arg1) {
+    u8 sp[0x8];
+    s32 temp_s0;
+    s32 temp_s1;
+
+    func_00266D78(sp);
+    temp_s1 = (dpcmp(litodp(subroutine_arg0 - D_004F9EB8), ((0x81BA << 0x10) | 0x9800) << 0x1F) < 1) ? 0 : 1;
+    func_00266E48(&D_004F9EB4, M2C_FIELD(arg0, s32* , 0x2CF0));
+    temp_s0 = D_004F9EB4;
+    switch (temp_s0) {                              /* irregular */
+    case 2:
+        if (temp_s1 == 0) {
+            switch (temp_s0) {                      /* switch 1; irregular */
+            case 1:
+            case 1:                                 /* switch 1 */
+                if (func_0016FA30(arg0) != temp_s0) {
+                    D_004F9EB0 = temp_s0;
+                } else {
+                    D_004F9EB0 = 0;
+                }
+                break;
+            }
+        } else {
+        case 0:
+        case 3:
+        case 0:                                     /* switch 1 */
+        case 3:                                     /* switch 1 */
+            func_0016FD68(arg0);
+            D_004F9EB4 = 3;
+            if (D_004F9EB0 == 0) {
+                D_004F9EB0 = 1;
+            }
+        }
+        break;
+    }
+    *arg1 = D_004F9EB0;
+    return D_004F9EB4;
+}
+//@@ func_0016F910 m2c2
+#include "m2c_macros.h"
+extern s32 D_004F9EB0;
+extern s32 D_004F9EB4;
+extern s32 D_004F9EB8;
+
+s32 func_0016F910(void* arg0, s32* arg1) {
+    u8 sp[0x4];
+    s32 temp_s0;
+    s32 temp_s1;
+
+    func_00266D78(sp);
+    temp_s1 = (dpcmp(litodp(subroutine_arg0 - D_004F9EB8), ((0x81BA << 0x10) | 0x9800) << 0x1F) < 1) ? 0 : 1;
+    func_00266E48(&D_004F9EB4, M2C_FIELD(arg0, s32* , 0x2CF0));
+    temp_s0 = D_004F9EB4;
+    switch (temp_s0) {                              /* irregular */
+    case 2:
+        if (temp_s1 == 0) {
+            switch (temp_s0) {                      /* switch 1; irregular */
+            case 1:
+            case 1:                                 /* switch 1 */
+                if (func_0016FA30(arg0) != temp_s0) {
+                    D_004F9EB0 = temp_s0;
+                } else {
+                    D_004F9EB0 = 0;
+                }
+                break;
+            }
+        } else {
+        case 0:
+        case 3:
+        case 0:                                     /* switch 1 */
+        case 3:                                     /* switch 1 */
+            func_0016FD68(arg0);
+            D_004F9EB4 = 3;
+            if (D_004F9EB0 == 0) {
+                D_004F9EB0 = 1;
+            }
+        }
+        break;
+    }
+    *arg1 = D_004F9EB0;
+    return D_004F9EB4;
+}
+//@@ func_0016FA30 m2c0
 #include "m2c_macros.h"
 extern s32 D_00317270;
 extern M2C_UNK D_004E7BC8;
@@ -4320,7 +11779,432 @@ block_16:
     D_004F9EB4 = 0;
     return 0;
 }
-//@@ func_0016FD68 m2c
+//@@ func_0016FA30 m2c1
+#include "m2c_macros.h"
+extern s32 D_00317270;
+extern M2C_UNK D_004E7BC8;
+extern s32 D_004F9EB4;
+
+s32 func_0016FA30(void* arg0) {
+    u8 sp[0xF0];
+    s32 spF0;
+    s32 spF4;
+    s32 spF8;
+    s32 spFC;
+    s32 var_s1;
+    s32* temp_a2;
+    s32* temp_v0;
+
+    printf("NETWORK: Successfully connected to Server %s, Connection Index = %d\n", arg0 + 0x1258, M2C_FIELD(arg0, s32* , 0x2CF0));
+    dmeGetMyClientIndex(&spF0, M2C_FIELD(arg0, s32* , 0x2CF0));
+    printf("NETWORK: NetGetMyClientIndex(mConnectionIndex) = %d\n", spF0);
+    temp_v0 = arg0 + ((spF0 * 0x220) + 0x10);
+    M2C_FIELD(arg0, s32** , 4) = temp_v0;
+    *temp_v0 = spF0;
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 4) = -1;
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 8, arg0 + 0x1998, -1);
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 0x48, arg0 + 0x19D8);
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xA4) = (s32) M2C_FIELD(arg0, s32* , 0x1A34);
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 0xC4, arg0 + 0x1A94);
+    temp_a2 = M2C_FIELD(arg0, s32** , 4);
+    M2C_FIELD(temp_a2, s32* , 0x204) = (s32) M2C_FIELD(arg0, s32* , 0x1B94);
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xBC) = 0;
+    func_00173570(arg0, 1, temp_a2);
+    func_00266EB0(&spF4, M2C_FIELD(arg0, s32* , 0x2CF0));
+    if (spF4 != 1) {
+        printf("NETWORK: Connection count = %d, I am NOT the Session Master\n", spF4);
+    } else {
+        printf("NETWORK: Connection count = %d, I should be the Session Master\n", 1);
+    }
+    if (spF4 == 1) {
+        D_00317270 = 1;
+        func_00174598(arg0);
+        M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xA4) = (s32) M2C_FIELD(arg0, s32* , 0x1A34);
+        memset(arg0 + 0x3080, 0, 0xC8);
+        M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((((((M2C_FIELD(arg0, s64* , 0x3080) & ~0x1E) | 4) & ~0x20 & ~0x3C0) | 0x40) & ~0xC00) | 0x800);
+        M2C_FIELD(arg0, u8* , 0x3084) = (u8) M2C_FIELD(arg0, u8* , 0x2DFC);
+        M2C_FIELD(arg0, s8* , 0x309B) = -1;
+        M2C_FIELD(arg0, s8* , 0x309A) = -1;
+        M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((M2C_FIELD(arg0, s64* , 0x3080) & 0xFFC0FFFF) | 0x230000);
+    }
+    if (spF4 < 2) {
+        M2C_FIELD(arg0, s32* , 0x2EE4) = 0;
+    } else {
+        func_00266D78(&spF8);
+        printf("NETWORK: Waiting for state info...\n");
+        M2C_FIELD(arg0, s32* , 0x2EE4) = 1;
+    }
+    var_s1 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x2EE4) != 0) {
+loop_13:
+        func_00266D78(&spFC);
+        if (((spFC - spF8) < 0x1389) || (netSendSessionMsg(arg0, func_00173500(arg0), sp), func_00266D78(&spF8), printf("NETWORK: Still waiting for state info...\n"), func_00266E48(&D_004F9EB4, M2C_FIELD(arg0, s32* , 0x2CF0)), var_s1 = ((D_004F9EB4 ^ 1) != 0) ? 0xB : (var_s1 + 1), ((var_s1 < 0xB) != 0))) {
+            func_001703E8(arg0);
+            if (M2C_FIELD(arg0, s32* , 0x2EE4) == 0) {
+                goto block_16;
+            }
+            goto loop_13;
+        }
+        func_00173570(arg0, 0);
+        func_0016FD68(arg0);
+        func_001748D8(arg0);
+        D_004F9EB4 = 3;
+        return 3;
+    }
+block_16:
+    if (M2C_FIELD(arg0, s32* , 0x1BB4) != 0xE) {
+        printf("NETWORK: Got State Info...\n");
+        printf(&D_004E7BC8);
+        D_004F9EB4 = 1;
+        return 1;
+    }
+    func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+    func_001748D8(arg0);
+    func_00173570(arg0, 0);
+    D_004F9EB4 = 0;
+    return 0;
+}
+//@@ func_0016FA30 m2c2
+#include "m2c_macros.h"
+extern s32 D_00317270;
+extern M2C_UNK D_004E7BC8;
+extern s32 D_004F9EB4;
+
+s32 func_0016FA30(void* arg0) {
+    u8 sp[0xE0];
+    s32 spF0;
+    s32 spF4;
+    s32 spF8;
+    s32 spFC;
+    s32 var_s1;
+    s32* temp_a2;
+    s32* temp_v0;
+
+    printf("NETWORK: Successfully connected to Server %s, Connection Index = %d\n", arg0 + 0x1258, M2C_FIELD(arg0, s32* , 0x2CF0));
+    dmeGetMyClientIndex(&spF0, M2C_FIELD(arg0, s32* , 0x2CF0));
+    printf("NETWORK: NetGetMyClientIndex(mConnectionIndex) = %d\n", spF0);
+    temp_v0 = arg0 + ((spF0 * 0x220) + 0x10);
+    M2C_FIELD(arg0, s32** , 4) = temp_v0;
+    *temp_v0 = spF0;
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 4) = -1;
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 8, arg0 + 0x1998, -1);
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 0x48, arg0 + 0x19D8);
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xA4) = (s32) M2C_FIELD(arg0, s32* , 0x1A34);
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 0xC4, arg0 + 0x1A94);
+    temp_a2 = M2C_FIELD(arg0, s32** , 4);
+    M2C_FIELD(temp_a2, s32* , 0x204) = (s32) M2C_FIELD(arg0, s32* , 0x1B94);
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xBC) = 0;
+    func_00173570(arg0, 1, temp_a2);
+    func_00266EB0(&spF4, M2C_FIELD(arg0, s32* , 0x2CF0));
+    if (spF4 != 1) {
+        printf("NETWORK: Connection count = %d, I am NOT the Session Master\n", spF4);
+    } else {
+        printf("NETWORK: Connection count = %d, I should be the Session Master\n", 1);
+    }
+    if (spF4 == 1) {
+        D_00317270 = 1;
+        func_00174598(arg0);
+        M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xA4) = (s32) M2C_FIELD(arg0, s32* , 0x1A34);
+        memset(arg0 + 0x3080, 0, 0xC8);
+        M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((((((M2C_FIELD(arg0, s64* , 0x3080) & ~0x1E) | 4) & ~0x20 & ~0x3C0) | 0x40) & ~0xC00) | 0x800);
+        M2C_FIELD(arg0, u8* , 0x3084) = (u8) M2C_FIELD(arg0, u8* , 0x2DFC);
+        M2C_FIELD(arg0, s8* , 0x309B) = -1;
+        M2C_FIELD(arg0, s8* , 0x309A) = -1;
+        M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((M2C_FIELD(arg0, s64* , 0x3080) & 0xFFC0FFFF) | 0x230000);
+    }
+    if (spF4 < 2) {
+        M2C_FIELD(arg0, s32* , 0x2EE4) = 0;
+    } else {
+        func_00266D78(&spF8);
+        printf("NETWORK: Waiting for state info...\n");
+        M2C_FIELD(arg0, s32* , 0x2EE4) = 1;
+    }
+    var_s1 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x2EE4) != 0) {
+loop_13:
+        func_00266D78(&spFC);
+        if (((spFC - spF8) < 0x1389) || (netSendSessionMsg(arg0, func_00173500(arg0), sp), func_00266D78(&spF8), printf("NETWORK: Still waiting for state info...\n"), func_00266E48(&D_004F9EB4, M2C_FIELD(arg0, s32* , 0x2CF0)), var_s1 = ((D_004F9EB4 ^ 1) != 0) ? 0xB : (var_s1 + 1), ((var_s1 < 0xB) != 0))) {
+            func_001703E8(arg0);
+            if (M2C_FIELD(arg0, s32* , 0x2EE4) == 0) {
+                goto block_16;
+            }
+            goto loop_13;
+        }
+        func_00173570(arg0, 0);
+        func_0016FD68(arg0);
+        func_001748D8(arg0);
+        D_004F9EB4 = 3;
+        return 3;
+    }
+block_16:
+    if (M2C_FIELD(arg0, s32* , 0x1BB4) != 0xE) {
+        printf("NETWORK: Got State Info...\n");
+        printf(&D_004E7BC8);
+        D_004F9EB4 = 1;
+        return 1;
+    }
+    func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+    func_001748D8(arg0);
+    func_00173570(arg0, 0);
+    D_004F9EB4 = 0;
+    return 0;
+}
+//@@ func_0016FA30 m2c3
+#include "m2c_macros.h"
+extern s32 D_00317270;
+extern M2C_UNK D_004E7BC8;
+extern s32 D_004F9EB4;
+
+s32 func_0016FA30(void* arg0) {
+    u8 sp[0xD0];
+    s32 spF0;
+    s32 spF4;
+    s32 spF8;
+    s32 spFC;
+    s32 var_s1;
+    s32* temp_a2;
+    s32* temp_v0;
+
+    printf("NETWORK: Successfully connected to Server %s, Connection Index = %d\n", arg0 + 0x1258, M2C_FIELD(arg0, s32* , 0x2CF0));
+    dmeGetMyClientIndex(&spF0, M2C_FIELD(arg0, s32* , 0x2CF0));
+    printf("NETWORK: NetGetMyClientIndex(mConnectionIndex) = %d\n", spF0);
+    temp_v0 = arg0 + ((spF0 * 0x220) + 0x10);
+    M2C_FIELD(arg0, s32** , 4) = temp_v0;
+    *temp_v0 = spF0;
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 4) = -1;
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 8, arg0 + 0x1998, -1);
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 0x48, arg0 + 0x19D8);
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xA4) = (s32) M2C_FIELD(arg0, s32* , 0x1A34);
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 0xC4, arg0 + 0x1A94);
+    temp_a2 = M2C_FIELD(arg0, s32** , 4);
+    M2C_FIELD(temp_a2, s32* , 0x204) = (s32) M2C_FIELD(arg0, s32* , 0x1B94);
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xBC) = 0;
+    func_00173570(arg0, 1, temp_a2);
+    func_00266EB0(&spF4, M2C_FIELD(arg0, s32* , 0x2CF0));
+    if (spF4 != 1) {
+        printf("NETWORK: Connection count = %d, I am NOT the Session Master\n", spF4);
+    } else {
+        printf("NETWORK: Connection count = %d, I should be the Session Master\n", 1);
+    }
+    if (spF4 == 1) {
+        D_00317270 = 1;
+        func_00174598(arg0);
+        M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xA4) = (s32) M2C_FIELD(arg0, s32* , 0x1A34);
+        memset(arg0 + 0x3080, 0, 0xC8);
+        M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((((((M2C_FIELD(arg0, s64* , 0x3080) & ~0x1E) | 4) & ~0x20 & ~0x3C0) | 0x40) & ~0xC00) | 0x800);
+        M2C_FIELD(arg0, u8* , 0x3084) = (u8) M2C_FIELD(arg0, u8* , 0x2DFC);
+        M2C_FIELD(arg0, s8* , 0x309B) = -1;
+        M2C_FIELD(arg0, s8* , 0x309A) = -1;
+        M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((M2C_FIELD(arg0, s64* , 0x3080) & 0xFFC0FFFF) | 0x230000);
+    }
+    if (spF4 < 2) {
+        M2C_FIELD(arg0, s32* , 0x2EE4) = 0;
+    } else {
+        func_00266D78(&spF8);
+        printf("NETWORK: Waiting for state info...\n");
+        M2C_FIELD(arg0, s32* , 0x2EE4) = 1;
+    }
+    var_s1 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x2EE4) != 0) {
+loop_13:
+        func_00266D78(&spFC);
+        if (((spFC - spF8) < 0x1389) || (netSendSessionMsg(arg0, func_00173500(arg0), sp), func_00266D78(&spF8), printf("NETWORK: Still waiting for state info...\n"), func_00266E48(&D_004F9EB4, M2C_FIELD(arg0, s32* , 0x2CF0)), var_s1 = ((D_004F9EB4 ^ 1) != 0) ? 0xB : (var_s1 + 1), ((var_s1 < 0xB) != 0))) {
+            func_001703E8(arg0);
+            if (M2C_FIELD(arg0, s32* , 0x2EE4) == 0) {
+                goto block_16;
+            }
+            goto loop_13;
+        }
+        func_00173570(arg0, 0);
+        func_0016FD68(arg0);
+        func_001748D8(arg0);
+        D_004F9EB4 = 3;
+        return 3;
+    }
+block_16:
+    if (M2C_FIELD(arg0, s32* , 0x1BB4) != 0xE) {
+        printf("NETWORK: Got State Info...\n");
+        printf(&D_004E7BC8);
+        D_004F9EB4 = 1;
+        return 1;
+    }
+    func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+    func_001748D8(arg0);
+    func_00173570(arg0, 0);
+    D_004F9EB4 = 0;
+    return 0;
+}
+//@@ func_0016FA30 m2c4
+#include "m2c_macros.h"
+extern s32 D_00317270;
+extern M2C_UNK D_004E7BC8;
+extern s32 D_004F9EB4;
+
+s32 func_0016FA30(void* arg0) {
+    u8 sp[0xC0];
+    s32 spF0;
+    s32 spF4;
+    s32 spF8;
+    s32 spFC;
+    s32 var_s1;
+    s32* temp_a2;
+    s32* temp_v0;
+
+    printf("NETWORK: Successfully connected to Server %s, Connection Index = %d\n", arg0 + 0x1258, M2C_FIELD(arg0, s32* , 0x2CF0));
+    dmeGetMyClientIndex(&spF0, M2C_FIELD(arg0, s32* , 0x2CF0));
+    printf("NETWORK: NetGetMyClientIndex(mConnectionIndex) = %d\n", spF0);
+    temp_v0 = arg0 + ((spF0 * 0x220) + 0x10);
+    M2C_FIELD(arg0, s32** , 4) = temp_v0;
+    *temp_v0 = spF0;
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 4) = -1;
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 8, arg0 + 0x1998, -1);
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 0x48, arg0 + 0x19D8);
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xA4) = (s32) M2C_FIELD(arg0, s32* , 0x1A34);
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 0xC4, arg0 + 0x1A94);
+    temp_a2 = M2C_FIELD(arg0, s32** , 4);
+    M2C_FIELD(temp_a2, s32* , 0x204) = (s32) M2C_FIELD(arg0, s32* , 0x1B94);
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xBC) = 0;
+    func_00173570(arg0, 1, temp_a2);
+    func_00266EB0(&spF4, M2C_FIELD(arg0, s32* , 0x2CF0));
+    if (spF4 != 1) {
+        printf("NETWORK: Connection count = %d, I am NOT the Session Master\n", spF4);
+    } else {
+        printf("NETWORK: Connection count = %d, I should be the Session Master\n", 1);
+    }
+    if (spF4 == 1) {
+        D_00317270 = 1;
+        func_00174598(arg0);
+        M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xA4) = (s32) M2C_FIELD(arg0, s32* , 0x1A34);
+        memset(arg0 + 0x3080, 0, 0xC8);
+        M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((((((M2C_FIELD(arg0, s64* , 0x3080) & ~0x1E) | 4) & ~0x20 & ~0x3C0) | 0x40) & ~0xC00) | 0x800);
+        M2C_FIELD(arg0, u8* , 0x3084) = (u8) M2C_FIELD(arg0, u8* , 0x2DFC);
+        M2C_FIELD(arg0, s8* , 0x309B) = -1;
+        M2C_FIELD(arg0, s8* , 0x309A) = -1;
+        M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((M2C_FIELD(arg0, s64* , 0x3080) & 0xFFC0FFFF) | 0x230000);
+    }
+    if (spF4 < 2) {
+        M2C_FIELD(arg0, s32* , 0x2EE4) = 0;
+    } else {
+        func_00266D78(&spF8);
+        printf("NETWORK: Waiting for state info...\n");
+        M2C_FIELD(arg0, s32* , 0x2EE4) = 1;
+    }
+    var_s1 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x2EE4) != 0) {
+loop_13:
+        func_00266D78(&spFC);
+        if (((spFC - spF8) < 0x1389) || (netSendSessionMsg(arg0, func_00173500(arg0), sp), func_00266D78(&spF8), printf("NETWORK: Still waiting for state info...\n"), func_00266E48(&D_004F9EB4, M2C_FIELD(arg0, s32* , 0x2CF0)), var_s1 = ((D_004F9EB4 ^ 1) != 0) ? 0xB : (var_s1 + 1), ((var_s1 < 0xB) != 0))) {
+            func_001703E8(arg0);
+            if (M2C_FIELD(arg0, s32* , 0x2EE4) == 0) {
+                goto block_16;
+            }
+            goto loop_13;
+        }
+        func_00173570(arg0, 0);
+        func_0016FD68(arg0);
+        func_001748D8(arg0);
+        D_004F9EB4 = 3;
+        return 3;
+    }
+block_16:
+    if (M2C_FIELD(arg0, s32* , 0x1BB4) != 0xE) {
+        printf("NETWORK: Got State Info...\n");
+        printf(&D_004E7BC8);
+        D_004F9EB4 = 1;
+        return 1;
+    }
+    func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+    func_001748D8(arg0);
+    func_00173570(arg0, 0);
+    D_004F9EB4 = 0;
+    return 0;
+}
+//@@ func_0016FA30 m2c5
+#include "m2c_macros.h"
+extern s32 D_00317270;
+extern M2C_UNK D_004E7BC8;
+extern s32 D_004F9EB4;
+
+s32 func_0016FA30(void* arg0) {
+    u8 sp[0xB0];
+    s32 spF0;
+    s32 spF4;
+    s32 spF8;
+    s32 spFC;
+    s32 var_s1;
+    s32* temp_a2;
+    s32* temp_v0;
+
+    printf("NETWORK: Successfully connected to Server %s, Connection Index = %d\n", arg0 + 0x1258, M2C_FIELD(arg0, s32* , 0x2CF0));
+    dmeGetMyClientIndex(&spF0, M2C_FIELD(arg0, s32* , 0x2CF0));
+    printf("NETWORK: NetGetMyClientIndex(mConnectionIndex) = %d\n", spF0);
+    temp_v0 = arg0 + ((spF0 * 0x220) + 0x10);
+    M2C_FIELD(arg0, s32** , 4) = temp_v0;
+    *temp_v0 = spF0;
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 4) = -1;
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 8, arg0 + 0x1998, -1);
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 0x48, arg0 + 0x19D8);
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xA4) = (s32) M2C_FIELD(arg0, s32* , 0x1A34);
+    strcpy(M2C_FIELD(arg0, s32** , 4) + 0xC4, arg0 + 0x1A94);
+    temp_a2 = M2C_FIELD(arg0, s32** , 4);
+    M2C_FIELD(temp_a2, s32* , 0x204) = (s32) M2C_FIELD(arg0, s32* , 0x1B94);
+    M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xBC) = 0;
+    func_00173570(arg0, 1, temp_a2);
+    func_00266EB0(&spF4, M2C_FIELD(arg0, s32* , 0x2CF0));
+    if (spF4 != 1) {
+        printf("NETWORK: Connection count = %d, I am NOT the Session Master\n", spF4);
+    } else {
+        printf("NETWORK: Connection count = %d, I should be the Session Master\n", 1);
+    }
+    if (spF4 == 1) {
+        D_00317270 = 1;
+        func_00174598(arg0);
+        M2C_FIELD(M2C_FIELD(arg0, s32** , 4), s32* , 0xA4) = (s32) M2C_FIELD(arg0, s32* , 0x1A34);
+        memset(arg0 + 0x3080, 0, 0xC8);
+        M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((((((M2C_FIELD(arg0, s64* , 0x3080) & ~0x1E) | 4) & ~0x20 & ~0x3C0) | 0x40) & ~0xC00) | 0x800);
+        M2C_FIELD(arg0, u8* , 0x3084) = (u8) M2C_FIELD(arg0, u8* , 0x2DFC);
+        M2C_FIELD(arg0, s8* , 0x309B) = -1;
+        M2C_FIELD(arg0, s8* , 0x309A) = -1;
+        M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((M2C_FIELD(arg0, s64* , 0x3080) & 0xFFC0FFFF) | 0x230000);
+    }
+    if (spF4 < 2) {
+        M2C_FIELD(arg0, s32* , 0x2EE4) = 0;
+    } else {
+        func_00266D78(&spF8);
+        printf("NETWORK: Waiting for state info...\n");
+        M2C_FIELD(arg0, s32* , 0x2EE4) = 1;
+    }
+    var_s1 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x2EE4) != 0) {
+loop_13:
+        func_00266D78(&spFC);
+        if (((spFC - spF8) < 0x1389) || (netSendSessionMsg(arg0, func_00173500(arg0), sp), func_00266D78(&spF8), printf("NETWORK: Still waiting for state info...\n"), func_00266E48(&D_004F9EB4, M2C_FIELD(arg0, s32* , 0x2CF0)), var_s1 = ((D_004F9EB4 ^ 1) != 0) ? 0xB : (var_s1 + 1), ((var_s1 < 0xB) != 0))) {
+            func_001703E8(arg0);
+            if (M2C_FIELD(arg0, s32* , 0x2EE4) == 0) {
+                goto block_16;
+            }
+            goto loop_13;
+        }
+        func_00173570(arg0, 0);
+        func_0016FD68(arg0);
+        func_001748D8(arg0);
+        D_004F9EB4 = 3;
+        return 3;
+    }
+block_16:
+    if (M2C_FIELD(arg0, s32* , 0x1BB4) != 0xE) {
+        printf("NETWORK: Got State Info...\n");
+        printf(&D_004E7BC8);
+        D_004F9EB4 = 1;
+        return 1;
+    }
+    func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+    func_001748D8(arg0);
+    func_00173570(arg0, 0);
+    D_004F9EB4 = 0;
+    return 0;
+}
+//@@ func_0016FD68 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_002C1690;
 extern s32 D_003183B0;
@@ -4351,7 +12235,69 @@ void func_0016FD68(void* arg0) {
         M2C_FIELD(arg0, s32* , 0x2CF0) = -1;
     }
 }
-//@@ func_00170308 m2c
+//@@ func_0016FD68 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+extern s32 D_003183B0;
+extern M2C_UNK D_004E7BC8;
+extern M2C_UNK D_004E7DE0;
+extern M2C_UNK D_004E7E08;
+extern M2C_UNK D_004E7E30;
+
+void func_0016FD68(void* arg0) {
+    u8 sp[0x8];
+    if (M2C_FIELD(arg0, s32* , 0x2CF0) >= 0) {
+        if (M2C_FIELD(arg0, s32* , 0x2E90) == 0) {
+            func_00165ED0(&D_002C1690, 2);
+            func_00266EB0(sp, D_003183B0);
+            if ((subroutine_arg0 < 2) && (func_001734B8(arg0) != 0)) {
+                func_00166600(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+            }
+        }
+        printf(&D_004E7BC8);
+        printf("NETWORK: Disconnecting from connection %d:\n", M2C_FIELD(arg0, s32* , 0x2CF0));
+        printf(&D_004E7DE0, (s32) (arg0 + 0x1258));
+        printf(&D_004E7E08, M2C_FIELD(arg0, s32* , 0x1298));
+        printf(&D_004E7E30, M2C_FIELD(arg0, s32* , 0x129C));
+        printf(&D_004E7BC8);
+        M2C_FIELD(arg0, s32* , 0x1BB0) = 0;
+        M2C_FIELD(arg0, s32* , 0x1BB4) = 0;
+        func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+        M2C_FIELD(arg0, s32* , 0x2CF0) = -1;
+    }
+}
+//@@ func_0016FD68 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_002C1690;
+extern s32 D_003183B0;
+extern M2C_UNK D_004E7BC8;
+extern M2C_UNK D_004E7DE0;
+extern M2C_UNK D_004E7E08;
+extern M2C_UNK D_004E7E30;
+
+void func_0016FD68(void* arg0) {
+    u8 sp[0x4];
+    if (M2C_FIELD(arg0, s32* , 0x2CF0) >= 0) {
+        if (M2C_FIELD(arg0, s32* , 0x2E90) == 0) {
+            func_00165ED0(&D_002C1690, 2);
+            func_00266EB0(sp, D_003183B0);
+            if ((subroutine_arg0 < 2) && (func_001734B8(arg0) != 0)) {
+                func_00166600(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+            }
+        }
+        printf(&D_004E7BC8);
+        printf("NETWORK: Disconnecting from connection %d:\n", M2C_FIELD(arg0, s32* , 0x2CF0));
+        printf(&D_004E7DE0, (s32) (arg0 + 0x1258));
+        printf(&D_004E7E08, M2C_FIELD(arg0, s32* , 0x1298));
+        printf(&D_004E7E30, M2C_FIELD(arg0, s32* , 0x129C));
+        printf(&D_004E7BC8);
+        M2C_FIELD(arg0, s32* , 0x1BB0) = 0;
+        M2C_FIELD(arg0, s32* , 0x1BB4) = 0;
+        func_0026E2D8(M2C_FIELD(arg0, s32* , 0x2CF0));
+        M2C_FIELD(arg0, s32* , 0x2CF0) = -1;
+    }
+}
+//@@ func_00170308 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_004E7BC8;
 extern M2C_UNK D_004E80E0;
@@ -4376,7 +12322,7 @@ void func_00170308(void* arg0) {
         M2C_FIELD(arg0, s32* , 0x3214) = (s32) M2C_FIELD(D_004FA03C, s32* , 0x1A3AC);
     }
 }
-//@@ func_001703E8 m2c
+//@@ func_001703E8 m2c0
 #include "m2c_macros.h"
 extern s32 D_002B8A00;
 extern M2C_UNK D_002C1690;
@@ -4505,7 +12451,652 @@ block_18:
         }
     }
 }
-//@@ func_00170760 m2c
+//@@ func_001703E8 m2c1
+#include "m2c_macros.h"
+extern s32 D_002B8A00;
+extern M2C_UNK D_002C1690;
+extern s32 D_00313D6C;
+extern M2C_UNK D_003156C0;
+extern s32 D_004F9E3C;
+extern u32 D_004F9E40;
+extern f32 D_004F9E44;
+extern f32 D_004F9E48;
+extern s32 D_004F9E4C;
+extern s32 D_004F9E50;
+extern M2C_UNK func_00168FB8;
+
+void func_001703E8(M2C_UNK* arg0) {
+    u8 sp[0x40];
+    M2C_UNK sp20;
+    M2C_UNK sp40;
+    s32 sp44;
+    M2C_UNK* var_a0;
+    s32 temp_a0;
+    s32 temp_s0_2;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
+    s32 temp_v0_4;
+    s32 var_s1;
+    s32 var_s2;
+    s32* temp_s0;
+    u32 temp_v0_5;
+
+    var_s2 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x1BB8) == 5) {
+        if (M2C_FIELD(arg0, s32* , 0x2E90) != 0) {
+            var_s2 = func_0026E028();
+        } else {
+            temp_v0 = func_0025A020();
+            if (temp_v0 != 0) {
+                var_s2 = func_0025C268(&D_002B8A00);
+                printf("Medius Update returned an Error %d, NetError %d\n", temp_v0, var_s2);
+            } else {
+                temp_v0_2 = func_0010A588(&D_002B8A00);
+                if (temp_v0_2 != 0) {
+                    var_s1 = 0;
+                    func_0026E278(sp);
+loop_7:
+                    if (var_s1 < 4) {
+                        temp_s0 = &(&sp4[0])[var_s1];
+                        printf("Connection %d Error = %d\n", var_s1, *temp_s0);
+                        temp_s0_2 = *temp_s0;
+                        if (temp_s0_2 == 0) {
+                            var_s1 += 1;
+                            goto loop_7;
+                        }
+                        var_s2 = temp_s0_2;
+                    }
+                    printf("MGCL Update returned an Error %d - Connection Index %d, NetError %d\n", temp_v0_2, D_002B8A00, var_s2);
+                }
+            }
+        }
+        if (func_0016D690(arg0) == -1) {
+            var_a0 = "InitCheckConnectionStatus returned an Error...\n";
+            goto block_18;
+        }
+        if (var_s2 != 0) {
+            printf("NETWORK: Update Error = %d\n", var_s2);
+            switch (var_s2) {                       /* irregular */
+            case 2:
+                var_a0 = "Update Error - Connection Lost\n";
+block_18:
+                printf(var_a0);
+                func_00174D78(arg0, 6, 2);
+                break;
+            case 12:
+                printf("Update Error - Bad Packet received from the server\n");
+                break;
+            default:
+                printf("Update Error - Network Error\n");
+                func_00174D78(arg0, 6, 2);
+                break;
+            }
+        }
+        temp_a0 = M2C_FIELD(arg0, s32* , 0x1BB4);
+        if ((u32) (temp_a0 - 1) < 6U) {
+            temp_v0_3 = D_004F9E4C + 1;
+            D_004F9E4C = temp_v0_3;
+            if (temp_v0_3 == 0x259) {
+                if (temp_a0 > 0) {
+                    if (M2C_FIELD(((D_004F9E50 * 0x220) + arg0), s32* , 0x10) != -1) {
+                        func_0026B7A0(M2C_FIELD(arg0, s32* , 0x2CF0), D_004F9E50, &func_00168FB8);
+                        func_0026DFF8();
+                    }
+                    temp_v0_4 = D_004F9E50 + 1;
+                    D_004F9E50 = temp_v0_4;
+                    if (temp_v0_4 >= 8) {
+                        D_004F9E50 = 0;
+                    }
+                }
+                D_004F9E4C = 0;
+            }
+        }
+        if (M2C_FIELD(arg0, s32* , 0x1BB4) > 0) {
+            func_00266DB8(&sp40);
+            func_00266228(&sp20);
+            D_004F9E3C += 1;
+            D_004F9E44 += sp28;
+            D_004F9E48 += sp38;
+            func_00266D78(&sp44);
+            if (((sp44 - M2C_FIELD(&D_002C1690, s32* , 0x526DC)) >= 0x4E21) && (M2C_FIELD(&D_002C1690, s32* , 8) >= 0) && (M2C_FIELD(arg0, s32* , 0x1BBC) != 0) && (M2C_FIELD(arg0, s32* , 0x2E90) == 0)) {
+                if (func_001734B8(&D_003156C0) != 0) {
+                    func_00166808(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+                }
+                func_00166940(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438), M2C_FIELD(&D_002C1690, s32* , 0x60));
+                func_0025A020();
+                func_00266D78(&D_00313D6C);
+            }
+            if (M2C_FIELD(arg0, s32* , 0x1BB4) == 0xB) {
+                if (func_001734B8(arg0) != 0) {
+                    temp_v0_5 = D_004F9E40 + 1;
+                    D_004F9E40 = temp_v0_5;
+                    if (temp_v0_5 >= 0x12DU) {
+                        M2C_FIELD(M2C_FIELD(&D_003156C0, void** , 0x3148), s8* , 0x24) = func_00176B10(&D_003156C0, 0);
+                        D_004F9E40 = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+//@@ func_001703E8 m2c2
+#include "m2c_macros.h"
+extern s32 D_002B8A00;
+extern M2C_UNK D_002C1690;
+extern s32 D_00313D6C;
+extern M2C_UNK D_003156C0;
+extern s32 D_004F9E3C;
+extern u32 D_004F9E40;
+extern f32 D_004F9E44;
+extern f32 D_004F9E48;
+extern s32 D_004F9E4C;
+extern s32 D_004F9E50;
+extern M2C_UNK func_00168FB8;
+
+void func_001703E8(M2C_UNK* arg0) {
+    u8 sp[0x30];
+    M2C_UNK sp20;
+    M2C_UNK sp40;
+    s32 sp44;
+    M2C_UNK* var_a0;
+    s32 temp_a0;
+    s32 temp_s0_2;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
+    s32 temp_v0_4;
+    s32 var_s1;
+    s32 var_s2;
+    s32* temp_s0;
+    u32 temp_v0_5;
+
+    var_s2 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x1BB8) == 5) {
+        if (M2C_FIELD(arg0, s32* , 0x2E90) != 0) {
+            var_s2 = func_0026E028();
+        } else {
+            temp_v0 = func_0025A020();
+            if (temp_v0 != 0) {
+                var_s2 = func_0025C268(&D_002B8A00);
+                printf("Medius Update returned an Error %d, NetError %d\n", temp_v0, var_s2);
+            } else {
+                temp_v0_2 = func_0010A588(&D_002B8A00);
+                if (temp_v0_2 != 0) {
+                    var_s1 = 0;
+                    func_0026E278(sp);
+loop_7:
+                    if (var_s1 < 4) {
+                        temp_s0 = &(&sp4[0])[var_s1];
+                        printf("Connection %d Error = %d\n", var_s1, *temp_s0);
+                        temp_s0_2 = *temp_s0;
+                        if (temp_s0_2 == 0) {
+                            var_s1 += 1;
+                            goto loop_7;
+                        }
+                        var_s2 = temp_s0_2;
+                    }
+                    printf("MGCL Update returned an Error %d - Connection Index %d, NetError %d\n", temp_v0_2, D_002B8A00, var_s2);
+                }
+            }
+        }
+        if (func_0016D690(arg0) == -1) {
+            var_a0 = "InitCheckConnectionStatus returned an Error...\n";
+            goto block_18;
+        }
+        if (var_s2 != 0) {
+            printf("NETWORK: Update Error = %d\n", var_s2);
+            switch (var_s2) {                       /* irregular */
+            case 2:
+                var_a0 = "Update Error - Connection Lost\n";
+block_18:
+                printf(var_a0);
+                func_00174D78(arg0, 6, 2);
+                break;
+            case 12:
+                printf("Update Error - Bad Packet received from the server\n");
+                break;
+            default:
+                printf("Update Error - Network Error\n");
+                func_00174D78(arg0, 6, 2);
+                break;
+            }
+        }
+        temp_a0 = M2C_FIELD(arg0, s32* , 0x1BB4);
+        if ((u32) (temp_a0 - 1) < 6U) {
+            temp_v0_3 = D_004F9E4C + 1;
+            D_004F9E4C = temp_v0_3;
+            if (temp_v0_3 == 0x259) {
+                if (temp_a0 > 0) {
+                    if (M2C_FIELD(((D_004F9E50 * 0x220) + arg0), s32* , 0x10) != -1) {
+                        func_0026B7A0(M2C_FIELD(arg0, s32* , 0x2CF0), D_004F9E50, &func_00168FB8);
+                        func_0026DFF8();
+                    }
+                    temp_v0_4 = D_004F9E50 + 1;
+                    D_004F9E50 = temp_v0_4;
+                    if (temp_v0_4 >= 8) {
+                        D_004F9E50 = 0;
+                    }
+                }
+                D_004F9E4C = 0;
+            }
+        }
+        if (M2C_FIELD(arg0, s32* , 0x1BB4) > 0) {
+            func_00266DB8(&sp40);
+            func_00266228(&sp20);
+            D_004F9E3C += 1;
+            D_004F9E44 += sp28;
+            D_004F9E48 += sp38;
+            func_00266D78(&sp44);
+            if (((sp44 - M2C_FIELD(&D_002C1690, s32* , 0x526DC)) >= 0x4E21) && (M2C_FIELD(&D_002C1690, s32* , 8) >= 0) && (M2C_FIELD(arg0, s32* , 0x1BBC) != 0) && (M2C_FIELD(arg0, s32* , 0x2E90) == 0)) {
+                if (func_001734B8(&D_003156C0) != 0) {
+                    func_00166808(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+                }
+                func_00166940(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438), M2C_FIELD(&D_002C1690, s32* , 0x60));
+                func_0025A020();
+                func_00266D78(&D_00313D6C);
+            }
+            if (M2C_FIELD(arg0, s32* , 0x1BB4) == 0xB) {
+                if (func_001734B8(arg0) != 0) {
+                    temp_v0_5 = D_004F9E40 + 1;
+                    D_004F9E40 = temp_v0_5;
+                    if (temp_v0_5 >= 0x12DU) {
+                        M2C_FIELD(M2C_FIELD(&D_003156C0, void** , 0x3148), s8* , 0x24) = func_00176B10(&D_003156C0, 0);
+                        D_004F9E40 = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+//@@ func_001703E8 m2c3
+#include "m2c_macros.h"
+extern s32 D_002B8A00;
+extern M2C_UNK D_002C1690;
+extern s32 D_00313D6C;
+extern M2C_UNK D_003156C0;
+extern s32 D_004F9E3C;
+extern u32 D_004F9E40;
+extern f32 D_004F9E44;
+extern f32 D_004F9E48;
+extern s32 D_004F9E4C;
+extern s32 D_004F9E50;
+extern M2C_UNK func_00168FB8;
+
+void func_001703E8(M2C_UNK* arg0) {
+    u8 sp[0x20];
+    M2C_UNK sp20;
+    M2C_UNK sp40;
+    s32 sp44;
+    M2C_UNK* var_a0;
+    s32 temp_a0;
+    s32 temp_s0_2;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
+    s32 temp_v0_4;
+    s32 var_s1;
+    s32 var_s2;
+    s32* temp_s0;
+    u32 temp_v0_5;
+
+    var_s2 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x1BB8) == 5) {
+        if (M2C_FIELD(arg0, s32* , 0x2E90) != 0) {
+            var_s2 = func_0026E028();
+        } else {
+            temp_v0 = func_0025A020();
+            if (temp_v0 != 0) {
+                var_s2 = func_0025C268(&D_002B8A00);
+                printf("Medius Update returned an Error %d, NetError %d\n", temp_v0, var_s2);
+            } else {
+                temp_v0_2 = func_0010A588(&D_002B8A00);
+                if (temp_v0_2 != 0) {
+                    var_s1 = 0;
+                    func_0026E278(sp);
+loop_7:
+                    if (var_s1 < 4) {
+                        temp_s0 = &(&sp4[0])[var_s1];
+                        printf("Connection %d Error = %d\n", var_s1, *temp_s0);
+                        temp_s0_2 = *temp_s0;
+                        if (temp_s0_2 == 0) {
+                            var_s1 += 1;
+                            goto loop_7;
+                        }
+                        var_s2 = temp_s0_2;
+                    }
+                    printf("MGCL Update returned an Error %d - Connection Index %d, NetError %d\n", temp_v0_2, D_002B8A00, var_s2);
+                }
+            }
+        }
+        if (func_0016D690(arg0) == -1) {
+            var_a0 = "InitCheckConnectionStatus returned an Error...\n";
+            goto block_18;
+        }
+        if (var_s2 != 0) {
+            printf("NETWORK: Update Error = %d\n", var_s2);
+            switch (var_s2) {                       /* irregular */
+            case 2:
+                var_a0 = "Update Error - Connection Lost\n";
+block_18:
+                printf(var_a0);
+                func_00174D78(arg0, 6, 2);
+                break;
+            case 12:
+                printf("Update Error - Bad Packet received from the server\n");
+                break;
+            default:
+                printf("Update Error - Network Error\n");
+                func_00174D78(arg0, 6, 2);
+                break;
+            }
+        }
+        temp_a0 = M2C_FIELD(arg0, s32* , 0x1BB4);
+        if ((u32) (temp_a0 - 1) < 6U) {
+            temp_v0_3 = D_004F9E4C + 1;
+            D_004F9E4C = temp_v0_3;
+            if (temp_v0_3 == 0x259) {
+                if (temp_a0 > 0) {
+                    if (M2C_FIELD(((D_004F9E50 * 0x220) + arg0), s32* , 0x10) != -1) {
+                        func_0026B7A0(M2C_FIELD(arg0, s32* , 0x2CF0), D_004F9E50, &func_00168FB8);
+                        func_0026DFF8();
+                    }
+                    temp_v0_4 = D_004F9E50 + 1;
+                    D_004F9E50 = temp_v0_4;
+                    if (temp_v0_4 >= 8) {
+                        D_004F9E50 = 0;
+                    }
+                }
+                D_004F9E4C = 0;
+            }
+        }
+        if (M2C_FIELD(arg0, s32* , 0x1BB4) > 0) {
+            func_00266DB8(&sp40);
+            func_00266228(&sp20);
+            D_004F9E3C += 1;
+            D_004F9E44 += sp28;
+            D_004F9E48 += sp38;
+            func_00266D78(&sp44);
+            if (((sp44 - M2C_FIELD(&D_002C1690, s32* , 0x526DC)) >= 0x4E21) && (M2C_FIELD(&D_002C1690, s32* , 8) >= 0) && (M2C_FIELD(arg0, s32* , 0x1BBC) != 0) && (M2C_FIELD(arg0, s32* , 0x2E90) == 0)) {
+                if (func_001734B8(&D_003156C0) != 0) {
+                    func_00166808(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+                }
+                func_00166940(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438), M2C_FIELD(&D_002C1690, s32* , 0x60));
+                func_0025A020();
+                func_00266D78(&D_00313D6C);
+            }
+            if (M2C_FIELD(arg0, s32* , 0x1BB4) == 0xB) {
+                if (func_001734B8(arg0) != 0) {
+                    temp_v0_5 = D_004F9E40 + 1;
+                    D_004F9E40 = temp_v0_5;
+                    if (temp_v0_5 >= 0x12DU) {
+                        M2C_FIELD(M2C_FIELD(&D_003156C0, void** , 0x3148), s8* , 0x24) = func_00176B10(&D_003156C0, 0);
+                        D_004F9E40 = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+//@@ func_001703E8 m2c4
+#include "m2c_macros.h"
+extern s32 D_002B8A00;
+extern M2C_UNK D_002C1690;
+extern s32 D_00313D6C;
+extern M2C_UNK D_003156C0;
+extern s32 D_004F9E3C;
+extern u32 D_004F9E40;
+extern f32 D_004F9E44;
+extern f32 D_004F9E48;
+extern s32 D_004F9E4C;
+extern s32 D_004F9E50;
+extern M2C_UNK func_00168FB8;
+
+void func_001703E8(M2C_UNK* arg0) {
+    u8 sp[0x10];
+    M2C_UNK sp20;
+    M2C_UNK sp40;
+    s32 sp44;
+    M2C_UNK* var_a0;
+    s32 temp_a0;
+    s32 temp_s0_2;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
+    s32 temp_v0_4;
+    s32 var_s1;
+    s32 var_s2;
+    s32* temp_s0;
+    u32 temp_v0_5;
+
+    var_s2 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x1BB8) == 5) {
+        if (M2C_FIELD(arg0, s32* , 0x2E90) != 0) {
+            var_s2 = func_0026E028();
+        } else {
+            temp_v0 = func_0025A020();
+            if (temp_v0 != 0) {
+                var_s2 = func_0025C268(&D_002B8A00);
+                printf("Medius Update returned an Error %d, NetError %d\n", temp_v0, var_s2);
+            } else {
+                temp_v0_2 = func_0010A588(&D_002B8A00);
+                if (temp_v0_2 != 0) {
+                    var_s1 = 0;
+                    func_0026E278(sp);
+loop_7:
+                    if (var_s1 < 4) {
+                        temp_s0 = &(&sp4[0])[var_s1];
+                        printf("Connection %d Error = %d\n", var_s1, *temp_s0);
+                        temp_s0_2 = *temp_s0;
+                        if (temp_s0_2 == 0) {
+                            var_s1 += 1;
+                            goto loop_7;
+                        }
+                        var_s2 = temp_s0_2;
+                    }
+                    printf("MGCL Update returned an Error %d - Connection Index %d, NetError %d\n", temp_v0_2, D_002B8A00, var_s2);
+                }
+            }
+        }
+        if (func_0016D690(arg0) == -1) {
+            var_a0 = "InitCheckConnectionStatus returned an Error...\n";
+            goto block_18;
+        }
+        if (var_s2 != 0) {
+            printf("NETWORK: Update Error = %d\n", var_s2);
+            switch (var_s2) {                       /* irregular */
+            case 2:
+                var_a0 = "Update Error - Connection Lost\n";
+block_18:
+                printf(var_a0);
+                func_00174D78(arg0, 6, 2);
+                break;
+            case 12:
+                printf("Update Error - Bad Packet received from the server\n");
+                break;
+            default:
+                printf("Update Error - Network Error\n");
+                func_00174D78(arg0, 6, 2);
+                break;
+            }
+        }
+        temp_a0 = M2C_FIELD(arg0, s32* , 0x1BB4);
+        if ((u32) (temp_a0 - 1) < 6U) {
+            temp_v0_3 = D_004F9E4C + 1;
+            D_004F9E4C = temp_v0_3;
+            if (temp_v0_3 == 0x259) {
+                if (temp_a0 > 0) {
+                    if (M2C_FIELD(((D_004F9E50 * 0x220) + arg0), s32* , 0x10) != -1) {
+                        func_0026B7A0(M2C_FIELD(arg0, s32* , 0x2CF0), D_004F9E50, &func_00168FB8);
+                        func_0026DFF8();
+                    }
+                    temp_v0_4 = D_004F9E50 + 1;
+                    D_004F9E50 = temp_v0_4;
+                    if (temp_v0_4 >= 8) {
+                        D_004F9E50 = 0;
+                    }
+                }
+                D_004F9E4C = 0;
+            }
+        }
+        if (M2C_FIELD(arg0, s32* , 0x1BB4) > 0) {
+            func_00266DB8(&sp40);
+            func_00266228(&sp20);
+            D_004F9E3C += 1;
+            D_004F9E44 += sp28;
+            D_004F9E48 += sp38;
+            func_00266D78(&sp44);
+            if (((sp44 - M2C_FIELD(&D_002C1690, s32* , 0x526DC)) >= 0x4E21) && (M2C_FIELD(&D_002C1690, s32* , 8) >= 0) && (M2C_FIELD(arg0, s32* , 0x1BBC) != 0) && (M2C_FIELD(arg0, s32* , 0x2E90) == 0)) {
+                if (func_001734B8(&D_003156C0) != 0) {
+                    func_00166808(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+                }
+                func_00166940(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438), M2C_FIELD(&D_002C1690, s32* , 0x60));
+                func_0025A020();
+                func_00266D78(&D_00313D6C);
+            }
+            if (M2C_FIELD(arg0, s32* , 0x1BB4) == 0xB) {
+                if (func_001734B8(arg0) != 0) {
+                    temp_v0_5 = D_004F9E40 + 1;
+                    D_004F9E40 = temp_v0_5;
+                    if (temp_v0_5 >= 0x12DU) {
+                        M2C_FIELD(M2C_FIELD(&D_003156C0, void** , 0x3148), s8* , 0x24) = func_00176B10(&D_003156C0, 0);
+                        D_004F9E40 = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+//@@ func_001703E8 m2c5
+#include "m2c_macros.h"
+extern s32 D_002B8A00;
+extern M2C_UNK D_002C1690;
+extern s32 D_00313D6C;
+extern M2C_UNK D_003156C0;
+extern s32 D_004F9E3C;
+extern u32 D_004F9E40;
+extern f32 D_004F9E44;
+extern f32 D_004F9E48;
+extern s32 D_004F9E4C;
+extern s32 D_004F9E50;
+extern M2C_UNK func_00168FB8;
+
+void func_001703E8(M2C_UNK* arg0) {
+    u8 sp[0x8];
+    M2C_UNK sp20;
+    M2C_UNK sp40;
+    s32 sp44;
+    M2C_UNK* var_a0;
+    s32 temp_a0;
+    s32 temp_s0_2;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
+    s32 temp_v0_4;
+    s32 var_s1;
+    s32 var_s2;
+    s32* temp_s0;
+    u32 temp_v0_5;
+
+    var_s2 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x1BB8) == 5) {
+        if (M2C_FIELD(arg0, s32* , 0x2E90) != 0) {
+            var_s2 = func_0026E028();
+        } else {
+            temp_v0 = func_0025A020();
+            if (temp_v0 != 0) {
+                var_s2 = func_0025C268(&D_002B8A00);
+                printf("Medius Update returned an Error %d, NetError %d\n", temp_v0, var_s2);
+            } else {
+                temp_v0_2 = func_0010A588(&D_002B8A00);
+                if (temp_v0_2 != 0) {
+                    var_s1 = 0;
+                    func_0026E278(sp);
+loop_7:
+                    if (var_s1 < 4) {
+                        temp_s0 = &(&sp4[0])[var_s1];
+                        printf("Connection %d Error = %d\n", var_s1, *temp_s0);
+                        temp_s0_2 = *temp_s0;
+                        if (temp_s0_2 == 0) {
+                            var_s1 += 1;
+                            goto loop_7;
+                        }
+                        var_s2 = temp_s0_2;
+                    }
+                    printf("MGCL Update returned an Error %d - Connection Index %d, NetError %d\n", temp_v0_2, D_002B8A00, var_s2);
+                }
+            }
+        }
+        if (func_0016D690(arg0) == -1) {
+            var_a0 = "InitCheckConnectionStatus returned an Error...\n";
+            goto block_18;
+        }
+        if (var_s2 != 0) {
+            printf("NETWORK: Update Error = %d\n", var_s2);
+            switch (var_s2) {                       /* irregular */
+            case 2:
+                var_a0 = "Update Error - Connection Lost\n";
+block_18:
+                printf(var_a0);
+                func_00174D78(arg0, 6, 2);
+                break;
+            case 12:
+                printf("Update Error - Bad Packet received from the server\n");
+                break;
+            default:
+                printf("Update Error - Network Error\n");
+                func_00174D78(arg0, 6, 2);
+                break;
+            }
+        }
+        temp_a0 = M2C_FIELD(arg0, s32* , 0x1BB4);
+        if ((u32) (temp_a0 - 1) < 6U) {
+            temp_v0_3 = D_004F9E4C + 1;
+            D_004F9E4C = temp_v0_3;
+            if (temp_v0_3 == 0x259) {
+                if (temp_a0 > 0) {
+                    if (M2C_FIELD(((D_004F9E50 * 0x220) + arg0), s32* , 0x10) != -1) {
+                        func_0026B7A0(M2C_FIELD(arg0, s32* , 0x2CF0), D_004F9E50, &func_00168FB8);
+                        func_0026DFF8();
+                    }
+                    temp_v0_4 = D_004F9E50 + 1;
+                    D_004F9E50 = temp_v0_4;
+                    if (temp_v0_4 >= 8) {
+                        D_004F9E50 = 0;
+                    }
+                }
+                D_004F9E4C = 0;
+            }
+        }
+        if (M2C_FIELD(arg0, s32* , 0x1BB4) > 0) {
+            func_00266DB8(&sp40);
+            func_00266228(&sp20);
+            D_004F9E3C += 1;
+            D_004F9E44 += sp28;
+            D_004F9E48 += sp38;
+            func_00266D78(&sp44);
+            if (((sp44 - M2C_FIELD(&D_002C1690, s32* , 0x526DC)) >= 0x4E21) && (M2C_FIELD(&D_002C1690, s32* , 8) >= 0) && (M2C_FIELD(arg0, s32* , 0x1BBC) != 0) && (M2C_FIELD(arg0, s32* , 0x2E90) == 0)) {
+                if (func_001734B8(&D_003156C0) != 0) {
+                    func_00166808(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438));
+                }
+                func_00166940(&D_002C1690, M2C_FIELD(&D_002C1690, s32* , 0x52438), M2C_FIELD(&D_002C1690, s32* , 0x60));
+                func_0025A020();
+                func_00266D78(&D_00313D6C);
+            }
+            if (M2C_FIELD(arg0, s32* , 0x1BB4) == 0xB) {
+                if (func_001734B8(arg0) != 0) {
+                    temp_v0_5 = D_004F9E40 + 1;
+                    D_004F9E40 = temp_v0_5;
+                    if (temp_v0_5 >= 0x12DU) {
+                        M2C_FIELD(M2C_FIELD(&D_003156C0, void** , 0x3148), s8* , 0x24) = func_00176B10(&D_003156C0, 0);
+                        D_004F9E40 = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+//@@ func_00170760 m2c0
 #include "m2c_macros.h"
 extern s8 D_003184B6;
 extern s32 D_004F9D18;
@@ -4650,7 +13241,297 @@ block_42:
         }
     }
 }
-//@@ func_00170B68 m2c
+//@@ func_00170760 m2c1
+#include "m2c_macros.h"
+extern s8 D_003184B6;
+extern s32 D_004F9D18;
+extern s32 D_004F9DE4;
+
+void func_00170760(s32 arg0, void* arg1) {
+    u8 sp[0x8];
+    s32 sp4;
+    s16 var_a1;
+    s32 temp_a0_2;
+    s32 var_a2;
+    s32* temp_a0;
+    s32* var_a0;
+    u8 temp_v0_2;
+    void* temp_a0_3;
+    void* temp_a0_4;
+    void* temp_v0;
+    void* temp_v1;
+    void* temp_v1_10;
+    void* temp_v1_11;
+    void* temp_v1_2;
+    void* temp_v1_3;
+    void* temp_v1_4;
+    void* temp_v1_5;
+    void* temp_v1_6;
+    void* temp_v1_7;
+    void* temp_v1_8;
+    void* temp_v1_9;
+
+    if ((arg1 != NULL) && (temp_v0 = M2C_FIELD(arg1, void** , 0x20D0), (temp_v0 != NULL))) {
+        M2C_FIELD(temp_v0, u8* , 0x32) = 0U;
+        if (((M2C_FIELD(arg1, s32* , 0x20F4) == 0xC0) && (M2C_FIELD(arg1, s32* , 0x24B4) != 0)) || ((M2C_FIELD(arg1, s32* , 0x20F4) == 0x160) && (M2C_FIELD(arg1, s32* , 0x24F0) == 2))) {
+            temp_v1 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1, u8* , 0x32) | 1);
+        }
+        if (M2C_FIELD(M2C_FIELD(arg1, void** , 0x2028), u8* , 0xC) != 0) {
+            temp_v1_2 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_2, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_2, u8* , 0x32) | 2);
+        }
+        func_001E5790(arg1, sp);
+        if (subroutine_arg0 != 0) {
+            temp_v1_3 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_3, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_3, u8* , 0x32) | 4);
+        }
+        if (M2C_FIELD(arg1, s8* , 0x486) != 0) {
+            temp_v1_4 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_4, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_4, u8* , 0x32) | 8);
+        }
+        if (M2C_FIELD(arg1, s8* , 0x485) != 0) {
+            temp_v1_5 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_5, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_5, u8* , 0x32) | 0x20);
+        }
+        if (D_003184B6 != 0) {
+            temp_v1_6 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_6, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_6, u8* , 0x32) | 0x40);
+        }
+        if (M2C_FIELD(arg1, s32* , 0x218C) != 0) {
+            temp_v1_7 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_7, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_7, u8* , 0x32) | 0x80);
+        }
+        temp_a0 = arg1 + 0x2338;
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), u8* , 0x2E) = (u8) M2C_FIELD(arg1, u8* , 0x590);
+        if (*(temp_a0 + (M2C_FIELD(arg1, s32* , 0x21B0) * 4)) <= 0) {
+            M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), u8* , 0x30) = 0U;
+        } else {
+            M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), u8* , 0x30) = (u8) M2C_FIELD(arg1, s32* , 0x21B0);
+        }
+        var_a0 = temp_a0;
+        var_a2 = 0;
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0x1C) = (f32) M2C_FIELD(arg1, f32* , 0x404);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), u16* , 0x2C) = 0U;
+        do {
+            if (*var_a0 != 0) {
+                temp_v1_8 = M2C_FIELD(arg1, void** , 0x20D0);
+                M2C_FIELD(temp_v1_8, u16* , 0x2C) = (u16) (((1 << var_a2) & 0xFFFF) | M2C_FIELD(temp_v1_8, u16* , 0x2C));
+            }
+            var_a2 += 1;
+            var_a0 += 4;
+        } while (var_a2 < 9);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), u8* , 0x31) = (u8) M2C_FIELD(arg1, u8* , 0x22C0);
+        var_a1 = (M2C_FIELD(arg1, s8* , 0x49B) == 0) ? 0 : 0x40;
+        if (M2C_FIELD(arg1, s8* , 0x49E) != 0) {
+            var_a1 = (var_a1 | 0x80) & 0xFF;
+        }
+        if (M2C_FIELD(arg1, s8* , 0x496) != 0) {
+            var_a1 |= 0x20;
+        }
+        if (M2C_FIELD(arg1, s8* , 0x490) != 0) {
+            var_a1 |= 8;
+            temp_v0_2 = M2C_FIELD(arg1, u8* , 0x491) - 1;
+            M2C_FIELD(arg1, u8* , 0x491) = temp_v0_2;
+            if ((temp_v0_2 << 0x18) <= 0) {
+                M2C_FIELD(arg1, s8* , 0x490) = 0;
+            }
+        }
+        if (M2C_FIELD(arg1, s8* , 0x497) != 0) {
+            var_a1 |= 0x10;
+        }
+        temp_a0_2 = M2C_FIELD(arg1, s32* , 0x20F4);
+        if (temp_a0_2 == 0xA0) {
+            var_a1 |= M2C_FIELD(arg1, u8* , 0x2508) & 7;
+        }
+        if (temp_a0_2 == 0x160) {
+            if (M2C_FIELD(arg1, s32* , 0x242C) == 0) {
+                goto block_42;
+            }
+        } else {
+block_42:
+            if ((temp_a0_2 == 0x120) && (M2C_FIELD(arg1, s32* , 0x242C) != 0)) {
+                temp_v1_9 = M2C_FIELD(arg1, void** , 0x20D0);
+                M2C_FIELD(temp_v1_9, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_9, u8* , 0x32) | 1);
+            }
+        }
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), s16* , 0x2A) = var_a1;
+        temp_v1_10 = M2C_FIELD(arg1, void** , 0x20D0);
+        M2C_FIELD(temp_v1_10, s16* , 0x24) = M2C_BITWISE(s16, M2C_FIELD(temp_v1_10, f32* , 4));
+        temp_a0_3 = M2C_FIELD(arg1, void** , 0x20D0);
+        M2C_FIELD(temp_a0_3, s16* , 0x26) = M2C_BITWISE(s16, M2C_FIELD(temp_a0_3, f32* , 8));
+        temp_a0_4 = M2C_FIELD(arg1, void** , 0x20D0);
+        if ((M2C_FIELD(temp_a0_4, s16* , 0x24) + M2C_FIELD(temp_a0_4, s16* , 0x26)) >= 0x321) {
+            M2C_FIELD(temp_a0_4, s16* , 0x24) = 0;
+            M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), s16* , 0x26) = 0;
+        }
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 4) = (f32) M2C_FIELD(M2C_FIELD(arg1, void** , 0x2028), f32* , 0x10);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 8) = (f32) M2C_FIELD(M2C_FIELD(arg1, void** , 0x2028), f32* , 0x14);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0xC) = (f32) M2C_FIELD(M2C_FIELD(arg1, void** , 0x2028), f32* , 0x18);
+        func_00266DB8(&sp4, var_a1, var_a2, 1);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0x20) = 16.6667f;
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0x10) = (f32) M2C_FIELD(arg1, f32* , 0x2D4);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0x14) = (f32) M2C_FIELD(M2C_FIELD(arg1, void** , 0x2028), f32* , 0x68);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0x18) = (f32) M2C_FIELD(arg1, f32* , 0x208);
+        if (M2C_FIELD(arg1, s32* , 0x20B4) == 4) {
+            func_00109810(arg1, M2C_FIELD(arg1, s32* , 0x20D4));
+        }
+        if (timerGetFieldCount__Fv() >= 0x5B) {
+            if (D_004F9DE4 == 0) {
+                D_004F9DE4 = 1;
+                func_0026C948(-1, D_004F9D18);
+            }
+            temp_v1_11 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_11, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_11, u8* , 0x32) | 0x10);
+        }
+    }
+}
+//@@ func_00170760 m2c2
+#include "m2c_macros.h"
+extern s8 D_003184B6;
+extern s32 D_004F9D18;
+extern s32 D_004F9DE4;
+
+void func_00170760(s32 arg0, void* arg1) {
+    u8 sp[0x4];
+    s32 sp4;
+    s16 var_a1;
+    s32 temp_a0_2;
+    s32 var_a2;
+    s32* temp_a0;
+    s32* var_a0;
+    u8 temp_v0_2;
+    void* temp_a0_3;
+    void* temp_a0_4;
+    void* temp_v0;
+    void* temp_v1;
+    void* temp_v1_10;
+    void* temp_v1_11;
+    void* temp_v1_2;
+    void* temp_v1_3;
+    void* temp_v1_4;
+    void* temp_v1_5;
+    void* temp_v1_6;
+    void* temp_v1_7;
+    void* temp_v1_8;
+    void* temp_v1_9;
+
+    if ((arg1 != NULL) && (temp_v0 = M2C_FIELD(arg1, void** , 0x20D0), (temp_v0 != NULL))) {
+        M2C_FIELD(temp_v0, u8* , 0x32) = 0U;
+        if (((M2C_FIELD(arg1, s32* , 0x20F4) == 0xC0) && (M2C_FIELD(arg1, s32* , 0x24B4) != 0)) || ((M2C_FIELD(arg1, s32* , 0x20F4) == 0x160) && (M2C_FIELD(arg1, s32* , 0x24F0) == 2))) {
+            temp_v1 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1, u8* , 0x32) | 1);
+        }
+        if (M2C_FIELD(M2C_FIELD(arg1, void** , 0x2028), u8* , 0xC) != 0) {
+            temp_v1_2 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_2, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_2, u8* , 0x32) | 2);
+        }
+        func_001E5790(arg1, sp);
+        if (subroutine_arg0 != 0) {
+            temp_v1_3 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_3, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_3, u8* , 0x32) | 4);
+        }
+        if (M2C_FIELD(arg1, s8* , 0x486) != 0) {
+            temp_v1_4 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_4, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_4, u8* , 0x32) | 8);
+        }
+        if (M2C_FIELD(arg1, s8* , 0x485) != 0) {
+            temp_v1_5 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_5, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_5, u8* , 0x32) | 0x20);
+        }
+        if (D_003184B6 != 0) {
+            temp_v1_6 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_6, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_6, u8* , 0x32) | 0x40);
+        }
+        if (M2C_FIELD(arg1, s32* , 0x218C) != 0) {
+            temp_v1_7 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_7, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_7, u8* , 0x32) | 0x80);
+        }
+        temp_a0 = arg1 + 0x2338;
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), u8* , 0x2E) = (u8) M2C_FIELD(arg1, u8* , 0x590);
+        if (*(temp_a0 + (M2C_FIELD(arg1, s32* , 0x21B0) * 4)) <= 0) {
+            M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), u8* , 0x30) = 0U;
+        } else {
+            M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), u8* , 0x30) = (u8) M2C_FIELD(arg1, s32* , 0x21B0);
+        }
+        var_a0 = temp_a0;
+        var_a2 = 0;
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0x1C) = (f32) M2C_FIELD(arg1, f32* , 0x404);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), u16* , 0x2C) = 0U;
+        do {
+            if (*var_a0 != 0) {
+                temp_v1_8 = M2C_FIELD(arg1, void** , 0x20D0);
+                M2C_FIELD(temp_v1_8, u16* , 0x2C) = (u16) (((1 << var_a2) & 0xFFFF) | M2C_FIELD(temp_v1_8, u16* , 0x2C));
+            }
+            var_a2 += 1;
+            var_a0 += 4;
+        } while (var_a2 < 9);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), u8* , 0x31) = (u8) M2C_FIELD(arg1, u8* , 0x22C0);
+        var_a1 = (M2C_FIELD(arg1, s8* , 0x49B) == 0) ? 0 : 0x40;
+        if (M2C_FIELD(arg1, s8* , 0x49E) != 0) {
+            var_a1 = (var_a1 | 0x80) & 0xFF;
+        }
+        if (M2C_FIELD(arg1, s8* , 0x496) != 0) {
+            var_a1 |= 0x20;
+        }
+        if (M2C_FIELD(arg1, s8* , 0x490) != 0) {
+            var_a1 |= 8;
+            temp_v0_2 = M2C_FIELD(arg1, u8* , 0x491) - 1;
+            M2C_FIELD(arg1, u8* , 0x491) = temp_v0_2;
+            if ((temp_v0_2 << 0x18) <= 0) {
+                M2C_FIELD(arg1, s8* , 0x490) = 0;
+            }
+        }
+        if (M2C_FIELD(arg1, s8* , 0x497) != 0) {
+            var_a1 |= 0x10;
+        }
+        temp_a0_2 = M2C_FIELD(arg1, s32* , 0x20F4);
+        if (temp_a0_2 == 0xA0) {
+            var_a1 |= M2C_FIELD(arg1, u8* , 0x2508) & 7;
+        }
+        if (temp_a0_2 == 0x160) {
+            if (M2C_FIELD(arg1, s32* , 0x242C) == 0) {
+                goto block_42;
+            }
+        } else {
+block_42:
+            if ((temp_a0_2 == 0x120) && (M2C_FIELD(arg1, s32* , 0x242C) != 0)) {
+                temp_v1_9 = M2C_FIELD(arg1, void** , 0x20D0);
+                M2C_FIELD(temp_v1_9, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_9, u8* , 0x32) | 1);
+            }
+        }
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), s16* , 0x2A) = var_a1;
+        temp_v1_10 = M2C_FIELD(arg1, void** , 0x20D0);
+        M2C_FIELD(temp_v1_10, s16* , 0x24) = M2C_BITWISE(s16, M2C_FIELD(temp_v1_10, f32* , 4));
+        temp_a0_3 = M2C_FIELD(arg1, void** , 0x20D0);
+        M2C_FIELD(temp_a0_3, s16* , 0x26) = M2C_BITWISE(s16, M2C_FIELD(temp_a0_3, f32* , 8));
+        temp_a0_4 = M2C_FIELD(arg1, void** , 0x20D0);
+        if ((M2C_FIELD(temp_a0_4, s16* , 0x24) + M2C_FIELD(temp_a0_4, s16* , 0x26)) >= 0x321) {
+            M2C_FIELD(temp_a0_4, s16* , 0x24) = 0;
+            M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), s16* , 0x26) = 0;
+        }
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 4) = (f32) M2C_FIELD(M2C_FIELD(arg1, void** , 0x2028), f32* , 0x10);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 8) = (f32) M2C_FIELD(M2C_FIELD(arg1, void** , 0x2028), f32* , 0x14);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0xC) = (f32) M2C_FIELD(M2C_FIELD(arg1, void** , 0x2028), f32* , 0x18);
+        func_00266DB8(&sp4, var_a1, var_a2, 1);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0x20) = 16.6667f;
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0x10) = (f32) M2C_FIELD(arg1, f32* , 0x2D4);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0x14) = (f32) M2C_FIELD(M2C_FIELD(arg1, void** , 0x2028), f32* , 0x68);
+        M2C_FIELD(M2C_FIELD(arg1, void** , 0x20D0), f32* , 0x18) = (f32) M2C_FIELD(arg1, f32* , 0x208);
+        if (M2C_FIELD(arg1, s32* , 0x20B4) == 4) {
+            func_00109810(arg1, M2C_FIELD(arg1, s32* , 0x20D4));
+        }
+        if (timerGetFieldCount__Fv() >= 0x5B) {
+            if (D_004F9DE4 == 0) {
+                D_004F9DE4 = 1;
+                func_0026C948(-1, D_004F9D18);
+            }
+            temp_v1_11 = M2C_FIELD(arg1, void** , 0x20D0);
+            M2C_FIELD(temp_v1_11, u8* , 0x32) = (u8) (M2C_FIELD(temp_v1_11, u8* , 0x32) | 0x10);
+        }
+    }
+}
+//@@ func_00170B68 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9CA0;
 extern void* D_004FA030;
@@ -4692,7 +13573,7 @@ void func_00170B68(s32 arg0) {
         } while (var_s2 < M2C_FIELD(D_004FA030, s32* , 0x96250));
     }
 }
-//@@ func_00170D38 m2c
+//@@ func_00170D38 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9CA0;
 extern M2C_UNK D_004F9E58;
@@ -4713,7 +13594,7 @@ void func_00170D38(void* arg0) {
         }
     }
 }
-//@@ func_00170DF0 m2c
+//@@ func_00170DF0 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9CA0;
 extern M2C_UNK D_004F9E60;
@@ -4890,7 +13771,7 @@ block_52:
         }
     }
 }
-//@@ func_001714D0 m2c
+//@@ func_001714D0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_0041BF00;
@@ -4995,7 +13876,7 @@ loop_20:
     }
     func_00170760(arg0, M2C_FIELD(M2C_FIELD(arg0, void** , 4), void** , 0xA0));
 }
-//@@ func_00171818 m2c
+//@@ func_00171818 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9D24;
 extern M2C_UNK D_004F9E78;
@@ -5121,7 +14002,7 @@ s32 func_00171818(s32 arg0, void* arg1, s32 arg2) {
     func_0026BD50(arg1 + 0x50, 1, 2, 0);
     return M2C_FIELD(arg1, s32* , 0x50);
 }
-//@@ func_00171AA8 m2c
+//@@ func_00171AA8 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 
@@ -5150,7 +14031,7 @@ block_7:
     }
     func_0026C948(-1, M2C_FIELD(arg1, s32* , 0x50));
 }
-//@@ func_00171B78 m2c
+//@@ func_00171B78 m2c0
 #include "m2c_macros.h"
 void func_00171B78(void* arg0, M2C_UNK arg1) {
     u8 sp[0xF0];
@@ -5175,7 +14056,132 @@ void func_00171B78(void* arg0, M2C_UNK arg1) {
     sp3C = M2C_FIELD(temp_v0, f32* , 0x9C);
     netSendSessionMsg(arg0, arg1, sp);
 }
-//@@ func_00171C08 m2c
+//@@ func_00171B78 m2c1
+#include "m2c_macros.h"
+void func_00171B78(void* arg0, M2C_UNK arg1) {
+    u8 sp[0xE0];
+    M2C_UNK sp18;
+    s8 sp27;
+    f32 sp30;
+    f32 sp34;
+    f32 sp38;
+    f32 sp3C;
+    s32 sp40;
+    void* temp_a1;
+    void* temp_v0;
+
+    temp_a1 = M2C_FIELD(arg0, void** , 4);
+    strncpy(&sp18, temp_a1 + 8, 0xF, M2C_FIELD(temp_a1, s32* , 0xA4));
+    sp27 = 0;
+    temp_v0 = M2C_FIELD(arg0, void** , 4);
+    sp30 = M2C_FIELD(temp_v0, f32* , 0x90);
+    sp34 = M2C_FIELD(temp_v0, f32* , 0x94);
+    sp38 = M2C_FIELD(temp_v0, f32* , 0x98);
+    sp40 = M2C_FIELD(arg0, s32* , 0x1BB4);
+    sp3C = M2C_FIELD(temp_v0, f32* , 0x9C);
+    netSendSessionMsg(arg0, arg1, sp);
+}
+//@@ func_00171B78 m2c2
+#include "m2c_macros.h"
+void func_00171B78(void* arg0, M2C_UNK arg1) {
+    u8 sp[0xD0];
+    M2C_UNK sp18;
+    s8 sp27;
+    f32 sp30;
+    f32 sp34;
+    f32 sp38;
+    f32 sp3C;
+    s32 sp40;
+    void* temp_a1;
+    void* temp_v0;
+
+    temp_a1 = M2C_FIELD(arg0, void** , 4);
+    strncpy(&sp18, temp_a1 + 8, 0xF, M2C_FIELD(temp_a1, s32* , 0xA4));
+    sp27 = 0;
+    temp_v0 = M2C_FIELD(arg0, void** , 4);
+    sp30 = M2C_FIELD(temp_v0, f32* , 0x90);
+    sp34 = M2C_FIELD(temp_v0, f32* , 0x94);
+    sp38 = M2C_FIELD(temp_v0, f32* , 0x98);
+    sp40 = M2C_FIELD(arg0, s32* , 0x1BB4);
+    sp3C = M2C_FIELD(temp_v0, f32* , 0x9C);
+    netSendSessionMsg(arg0, arg1, sp);
+}
+//@@ func_00171B78 m2c3
+#include "m2c_macros.h"
+void func_00171B78(void* arg0, M2C_UNK arg1) {
+    u8 sp[0xC0];
+    M2C_UNK sp18;
+    s8 sp27;
+    f32 sp30;
+    f32 sp34;
+    f32 sp38;
+    f32 sp3C;
+    s32 sp40;
+    void* temp_a1;
+    void* temp_v0;
+
+    temp_a1 = M2C_FIELD(arg0, void** , 4);
+    strncpy(&sp18, temp_a1 + 8, 0xF, M2C_FIELD(temp_a1, s32* , 0xA4));
+    sp27 = 0;
+    temp_v0 = M2C_FIELD(arg0, void** , 4);
+    sp30 = M2C_FIELD(temp_v0, f32* , 0x90);
+    sp34 = M2C_FIELD(temp_v0, f32* , 0x94);
+    sp38 = M2C_FIELD(temp_v0, f32* , 0x98);
+    sp40 = M2C_FIELD(arg0, s32* , 0x1BB4);
+    sp3C = M2C_FIELD(temp_v0, f32* , 0x9C);
+    netSendSessionMsg(arg0, arg1, sp);
+}
+//@@ func_00171B78 m2c4
+#include "m2c_macros.h"
+void func_00171B78(void* arg0, M2C_UNK arg1) {
+    u8 sp[0xB0];
+    M2C_UNK sp18;
+    s8 sp27;
+    f32 sp30;
+    f32 sp34;
+    f32 sp38;
+    f32 sp3C;
+    s32 sp40;
+    void* temp_a1;
+    void* temp_v0;
+
+    temp_a1 = M2C_FIELD(arg0, void** , 4);
+    strncpy(&sp18, temp_a1 + 8, 0xF, M2C_FIELD(temp_a1, s32* , 0xA4));
+    sp27 = 0;
+    temp_v0 = M2C_FIELD(arg0, void** , 4);
+    sp30 = M2C_FIELD(temp_v0, f32* , 0x90);
+    sp34 = M2C_FIELD(temp_v0, f32* , 0x94);
+    sp38 = M2C_FIELD(temp_v0, f32* , 0x98);
+    sp40 = M2C_FIELD(arg0, s32* , 0x1BB4);
+    sp3C = M2C_FIELD(temp_v0, f32* , 0x9C);
+    netSendSessionMsg(arg0, arg1, sp);
+}
+//@@ func_00171B78 m2c5
+#include "m2c_macros.h"
+void func_00171B78(void* arg0, M2C_UNK arg1) {
+    u8 sp[0xA0];
+    M2C_UNK sp18;
+    s8 sp27;
+    f32 sp30;
+    f32 sp34;
+    f32 sp38;
+    f32 sp3C;
+    s32 sp40;
+    void* temp_a1;
+    void* temp_v0;
+
+    temp_a1 = M2C_FIELD(arg0, void** , 4);
+    strncpy(&sp18, temp_a1 + 8, 0xF, M2C_FIELD(temp_a1, s32* , 0xA4));
+    sp27 = 0;
+    temp_v0 = M2C_FIELD(arg0, void** , 4);
+    sp30 = M2C_FIELD(temp_v0, f32* , 0x90);
+    sp34 = M2C_FIELD(temp_v0, f32* , 0x94);
+    sp38 = M2C_FIELD(temp_v0, f32* , 0x98);
+    sp40 = M2C_FIELD(arg0, s32* , 0x1BB4);
+    sp3C = M2C_FIELD(temp_v0, f32* , 0x9C);
+    netSendSessionMsg(arg0, arg1, sp);
+}
+//@@ func_00171C08 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9D80;
 
@@ -5198,7 +14204,122 @@ loop_1:
         goto loop_1;
     }
 }
-//@@ netSendSessionMsg m2c
+//@@ func_00171C08 m2c1
+#include "m2c_macros.h"
+extern s32 D_004F9D80;
+
+void func_00171C08(void* arg0) {
+    u8 sp[0x50];
+    s8 sp50;
+    s32 temp_a2;
+    s32 var_s0;
+
+    var_s0 = 0;
+    strcpy(sp);
+loop_1:
+    func_00266708(&sp50, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0);
+    temp_a2 = var_s0;
+    var_s0 += 1;
+    if (sp50 != 0) {
+        dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), temp_a2, D_004F9D80);
+    }
+    if (var_s0 < 8) {
+        goto loop_1;
+    }
+}
+//@@ func_00171C08 m2c2
+#include "m2c_macros.h"
+extern s32 D_004F9D80;
+
+void func_00171C08(void* arg0) {
+    u8 sp[0x40];
+    s8 sp50;
+    s32 temp_a2;
+    s32 var_s0;
+
+    var_s0 = 0;
+    strcpy(sp);
+loop_1:
+    func_00266708(&sp50, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0);
+    temp_a2 = var_s0;
+    var_s0 += 1;
+    if (sp50 != 0) {
+        dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), temp_a2, D_004F9D80);
+    }
+    if (var_s0 < 8) {
+        goto loop_1;
+    }
+}
+//@@ func_00171C08 m2c3
+#include "m2c_macros.h"
+extern s32 D_004F9D80;
+
+void func_00171C08(void* arg0) {
+    u8 sp[0x30];
+    s8 sp50;
+    s32 temp_a2;
+    s32 var_s0;
+
+    var_s0 = 0;
+    strcpy(sp);
+loop_1:
+    func_00266708(&sp50, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0);
+    temp_a2 = var_s0;
+    var_s0 += 1;
+    if (sp50 != 0) {
+        dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), temp_a2, D_004F9D80);
+    }
+    if (var_s0 < 8) {
+        goto loop_1;
+    }
+}
+//@@ func_00171C08 m2c4
+#include "m2c_macros.h"
+extern s32 D_004F9D80;
+
+void func_00171C08(void* arg0) {
+    u8 sp[0x20];
+    s8 sp50;
+    s32 temp_a2;
+    s32 var_s0;
+
+    var_s0 = 0;
+    strcpy(sp);
+loop_1:
+    func_00266708(&sp50, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0);
+    temp_a2 = var_s0;
+    var_s0 += 1;
+    if (sp50 != 0) {
+        dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), temp_a2, D_004F9D80);
+    }
+    if (var_s0 < 8) {
+        goto loop_1;
+    }
+}
+//@@ func_00171C08 m2c5
+#include "m2c_macros.h"
+extern s32 D_004F9D80;
+
+void func_00171C08(void* arg0) {
+    u8 sp[0x10];
+    s8 sp50;
+    s32 temp_a2;
+    s32 var_s0;
+
+    var_s0 = 0;
+    strcpy(sp);
+loop_1:
+    func_00266708(&sp50, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0);
+    temp_a2 = var_s0;
+    var_s0 += 1;
+    if (sp50 != 0) {
+        dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), temp_a2, D_004F9D80);
+    }
+    if (var_s0 < 8) {
+        goto loop_1;
+    }
+}
+//@@ netSendSessionMsg m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9D88;
 
@@ -5238,7 +14359,87 @@ block_17:
         goto block_17;
     }
 }
-//@@ netSendGameEvent m2c
+//@@ netSendSessionMsg m2c1
+#include "m2c_macros.h"
+extern s32 D_004F9D88;
+
+s32 netSendSessionMsg(void* arg0, s32 arg1, s32* arg2) {
+    u8 sp[0x8];
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v1;
+    s32 var_s0;
+
+    temp_v1 = *M2C_FIELD(arg0, s32** , 4);
+    if ((temp_v1 != -1) && (temp_v1 == arg1)) {
+        netMsgSessionHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), arg1, arg2);
+        goto block_17;
+    }
+    switch (arg1) {                                 /* irregular */
+    case -1:
+        var_s0 = 0;
+        do {
+            if ((func_00266708(sp, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0) == 0) && (subroutine_arg0 != 0)) {
+                temp_v0 = dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0, D_004F9D88);
+                if (temp_v0 != 0) {
+                    printf("NETWORK WARNING: Failed to send PREGAME (1) command %d to client %d NetError = %d\n", *arg2, var_s0, temp_v0);
+                }
+            }
+            var_s0 += 1;
+        } while (var_s0 < 8);
+block_17:
+        return 1;
+    case -99:
+        return 0;
+    default:
+        temp_v0_2 = dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), arg1, D_004F9D88);
+        if (temp_v0_2 != 0) {
+            printf("NETWORK WARNING: Failed to send PREGAME (1) command %d to client %d NetError = %d\n", *arg2, arg1, temp_v0_2);
+        }
+        goto block_17;
+    }
+}
+//@@ netSendSessionMsg m2c2
+#include "m2c_macros.h"
+extern s32 D_004F9D88;
+
+s32 netSendSessionMsg(void* arg0, s32 arg1, s32* arg2) {
+    u8 sp[0x4];
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v1;
+    s32 var_s0;
+
+    temp_v1 = *M2C_FIELD(arg0, s32** , 4);
+    if ((temp_v1 != -1) && (temp_v1 == arg1)) {
+        netMsgSessionHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), arg1, arg2);
+        goto block_17;
+    }
+    switch (arg1) {                                 /* irregular */
+    case -1:
+        var_s0 = 0;
+        do {
+            if ((func_00266708(sp, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0) == 0) && (subroutine_arg0 != 0)) {
+                temp_v0 = dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0, D_004F9D88);
+                if (temp_v0 != 0) {
+                    printf("NETWORK WARNING: Failed to send PREGAME (1) command %d to client %d NetError = %d\n", *arg2, var_s0, temp_v0);
+                }
+            }
+            var_s0 += 1;
+        } while (var_s0 < 8);
+block_17:
+        return 1;
+    case -99:
+        return 0;
+    default:
+        temp_v0_2 = dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), arg1, D_004F9D88);
+        if (temp_v0_2 != 0) {
+            printf("NETWORK WARNING: Failed to send PREGAME (1) command %d to client %d NetError = %d\n", *arg2, arg1, temp_v0_2);
+        }
+        goto block_17;
+    }
+}
+//@@ netSendGameEvent m2c0
 #include "m2c_macros.h"
 s32 netSendGameEvent(void* arg0, s32 arg1, void* arg2) {
     s32 temp_v0;
@@ -5253,7 +14454,7 @@ s32 netSendGameEvent(void* arg0, s32 arg1, void* arg2) {
     }
     return 1;
 }
-//@@ func_00171F88 m2c
+//@@ func_00171F88 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_00318416;
 extern s32 D_004F9D98;
@@ -5370,7 +14571,592 @@ loop_3:
     }
     return 1;
 }
-//@@ func_00172190 m2c
+//@@ func_00171F88 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_00318416;
+extern s32 D_004F9D98;
+extern s32 D_004FA030;
+
+s32 func_00171F88(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x180];
+    s32 sp14;
+    s32 sp18;
+    s32 sp1C;
+    s32 sp20;
+    s32 sp24;
+    s32 sp28;
+    s32 sp2C;
+    s8 sp180;
+    s8 sp18F;
+    s128 sp190;
+    s128 sp1A0;
+    s128 sp1B0;
+    s128 sp1C0;
+    s128 sp1D0;
+    M2C_UNK* var_t2;
+    s128 var_t3;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v1;
+    s32 temp_v1_2;
+    s32 var_a2;
+    s32 var_a3;
+    s32 var_s1;
+    s32 var_s1_2;
+    s32* var_fp;
+    s32* var_s3;
+    s32* var_s4;
+    s32* var_s6;
+    s32* var_s7;
+    s32* var_t0;
+    s32* var_t1;
+    s32* var_t4;
+    s8* temp_v0_3;
+    void* temp_a0;
+    void* var_s0;
+    void* var_s2;
+
+    var_a2 = arg2;
+    var_a3 = arg3;
+    var_t2 = &D_00318416;
+    var_t1 = &sp2C;
+    var_t4 = &D_00318416 + 0x272;
+    var_t0 = &sp28;
+    var_fp = &sp1C;
+    var_s7 = &sp18;
+    var_s1 = 0;
+    var_s6 = &sp20;
+    var_s4 = &sp24;
+    var_s3 = &sp14;
+    var_s2 = sp;
+    var_s0 = &D_00318416 + 0x252;
+    var_t3 = 0;
+    do {
+        temp_a0 = var_s2;
+        sp190 = (s128) var_t0;
+        var_s1 += 1;
+        sp1A0 = (s128) var_t1;
+        var_s2 += 0x30;
+        sp1B0 = (s128) var_t2;
+        sp1C0 = var_t3;
+        sp1D0 = (s128) var_t4;
+        strcpy(temp_a0, (s128) var_t2, var_a2, var_a3);
+        var_a3 = var_s1 < 8;
+        temp_v1 = M2C_FIELD((D_004FA030 + var_t3), s32* , 0x20F4);
+        var_t2 += 0x14;
+        var_t3 += 0x31B0;
+        var_a2 = M2C_FIELD(var_s0, s32* , -0x80);
+        *var_s3 = temp_v1;
+        *var_s4 = M2C_FIELD(var_s0, s32* , -0x20);
+        var_s3 += 0x30;
+        *var_s6 = M2C_FIELD(var_s0, s32* , -0x60);
+        var_s4 += 0x30;
+        var_s6 += 0x30;
+        *var_s7 = var_a2;
+        var_s7 += 0x30;
+        temp_v1_2 = M2C_FIELD(var_s0, s32* , 0);
+        *var_fp = M2C_FIELD(var_s0, s32* , -0x40);
+        var_s0 += 4;
+        var_fp += 0x30;
+        temp_v0 = *var_t4;
+        *var_t0 = temp_v1_2;
+        var_t4 += 4;
+        var_t0 += 0x30;
+        *var_t1 = temp_v0;
+        var_t1 += 0x30;
+    } while (var_a3 != 0);
+    var_s1_2 = 0;
+loop_3:
+    if (*M2C_FIELD(arg0, s32** , 4) == var_s1_2) {
+        netMsgRosterHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), var_s1_2, sp);
+    } else {
+        temp_v0_2 = func_00266708(&sp180, M2C_FIELD(arg0, s32* , 0x2CF0), var_s1_2);
+        if (temp_v0_2 != 0) {
+            sp18F = 0;
+            printf("NETWORK WARNING:  NetGetClientIpAddress Failed %d (%s)\n", temp_v0_2, &sp180);
+        }
+        if (sp180 != 0) {
+            temp_v0_3 = dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), var_s1_2, D_004F9D98);
+            if (temp_v0_3 != NULL) {
+                printf("NETWORK WARNING: Failed to FINAL SCORE to client %d NetError = %d\n", var_s1_2, temp_v0_3);
+            }
+        }
+    }
+    var_s1_2 += 1;
+    if (var_s1_2 < 8) {
+        goto loop_3;
+    }
+    return 1;
+}
+//@@ func_00171F88 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_00318416;
+extern s32 D_004F9D98;
+extern s32 D_004FA030;
+
+s32 func_00171F88(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x170];
+    s32 sp14;
+    s32 sp18;
+    s32 sp1C;
+    s32 sp20;
+    s32 sp24;
+    s32 sp28;
+    s32 sp2C;
+    s8 sp180;
+    s8 sp18F;
+    s128 sp190;
+    s128 sp1A0;
+    s128 sp1B0;
+    s128 sp1C0;
+    s128 sp1D0;
+    M2C_UNK* var_t2;
+    s128 var_t3;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v1;
+    s32 temp_v1_2;
+    s32 var_a2;
+    s32 var_a3;
+    s32 var_s1;
+    s32 var_s1_2;
+    s32* var_fp;
+    s32* var_s3;
+    s32* var_s4;
+    s32* var_s6;
+    s32* var_s7;
+    s32* var_t0;
+    s32* var_t1;
+    s32* var_t4;
+    s8* temp_v0_3;
+    void* temp_a0;
+    void* var_s0;
+    void* var_s2;
+
+    var_a2 = arg2;
+    var_a3 = arg3;
+    var_t2 = &D_00318416;
+    var_t1 = &sp2C;
+    var_t4 = &D_00318416 + 0x272;
+    var_t0 = &sp28;
+    var_fp = &sp1C;
+    var_s7 = &sp18;
+    var_s1 = 0;
+    var_s6 = &sp20;
+    var_s4 = &sp24;
+    var_s3 = &sp14;
+    var_s2 = sp;
+    var_s0 = &D_00318416 + 0x252;
+    var_t3 = 0;
+    do {
+        temp_a0 = var_s2;
+        sp190 = (s128) var_t0;
+        var_s1 += 1;
+        sp1A0 = (s128) var_t1;
+        var_s2 += 0x30;
+        sp1B0 = (s128) var_t2;
+        sp1C0 = var_t3;
+        sp1D0 = (s128) var_t4;
+        strcpy(temp_a0, (s128) var_t2, var_a2, var_a3);
+        var_a3 = var_s1 < 8;
+        temp_v1 = M2C_FIELD((D_004FA030 + var_t3), s32* , 0x20F4);
+        var_t2 += 0x14;
+        var_t3 += 0x31B0;
+        var_a2 = M2C_FIELD(var_s0, s32* , -0x80);
+        *var_s3 = temp_v1;
+        *var_s4 = M2C_FIELD(var_s0, s32* , -0x20);
+        var_s3 += 0x30;
+        *var_s6 = M2C_FIELD(var_s0, s32* , -0x60);
+        var_s4 += 0x30;
+        var_s6 += 0x30;
+        *var_s7 = var_a2;
+        var_s7 += 0x30;
+        temp_v1_2 = M2C_FIELD(var_s0, s32* , 0);
+        *var_fp = M2C_FIELD(var_s0, s32* , -0x40);
+        var_s0 += 4;
+        var_fp += 0x30;
+        temp_v0 = *var_t4;
+        *var_t0 = temp_v1_2;
+        var_t4 += 4;
+        var_t0 += 0x30;
+        *var_t1 = temp_v0;
+        var_t1 += 0x30;
+    } while (var_a3 != 0);
+    var_s1_2 = 0;
+loop_3:
+    if (*M2C_FIELD(arg0, s32** , 4) == var_s1_2) {
+        netMsgRosterHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), var_s1_2, sp);
+    } else {
+        temp_v0_2 = func_00266708(&sp180, M2C_FIELD(arg0, s32* , 0x2CF0), var_s1_2);
+        if (temp_v0_2 != 0) {
+            sp18F = 0;
+            printf("NETWORK WARNING:  NetGetClientIpAddress Failed %d (%s)\n", temp_v0_2, &sp180);
+        }
+        if (sp180 != 0) {
+            temp_v0_3 = dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), var_s1_2, D_004F9D98);
+            if (temp_v0_3 != NULL) {
+                printf("NETWORK WARNING: Failed to FINAL SCORE to client %d NetError = %d\n", var_s1_2, temp_v0_3);
+            }
+        }
+    }
+    var_s1_2 += 1;
+    if (var_s1_2 < 8) {
+        goto loop_3;
+    }
+    return 1;
+}
+//@@ func_00171F88 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_00318416;
+extern s32 D_004F9D98;
+extern s32 D_004FA030;
+
+s32 func_00171F88(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x160];
+    s32 sp14;
+    s32 sp18;
+    s32 sp1C;
+    s32 sp20;
+    s32 sp24;
+    s32 sp28;
+    s32 sp2C;
+    s8 sp180;
+    s8 sp18F;
+    s128 sp190;
+    s128 sp1A0;
+    s128 sp1B0;
+    s128 sp1C0;
+    s128 sp1D0;
+    M2C_UNK* var_t2;
+    s128 var_t3;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v1;
+    s32 temp_v1_2;
+    s32 var_a2;
+    s32 var_a3;
+    s32 var_s1;
+    s32 var_s1_2;
+    s32* var_fp;
+    s32* var_s3;
+    s32* var_s4;
+    s32* var_s6;
+    s32* var_s7;
+    s32* var_t0;
+    s32* var_t1;
+    s32* var_t4;
+    s8* temp_v0_3;
+    void* temp_a0;
+    void* var_s0;
+    void* var_s2;
+
+    var_a2 = arg2;
+    var_a3 = arg3;
+    var_t2 = &D_00318416;
+    var_t1 = &sp2C;
+    var_t4 = &D_00318416 + 0x272;
+    var_t0 = &sp28;
+    var_fp = &sp1C;
+    var_s7 = &sp18;
+    var_s1 = 0;
+    var_s6 = &sp20;
+    var_s4 = &sp24;
+    var_s3 = &sp14;
+    var_s2 = sp;
+    var_s0 = &D_00318416 + 0x252;
+    var_t3 = 0;
+    do {
+        temp_a0 = var_s2;
+        sp190 = (s128) var_t0;
+        var_s1 += 1;
+        sp1A0 = (s128) var_t1;
+        var_s2 += 0x30;
+        sp1B0 = (s128) var_t2;
+        sp1C0 = var_t3;
+        sp1D0 = (s128) var_t4;
+        strcpy(temp_a0, (s128) var_t2, var_a2, var_a3);
+        var_a3 = var_s1 < 8;
+        temp_v1 = M2C_FIELD((D_004FA030 + var_t3), s32* , 0x20F4);
+        var_t2 += 0x14;
+        var_t3 += 0x31B0;
+        var_a2 = M2C_FIELD(var_s0, s32* , -0x80);
+        *var_s3 = temp_v1;
+        *var_s4 = M2C_FIELD(var_s0, s32* , -0x20);
+        var_s3 += 0x30;
+        *var_s6 = M2C_FIELD(var_s0, s32* , -0x60);
+        var_s4 += 0x30;
+        var_s6 += 0x30;
+        *var_s7 = var_a2;
+        var_s7 += 0x30;
+        temp_v1_2 = M2C_FIELD(var_s0, s32* , 0);
+        *var_fp = M2C_FIELD(var_s0, s32* , -0x40);
+        var_s0 += 4;
+        var_fp += 0x30;
+        temp_v0 = *var_t4;
+        *var_t0 = temp_v1_2;
+        var_t4 += 4;
+        var_t0 += 0x30;
+        *var_t1 = temp_v0;
+        var_t1 += 0x30;
+    } while (var_a3 != 0);
+    var_s1_2 = 0;
+loop_3:
+    if (*M2C_FIELD(arg0, s32** , 4) == var_s1_2) {
+        netMsgRosterHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), var_s1_2, sp);
+    } else {
+        temp_v0_2 = func_00266708(&sp180, M2C_FIELD(arg0, s32* , 0x2CF0), var_s1_2);
+        if (temp_v0_2 != 0) {
+            sp18F = 0;
+            printf("NETWORK WARNING:  NetGetClientIpAddress Failed %d (%s)\n", temp_v0_2, &sp180);
+        }
+        if (sp180 != 0) {
+            temp_v0_3 = dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), var_s1_2, D_004F9D98);
+            if (temp_v0_3 != NULL) {
+                printf("NETWORK WARNING: Failed to FINAL SCORE to client %d NetError = %d\n", var_s1_2, temp_v0_3);
+            }
+        }
+    }
+    var_s1_2 += 1;
+    if (var_s1_2 < 8) {
+        goto loop_3;
+    }
+    return 1;
+}
+//@@ func_00171F88 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_00318416;
+extern s32 D_004F9D98;
+extern s32 D_004FA030;
+
+s32 func_00171F88(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x150];
+    s32 sp14;
+    s32 sp18;
+    s32 sp1C;
+    s32 sp20;
+    s32 sp24;
+    s32 sp28;
+    s32 sp2C;
+    s8 sp180;
+    s8 sp18F;
+    s128 sp190;
+    s128 sp1A0;
+    s128 sp1B0;
+    s128 sp1C0;
+    s128 sp1D0;
+    M2C_UNK* var_t2;
+    s128 var_t3;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v1;
+    s32 temp_v1_2;
+    s32 var_a2;
+    s32 var_a3;
+    s32 var_s1;
+    s32 var_s1_2;
+    s32* var_fp;
+    s32* var_s3;
+    s32* var_s4;
+    s32* var_s6;
+    s32* var_s7;
+    s32* var_t0;
+    s32* var_t1;
+    s32* var_t4;
+    s8* temp_v0_3;
+    void* temp_a0;
+    void* var_s0;
+    void* var_s2;
+
+    var_a2 = arg2;
+    var_a3 = arg3;
+    var_t2 = &D_00318416;
+    var_t1 = &sp2C;
+    var_t4 = &D_00318416 + 0x272;
+    var_t0 = &sp28;
+    var_fp = &sp1C;
+    var_s7 = &sp18;
+    var_s1 = 0;
+    var_s6 = &sp20;
+    var_s4 = &sp24;
+    var_s3 = &sp14;
+    var_s2 = sp;
+    var_s0 = &D_00318416 + 0x252;
+    var_t3 = 0;
+    do {
+        temp_a0 = var_s2;
+        sp190 = (s128) var_t0;
+        var_s1 += 1;
+        sp1A0 = (s128) var_t1;
+        var_s2 += 0x30;
+        sp1B0 = (s128) var_t2;
+        sp1C0 = var_t3;
+        sp1D0 = (s128) var_t4;
+        strcpy(temp_a0, (s128) var_t2, var_a2, var_a3);
+        var_a3 = var_s1 < 8;
+        temp_v1 = M2C_FIELD((D_004FA030 + var_t3), s32* , 0x20F4);
+        var_t2 += 0x14;
+        var_t3 += 0x31B0;
+        var_a2 = M2C_FIELD(var_s0, s32* , -0x80);
+        *var_s3 = temp_v1;
+        *var_s4 = M2C_FIELD(var_s0, s32* , -0x20);
+        var_s3 += 0x30;
+        *var_s6 = M2C_FIELD(var_s0, s32* , -0x60);
+        var_s4 += 0x30;
+        var_s6 += 0x30;
+        *var_s7 = var_a2;
+        var_s7 += 0x30;
+        temp_v1_2 = M2C_FIELD(var_s0, s32* , 0);
+        *var_fp = M2C_FIELD(var_s0, s32* , -0x40);
+        var_s0 += 4;
+        var_fp += 0x30;
+        temp_v0 = *var_t4;
+        *var_t0 = temp_v1_2;
+        var_t4 += 4;
+        var_t0 += 0x30;
+        *var_t1 = temp_v0;
+        var_t1 += 0x30;
+    } while (var_a3 != 0);
+    var_s1_2 = 0;
+loop_3:
+    if (*M2C_FIELD(arg0, s32** , 4) == var_s1_2) {
+        netMsgRosterHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), var_s1_2, sp);
+    } else {
+        temp_v0_2 = func_00266708(&sp180, M2C_FIELD(arg0, s32* , 0x2CF0), var_s1_2);
+        if (temp_v0_2 != 0) {
+            sp18F = 0;
+            printf("NETWORK WARNING:  NetGetClientIpAddress Failed %d (%s)\n", temp_v0_2, &sp180);
+        }
+        if (sp180 != 0) {
+            temp_v0_3 = dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), var_s1_2, D_004F9D98);
+            if (temp_v0_3 != NULL) {
+                printf("NETWORK WARNING: Failed to FINAL SCORE to client %d NetError = %d\n", var_s1_2, temp_v0_3);
+            }
+        }
+    }
+    var_s1_2 += 1;
+    if (var_s1_2 < 8) {
+        goto loop_3;
+    }
+    return 1;
+}
+//@@ func_00171F88 m2c5
+#include "m2c_macros.h"
+extern M2C_UNK D_00318416;
+extern s32 D_004F9D98;
+extern s32 D_004FA030;
+
+s32 func_00171F88(void* arg0, s32 arg1, s32 arg2, s32 arg3) {
+    u8 sp[0x140];
+    s32 sp14;
+    s32 sp18;
+    s32 sp1C;
+    s32 sp20;
+    s32 sp24;
+    s32 sp28;
+    s32 sp2C;
+    s8 sp180;
+    s8 sp18F;
+    s128 sp190;
+    s128 sp1A0;
+    s128 sp1B0;
+    s128 sp1C0;
+    s128 sp1D0;
+    M2C_UNK* var_t2;
+    s128 var_t3;
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v1;
+    s32 temp_v1_2;
+    s32 var_a2;
+    s32 var_a3;
+    s32 var_s1;
+    s32 var_s1_2;
+    s32* var_fp;
+    s32* var_s3;
+    s32* var_s4;
+    s32* var_s6;
+    s32* var_s7;
+    s32* var_t0;
+    s32* var_t1;
+    s32* var_t4;
+    s8* temp_v0_3;
+    void* temp_a0;
+    void* var_s0;
+    void* var_s2;
+
+    var_a2 = arg2;
+    var_a3 = arg3;
+    var_t2 = &D_00318416;
+    var_t1 = &sp2C;
+    var_t4 = &D_00318416 + 0x272;
+    var_t0 = &sp28;
+    var_fp = &sp1C;
+    var_s7 = &sp18;
+    var_s1 = 0;
+    var_s6 = &sp20;
+    var_s4 = &sp24;
+    var_s3 = &sp14;
+    var_s2 = sp;
+    var_s0 = &D_00318416 + 0x252;
+    var_t3 = 0;
+    do {
+        temp_a0 = var_s2;
+        sp190 = (s128) var_t0;
+        var_s1 += 1;
+        sp1A0 = (s128) var_t1;
+        var_s2 += 0x30;
+        sp1B0 = (s128) var_t2;
+        sp1C0 = var_t3;
+        sp1D0 = (s128) var_t4;
+        strcpy(temp_a0, (s128) var_t2, var_a2, var_a3);
+        var_a3 = var_s1 < 8;
+        temp_v1 = M2C_FIELD((D_004FA030 + var_t3), s32* , 0x20F4);
+        var_t2 += 0x14;
+        var_t3 += 0x31B0;
+        var_a2 = M2C_FIELD(var_s0, s32* , -0x80);
+        *var_s3 = temp_v1;
+        *var_s4 = M2C_FIELD(var_s0, s32* , -0x20);
+        var_s3 += 0x30;
+        *var_s6 = M2C_FIELD(var_s0, s32* , -0x60);
+        var_s4 += 0x30;
+        var_s6 += 0x30;
+        *var_s7 = var_a2;
+        var_s7 += 0x30;
+        temp_v1_2 = M2C_FIELD(var_s0, s32* , 0);
+        *var_fp = M2C_FIELD(var_s0, s32* , -0x40);
+        var_s0 += 4;
+        var_fp += 0x30;
+        temp_v0 = *var_t4;
+        *var_t0 = temp_v1_2;
+        var_t4 += 4;
+        var_t0 += 0x30;
+        *var_t1 = temp_v0;
+        var_t1 += 0x30;
+    } while (var_a3 != 0);
+    var_s1_2 = 0;
+loop_3:
+    if (*M2C_FIELD(arg0, s32** , 4) == var_s1_2) {
+        netMsgRosterHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), var_s1_2, sp);
+    } else {
+        temp_v0_2 = func_00266708(&sp180, M2C_FIELD(arg0, s32* , 0x2CF0), var_s1_2);
+        if (temp_v0_2 != 0) {
+            sp18F = 0;
+            printf("NETWORK WARNING:  NetGetClientIpAddress Failed %d (%s)\n", temp_v0_2, &sp180);
+        }
+        if (sp180 != 0) {
+            temp_v0_3 = dmeSendMsgToClient(0x40, M2C_FIELD(arg0, s32* , 0x2CF0), var_s1_2, D_004F9D98);
+            if (temp_v0_3 != NULL) {
+                printf("NETWORK WARNING: Failed to FINAL SCORE to client %d NetError = %d\n", var_s1_2, temp_v0_3);
+            }
+        }
+    }
+    var_s1_2 += 1;
+    if (var_s1_2 < 8) {
+        goto loop_3;
+    }
+    return 1;
+}
+//@@ func_00172190 m2c0
 #include "m2c_macros.h"
 extern s32 D_004FA03C;
 
@@ -5383,7 +15169,7 @@ void func_00172190(s32 arg0, M2C_UNK arg1, M2C_UNK arg2) {
         func_00172378(arg0, temp_s2);
     }
 }
-//@@ func_00172218 m2c
+//@@ func_00172218 m2c0
 #include "m2c_macros.h"
 s32 func_00172218(void* arg0) {
     s32 temp_s1;
@@ -5393,7 +15179,7 @@ s32 func_00172218(void* arg0) {
     sprintf(temp_s1, "[CONNECT_IP] %s\n[CLIENT_IP] %s\n[CLIENT_SUBNET] %s\n[CLIENT_GATEWAY] %s\n[WORLD_ID] %d\n[SERVER_IP] %s\n[DNS_SERVERS] %s %s\n[SERVER_PORT] %d\n[CURRENT_CONFIG] %d\n[AUTO_RECONNECT] %d\n[SHOW_DIAGNOSTICS] %d\n[MEDIUS_SERVER] %s\n[MEDIUS_PORT] %s\n", arg0 + 0x13AC, arg0 + 0x1A54, M2C_FIELD(arg0, s32* , 0x1298), M2C_FIELD(arg0, s32* , 0x4288), M2C_FIELD(arg0, s32* , 0x4270), M2C_FIELD(arg0, s32* , 0x4274), arg0 + 0x142C, arg0 + 0x146C);
     return 1;
 }
-//@@ func_001722C0 m2c
+//@@ func_001722C0 m2c0
 #include "m2c_macros.h"
 s32 func_001722C0(void* arg0) {
     s32 temp_s1;
@@ -5403,7 +15189,7 @@ s32 func_001722C0(void* arg0) {
     sprintf(temp_s1, "[USER_NAME] %s\n[USER_CAR] %d\n[GAME_NAME] %s\n", arg0 + 0x1998, M2C_FIELD(arg0, s32* , 0x1A34));
     return 1;
 }
-//@@ func_00172A10 m2c
+//@@ func_00172A10 m2c0
 #include "m2c_macros.h"
 extern s8* D_004FB4F0;
 
@@ -5440,7 +15226,7 @@ block_8:
     }
     return D_004FB4F0;
 }
-//@@ func_00172A90 m2c
+//@@ func_00172A90 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern s32 D_004F9E8C;
@@ -5623,7 +15409,7 @@ block_29:
         func_00176EA0(arg0);
     }
 }
-//@@ func_00172FA0 m2c
+//@@ func_00172FA0 m2c0
 #include "m2c_macros.h"
 void func_00172FA0(void* arg0, s8 arg1, s32 arg2) {
     s32 temp_a0;
@@ -5642,7 +15428,7 @@ void func_00172FA0(void* arg0, s8 arg1, s32 arg2) {
         }
     }
 }
-//@@ func_00172FE8 m2c
+//@@ func_00172FE8 m2c0
 #include "m2c_macros.h"
 void func_00172FE8(void* arg0, s32 arg1, s8 arg2, M2C_UNK arg3) {
     s32 temp_a0;
@@ -5710,7 +15496,7 @@ block_4:
         }
     }
 }
-//@@ func_001731A8 m2c
+//@@ func_001731A8 m2c0
 #include "m2c_macros.h"
 void func_001731A8(void* arg0, s32 arg1, s32 arg2) {
     s32 var_a3;
@@ -5757,7 +15543,7 @@ block_14:
     }
     M2C_FIELD(M2C_FIELD(arg0, void** , 0x3148), s8* , 0x1B) = temp_a1_2;
 }
-//@@ func_00173248 m2c
+//@@ func_00173248 m2c0
 #include "m2c_macros.h"
 void func_00173248(void* arg0, s32 arg1, s32 arg2) {
     s32 temp_a0;
@@ -5790,7 +15576,7 @@ loop_1:
     }
     M2C_FIELD(temp_v0_2, s8* , 0x1B) = temp_v0;
 }
-//@@ func_001734B8 m2c
+//@@ func_001734B8 m2c0
 #include "m2c_macros.h"
 s32 func_001734B8(void* arg0) {
     u8 sp[0x10];
@@ -5802,7 +15588,31 @@ s32 func_001734B8(void* arg0) {
     }
     return var_v0;
 }
-//@@ func_00173500 m2c
+//@@ func_001734B8 m2c1
+#include "m2c_macros.h"
+s32 func_001734B8(void* arg0) {
+    u8 sp[0x8];
+    s32 var_v0;
+
+    var_v0 = 0;
+    if (dmeGetMyClientIndex(sp, M2C_FIELD(arg0, s32* , 0x2CF0)) == 0) {
+        var_v0 = subroutine_arg0 == func_00173500(arg0);
+    }
+    return var_v0;
+}
+//@@ func_001734B8 m2c2
+#include "m2c_macros.h"
+s32 func_001734B8(void* arg0) {
+    u8 sp[0x4];
+    s32 var_v0;
+
+    var_v0 = 0;
+    if (dmeGetMyClientIndex(sp, M2C_FIELD(arg0, s32* , 0x2CF0)) == 0) {
+        var_v0 = subroutine_arg0 == func_00173500(arg0);
+    }
+    return var_v0;
+}
+//@@ func_00173500 m2c0
 #include "m2c_macros.h"
 s32 func_00173500(void* arg0) {
     u8 sp[0x10];
@@ -5818,7 +15628,39 @@ s32 func_00173500(void* arg0) {
     }
     return subroutine_arg0;
 }
-//@@ func_00173570 m2c
+//@@ func_00173500 m2c1
+#include "m2c_macros.h"
+s32 func_00173500(void* arg0) {
+    u8 sp[0x8];
+    s32 temp_v0;
+
+    temp_v0 = func_001733F8();
+    if (temp_v0 == 1) {
+
+    } else if (temp_v0 == 2) {
+        if (func_00266DE0(sp, M2C_FIELD(arg0, s32* , 0x2CF0)) != 0) {
+
+        }
+    }
+    return subroutine_arg0;
+}
+//@@ func_00173500 m2c2
+#include "m2c_macros.h"
+s32 func_00173500(void* arg0) {
+    u8 sp[0x4];
+    s32 temp_v0;
+
+    temp_v0 = func_001733F8();
+    if (temp_v0 == 1) {
+
+    } else if (temp_v0 == 2) {
+        if (func_00266DE0(sp, M2C_FIELD(arg0, s32* , 0x2CF0)) != 0) {
+
+        }
+    }
+    return subroutine_arg0;
+}
+//@@ func_00173570 m2c0
 #include "m2c_macros.h"
 void func_00173570(void* arg0, s32 arg1) {
     M2C_FIELD(arg0, s32* , 0x1BB4) = arg1;
@@ -5827,7 +15669,7 @@ void func_00173570(void* arg0, s32 arg1) {
         func_00171B78(-1);
     }
 }
-//@@ func_001735A8 m2c
+//@@ func_001735A8 m2c0
 #include "m2c_macros.h"
 u8 func_001735A8(s32 arg0, s32 arg1, void* arg2) {
     s32 var_s0;
@@ -5842,7 +15684,7 @@ u8 func_001735A8(s32 arg0, s32 arg1, void* arg2) {
     }
     return (u8) var_s0;
 }
-//@@ func_00173810 m2c
+//@@ func_00173810 m2c0
 #include "m2c_macros.h"
 void func_00173810(s32 arg0, s32 arg1) {
     s32 var_a1;
@@ -5864,7 +15706,7 @@ loop_1:
         goto loop_1;
     }
 }
-//@@ func_00173880 m2c
+//@@ func_00173880 m2c0
 #include "m2c_macros.h"
 extern s32 D_004B1340;
 extern s32 D_004B1360;
@@ -5984,7 +15826,7 @@ s32 func_00173880(void* arg0, void* arg1) {
     }
     return 1;
 }
-//@@ func_00173BE8 m2c
+//@@ func_00173BE8 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9C9C;
 
@@ -5995,7 +15837,62 @@ void func_00173BE8(s32 arg0, M2C_UNK arg1) {
         D_004F9C9C = 1;
     }
 }
-//@@ func_00173C50 m2c
+//@@ func_00173BE8 m2c1
+#include "m2c_macros.h"
+extern s32 D_004F9C9C;
+
+void func_00173BE8(s32 arg0, M2C_UNK arg1) {
+    u8 sp[0x40];
+    if (D_004F9C9C == 0) {
+        netSendGameEvent(arg0, arg1, sp, timerGetCurTics__Fv());
+        D_004F9C9C = 1;
+    }
+}
+//@@ func_00173BE8 m2c2
+#include "m2c_macros.h"
+extern s32 D_004F9C9C;
+
+void func_00173BE8(s32 arg0, M2C_UNK arg1) {
+    u8 sp[0x30];
+    if (D_004F9C9C == 0) {
+        netSendGameEvent(arg0, arg1, sp, timerGetCurTics__Fv());
+        D_004F9C9C = 1;
+    }
+}
+//@@ func_00173BE8 m2c3
+#include "m2c_macros.h"
+extern s32 D_004F9C9C;
+
+void func_00173BE8(s32 arg0, M2C_UNK arg1) {
+    u8 sp[0x20];
+    if (D_004F9C9C == 0) {
+        netSendGameEvent(arg0, arg1, sp, timerGetCurTics__Fv());
+        D_004F9C9C = 1;
+    }
+}
+//@@ func_00173BE8 m2c4
+#include "m2c_macros.h"
+extern s32 D_004F9C9C;
+
+void func_00173BE8(s32 arg0, M2C_UNK arg1) {
+    u8 sp[0x10];
+    if (D_004F9C9C == 0) {
+        netSendGameEvent(arg0, arg1, sp, timerGetCurTics__Fv());
+        D_004F9C9C = 1;
+    }
+}
+//@@ func_00173BE8 m2c5
+#include "m2c_macros.h"
+extern s32 D_004F9C9C;
+
+void func_00173BE8(s32 arg0, M2C_UNK arg1) {
+    u8 sp[0x8];
+    if (D_004F9C9C == 0) {
+        netSendGameEvent(arg0, arg1, sp, timerGetCurTics__Fv());
+        D_004F9C9C = 1;
+    }
+}
+//@@ func_00173C50 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_004E7E70;
 
@@ -6013,7 +15910,97 @@ void func_00173C50(void* arg0) {
     }
     netSendGameEvent(arg0, func_00173500(arg0), sp);
 }
-//@@ func_00173D08 m2c
+//@@ func_00173C50 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_004E7E70;
+
+void func_00173C50(void* arg0) {
+    u8 sp[0x40];
+    netGetMyClientIndex();
+    if (func_001734B8(arg0) != 0) {
+        M2C_FIELD(arg0, s32* , 0x307C) = (s32) subroutine_arg0;
+        printf(&D_004E7E70);
+        printf(">>>>> 2 Setting ConnectionSessionMaster = %d\n", M2C_FIELD(arg0, s32* , 0x307C));
+        printf(&D_004E7E70);
+        M2C_FIELD(arg0, s32* , 0x2E8C) = 1;
+        netMsgGameEventHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), netGetMyClientIndex(arg0), sp);
+        return;
+    }
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+}
+//@@ func_00173C50 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_004E7E70;
+
+void func_00173C50(void* arg0) {
+    u8 sp[0x30];
+    netGetMyClientIndex();
+    if (func_001734B8(arg0) != 0) {
+        M2C_FIELD(arg0, s32* , 0x307C) = (s32) subroutine_arg0;
+        printf(&D_004E7E70);
+        printf(">>>>> 2 Setting ConnectionSessionMaster = %d\n", M2C_FIELD(arg0, s32* , 0x307C));
+        printf(&D_004E7E70);
+        M2C_FIELD(arg0, s32* , 0x2E8C) = 1;
+        netMsgGameEventHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), netGetMyClientIndex(arg0), sp);
+        return;
+    }
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+}
+//@@ func_00173C50 m2c3
+#include "m2c_macros.h"
+extern M2C_UNK D_004E7E70;
+
+void func_00173C50(void* arg0) {
+    u8 sp[0x20];
+    netGetMyClientIndex();
+    if (func_001734B8(arg0) != 0) {
+        M2C_FIELD(arg0, s32* , 0x307C) = (s32) subroutine_arg0;
+        printf(&D_004E7E70);
+        printf(">>>>> 2 Setting ConnectionSessionMaster = %d\n", M2C_FIELD(arg0, s32* , 0x307C));
+        printf(&D_004E7E70);
+        M2C_FIELD(arg0, s32* , 0x2E8C) = 1;
+        netMsgGameEventHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), netGetMyClientIndex(arg0), sp);
+        return;
+    }
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+}
+//@@ func_00173C50 m2c4
+#include "m2c_macros.h"
+extern M2C_UNK D_004E7E70;
+
+void func_00173C50(void* arg0) {
+    u8 sp[0x10];
+    netGetMyClientIndex();
+    if (func_001734B8(arg0) != 0) {
+        M2C_FIELD(arg0, s32* , 0x307C) = (s32) subroutine_arg0;
+        printf(&D_004E7E70);
+        printf(">>>>> 2 Setting ConnectionSessionMaster = %d\n", M2C_FIELD(arg0, s32* , 0x307C));
+        printf(&D_004E7E70);
+        M2C_FIELD(arg0, s32* , 0x2E8C) = 1;
+        netMsgGameEventHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), netGetMyClientIndex(arg0), sp);
+        return;
+    }
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+}
+//@@ func_00173C50 m2c5
+#include "m2c_macros.h"
+extern M2C_UNK D_004E7E70;
+
+void func_00173C50(void* arg0) {
+    u8 sp[0x8];
+    netGetMyClientIndex();
+    if (func_001734B8(arg0) != 0) {
+        M2C_FIELD(arg0, s32* , 0x307C) = (s32) subroutine_arg0;
+        printf(&D_004E7E70);
+        printf(">>>>> 2 Setting ConnectionSessionMaster = %d\n", M2C_FIELD(arg0, s32* , 0x307C));
+        printf(&D_004E7E70);
+        M2C_FIELD(arg0, s32* , 0x2E8C) = 1;
+        netMsgGameEventHandler(M2C_FIELD(arg0, s32* , 0x2CF0), M2C_FIELD(arg0, s32* , 0x129C), netGetMyClientIndex(arg0), sp);
+        return;
+    }
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+}
+//@@ func_00173D08 m2c0
 #include "m2c_macros.h"
 extern s32 D_003188E0;
 
@@ -6079,65 +16066,337 @@ block_13:
     }
     return var_v0;
 }
-//@@ func_00173ED0 m2c
+//@@ func_00173D08 m2c1
 #include "m2c_macros.h"
-s32 func_00173ED0(s32 arg0, s32 arg1, s32 arg2) {
-    void* temp_v0;
+extern s32 D_003188E0;
 
-    temp_v0 = netGetDmeTime();
-    if (temp_v0 != NULL) {
-        M2C_FIELD(M2C_FIELD(temp_v0, void** , 0x1C), s32* , 0x24) = arg2;
-        return 1;
+s32 func_00173D08(void* arg0, s32 arg1) {
+    u8 sp[0x50];
+    f32 var_f0;
+    s32 temp_a0;
+    s32 var_s4;
+    s32 var_v0;
+    s32 var_v0_2;
+    s64 temp_v0;
+    s64 var_s0;
+    s64 var_s1;
+    s64 var_s3;
+
+    var_s4 = 0x1B7740;
+    var_s3 = timerGetCurTics__Fv();
+    var_s1 = var_s3;
+    if (arg1 > 0) {
+        var_s4 = arg1 * 0x3E8;
     }
-    return 0;
+    var_s0 = (s64) (var_s3 << 0x20) >> 0x20;
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    var_v0 = 1;
+    if (D_003188E0 == 0) {
+        func_00173C50(arg0);
+        M2C_FIELD(arg0, s32* , 0x2E8C) = 0;
+loop_4:
+        temp_v0 = timerGetCurTics__Fv();
+        if (temp_v0 < var_s0) {
+            var_v0_2 = (temp_v0 + 0x10000) - var_s0;
+        } else {
+            var_v0_2 = temp_v0 - var_s0;
+        }
+        var_s1 += var_v0_2;
+        temp_a0 = var_s1 - var_s3;
+        var_s0 = temp_v0;
+        if (temp_a0 >= 0) {
+            var_f0 = func_001F2CC8(temp_a0);
+        } else {
+            var_f0 = 2.0f * func_001F2CC8((temp_a0 & 1) | ((u64) temp_a0 >> 1));
+        }
+        if ((var_f0 / 576.0f) > 5000.0f) {
+            var_s4 -= 0x1388;
+            var_v0 = 0;
+            if (var_s4 >= 0) {
+                func_00173C50(arg0);
+                var_s3 = timerGetCurTics__Fv();
+                var_s1 = var_s3;
+                var_s0 = (s64) (var_s3 << 0x20) >> 0x20;
+                goto block_13;
+            }
+        } else {
+block_13:
+            func_001703E8(arg0);
+            var_v0 = 1;
+            if (M2C_FIELD(arg0, s32* , 0x2E8C) == 0) {
+                goto loop_4;
+            }
+        }
+    }
+    return var_v0;
 }
-//@@ func_00173F10 m2c
+//@@ func_00173D08 m2c2
 #include "m2c_macros.h"
-s32 func_00173F10(void) {
-    void* temp_v0;
+extern s32 D_003188E0;
 
-    temp_v0 = netGetDmeTime();
-    if (temp_v0 != NULL) {
-        return M2C_FIELD(M2C_FIELD(temp_v0, void** , 0x1C), s32* , 0x24);
+s32 func_00173D08(void* arg0, s32 arg1) {
+    u8 sp[0x40];
+    f32 var_f0;
+    s32 temp_a0;
+    s32 var_s4;
+    s32 var_v0;
+    s32 var_v0_2;
+    s64 temp_v0;
+    s64 var_s0;
+    s64 var_s1;
+    s64 var_s3;
+
+    var_s4 = 0x1B7740;
+    var_s3 = timerGetCurTics__Fv();
+    var_s1 = var_s3;
+    if (arg1 > 0) {
+        var_s4 = arg1 * 0x3E8;
     }
-    return 0;
+    var_s0 = (s64) (var_s3 << 0x20) >> 0x20;
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    var_v0 = 1;
+    if (D_003188E0 == 0) {
+        func_00173C50(arg0);
+        M2C_FIELD(arg0, s32* , 0x2E8C) = 0;
+loop_4:
+        temp_v0 = timerGetCurTics__Fv();
+        if (temp_v0 < var_s0) {
+            var_v0_2 = (temp_v0 + 0x10000) - var_s0;
+        } else {
+            var_v0_2 = temp_v0 - var_s0;
+        }
+        var_s1 += var_v0_2;
+        temp_a0 = var_s1 - var_s3;
+        var_s0 = temp_v0;
+        if (temp_a0 >= 0) {
+            var_f0 = func_001F2CC8(temp_a0);
+        } else {
+            var_f0 = 2.0f * func_001F2CC8((temp_a0 & 1) | ((u64) temp_a0 >> 1));
+        }
+        if ((var_f0 / 576.0f) > 5000.0f) {
+            var_s4 -= 0x1388;
+            var_v0 = 0;
+            if (var_s4 >= 0) {
+                func_00173C50(arg0);
+                var_s3 = timerGetCurTics__Fv();
+                var_s1 = var_s3;
+                var_s0 = (s64) (var_s3 << 0x20) >> 0x20;
+                goto block_13;
+            }
+        } else {
+block_13:
+            func_001703E8(arg0);
+            var_v0 = 1;
+            if (M2C_FIELD(arg0, s32* , 0x2E8C) == 0) {
+                goto loop_4;
+            }
+        }
+    }
+    return var_v0;
 }
-//@@ func_00173F40 m2c
+//@@ func_00173D08 m2c3
 #include "m2c_macros.h"
-s32 func_00173F40(s32 arg0, s32 arg1, s32 arg2) {
-    void* temp_v0;
+extern s32 D_003188E0;
 
-    temp_v0 = netGetDmeTime();
-    if (temp_v0 != NULL) {
-        M2C_FIELD(M2C_FIELD(temp_v0, void** , 0x1C), s32* , 0x1C) = arg2;
-        return 1;
+s32 func_00173D08(void* arg0, s32 arg1) {
+    u8 sp[0x30];
+    f32 var_f0;
+    s32 temp_a0;
+    s32 var_s4;
+    s32 var_v0;
+    s32 var_v0_2;
+    s64 temp_v0;
+    s64 var_s0;
+    s64 var_s1;
+    s64 var_s3;
+
+    var_s4 = 0x1B7740;
+    var_s3 = timerGetCurTics__Fv();
+    var_s1 = var_s3;
+    if (arg1 > 0) {
+        var_s4 = arg1 * 0x3E8;
     }
-    return 0;
+    var_s0 = (s64) (var_s3 << 0x20) >> 0x20;
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    var_v0 = 1;
+    if (D_003188E0 == 0) {
+        func_00173C50(arg0);
+        M2C_FIELD(arg0, s32* , 0x2E8C) = 0;
+loop_4:
+        temp_v0 = timerGetCurTics__Fv();
+        if (temp_v0 < var_s0) {
+            var_v0_2 = (temp_v0 + 0x10000) - var_s0;
+        } else {
+            var_v0_2 = temp_v0 - var_s0;
+        }
+        var_s1 += var_v0_2;
+        temp_a0 = var_s1 - var_s3;
+        var_s0 = temp_v0;
+        if (temp_a0 >= 0) {
+            var_f0 = func_001F2CC8(temp_a0);
+        } else {
+            var_f0 = 2.0f * func_001F2CC8((temp_a0 & 1) | ((u64) temp_a0 >> 1));
+        }
+        if ((var_f0 / 576.0f) > 5000.0f) {
+            var_s4 -= 0x1388;
+            var_v0 = 0;
+            if (var_s4 >= 0) {
+                func_00173C50(arg0);
+                var_s3 = timerGetCurTics__Fv();
+                var_s1 = var_s3;
+                var_s0 = (s64) (var_s3 << 0x20) >> 0x20;
+                goto block_13;
+            }
+        } else {
+block_13:
+            func_001703E8(arg0);
+            var_v0 = 1;
+            if (M2C_FIELD(arg0, s32* , 0x2E8C) == 0) {
+                goto loop_4;
+            }
+        }
+    }
+    return var_v0;
 }
-//@@ func_00173F80 m2c
+//@@ func_00173D08 m2c4
 #include "m2c_macros.h"
-s32 func_00173F80(s32 arg0, s32 arg1, s32 arg2) {
-    void* temp_v0;
+extern s32 D_003188E0;
 
-    temp_v0 = netGetDmeTime();
-    if (temp_v0 != NULL) {
-        M2C_FIELD(M2C_FIELD(temp_v0, void** , 0x1C), s32* , 0x20) = arg2;
-        return 1;
+s32 func_00173D08(void* arg0, s32 arg1) {
+    u8 sp[0x20];
+    f32 var_f0;
+    s32 temp_a0;
+    s32 var_s4;
+    s32 var_v0;
+    s32 var_v0_2;
+    s64 temp_v0;
+    s64 var_s0;
+    s64 var_s1;
+    s64 var_s3;
+
+    var_s4 = 0x1B7740;
+    var_s3 = timerGetCurTics__Fv();
+    var_s1 = var_s3;
+    if (arg1 > 0) {
+        var_s4 = arg1 * 0x3E8;
     }
-    return 0;
+    var_s0 = (s64) (var_s3 << 0x20) >> 0x20;
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    var_v0 = 1;
+    if (D_003188E0 == 0) {
+        func_00173C50(arg0);
+        M2C_FIELD(arg0, s32* , 0x2E8C) = 0;
+loop_4:
+        temp_v0 = timerGetCurTics__Fv();
+        if (temp_v0 < var_s0) {
+            var_v0_2 = (temp_v0 + 0x10000) - var_s0;
+        } else {
+            var_v0_2 = temp_v0 - var_s0;
+        }
+        var_s1 += var_v0_2;
+        temp_a0 = var_s1 - var_s3;
+        var_s0 = temp_v0;
+        if (temp_a0 >= 0) {
+            var_f0 = func_001F2CC8(temp_a0);
+        } else {
+            var_f0 = 2.0f * func_001F2CC8((temp_a0 & 1) | ((u64) temp_a0 >> 1));
+        }
+        if ((var_f0 / 576.0f) > 5000.0f) {
+            var_s4 -= 0x1388;
+            var_v0 = 0;
+            if (var_s4 >= 0) {
+                func_00173C50(arg0);
+                var_s3 = timerGetCurTics__Fv();
+                var_s1 = var_s3;
+                var_s0 = (s64) (var_s3 << 0x20) >> 0x20;
+                goto block_13;
+            }
+        } else {
+block_13:
+            func_001703E8(arg0);
+            var_v0 = 1;
+            if (M2C_FIELD(arg0, s32* , 0x2E8C) == 0) {
+                goto loop_4;
+            }
+        }
+    }
+    return var_v0;
 }
-//@@ func_00173FC0 m2c
+//@@ func_00173D08 m2c5
 #include "m2c_macros.h"
-s32 func_00173FC0(void) {
-    void* temp_v0;
+extern s32 D_003188E0;
 
-    temp_v0 = netGetDmeTime();
-    if (temp_v0 != NULL) {
-        return M2C_FIELD(M2C_FIELD(temp_v0, void** , 0x1C), s32* , 0x20);
+s32 func_00173D08(void* arg0, s32 arg1) {
+    u8 sp[0x10];
+    f32 var_f0;
+    s32 temp_a0;
+    s32 var_s4;
+    s32 var_v0;
+    s32 var_v0_2;
+    s64 temp_v0;
+    s64 var_s0;
+    s64 var_s1;
+    s64 var_s3;
+
+    var_s4 = 0x1B7740;
+    var_s3 = timerGetCurTics__Fv();
+    var_s1 = var_s3;
+    if (arg1 > 0) {
+        var_s4 = arg1 * 0x3E8;
     }
-    return 0;
+    var_s0 = (s64) (var_s3 << 0x20) >> 0x20;
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    netSendGameEvent(arg0, func_00173500(arg0), sp);
+    var_v0 = 1;
+    if (D_003188E0 == 0) {
+        func_00173C50(arg0);
+        M2C_FIELD(arg0, s32* , 0x2E8C) = 0;
+loop_4:
+        temp_v0 = timerGetCurTics__Fv();
+        if (temp_v0 < var_s0) {
+            var_v0_2 = (temp_v0 + 0x10000) - var_s0;
+        } else {
+            var_v0_2 = temp_v0 - var_s0;
+        }
+        var_s1 += var_v0_2;
+        temp_a0 = var_s1 - var_s3;
+        var_s0 = temp_v0;
+        if (temp_a0 >= 0) {
+            var_f0 = func_001F2CC8(temp_a0);
+        } else {
+            var_f0 = 2.0f * func_001F2CC8((temp_a0 & 1) | ((u64) temp_a0 >> 1));
+        }
+        if ((var_f0 / 576.0f) > 5000.0f) {
+            var_s4 -= 0x1388;
+            var_v0 = 0;
+            if (var_s4 >= 0) {
+                func_00173C50(arg0);
+                var_s3 = timerGetCurTics__Fv();
+                var_s1 = var_s3;
+                var_s0 = (s64) (var_s3 << 0x20) >> 0x20;
+                goto block_13;
+            }
+        } else {
+block_13:
+            func_001703E8(arg0);
+            var_v0 = 1;
+            if (M2C_FIELD(arg0, s32* , 0x2E8C) == 0) {
+                goto loop_4;
+            }
+        }
+    }
+    return var_v0;
 }
-//@@ func_00173FF0 m2c
+//@@ func_00173FF0 m2c0
 #include "m2c_macros.h"
 s32 func_00173FF0(void* arg0, void* arg1, void* arg2) {
     s32 temp_v1;
@@ -6168,7 +16427,7 @@ s32 func_00173FF0(void* arg0, void* arg1, void* arg2) {
     }
     return 0;
 }
-//@@ func_001740B0 m2c
+//@@ func_001740B0 m2c0
 #include "m2c_macros.h"
 s32 func_001740B0(void* arg0, void* arg1, void* arg2) {
     f32 temp_f0;
@@ -6224,7 +16483,7 @@ block_24:
     }
     return 0;
 }
-//@@ func_001742B0 m2c
+//@@ func_001742B0 m2c0
 #include "m2c_macros.h"
 extern s32 D_004FA030;
 extern s32 D_004FA03C;
@@ -6358,7 +16617,7 @@ block_25:
         goto loop_1;
     }
 }
-//@@ func_00174598 m2c
+//@@ func_00174598 m2c0
 #include "m2c_macros.h"
 void func_00174598(void* arg0) {
     s32 temp_s1;
@@ -6378,7 +16637,7 @@ loop_1:
         goto loop_1;
     }
 }
-//@@ func_00174608 m2c
+//@@ func_00174608 m2c0
 #include "m2c_macros.h"
 void func_00174608(s32 arg0, s32 arg1) {
     s32 var_v0;
@@ -6392,7 +16651,7 @@ void func_00174608(s32 arg0, s32 arg1) {
         var_a0 -= 0x220;
     } while (var_v0 >= 0);
 }
-//@@ func_001746E8 m2c
+//@@ func_001746E8 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9F70;
 extern s32 D_004F9F74;
@@ -6466,7 +16725,7 @@ void func_001746E8(void* arg0) {
     D_004F9F70 = 0;
     D_004F9F74 = 0;
 }
-//@@ func_00174860 m2c
+//@@ func_00174860 m2c0
 #include "m2c_macros.h"
 void func_00174860(void* arg0) {
     s32 var_s2;
@@ -6485,7 +16744,7 @@ void func_00174860(void* arg0) {
     M2C_FIELD(arg0, s32* , 0x307C) = -0x63;
     func_00174910(arg0);
 }
-//@@ func_001748D8 m2c
+//@@ func_001748D8 m2c0
 #include "m2c_macros.h"
 extern s32 D_004FA030;
 
@@ -6494,7 +16753,7 @@ void func_001748D8(s32 arg0) {
     func_00174860(arg0);
     InitTypeOfVehicles__7TheGame(D_004FA030);
 }
-//@@ func_00174BF0 m2c
+//@@ func_00174BF0 m2c0
 #include "m2c_macros.h"
 extern s32 D_004F9CA8;
 extern s32 D_004F9CAC;
@@ -6534,14 +16793,14 @@ void func_00174BF0(void* arg0) {
         }
     }
 }
-//@@ func_00174D58 m2c
+//@@ func_00174D58 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_00320E80;
 
 s32 func_00174D58(void* arg0) {
     return *((M2C_FIELD(M2C_FIELD(arg0, void** , 0x3148), s32* , 0x20) * 4) + &D_00320E80);
 }
-//@@ func_00175588 m2c
+//@@ func_00175588 m2c0
 #include "m2c_macros.h"
 extern void* D_004FA030;
 
@@ -6577,7 +16836,7 @@ block_5:
     }
     return 1;
 }
-//@@ func_001756A0 m2c
+//@@ func_001756A0 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_0041BF00;
 extern M2C_UNK D_004E8528;
@@ -6697,7 +16956,7 @@ loop_24:
     }
     return 1;
 }
-//@@ func_001759D8 m2c
+//@@ func_001759D8 m2c0
 #include "m2c_macros.h"
 void func_001759D8(s32 arg0, void* arg1) {
     s32* temp_v0;
@@ -6731,7 +16990,7 @@ void func_001759D8(s32 arg0, void* arg1) {
         }
     }
 }
-//@@ func_001761E8 m2c
+//@@ func_001761E8 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern void* D_004FA030;
@@ -6912,7 +17171,7 @@ block_52:
 block_53:
     return;
 }
-//@@ func_00176B10 m2c
+//@@ func_00176B10 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 
@@ -6952,7 +17211,87 @@ s32 func_00176B10(void* arg0, s32 arg1) {
     }
     return var_s2;
 }
-//@@ func_00176C20 m2c
+//@@ func_00176B10 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_003156C0;
+
+s32 func_00176B10(void* arg0, s32 arg1) {
+    u8 sp[0x8];
+    s32 var_s0;
+    s32 var_s0_2;
+    s32 var_s2;
+    s32* var_a0;
+    s32* var_s1;
+    s32* var_v1;
+
+    var_s2 = 0;
+    if (func_001733F8(&D_003156C0) != 1) {
+        var_s0 = 0;
+        var_s1 = arg0 + 0xC8;
+        do {
+            func_00264AE0(sp, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0);
+            if ((subroutine_arg0 == 2) && ((*var_s1 == 0) || (arg1 != 0))) {
+                var_s2 += 1;
+            }
+            var_s0 += 1;
+            var_s1 += 0x220;
+        } while (var_s0 < 8);
+    } else {
+        var_v1 = &D_003156C0 + 0x214;
+        var_a0 = arg0 + 0xC8;
+        var_s0_2 = 7;
+        do {
+            if ((*var_v1 >= 9) && ((*var_a0 == 0) || (arg1 != 0))) {
+                var_s2 += 1;
+            }
+            var_a0 += 0x220;
+            var_s0_2 -= 1;
+            var_v1 += 0x220;
+        } while (var_s0_2 >= 0);
+    }
+    return var_s2;
+}
+//@@ func_00176B10 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_003156C0;
+
+s32 func_00176B10(void* arg0, s32 arg1) {
+    u8 sp[0x4];
+    s32 var_s0;
+    s32 var_s0_2;
+    s32 var_s2;
+    s32* var_a0;
+    s32* var_s1;
+    s32* var_v1;
+
+    var_s2 = 0;
+    if (func_001733F8(&D_003156C0) != 1) {
+        var_s0 = 0;
+        var_s1 = arg0 + 0xC8;
+        do {
+            func_00264AE0(sp, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0);
+            if ((subroutine_arg0 == 2) && ((*var_s1 == 0) || (arg1 != 0))) {
+                var_s2 += 1;
+            }
+            var_s0 += 1;
+            var_s1 += 0x220;
+        } while (var_s0 < 8);
+    } else {
+        var_v1 = &D_003156C0 + 0x214;
+        var_a0 = arg0 + 0xC8;
+        var_s0_2 = 7;
+        do {
+            if ((*var_v1 >= 9) && ((*var_a0 == 0) || (arg1 != 0))) {
+                var_s2 += 1;
+            }
+            var_a0 += 0x220;
+            var_s0_2 -= 1;
+            var_v1 += 0x220;
+        } while (var_s0_2 >= 0);
+    }
+    return var_s2;
+}
+//@@ func_00176C20 m2c0
 #include "m2c_macros.h"
 s8 func_00176C20(void* arg0) {
     u8 sp[0x10];
@@ -6973,7 +17312,49 @@ loop_1:
     printf("GetPlayersJoinedList = 0x%x\n", var_s1);
     return var_s1;
 }
-//@@ func_00176CC8 m2c
+//@@ func_00176C20 m2c1
+#include "m2c_macros.h"
+s8 func_00176C20(void* arg0) {
+    u8 sp[0x8];
+    s32 var_s0;
+    s8 var_s1;
+
+    var_s1 = 0;
+    var_s0 = 0;
+loop_1:
+    func_00264AE0(sp, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0);
+    if (subroutine_arg0 == 2) {
+        var_s1 |= 1 << var_s0;
+    }
+    var_s0 += 1;
+    if (var_s0 < 8) {
+        goto loop_1;
+    }
+    printf("GetPlayersJoinedList = 0x%x\n", var_s1);
+    return var_s1;
+}
+//@@ func_00176C20 m2c2
+#include "m2c_macros.h"
+s8 func_00176C20(void* arg0) {
+    u8 sp[0x4];
+    s32 var_s0;
+    s8 var_s1;
+
+    var_s1 = 0;
+    var_s0 = 0;
+loop_1:
+    func_00264AE0(sp, M2C_FIELD(arg0, s32* , 0x2CF0), var_s0);
+    if (subroutine_arg0 == 2) {
+        var_s1 |= 1 << var_s0;
+    }
+    var_s0 += 1;
+    if (var_s0 < 8) {
+        goto loop_1;
+    }
+    printf("GetPlayersJoinedList = 0x%x\n", var_s1);
+    return var_s1;
+}
+//@@ func_00176CC8 m2c0
 #include "m2c_macros.h"
 extern M2C_UNK D_003156C0;
 extern M2C_UNK D_004E7E70;
@@ -7029,7 +17410,119 @@ s32 func_00176CC8(void* arg0) {
     M2C_FIELD(arg0, s32* , 0x307C) = -1;
     return 0;
 }
-//@@ func_00176EA0 m2c
+//@@ func_00176CC8 m2c1
+#include "m2c_macros.h"
+extern M2C_UNK D_003156C0;
+extern M2C_UNK D_004E7E70;
+
+s32 func_00176CC8(void* arg0) {
+    u8 sp[0x8];
+    s32 temp_s2;
+    s32 temp_v0;
+    void* temp_a0;
+    void* temp_a0_2;
+    void* temp_a1;
+    void* temp_v1;
+
+    temp_s2 = netGetMyClientIndex(&D_003156C0);
+    if (func_002663F0(M2C_FIELD(arg0, s32* , 0x2CF0), sp) == 0) {
+        M2C_FIELD(arg0, s32* , 0x307C) = (s32) subroutine_arg0;
+        if (subroutine_arg0 == temp_s2) {
+            if (func_00176B10(&D_003156C0, 1) <= 0) {
+                M2C_FIELD(&D_003156C0, s32* , 0x1BB0) = (s32) M2C_FIELD(&D_003156C0, s32* , 0x1BB4);
+                if (M2C_FIELD(&D_003156C0, s32* , 0x1BB4) >= 9) {
+                    M2C_FIELD(&D_003156C0, s32* , 0x1BB0) = 8;
+                }
+            }
+            if (M2C_FIELD(&D_003156C0, s32* , 0x1BB4) < 0xA) {
+                *M2C_FIELD(&D_003156C0, u32** , 0x3148) &= ~1;
+            }
+            M2C_FIELD(arg0, s32* , 0x307C) = temp_s2;
+            printf(&D_004E7E70);
+            printf(">>>>> 3 Setting ConnectionSessionMaster = %d\n\0BASCUS-97196\0\0\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789\0\\PTS\\PEDANIM.CFG;1", M2C_FIELD(arg0, s32* , 0x307C));
+            printf(&D_004E7E70);
+            temp_v0 = ((u32) *M2C_FIELD(&D_003156C0, u32** , 0x3148) >> 1) & 0xF;
+            if (temp_v0 == 1) {
+                M2C_FIELD(&D_003156C0, s32* , 0x1BB0) = temp_v0;
+                memset(M2C_FIELD(arg0, void** , 0x3148), 0, 0xC8);
+                temp_a0 = M2C_FIELD(arg0, void** , 0x3148);
+                M2C_FIELD(temp_a0, s32* , 0) = (s32) ((M2C_FIELD(temp_a0, s32* , 0) & ~0x1E) | 4);
+                temp_v1 = M2C_FIELD(arg0, void** , 0x3148);
+                M2C_FIELD(temp_v1, s32* , 0) = (s32) (M2C_FIELD(temp_v1, s32* , 0) & ~0x20);
+                temp_a0_2 = M2C_FIELD(arg0, void** , 0x3148);
+                M2C_FIELD(temp_a0_2, s32* , 0) = (s32) ((M2C_FIELD(temp_a0_2, s32* , 0) & ~0x3C0) | 0x40);
+                temp_a1 = M2C_FIELD(arg0, void** , 0x3148);
+                M2C_FIELD(temp_a1, s32* , 0) = (s32) ((M2C_FIELD(temp_a1, s32* , 0) & ~0xC00) | 0x800);
+                M2C_FIELD(M2C_FIELD(arg0, void** , 0x3148), s8* , 4) = 8;
+                M2C_FIELD(M2C_FIELD(arg0, void** , 0x3148), s8* , 0x1A) = -1;
+                M2C_FIELD(M2C_FIELD(arg0, void** , 0x3148), s8* , 0x1B) = -1;
+                M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((M2C_FIELD(arg0, s64* , 0x3080) & 0xFFC0FFFF) | 0x230000);
+            }
+            func_00174988(&D_003156C0, -1);
+            return 1;
+        }
+        return 0;
+    }
+    M2C_FIELD(arg0, s32* , 0x307C) = -1;
+    return 0;
+}
+//@@ func_00176CC8 m2c2
+#include "m2c_macros.h"
+extern M2C_UNK D_003156C0;
+extern M2C_UNK D_004E7E70;
+
+s32 func_00176CC8(void* arg0) {
+    u8 sp[0x4];
+    s32 temp_s2;
+    s32 temp_v0;
+    void* temp_a0;
+    void* temp_a0_2;
+    void* temp_a1;
+    void* temp_v1;
+
+    temp_s2 = netGetMyClientIndex(&D_003156C0);
+    if (func_002663F0(M2C_FIELD(arg0, s32* , 0x2CF0), sp) == 0) {
+        M2C_FIELD(arg0, s32* , 0x307C) = (s32) subroutine_arg0;
+        if (subroutine_arg0 == temp_s2) {
+            if (func_00176B10(&D_003156C0, 1) <= 0) {
+                M2C_FIELD(&D_003156C0, s32* , 0x1BB0) = (s32) M2C_FIELD(&D_003156C0, s32* , 0x1BB4);
+                if (M2C_FIELD(&D_003156C0, s32* , 0x1BB4) >= 9) {
+                    M2C_FIELD(&D_003156C0, s32* , 0x1BB0) = 8;
+                }
+            }
+            if (M2C_FIELD(&D_003156C0, s32* , 0x1BB4) < 0xA) {
+                *M2C_FIELD(&D_003156C0, u32** , 0x3148) &= ~1;
+            }
+            M2C_FIELD(arg0, s32* , 0x307C) = temp_s2;
+            printf(&D_004E7E70);
+            printf(">>>>> 3 Setting ConnectionSessionMaster = %d\n\0BASCUS-97196\0\0\0 !\"#$%&'()*+,-.0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_abcdefghijklmnopqrstuvwxyz{}\0\00123456789\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\0 .0123456789\0\\PTS\\PEDANIM.CFG;1", M2C_FIELD(arg0, s32* , 0x307C));
+            printf(&D_004E7E70);
+            temp_v0 = ((u32) *M2C_FIELD(&D_003156C0, u32** , 0x3148) >> 1) & 0xF;
+            if (temp_v0 == 1) {
+                M2C_FIELD(&D_003156C0, s32* , 0x1BB0) = temp_v0;
+                memset(M2C_FIELD(arg0, void** , 0x3148), 0, 0xC8);
+                temp_a0 = M2C_FIELD(arg0, void** , 0x3148);
+                M2C_FIELD(temp_a0, s32* , 0) = (s32) ((M2C_FIELD(temp_a0, s32* , 0) & ~0x1E) | 4);
+                temp_v1 = M2C_FIELD(arg0, void** , 0x3148);
+                M2C_FIELD(temp_v1, s32* , 0) = (s32) (M2C_FIELD(temp_v1, s32* , 0) & ~0x20);
+                temp_a0_2 = M2C_FIELD(arg0, void** , 0x3148);
+                M2C_FIELD(temp_a0_2, s32* , 0) = (s32) ((M2C_FIELD(temp_a0_2, s32* , 0) & ~0x3C0) | 0x40);
+                temp_a1 = M2C_FIELD(arg0, void** , 0x3148);
+                M2C_FIELD(temp_a1, s32* , 0) = (s32) ((M2C_FIELD(temp_a1, s32* , 0) & ~0xC00) | 0x800);
+                M2C_FIELD(M2C_FIELD(arg0, void** , 0x3148), s8* , 4) = 8;
+                M2C_FIELD(M2C_FIELD(arg0, void** , 0x3148), s8* , 0x1A) = -1;
+                M2C_FIELD(M2C_FIELD(arg0, void** , 0x3148), s8* , 0x1B) = -1;
+                M2C_FIELD(arg0, s64* , 0x3080) = (s64) ((M2C_FIELD(arg0, s64* , 0x3080) & 0xFFC0FFFF) | 0x230000);
+            }
+            func_00174988(&D_003156C0, -1);
+            return 1;
+        }
+        return 0;
+    }
+    M2C_FIELD(arg0, s32* , 0x307C) = -1;
+    return 0;
+}
+//@@ func_00176EA0 m2c0
 #include "m2c_macros.h"
 extern u32* D_00318808;
 extern void* D_004FA030;

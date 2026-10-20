@@ -47,14 +47,19 @@ for asmdir, name in items:
     body = re.sub(rf"^(.*\b{re.escape(name)})\((.*)\) \{{", fill, body, count=1, flags=re.M)
     # bare `sp` = address of a local buffer at the bottom of the frame: declare it, sized from
     # the frame minus the 16-byte register save slots
+    variants = [body]
     if re.search(r"\bsp\b", body) and not re.search(r"\bsp\[", body):
         frame = re.search(r"addiu\s+\$29, \$29, -(0x[0-9A-F]+)", t)
         saves = len(re.findall(r"\bsq\s+\$\d+, 0x[0-9A-F]+\(\$29\)", t))
-        if frame and int(frame.group(1), 16) - 16 * saves > 0:
-            body = re.sub(rf"^(.*\b{re.escape(name)}\(.*\) \{{)$",
-                          lambda m: m.group(1) + f"\n    u8 sp[0x{int(frame.group(1), 16) - 16 * saves:X}];",
-                          body, count=1, flags=re.M)
-    blocks.append(f"//@@ {name} m2c\n#include \"m2c_macros.h\"\n" + body + "\n")
+        room = int(frame.group(1), 16) - 16 * saves if frame else 0
+        if room > 0:
+            # the right buffer size is unknown; try a few (largest first), fast_match keeps the first MATCH
+            sizes = sorted({room, *range(16, room, 16), 4, 8}, reverse=True)[:6]
+            variants = [re.sub(rf"^(.*\b{re.escape(name)}\(.*\) \{{)$",
+                               lambda m, n=n: m.group(1) + f"\n    u8 sp[0x{n:X}];", body, count=1, flags=re.M)
+                        for n in sizes]
+    for i, v in enumerate(variants):
+        blocks.append(f"//@@ {name} m2c{i}\n#include \"m2c_macros.h\"\n" + v + "\n")
     stats["ok"] += 1
 out.write_text("".join(blocks))
 print(f"{len(items)} INCLUDE_ASM functions -> drafts written: {stats['ok']}  "
