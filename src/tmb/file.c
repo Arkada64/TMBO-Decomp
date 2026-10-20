@@ -4,11 +4,26 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", fileWritef__FPcPv
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", func_002008E8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", getTexFilesLoaded__Fv);
+#include "m2c_macros.h"
+extern s8 D_0048AC48_ed__Fv __asm__("D_0048AC48");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", getNgpFilesLoaded__Fv);
+s8 getTexFilesLoaded__Fv(void) {
+    return D_0048AC48_ed__Fv;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", getResFilesLoaded__Fv);
+#include "m2c_macros.h"
+extern s8 D_0048AC84_ed__Fv __asm__("D_0048AC84");
+
+s8 getNgpFilesLoaded__Fv(void) {
+    return D_0048AC84_ed__Fv;
+}
+
+#include "m2c_macros.h"
+extern s8 D_0048ACC0_ed__Fv __asm__("D_0048ACC0");
+
+s8 getResFilesLoaded__Fv(void) {
+    return D_0048ACC0_ed__Fv;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", getNextNgpLoadAddr__Fv);
 
