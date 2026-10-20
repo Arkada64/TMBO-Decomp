@@ -14,7 +14,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigiddebris", func_00182
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigiddebris", createInstance__11RigidDebris);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigiddebris", destroyInstance__11RigidDebrisP11RigidDebris);
+#include "m2c_macros.h"
+void destroyInstance__11RigidDebrisP11RigidDebris(void* arg0) {
+    M2C_FIELD(M2C_FIELD(arg0, void** , 0x110), s8* , 0xC) = 0;
+    M2C_FIELD(M2C_FIELD(arg0, void** , 0x110), s8* , 0xD) = 0;
+    M2C_FIELD(arg0, s32* , 8) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigiddebris", getExistingInstance__11RigidDebrisUi);
 
