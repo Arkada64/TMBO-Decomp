@@ -37,7 +37,8 @@ blocks = re.split(r"^//@@ (\S+) ?(\S*)\n", Path(sys.argv[1]).read_text(), flags=
 for name, label, code in zip(blocks[0::3], blocks[1::3], blocks[2::3]):
     (WORK / "v.c").write_text(f'#include "{header}"\n{code}')
     rel = os.path.relpath(R / SN, WORK)
-    r = subprocess.run([f"{R / SN}/bin/ee-gcc.exe", f"-B{rel}/lib/gcc-lib/ee/2.95.3/", "-S", "-O2", "-G0",
+    extra = os.environ.get("FLAGS", "").split()
+    r = subprocess.run([f"{R / SN}/bin/ee-gcc.exe", f"-B{rel}/lib/gcc-lib/ee/2.95.3/", "-S", "-O2", "-G0", *extra,
                         "-Iinclude", "v.c", "-o", "v.s"], cwd=WORK, capture_output=True, text=True)
     if r.returncode: print(f"{name} [{label}] COMPILE FAILED: {r.stderr.strip()[-300:]}"); continue
     s = (WORK / "v.s").read_text()

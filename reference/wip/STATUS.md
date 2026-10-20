@@ -9,10 +9,20 @@
 - `use_gp_rel_macro_nonmatching: True` in the yaml, so INCLUDE_ASM files spell out `%gp_rel(...)($gp)` under -G0.
 - Compilers live in `tools/compilers/` (not in git; github.com/decompme/compilers, release "compilers").
 
-## Matched C in src/online/net.c (build is byte-identical)
-- `netGetMyClientIndex`, `netGetDmeTime`, `func_00174268`
+## Matched in C so far (build byte-identical)
+- `netGetMyClientIndex`, `netGetDmeTime`, `func_00174268`, `netMsgChatHandler` (early-return form)
+
+## Open toolchain issue (do this next)
+- `netSendGameEvent` is right except one global load: the original has `lui a3,%hi(D)` / `lw a3,%lo(D)(a3)`
+  back to back (an unsplit `lw $7,D` macro expanded by SN's assembler). Our SN `-S` output splits it
+  (`lui $2,...` scheduled early). `-mno-split-addresses` fixes that load but turns every `la` into 64-bit
+  `daddiu` under GNU as, breaking the other 4 (see logs from variants3, `reference/wip/variants3.c`).
+- Conclusion: C functions need SN's own assembler; INCLUDE_ASM functions need GNU as.
+  Plan: asm-processor-style splice. Build C-only object with the full SN toolchain (`-c`, INCLUDE_ASM
+  defined empty), build the INCLUDE_ASM-only object with GNU as, then splice each C function's bytes
+  and relocations into place by symbol, preserving order. Verify with cmp after each step.
 
 ## Next
-- Near misses in `reference/wip/net_funcs.c`: `netMsgChatHandler` (4 insns), `netSendGameEvent` (5 insns).
+- Write the splice tool (above), re-test all 5 with SN as.
 - Workflow per function: write C -> `python3 tools/apply_c.py src/online/net.c <file>` -> `ninja` -> `cmp` / `tools/funcdiff.py`.
 - After a config or toolchain change: `./configure.py distclean && ./configure.py generate && ninja`.
