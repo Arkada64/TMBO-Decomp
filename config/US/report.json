@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.15149441,
-    "total_code": "1753200",
+    "fuzzy_match_percent": 0.15149476,
+    "total_code": "1753196",
     "matched_code": "2656",
-    "matched_code_percent": 0.15149441,
+    "matched_code_percent": 0.15149476,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -3847,7 +3847,7 @@
     {
       "name": "tmb/drivein",
       "measures": {
-        "total_code": "1280",
+        "total_code": "1276",
         "matched_data_percent": 100.0,
         "total_functions": 5,
         "total_units": 1
@@ -3855,7 +3855,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "1280",
+          "size": "1276",
           "metadata": {
             "virtual_address": "1236448"
           }
@@ -3892,7 +3892,7 @@
         },
         {
           "name": "AddEpNode__7DriveIniP9_hierhead",
-          "size": "24",
+          "size": "20",
           "metadata": {
             "virtual_address": "1237704"
           }
@@ -50861,10 +50861,10 @@
       "id": "tmb",
       "name": "tmb",
       "measures": {
-        "fuzzy_match_percent": 0.023010574,
-        "total_code": "1112532",
+        "fuzzy_match_percent": 0.023010656,
+        "total_code": "1112528",
         "matched_code": "256",
-        "matched_code_percent": 0.023010574,
+        "matched_code_percent": 0.023010656,
         "matched_data_percent": 100.0,
         "total_functions": 2731,
         "matched_functions": 32,
