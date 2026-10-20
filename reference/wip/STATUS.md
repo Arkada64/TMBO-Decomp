@@ -15,9 +15,20 @@
 ## Matched in C (build byte-identical)
 - `netGetMyClientIndex`, `netGetDmeTime`, `func_00174268`, `netMsgChatHandler` (early-return form)
 
-## Open
+## Progress
+- 17 of 241 functions in src/online/net.c are matched C (batches in reference/wip/batch1-3.c).
+- Batch workflow: `python3 tools/batch_try.py src/online/net.c <file>` tries variants per function in the
+  real build, keeps byte-identical ones, prints `>>` diffs for misses. "subcommand failed" = ninja's sha1
+  check, i.e. a mismatch, not a compile error.
+
+## Open (with hints from diffs, reference/wip/batch3.c)
 - `netSendGameEvent`: logic right; the message-id global load is split (`lui v0` early) where the original
-  has `lui a3`/`lw a3` back to back. Not a flag (see above); a source-shape difference still to find.
+  has `lui a3`/`lw a3` back to back. Not a flag; a source-shape difference still to find.
+- `func_00164240` (log append): original falls through to success and branches away on failure; ours is
+  inverted -> try a result variable (`ret = 0; if (...) {...; ret = 1;} return ret;`) or `if (n >= 0x100) return 0;`.
+- `func_0016D638` (RTime shutdown): only the register for the constant 4 (orig v1) and where `return 0`
+  is set differ -> try `void` + separate caller-visible result, or a temp variable for 4.
+- `func_001653D8` (callbacks): lui/addiu order differs -> try other assignment orders of cb.fn[0..3].
 
 ## Workflow
 - Per function: write C -> `python3 tools/apply_c.py src/online/net.c <file>` -> `ninja` -> `cmp`.
