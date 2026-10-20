@@ -86,7 +86,17 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationGetT
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationGetFrameAtPercent__FR11_animHandlef);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationSetIterations__FR11_animHandleUs);
+#include "m2c_macros.h"
+#include "m2c_macros.h"
+void animationSetIterations__FR11_animHandleUs(void *arg0, s32 arg1)
+{
+  int new_var;
+  new_var = arg1 & 0xFFFF;
+  if ((*((s32 *) (((u8 *) arg0) + 0))) != 0)
+  {
+    *((s16 *) (((u8 *) (*((void **) (((u8 *) arg0) + 4)))) + 0x2A)) = (s16) new_var;
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationCheckDirty__FP17_animCharInstanceP14_animtransform);
 
