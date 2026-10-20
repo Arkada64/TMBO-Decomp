@@ -30,7 +30,20 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010BC10)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", attractInitPoints__15AttractorPointsii);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010BD88);
+#include "m2c_macros.h"
+void func_0010BD88(void* arg0) {
+    s32 temp_v1;
+    s32 var_a1;
+
+    var_a1 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x24C) > 0) {
+        do {
+            temp_v1 = var_a1 * 4;
+            var_a1 += 1;
+            M2C_FIELD((temp_v1 + M2C_FIELD(arg0, s32* , 4)), s16* , 2) = 0;
+        } while (var_a1 < M2C_FIELD(arg0, s32* , 0x24C));
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010BDC0);
 
