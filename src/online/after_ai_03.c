@@ -31,15 +31,27 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_00
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A588);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A678);
+#include "m2c_macros.h"
+s32 func_0010A678(void* arg0) {
+    return M2C_FIELD(arg0, s32* , 0xD4);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A680);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A748);
+#include "m2c_macros.h"
+M2C_UNK func_0028B414_10A748() __asm__("func_0028B414");
+
+void func_0010A748(void* arg0) {
+    func_0028B414_10A748();
+    M2C_FIELD(arg0, s32* , 0xD4) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A770);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A7D8);
+#include "m2c_macros.h"
+void func_0010A7D8(void* arg0, s32 arg1) {
+    M2C_FIELD(arg0, s32* , 0xDC) = arg1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010A7E0);
 
@@ -59,8 +71,23 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_00
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010AD30);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010AE80);
+#include "m2c_macros.h"
+M2C_UNK func_0010A1F0_10AE80() __asm__("func_0010A1F0");
+extern M2C_UNK D_002B8A00_10AE80 __asm__("D_002B8A00");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010AEB0);
+void func_0010AE80(s32 arg0, s32 arg1) {
+    if (arg1 == 0xFFFF) {
+        if (arg0 != 0) {
+            func_0010A1F0_10AE80(&D_002B8A00_10AE80);
+        }
+    }
+}
+
+#include "m2c_macros.h"
+M2C_UNK func_0010AE80_10AEB0() __asm__("func_0010AE80");
+
+void func_0010AEB0(void) {
+    func_0010AE80_10AEB0(1, 0xFFFF);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_ai_03", func_0010AED0);
