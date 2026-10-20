@@ -1,6 +1,12 @@
 #include "common.h"
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/CsColor", __Q27CsColor4Data);
+#include "m2c_macros.h"
+void* __Q27CsColor4Data(void* arg0) {
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    M2C_FIELD(arg0, f32* , 4) = 1.0f;
+    M2C_FIELD(arg0, s32* , 8) = 0;
+    return arg0;
+}
 
 #include "m2c_macros.h"
 extern s32 D_00505D80_Colorv __asm__("D_00505D80");
