@@ -32,7 +32,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", plightSetRange_
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", plightSetColor__FP11_pointlightfff);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", plightGetParaLight__Fv);
+#include "m2c_macros.h"
+extern M2C_UNK D_004B9F50_ht__Fv __asm__("D_004B9F50");
+
+M2C_UNK* plightGetParaLight__Fv(void) {
+    return &D_004B9F50_ht__Fv;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", plightInObject__FPA3_fP9_fvector4T1fT1P3_cs);
 
@@ -63,4 +68,9 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", func_0022F888);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", plightRenderObj__Fv);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", plightGetPktPtr__Fv);
+#include "m2c_macros.h"
+extern M2C_UNK D_004BA050_tr__Fv __asm__("D_004BA050");
+
+M2C_UNK* plightGetPktPtr__Fv(void) {
+    return &D_004BA050_tr__Fv;
+}

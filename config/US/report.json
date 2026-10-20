@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.15149648,
-    "total_code": "1753176",
+    "fuzzy_match_percent": 0.15149683,
+    "total_code": "1753172",
     "matched_code": "2656",
-    "matched_code_percent": 0.15149648,
+    "matched_code_percent": 0.15149683,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -27772,10 +27772,10 @@
     {
       "name": "tmb/plight",
       "measures": {
-        "fuzzy_match_percent": 0.16207455,
-        "total_code": "4936",
+        "fuzzy_match_percent": 0.162206,
+        "total_code": "4932",
         "matched_code": "8",
-        "matched_code_percent": 0.16207455,
+        "matched_code_percent": 0.162206,
         "matched_data_percent": 100.0,
         "total_functions": 32,
         "matched_functions": 1,
@@ -27785,8 +27785,8 @@
       "sections": [
         {
           "name": ".text",
-          "size": "4936",
-          "fuzzy_match_percent": 0.16207455,
+          "size": "4932",
+          "fuzzy_match_percent": 0.162206,
           "metadata": {
             "virtual_address": "2287768"
           }
@@ -28013,7 +28013,7 @@
         },
         {
           "name": "plightGetPktPtr__Fv",
-          "size": "16",
+          "size": "12",
           "metadata": {
             "virtual_address": "2292688"
           }
@@ -50861,10 +50861,10 @@
       "id": "tmb",
       "name": "tmb",
       "measures": {
-        "fuzzy_match_percent": 0.02301107,
-        "total_code": "1112508",
+        "fuzzy_match_percent": 0.023011154,
+        "total_code": "1112504",
         "matched_code": "256",
-        "matched_code_percent": 0.02301107,
+        "matched_code_percent": 0.023011154,
         "matched_data_percent": 100.0,
         "total_functions": 2731,
         "matched_functions": 32,
