@@ -20,7 +20,18 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodder", fodderUpdateBli
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodder", fodderGetBlinkerOffState__7Vehicle);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodder", fodderGetBlinkerOnState__7Vehicle);
+#include "m2c_macros.h"
+s32 fodderGetBlinkerOnState__7Vehicle(void* arg0) {
+    s32 temp_v0;
+    s32 var_v1;
+
+    temp_v0 = M2C_FIELD(arg0, s32* , 0x20AC);
+    var_v1 = 1;
+    if (temp_v0 != 0) {
+        var_v1 = ((temp_v0 ^ 1) != 0) ? 0 : 2;
+    }
+    return var_v1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodder", fodderBrakeLights__7Vehicleb);
 
