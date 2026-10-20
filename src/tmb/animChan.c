@@ -40,7 +40,25 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationSetT
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FC170);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationPause__FR11_animHandle);
+#include "m2c_macros.h"
+f32 animationCalculatePlayTime__FR11_animHandle_Handle() __asm__("animationCalculatePlayTime__FR11_animHandle");
+s32 timerGetFieldCount__Fv_Handle() __asm__("timerGetFieldCount__Fv");
+
+void animationPause__FR11_animHandle(void* arg0) {
+    s32 temp_v0;
+    void* temp_v1;
+    void* temp_v1_2;
+
+    if ((M2C_FIELD(arg0, s32* , 0) != 0) && (M2C_FIELD(M2C_FIELD(arg0, void** , 4), u8* , 0x28) != 0)) {
+        temp_v0 = timerGetFieldCount__Fv_Handle();
+        temp_v1 = M2C_FIELD(arg0, void** , 4);
+        M2C_FIELD(temp_v1, s32* , 0x14) = (s32) (temp_v0 - M2C_FIELD(temp_v1, s32* , 0x14));
+        M2C_FIELD(M2C_FIELD(arg0, void** , 4), f32* , 0x20) = animationCalculatePlayTime__FR11_animHandle_Handle(arg0);
+        temp_v1_2 = M2C_FIELD(arg0, void** , 4);
+        M2C_FIELD(temp_v1_2, s32* , 0x24) = (s32) (temp_v0 - M2C_FIELD(temp_v1_2, s32* , 0x14));
+        M2C_FIELD(M2C_FIELD(arg0, void** , 4), u8* , 0x28) = 0U;
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationResume__FR11_animHandle);
 
