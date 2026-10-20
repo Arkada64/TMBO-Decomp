@@ -15,7 +15,18 @@ void func_00134F60(void* arg0) {
 void setupCheapDriving__12FodderDriver(void) {
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", updateCheapDriving__12FodderDriver);
+#include "m2c_macros.h"
+M2C_UNK updatePosition__12FodderDriverb_Driver() __asm__("updatePosition__12FodderDriverb");
+M2C_UNK updateSteering__12FodderDriver_Driver() __asm__("updateSteering__12FodderDriver");
+
+void updateCheapDriving__12FodderDriver(void** arg0) {
+    void* temp_v1;
+
+    updateSteering__12FodderDriver_Driver();
+    updatePosition__12FodderDriverb_Driver(arg0, 0);
+    temp_v1 = *arg0;
+    M2C_FIELD(temp_v1, s32* , 0x17D8) = (s32) (M2C_FIELD(temp_v1, s32* , 0x17D8) + 1);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", updatePosition__12FodderDriverb);
 
