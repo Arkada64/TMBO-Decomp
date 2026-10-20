@@ -61,6 +61,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", updateCu
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", getRangeToWaypoint2__13HighwayDriverPQ27Highway8Waypoint);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", handleEndOfHighway__13HighwayDriver);
+#include "m2c_macros.h"
+M2C_UNK func_001430E0_Driver() __asm__("func_001430E0");
+s32 getWaypointIndex__7HighwayPQ27Highway8Waypoint_Driver() __asm__("getWaypointIndex__7HighwayPQ27Highway8Waypoint");
+
+void handleEndOfHighway__13HighwayDriver(void* arg0) {
+    void* temp_s1;
+
+    temp_s1 = M2C_FIELD(arg0, void** , 0x14);
+    func_001430E0_Driver(arg0, M2C_FIELD(arg0, void** , 0x14) + (((getWaypointIndex__7HighwayPQ27Highway8Waypoint_Driver(temp_s1, M2C_FIELD(arg0, s32* , 0x18)) % (s32) M2C_FIELD(temp_s1, s32* , 0x2450)) * 0x10) + 0x10));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", getWaypointIndex__7HighwayPQ27Highway8Waypoint);
