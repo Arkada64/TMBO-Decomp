@@ -44,7 +44,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfRotAxisToMa
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021DB18);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021DE90);
+#include "m2c_macros.h"
+M2C_UNK func_0021DB18_21DE90() __asm__("func_0021DB18");
+M2C_UNK mathfUnitMatrixAsm__FPA3_f_21DE90() __asm__("mathfUnitMatrixAsm__FPA3_f");
+
+void func_0021DE90(s32 arg0, M2C_UNK arg1) {
+    u8 sp[0x40];
+    mathfUnitMatrixAsm__FPA3_f_21DE90(sp);
+    func_0021DB18_21DE90(arg0, sp, arg1);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfCopyVector__FP8_fvectorT0);
 
