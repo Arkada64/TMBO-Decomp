@@ -68,7 +68,10 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierCsAddToCsLis
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", func_00214088);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierSetCsEpNode__FP3_csP9_hierhead);
+#include "m2c_macros.h"
+void hierSetCsEpNode__FP3_csP9_hierhead(s32* arg0, s32 arg1) {
+    *arg0 = arg1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierCsPtLightMe__FP3_csi);
 
@@ -90,7 +93,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierSetKlod__Ff)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierGetKlod__Fv);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierGetBigBufAddr__Fv);
+#include "m2c_macros.h"
+extern M2C_UNK D_00566480_dr__Fv __asm__("D_00566480");
+
+M2C_UNK* hierGetBigBufAddr__Fv(void) {
+    return &D_00566480_dr__Fv;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", func_00214290);
 
