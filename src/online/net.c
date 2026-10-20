@@ -189,7 +189,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001669A0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001669C8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", netMsgChatHandler);
+int netMsgChatHandler(int unused0, int unused1, int client, void* text) {
+    NetChatLine line;
+
+    func_001188C0(&line);
+    if (client == 0x100) {
+        return 0x44;
+    }
+    strcpy(line.name, D_003156D8 + client * 0x220);
+    line.client = client;
+    func_00118380(&line, text);
+    func_001186C8(D_002B90A0, &line);
+    return 0x44;
+}
 
 INCLUDE_RODATA("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", D_004E6500);
 
