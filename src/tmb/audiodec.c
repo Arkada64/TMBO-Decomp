@@ -4,7 +4,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/audiodec", func_002468C8
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/audiodec", audioDecReset__FP8AudioDec);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/audiodec", func_00246980);
+#include "m2c_macros.h"
+M2C_UNK func_001FADF0_246980() __asm__("func_001FADF0");
+M2C_UNK func_001FAE40_246980() __asm__("func_001FAE40");
+
+s32 func_00246980(void) {
+    func_001FADF0_246980();
+    func_001FAE40_246980();
+    return 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/audiodec", func_002469A8);
 
@@ -24,4 +32,9 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/audiodec", sendToIOP__Fi
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/audiodec", audioDecPause__FP8AudioDec);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/audiodec", audioDecResume__FP8AudioDec);
+#include "m2c_macros.h"
+M2C_UNK audioDecStart__FP8AudioDec_dioDec() __asm__("audioDecStart__FP8AudioDec");
+
+void audioDecResume__FP8AudioDec(void) {
+    audioDecStart__FP8AudioDec_dioDec();
+}

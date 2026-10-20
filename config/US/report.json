@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.15149407,
-    "total_code": "1753204",
+    "fuzzy_match_percent": 0.15149441,
+    "total_code": "1753200",
     "matched_code": "2656",
-    "matched_code_percent": 0.15149407,
+    "matched_code_percent": 0.15149441,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -31040,7 +31040,7 @@
     {
       "name": "tmb/audiodec",
       "measures": {
-        "total_code": "1784",
+        "total_code": "1780",
         "matched_data_percent": 100.0,
         "total_functions": 13,
         "total_units": 1
@@ -31048,7 +31048,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "1784",
+          "size": "1780",
           "metadata": {
             "virtual_address": "2386120"
           }
@@ -31141,7 +31141,7 @@
         },
         {
           "name": "audioDecResume__FP8AudioDec",
-          "size": "32",
+          "size": "28",
           "metadata": {
             "virtual_address": "2387872"
           }
@@ -50861,10 +50861,10 @@
       "id": "tmb",
       "name": "tmb",
       "measures": {
-        "fuzzy_match_percent": 0.02301049,
-        "total_code": "1112536",
+        "fuzzy_match_percent": 0.023010574,
+        "total_code": "1112532",
         "matched_code": "256",
-        "matched_code_percent": 0.02301049,
+        "matched_code_percent": 0.023010574,
         "matched_data_percent": 100.0,
         "total_functions": 2731,
         "matched_functions": 32,
