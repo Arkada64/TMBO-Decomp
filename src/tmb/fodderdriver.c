@@ -4,7 +4,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", init__12F
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_00134DD0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_00134F60);
+#include "m2c_macros.h"
+M2C_UNK removeOccupant__12AttractPointP7Vehicle_134F60() __asm__("removeOccupant__12AttractPointP7Vehicle");
+
+void func_00134F60(void* arg0) {
+    removeOccupant__12AttractPointP7Vehicle_134F60(M2C_FIELD(arg0, s32* , 0xC), M2C_FIELD(arg0, s32* , 0));
+    M2C_FIELD(arg0, s32* , 8) = 0;
+}
 
 void setupCheapDriving__12FodderDriver(void) {
 }
@@ -17,7 +23,20 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_0013
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", updateSteering__12FodderDriver);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", reattach__12FodderDriverP12AttractPoint);
+#include "m2c_macros.h"
+M2C_UNK addOccupant__12AttractPointP7Vehicle_tPoint() __asm__("addOccupant__12AttractPointP7Vehicle");
+M2C_UNK removeOccupant__12AttractPointP7Vehicle_tPoint() __asm__("removeOccupant__12AttractPointP7Vehicle");
+
+void reattach__12FodderDriverP12AttractPoint(void* arg0, s32 arg1) {
+    s32 temp_a0;
+
+    temp_a0 = M2C_FIELD(arg0, s32* , 0xC);
+    if (temp_a0 != arg1) {
+        removeOccupant__12AttractPointP7Vehicle_tPoint(temp_a0, M2C_FIELD(arg0, s32* , 0));
+        M2C_FIELD(arg0, s32* , 0xC) = arg1;
+        addOccupant__12AttractPointP7Vehicle_tPoint(arg1, M2C_FIELD(arg0, s32* , 0));
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", getClosestCarInPath__12FodderDriverPf);
 
@@ -35,7 +54,11 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_0013
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_00135E00);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", forceFullCollis__12FodderDriver);
+#include "m2c_macros.h"
+void forceFullCollis__12FodderDriver(void** arg0) {
+    M2C_FIELD(*arg0, s32* , 0x17D0) = 0;
+    M2C_FIELD(*arg0, s32* , 0x1A64) = 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", vectorCrossUp__12FodderDriverP8_fvectorT1);
 
