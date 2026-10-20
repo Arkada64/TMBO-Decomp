@@ -36335,7 +36335,7 @@
           }
         },
         {
-          "name": "func_00266378",
+          "name": "dmeGetMyClientIndex",
           "size": "120",
           "metadata": {
             "virtual_address": "2515832"
@@ -36501,7 +36501,7 @@
           }
         },
         {
-          "name": "func_00266C58",
+          "name": "dmeGetTime",
           "size": "72",
           "metadata": {
             "virtual_address": "2518104"

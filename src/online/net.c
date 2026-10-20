@@ -1,4 +1,4 @@
-#include "common.h"
+#include "online/net.h"
 
 void func_001625D8(void) {
 }
