@@ -28,7 +28,18 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vibuf", viBufRestartDMA_
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vibuf", func_00249180);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vibuf", func_002491D8);
+#include "m2c_macros.h"
+M2C_UNK SignalSema_2491D8() __asm__("SignalSema");
+M2C_UNK WaitSema_2491D8() __asm__("WaitSema");
+
+s32 func_002491D8(void* arg0) {
+    s32 temp_s1;
+
+    WaitSema_2491D8(M2C_FIELD(arg0, s32* , 0x40));
+    temp_s1 = M2C_FIELD(arg0, s32* , 0x44);
+    SignalSema_2491D8(M2C_FIELD(arg0, s32* , 0x40));
+    return temp_s1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vibuf", viBufCount__FP5ViBuf);
 
