@@ -35,6 +35,12 @@
   (2) assisted matching in batches (assistant writes C variants, tools/batch_try.py verifies);
   (3) the 11 rejected + 14 shared-rodata files.
 - Re-run auto_all.py any time; it resumes on what is left (log: logs/auto_all.txt).
+- Fixed M2C_FIELD (m2c passes the pointer type; old macro added a pointer level, breaking all float
+  fields). Earlier matches use M2C_FIELD_V1 (old form) so their verified bytes are untouched.
+  Draft compile errors fell 785 -> 437 of 1,834, but the second pass matched only 44 more:
+  raw m2c tops out ~12-14% here. Total matched game functions ~335.
+- NEXT: decomp-permuter (tools/decomp-permuter) on near misses ranked by differing instructions,
+  run unattended with the SN toolchain, results verified by the real build.
 
 ## Progress
 - 52 of 241 functions in src/online/net.c are matched C, all verified in the real build (commit ffd402a).
