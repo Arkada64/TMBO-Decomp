@@ -324,7 +324,23 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A4
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", setReverbDepth__19AmbientSoundManagerffii);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", evaluateStreamState__19AmbientSoundManagerP14StreamingSound);
+#include "m2c_macros.h"
+#include "m2c_macros.h"
+void evaluateStreamState__19AmbientSoundManagerP14StreamingSound(s32 arg0, void *arg1)
+{
+  s32 temp_v0;
+  u8 *new_var;
+  if ((*((s32 *) (((u8 *) arg1) + 0x40))) == 4)
+  {
+    temp_v0 = *((s32 *) (((u8 *) arg1) + 0x14));
+    if (temp_v0 != (-1))
+    {
+      new_var = (u8 *) (arg0 + (temp_v0 * 8));
+      *((s32 *) (new_var + 0x3C)) = 1;
+      *((s32 *) (((u8 *) arg1) + 0x14)) = -1;
+    }
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", evaluateSFXState__19AmbientSoundManagerP17SFXStreamingSound);
 
