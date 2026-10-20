@@ -139,7 +139,24 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", particleCreat
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", particleCreateFadingFlame__FP8_fvectoriT0f);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", func_0022C7C0);
+#include "m2c_macros.h"
+void* particleGetParticle__Fi_22C7C0() __asm__("particleGetParticle__Fi");
+
+void func_0022C7C0(s32 arg0) {
+    void* temp_a0;
+    void* temp_v0;
+
+    if (arg0 != -1) {
+        temp_v0 = particleGetParticle__Fi_22C7C0();
+        if ((M2C_FIELD(temp_v0, s32* , 0x2DBC) == 0x48) && (M2C_FIELD(temp_v0, s32* , 0x2E70) > 0)) {
+            temp_a0 = M2C_FIELD(temp_v0, void** , 0x2E7C);
+            M2C_FIELD(temp_v0, s32* , 0x2DC0) = (s32) (M2C_FIELD(temp_v0, s32* , 0x2DC0) & 0xFFFFFDFF);
+            if (temp_a0 != NULL) {
+                M2C_FIELD(temp_a0, s32* , 0x2DC0) = (s32) (M2C_FIELD(temp_a0, s32* , 0x2DC0) & 0xFFFFFDFF);
+            }
+        }
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", func_0022C830);
 
