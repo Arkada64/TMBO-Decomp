@@ -97,7 +97,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", fu
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_0011B730);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_0011B8F8);
+#include "m2c_macros.h"
+M2C_UNK func_0011AD70_11B8F8() __asm__("func_0011AD70");
+
+void func_0011B8F8(s32 arg0, s32 arg1, void* arg2, void* arg3) {
+    M2C_FIELD(((M2C_FIELD(arg3, s32* , 0x10) * 0x7C) + arg0), s32* , 0x10) = 0;
+    M2C_FIELD(M2C_FIELD(((M2C_FIELD(arg3, s32* , 0x10) * 0x7C) + arg0), void** , 0x34), s8* , 0xC) = 0;
+    M2C_FIELD(arg2, s32* , 0x20BC) = -1;
+    func_0011AD70_11B8F8(arg0, M2C_FIELD(arg3, s32* , 0x10));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_0011B948);
 
