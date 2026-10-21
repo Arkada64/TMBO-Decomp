@@ -2,7 +2,14 @@
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0018F560);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", initAnimationSound__14AnimationSoundP7Vehicle);
+#include "m2c_macros.h"
+void initAnimationSound__14AnimationSoundP7Vehicle(void *arg0, s32 arg1)
+{
+  *((s32 *) (((u8 *) arg0) + 0x10)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x3C)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x4C)) = arg1;
+}
 
 #include "m2c_macros.h"
 M2C_UNK func_001A9600_18F5D0() __asm__("func_001A9600");
