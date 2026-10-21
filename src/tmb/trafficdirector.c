@@ -2,7 +2,22 @@
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", func_001B0688);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", initAnim__15TrafficDirector);
+#include "m2c_macros.h"
+long func_001FBCF8_rector() __asm__("func_001FBCF8");
+
+void initAnim__15TrafficDirector(void *arg0)
+{
+  func_001FBCF8_rector(arg0 + 0x1F0, 0x283F, 0, 1);
+  func_001FBCF8_rector(arg0 + 0x1FC, 0x283F, 0, 2);
+  func_001FBCF8_rector(arg0 + 0x208, 0x2840, 0, 1);
+  func_001FBCF8_rector(arg0 + 0x214, 0x2840, 0, 2);
+  func_001FBCF8_rector(arg0 + 0x420, 0x283D, 0, 1);
+  func_001FBCF8_rector(arg0 + 0x42C, 0x283D, 0, 2);
+  func_001FBCF8_rector(arg0 + 0x438, 0x283E, 0, 1);
+  func_001FBCF8_rector(arg0 + 0x444, 0x283E, 0, 2);
+  *((s32 *) (((u8 *) arg0) + 0x220)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x450)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", changeFodder__15TrafficDirectorP7Vehiclei);
 
