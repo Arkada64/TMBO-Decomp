@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.15149787,
-    "total_code": "1753160",
+    "fuzzy_match_percent": 0.15149821,
+    "total_code": "1753156",
     "matched_code": "2656",
-    "matched_code_percent": 0.15149787,
+    "matched_code_percent": 0.15149821,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -3400,7 +3400,7 @@
     {
       "name": "online/after_prison_10",
       "measures": {
-        "total_code": "2648",
+        "total_code": "2644",
         "matched_data_percent": 100.0,
         "total_functions": 7,
         "total_units": 1
@@ -3408,7 +3408,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "2648",
+          "size": "2644",
           "metadata": {
             "virtual_address": "1208712"
           }
@@ -3466,7 +3466,7 @@
         },
         {
           "name": "func_00127B58",
-          "size": "136",
+          "size": "132",
           "metadata": {
             "virtual_address": "1211224"
           }
@@ -50845,10 +50845,10 @@
       "id": "online",
       "name": "online",
       "measures": {
-        "fuzzy_match_percent": 0.4954828,
-        "total_code": "484376",
+        "fuzzy_match_percent": 0.49548692,
+        "total_code": "484372",
         "matched_code": "2400",
-        "matched_code_percent": 0.49548283,
+        "matched_code_percent": 0.49548694,
         "matched_data_percent": 100.0,
         "total_functions": 1890,
         "matched_functions": 60,
