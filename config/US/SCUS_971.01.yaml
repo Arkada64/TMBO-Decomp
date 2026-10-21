@@ -131,7 +131,7 @@ segments:
       - [0xBCEC8, asm, tmb/aa]
       - [0xBD530, asm, tmb/animChan]
       - [0xBFF98, asm, tmb/bound]
-      - [0xC00D0, asm, tmb/CsColor]
+      - [0xC00D0, c, tmb/CsColor]
       - [0xC0248, asm, tmb/dbs] # this file has C++ STL inlines
       - [0xC1310, asm, tmb/disp]
       - [0xC1B20, asm, tmb/drawc]
