@@ -16,13 +16,13 @@ SZ = {"s8": 1, "u8": 1, "char": 1, "s16": 2, "u16": 2, "M2C_UNK16": 2, "s32": 4,
       "M2C_UNK": 4, "M2C_UNK32": 4, "s64": 8, "u64": 8, "f64": 8, "M2C_UNK64": 8}
 NUM = r"(0x[0-9A-Fa-f]+|\d+)"
 
-def scale_ptrs(code):
+def scale_ptrs(code, head=""):
     ptrs = {}
     for m in re.finditer(r"\b(\w+)\s*(\*+)\s*(\w+)\s*[;,)=]", code):
         t, stars, v = m.groups()
         size = 4 if len(stars) > 1 else SZ.get(t)
         if size and size > 1: ptrs[v] = size
-    for m in re.finditer(r"^extern (\w+) (\w+)", code, re.M):
+    for m in re.finditer(r"^extern (\w+) (\w+)", head + code, re.M):
         if SZ.get(m.group(1), 0) > 1: ptrs["&" + m.group(2)] = SZ[m.group(1)]
     new = code
     def div(v, s, n):
@@ -78,7 +78,7 @@ def main():
             if fpos < 0: continue
             ls = code.rfind("\n", 0, fpos) + 1
             head, fn = code[:ls], code[ls:]
-            p = scale_ptrs(fn)
+            p = scale_ptrs(fn, head)
             cands = ([p] if p != fn else []) + arg_variants(fn) + ([q for q in arg_variants(p)] if p != fn else [])
             for c in cands: var.append(f"//@@ {name}\n{head}{c}")
         if not var: continue

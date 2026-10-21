@@ -20,7 +20,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", func_00202C58);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", fontSetSize__Fii);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", fontSetCharWidth__Fii);
+#include "m2c_macros.h"
+extern M2C_UNK D_00505EF0_h__Fii __asm__("D_00505EF0");
+
+void fontSetCharWidth__Fii(s32 arg0, s16 arg1)
+{
+  u8 *new_var;
+  ;
+  new_var = &D_00505EF0_h__Fii;
+  *((s16 *) (((u8 *) ((arg0 << 5) + new_var)) + 4)) = arg1;
+}
 
 #include "m2c_macros.h"
 M2C_UNK fontSetSize__Fii_ze__Fi() __asm__("fontSetSize__Fii");
