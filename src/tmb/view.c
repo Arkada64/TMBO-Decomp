@@ -28,9 +28,19 @@ s32 viewGetRot__Fi(s32 arg0)
   return (*new_var) + 0x60;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetMat__Fi);
+#include "m2c_macros.h"
+extern M2C_UNK D_004CFB90_at__Fi __asm__("D_004CFB90");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetTrans__Fi);
+s32 viewGetMat__Fi(s32 arg0) {
+    return *((arg0 * 0x4) + &D_004CFB90_at__Fi) + 0x20;
+}
+
+#include "m2c_macros.h"
+extern M2C_UNK D_004CFB90_ns__Fi __asm__("D_004CFB90");
+
+s32 viewGetTrans__Fi(s32 arg0) {
+    return *((arg0 * 0x4) + &D_004CFB90_ns__Fi) + 0x10;
+}
 
 #include "m2c_macros.h"
 extern volatile unsigned char D_004CFB90_ectori __asm__("D_004CFB90");
@@ -102,7 +112,52 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", func_00242FE0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetSky__Fi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", func_002430E0);
+#include "m2c_macros.h"
+s32 viewGameIsInRearViewMode__Fv_2430E0() __asm__("viewGameIsInRearViewMode__Fv");
+extern M2C_UNK D_0048CC70_2430E0 __asm__("D_0048CC70");
+
+void func_002430E0(void* arg0, s32 arg1) {
+    void* temp_v0;
+    void* temp_v0_2;
+    void* temp_v0_3;
+    void* temp_v1;
+    void* temp_v1_2;
+    void* temp_v1_3;
+
+    temp_v1 = (arg1 * 0x3c) + &D_0048CC70_2430E0;
+    temp_v0 = M2C_FIELD(temp_v1, void** , 4);
+    if (temp_v0 != NULL) {
+        M2C_FIELD(temp_v0, f32* , 0x10) = (f32) M2C_FIELD(arg0, f32* , 0);
+        M2C_FIELD(M2C_FIELD(temp_v1, void** , 4), f32* , 0x14) = (f32) M2C_FIELD(arg0, f32* , 4);
+        M2C_FIELD(M2C_FIELD(temp_v1, void** , 4), f32* , 0x18) = (f32) M2C_FIELD(arg0, f32* , 8);
+        if ((viewGameIsInRearViewMode__Fv_2430E0() != 0) && (arg1 == 0)) {
+            M2C_FIELD(M2C_FIELD(&D_0048CC70_2430E0, void** , 0xF4), f32* , 0x10) = (f32) M2C_FIELD(arg0, f32* , 0);
+            M2C_FIELD(M2C_FIELD(&D_0048CC70_2430E0, void** , 0xF4), f32* , 0x14) = (f32) M2C_FIELD(arg0, f32* , 4);
+            M2C_FIELD(M2C_FIELD(&D_0048CC70_2430E0, void** , 0xF4), f32* , 0x18) = (f32) M2C_FIELD(arg0, f32* , 8);
+        }
+    }
+    temp_v1_2 = (arg1 * 0x3c) + &D_0048CC70_2430E0;
+    temp_v0_2 = M2C_FIELD(temp_v1_2, void** , 8);
+    if (temp_v0_2 != NULL) {
+        M2C_FIELD(temp_v0_2, f32* , 0x10) = (f32) M2C_FIELD(arg0, f32* , 0);
+        M2C_FIELD(M2C_FIELD(temp_v1_2, void** , 8), f32* , 0x14) = (f32) M2C_FIELD(arg0, f32* , 4);
+        M2C_FIELD(M2C_FIELD(temp_v1_2, void** , 8), f32* , 0x18) = (f32) M2C_FIELD(arg0, f32* , 8);
+        if ((viewGameIsInRearViewMode__Fv_2430E0() != 0) && (arg1 == 0)) {
+            M2C_FIELD(M2C_FIELD(&D_0048CC70_2430E0, void** , 0xF8), f32* , 0x10) = (f32) M2C_FIELD(arg0, f32* , 0);
+            M2C_FIELD(M2C_FIELD(&D_0048CC70_2430E0, void** , 0xF8), f32* , 0x14) = (f32) M2C_FIELD(arg0, f32* , 4);
+            M2C_FIELD(M2C_FIELD(&D_0048CC70_2430E0, void** , 0xF8), f32* , 0x18) = (f32) M2C_FIELD(arg0, f32* , 8);
+        }
+    }
+    temp_v1_3 = (arg1 * 0x3c) + &D_0048CC70_2430E0;
+    temp_v0_3 = M2C_FIELD(temp_v1_3, void** , 0xC);
+    if ((temp_v0_3 != NULL) && (M2C_FIELD(temp_v0_3, f32* , 0x10) = (f32) M2C_FIELD(arg0, f32* , 0), M2C_FIELD(M2C_FIELD(temp_v1_3, void** , 0xC), f32* , 0x14) = (f32) M2C_FIELD(arg0, f32* , 4), M2C_FIELD(M2C_FIELD(temp_v1_3, void** , 0xC), f32* , 0x18) = (f32) M2C_FIELD(arg0, f32* , 8), (viewGameIsInRearViewMode__Fv_2430E0() != 0))) {
+        if (arg1 == 0) {
+            M2C_FIELD(M2C_FIELD(&D_0048CC70_2430E0, void** , 0xFC), f32* , 0x10) = (f32) M2C_FIELD(arg0, f32* , 0);
+            M2C_FIELD(M2C_FIELD(&D_0048CC70_2430E0, void** , 0xFC), f32* , 0x14) = (f32) M2C_FIELD(arg0, f32* , 4);
+            M2C_FIELD(M2C_FIELD(&D_0048CC70_2430E0, void** , 0xFC), f32* , 0x18) = (f32) M2C_FIELD(arg0, f32* , 8);
+        }
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewSetSkyNode__FP9_hierheadi);
 
