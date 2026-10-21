@@ -154,7 +154,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", playTunnel
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A1940);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", initElevatorSound__13ElevatorSound);
+#include "m2c_macros.h"
+void initElevatorSound__13ElevatorSound(void *arg0)
+{
+  s32 *new_var;
+  *((s32 *) (((u8 *) arg0) + 4)) = 0;
+ do { new_var = (s32 *) (((u8 *) arg0) + 0); *new_var = 0; } while (0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", startElevatorSound__13ElevatorSoundii);
 
