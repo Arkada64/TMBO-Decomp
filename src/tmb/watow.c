@@ -1,6 +1,11 @@
 #include "common.h"
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/watow", InitWaterTowerBefore__10WaterTower);
+#include "m2c_macros.h"
+void InitWaterTowerBefore__10WaterTower(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 0x64)) = 0;
+ do { *((s32 *) (((u8 *) arg0) + 0x60)) = 0; } while (0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/watow", InitWaterTowerAfter__10WaterTower);
 
