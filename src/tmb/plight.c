@@ -6,7 +6,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", func_0022E8D0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", plightCreate__Fv);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", plightDestroy__FP11_pointlight);
+#include "m2c_macros.h"
+void plightDestroy__FP11_pointlight(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 0x34)) = 0;
+ do { *((s32 *) (((u8 *) arg0) + 0x30)) = 0; } while (0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", plightParaActivate__Fv);
 
