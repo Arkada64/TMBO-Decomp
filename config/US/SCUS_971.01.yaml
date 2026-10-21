@@ -160,7 +160,7 @@ segments:
       - [0xEB030, c, tmb/plight]
       - [0xEC2C8, asm, tmb/read]
       - [0xEC5F8, c, tmb/readbuf]
-      - [0xEC708, asm, tmb/resetcom]
+      - [0xEC708, c, tmb/resetcom]
       - [0xECF60, asm, tmb/rigidbody]
       - [0xEE1A8, asm, tmb/smooth]
       - [0xEE8D8, asm, tmb/strfile]
