@@ -603,7 +603,18 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", initFireSound__9
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", updateFireSound__9FireSound);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019C758);
+#include "m2c_macros.h"
+int timerGetFieldCount__Fv_19C758(void) __asm__("timerGetFieldCount__Fv");
+void func_0019C758(void* arg0, s32 arg1, s32 arg2, f32 fparg0, f32 fparg1, f32 fparg2) {
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    M2C_FIELD(arg0, s32* , 0xC) = 0;
+    M2C_FIELD(arg0, f32* , 0x20) = fparg0;
+    M2C_FIELD(arg0, f32* , 0x24) = fparg1;
+    M2C_FIELD(arg0, f32* , 0x28) = fparg2;
+    M2C_FIELD(arg0, s32* , 4) = arg1;
+    M2C_FIELD(arg0, s32* , 8) = arg2;
+    M2C_FIELD(arg0, s32* , 0x10) = timerGetFieldCount__Fv_19C758();
+}
 
 #include "m2c_macros.h"
 s32 timerGetFieldCount__Fv_19C7A0() __asm__("timerGetFieldCount__Fv");
