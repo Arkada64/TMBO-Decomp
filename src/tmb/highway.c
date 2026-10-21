@@ -35,7 +35,20 @@ void clearRoadblock__7Highwayi(void* arg0, s32 arg1) {
     }
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highway", func_00142298);
+#include "m2c_macros.h"
+#include "m2c_macros.h"
+s32 isRoadblockSet__7Highwayi_142298() __asm__("isRoadblockSet__7Highwayi");
+
+void func_00142298(void *arg0, s32 arg1)
+{
+  s32 *new_var;
+  if (isRoadblockSet__7Highwayi_142298() == 0)
+  {
+    new_var = (s32 *) (((u8 *) (arg0 + ((*((s32 *) (((u8 *) arg0) + 0x2458))) * 4))) + 0x245C);
+    *new_var = arg1;
+    *((s32 *) (((u8 *) arg0) + 0x2458)) = (s32) ((*((s32 *) (((u8 *) arg0) + 0x2458))) + 1);
+  }
+}
 
 #include "m2c_macros.h"
 s32 isRoadblockSet__7Highwayi(void* arg0, s32 arg1) {
