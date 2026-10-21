@@ -18,7 +18,18 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigidbody", initEllipsoi
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigidbody", func_00230AD8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigidbody", func_00230B28);
+#include "m2c_macros.h"
+void func_00230B28(void *arg0)
+{
+  void *temp_v0;
+  void *temp_v1;
+  *((s32 *) (((u8 *) arg0) + 0xD0)) = 0;
+  temp_v0 = arg0 + 0xD0;
+  *((s32 *) (((u8 *) temp_v0) + 8)) = 0;
+ do { temp_v1 = arg0 + 0xE0; *((s32 *) (((u8 *) temp_v0) + 4)) = 0; *((s32 *) (((u8 *) arg0) + 0xE0)) = 0; } while (0);
+  *((s32 *) (((u8 *) temp_v1) + 8)) = 0;
+  *((s32 *) (((u8 *) temp_v1) + 4)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigidbody", applyWorldForce__9RigidBodyR8_fvector);
 
