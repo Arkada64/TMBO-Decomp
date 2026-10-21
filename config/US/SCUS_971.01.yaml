@@ -172,7 +172,7 @@ segments:
       - [0xF8868, c, tmb/texm] # has C++ STL inlines
       - [0xFB9F0, asm, tmb/texa] # texa.s HASM
       - [0xFBD08, c, tmb/utilities]
-      - [0xFCA00, asm, tmb/view]
+      - [0xFCA00, c, tmb/view]
       - [0xFE590, c, tmb/videodec]
       - [0xFED98, asm, tmb/vobuf]
       - [0xFEF78, asm, tmb/zip]
