@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 0.15149856,
-    "total_code": "1753152",
+    "fuzzy_match_percent": 0.15149891,
+    "total_code": "1753148",
     "matched_code": "2656",
-    "matched_code_percent": 0.15149856,
+    "matched_code_percent": 0.15149891,
     "matched_data_percent": 100.0,
     "total_functions": 5472,
     "matched_functions": 92,
@@ -28300,7 +28300,7 @@
     {
       "name": "online/after_resetcom_74",
       "measures": {
-        "total_code": "80",
+        "total_code": "76",
         "matched_data_percent": 100.0,
         "total_functions": 2,
         "total_units": 1
@@ -28308,7 +28308,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "80",
+          "size": "76",
           "metadata": {
             "virtual_address": "2295664"
           }
@@ -28324,7 +28324,7 @@
         },
         {
           "name": "func_00230798",
-          "size": "40",
+          "size": "36",
           "metadata": {
             "virtual_address": "2295704"
           }
@@ -50845,10 +50845,10 @@
       "id": "online",
       "name": "online",
       "measures": {
-        "fuzzy_match_percent": 0.49548692,
-        "total_code": "484372",
+        "fuzzy_match_percent": 0.495491,
+        "total_code": "484368",
         "matched_code": "2400",
-        "matched_code_percent": 0.49548694,
+        "matched_code_percent": 0.49549103,
         "matched_data_percent": 100.0,
         "total_functions": 1890,
         "matched_functions": 60,

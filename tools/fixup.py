@@ -76,7 +76,7 @@ def main():
     tot = {}
     for src in sorted((R / "src").rglob("*.c")):
         rel = src.relative_to(R); slug = str(rel).replace("/", "_")
-        drafts = R / f"logs/auto/{slug}.drafts.c"
+        drafts = R / os.environ.get("DRAFTDIR", "logs/auto") / f"{slug}.drafts.c"
         names = set(re.findall(r'^INCLUDE_ASM\("[^"]*", (\S+)\);', src.read_text(), re.M))
         if not names or not drafts.exists(): continue
         blocks = re.split(r"^//@@ (\S+)[^\n]*\n", drafts.read_text(), flags=re.M)[1:]
@@ -84,7 +84,7 @@ def main():
         for name, code in zip(blocks[0::2], blocks[1::2]):
             if name not in names or name in seen: continue
             seen.add(name)
-            if name in NEAR: code = NEAR[name]["code"]           # closest variant we know of
+            if name in NEAR and not os.environ.get("DRAFTDIR"): code = NEAR[name]["code"]   # closest known variant
             fpos = code.find(f"{name}(")
             if fpos < 0: continue
             ls = code.rfind("\n", 0, fpos) + 1

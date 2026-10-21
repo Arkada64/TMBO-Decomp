@@ -11,6 +11,8 @@ from pathlib import Path
 R = Path.home() / "tmbo_decomp"
 src, header, out = Path(sys.argv[1]), (R / "include" / sys.argv[2]).read_text(), Path(sys.argv[3])
 max_size = int(sys.argv[4]) if len(sys.argv) > 4 else 1 << 30
+import os, json
+PROTOS = json.loads(Path(os.environ["M2C_PROTOS"]).read_text()) if os.environ.get("M2C_PROTOS") else {}
 known = set(re.findall(r"\b(D_[0-9A-F]{8}|func_[0-9A-F]{8}|[a-z]\w+)\b", header))
 items = re.findall(r'^INCLUDE_ASM\("([^"]*)", (\S+)\);', src.read_text(), re.M)
 blocks, stats = [], {"ok": 0, "error": 0, "too_big": 0, "failed": 0}
@@ -25,8 +27,10 @@ for asmdir, name in items:
     tmp = Path("/tmp") / f"m2c_{name}.s"
     tmp.write_text(".set noat\n.set noreorder\n" + re.sub(r"\$(\d{1,2})\b(?![0-9A-Fa-f])",
                    lambda m: "$" + REG[int(m.group(1))] if int(m.group(1)) < 32 else m.group(0), t))
-    r = subprocess.run([sys.executable, "-m", "m2c.main", "-t", "mips-gcc-c", "--valid-syntax",
-                        "--pointer-style", "left", str(tmp), "-f", name], capture_output=True, text=True)
+    import os
+    ctx = ["--context", os.environ["M2C_CONTEXT"]] if os.environ.get("M2C_CONTEXT") else []
+    r = subprocess.run([sys.executable, "-m", "m2c.main", "-t", os.environ.get("M2C_TARGET", "mips-gcc-c"), "--valid-syntax",
+                        "--pointer-style", "left", *ctx, str(tmp), "-f", name], capture_output=True, text=True)
     if r.returncode or not r.stdout.strip(): stats["failed"] += 1; continue
     code = r.stdout
     if "M2C_ERROR" in code: stats["error"] += 1; continue
@@ -46,6 +50,16 @@ for asmdir, name in items:
             l = f'extern {d.group(1)}{d.group(2)}_{sfx}{d.group(3)} __asm__("{d.group(2)}");'
         lines.append(l)
     body = "\n".join(lines).strip()
+    # with a context, m2c knows the callee prototypes and doesn't declare them: add aliased, prototyped ones
+    if PROTOS:
+        fpos = body.find(f"{name}(")
+        for callee in sorted(set(re.findall(r"\b(\w+)\(", body[fpos:]))):
+            if callee in PROTOS and callee != name and callee not in aliases:
+                rt, ps = PROTOS[callee]
+                args = ", ".join(p if p != "..." else "..." for p in ps) or "void"
+                aliases[callee] = f"{callee}_{sfx}"
+                lines.insert(0, f'{rt} {callee}_{sfx}({args}) __asm__("{callee}");')
+        body = "\n".join(lines).strip()
     decl_end = max(body.find(f"{name}("), 0)
     head, rest = body[:decl_end], body[decl_end:]
     for real, alias in aliases.items():
