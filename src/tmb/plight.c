@@ -48,11 +48,65 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", plightInObject_
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", func_0022F050);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", func_0022F088);
+#include "m2c_macros.h"
+float plightSetRange__FP11_pointlightf_22F088(void*, float) __asm__("plightSetRange__FP11_pointlightf");
+void plightSetColor__FP11_pointlightfff_22F088(void*, float, float, float) __asm__("plightSetColor__FP11_pointlightfff");
+void plightSetBeamAngle__FP11_pointlightf_22F088(void*, float) __asm__("plightSetBeamAngle__FP11_pointlightf");
+int plightCreate__Fv_22F088(void) __asm__("plightCreate__Fv");
+s32 func_0022F088(s32 arg0) {
+    s32 temp_v0;
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", func_0022F110);
+    temp_v0 = plightCreate__Fv_22F088();
+    if (temp_v0 != 0) {
+        plightSetRange__FP11_pointlightf_22F088((void* ) temp_v0, 800.0f);
+        plightSetColor__FP11_pointlightfff_22F088((void* ) temp_v0, 255.0f, 255.0f, 230.0f);
+        M2C_FIELD(temp_v0, s32* , 0x38) = 0;
+        plightSetBeamAngle__FP11_pointlightf_22F088((void* ) temp_v0, 96.0f);
+        M2C_FIELD(temp_v0, s32* , 0x3C) = arg0;
+        M2C_FIELD(temp_v0, s32* , 0x34) = 0;
+    }
+    return temp_v0;
+}
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", func_0022F198);
+#include "m2c_macros.h"
+float plightSetRange__FP11_pointlightf_22F110(void*, float) __asm__("plightSetRange__FP11_pointlightf");
+void plightSetColor__FP11_pointlightfff_22F110(void*, float, float, float) __asm__("plightSetColor__FP11_pointlightfff");
+void plightSetBeamAngle__FP11_pointlightf_22F110(void*, float) __asm__("plightSetBeamAngle__FP11_pointlightf");
+int plightCreate__Fv_22F110(void) __asm__("plightCreate__Fv");
+s32 func_0022F110(s32 arg0) {
+    s32 temp_v0;
+
+    temp_v0 = plightCreate__Fv_22F110();
+    if (temp_v0 != 0) {
+        plightSetRange__FP11_pointlightf_22F110((void* ) temp_v0, 800.0f);
+        plightSetColor__FP11_pointlightfff_22F110((void* ) temp_v0, 255.0f, 255.0f, 230.0f);
+        M2C_FIELD(temp_v0, s32* , 0x38) = 0;
+        plightSetBeamAngle__FP11_pointlightf_22F110((void* ) temp_v0, 96.0f);
+        M2C_FIELD(temp_v0, s32* , 0x3C) = arg0;
+        M2C_FIELD(temp_v0, s32* , 0x34) = 0;
+    }
+    return temp_v0;
+}
+
+#include "m2c_macros.h"
+float plightSetRange__FP11_pointlightf_22F198(void*, float) __asm__("plightSetRange__FP11_pointlightf");
+void plightSetColor__FP11_pointlightfff_22F198(void*, float, float, float) __asm__("plightSetColor__FP11_pointlightfff");
+void plightSetBeamAngle__FP11_pointlightf_22F198(void*, float) __asm__("plightSetBeamAngle__FP11_pointlightf");
+int plightCreate__Fv_22F198(void) __asm__("plightCreate__Fv");
+s32 func_0022F198(s32 arg0) {
+    s32 temp_v0;
+
+    temp_v0 = plightCreate__Fv_22F198();
+    if (temp_v0 != 0) {
+        plightSetRange__FP11_pointlightf_22F198((void* ) temp_v0, 1000.0f);
+        plightSetColor__FP11_pointlightfff_22F198((void* ) temp_v0, 188.0f, 141.0f, 255.0f);
+        M2C_FIELD(temp_v0, s32* , 0x38) = 1;
+        plightSetBeamAngle__FP11_pointlightf_22F198((void* ) temp_v0, 126.0f);
+        M2C_FIELD(temp_v0, s32* , 0x3C) = arg0;
+        M2C_FIELD(temp_v0, s32* , 0x34) = 0;
+    }
+    return temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/plight", func_0022F228);
 
