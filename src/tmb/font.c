@@ -16,7 +16,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", fontClearCutOut__
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", fontSetCutOut__Fi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", func_00202C58);
+#include "m2c_macros.h"
+M2C_UNK fontSetColor__Fiiii_202C58() __asm__("fontSetColor__Fiiii");
+
+void func_00202C58(void* arg0)
+{
+    fontSetColor__Fiiii_202C58(arg0, 0x80, 0x80, 0x40);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/font", fontSetSize__Fii);
 
