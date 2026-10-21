@@ -356,7 +356,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", updateCloudSound
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", triggerCloudEnvironmentWeaponSound__10CloudSound);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", initCraneSound__10CraneSound);
+#include "m2c_macros.h"
+void initCraneSound__10CraneSound(void *arg0)
+{
+  int new_var;
+  *((s32 *) (((u8 *) arg0) + 4)) = 0;
+  new_var = 0;
+  *((s32 *) (((u8 *) arg0) + new_var)) = new_var;
+  *((s32 *) (((u8 *) arg0) + 4)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00196F10);
 
