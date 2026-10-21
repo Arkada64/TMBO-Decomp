@@ -9,7 +9,10 @@ Y=config/US/SCUS_971.01.yaml; L=logs/retail_integrate.txt
 T=$'\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01NDPuYvF2UhuQVqWzE5yi2a'
 sha_ok() { rm -f build/*.rom; ninja > logs/ninja.log 2>&1 && \
   [ "$(sha1sum build/SCUS_971.01.rom | cut -d' ' -f1)" = "$(grep -m1 '^sha1:' $Y | cut -d' ' -f2)" ]; }
-regen() { ./configure.py split > logs/split.log 2>&1 && ./configure.py generate > logs/generate.log 2>&1; }
+regen() { ./configure.py split > logs/split.log 2>&1 && ! grep -q 'Problem detected' logs/split.log && \
+  ./configure.py generate > logs/generate.log 2>&1; }
+# needs `migrate_rodata_to_functions: False` (splat refuses c segments whose rodata stays asm otherwise)
+grep -q '^  migrate_rodata_to_functions: False' $Y || { echo "set migrate_rodata_to_functions: False in $Y"; exit 1; }
 segs=()
 for m in logs/drafts/*.match.c; do
   n=$(basename "$m" .match.c)
@@ -19,16 +22,16 @@ done
 echo "== start $(date): ${#segs[@]} segments to convert" | tee -a $L
 cp $Y logs/yaml.bak
 for n in "${segs[@]}"; do sed -i "s|^\(      - \[0x[0-9A-F]*\), asm, tmb/$n\]|\1, c, tmb/$n]|" $Y; done
-regen
-if sha_ok; then
+allsrc() { for n in "${segs[@]}"; do [ -f src/tmb/$n.c ] || return 1; done; }
+if regen && allsrc && sha_ok; then
   echo "bulk conversion builds byte-identical" | tee -a $L
   git add -A src $Y && git -c user.name=tmbo -c user.email=tmbo@localhost commit -q --no-verify -m "Retail: convert ${#segs[@]} segments to C (INCLUDE_ASM)$T"
 else
   echo "bulk conversion NOT byte-identical; converting one at a time" | tee -a $L
   cp logs/yaml.bak $Y; git checkout -q -- src; git clean -fq src; regen
   for n in "${segs[@]}"; do
-    sed -i "s|^\(      - \[0x[0-9A-F]*\), asm, tmb/$n\]|\1, c, tmb/$n]|" $Y; regen
-    if sha_ok; then echo "$n: converted" | tee -a $L
+    sed -i "s|^\(      - \[0x[0-9A-F]*\), asm, tmb/$n\]|\1, c, tmb/$n]|" $Y
+    if regen && [ -f src/tmb/$n.c ] && sha_ok; then echo "$n: converted" | tee -a $L
       git add -A src $Y && git -c user.name=tmbo -c user.email=tmbo@localhost commit -q --no-verify -m "Retail: convert tmb/$n to C (INCLUDE_ASM)$T"
     else echo "$n: conversion breaks the build, skipped" | tee -a $L
       git checkout -q -- $Y; rm -f src/tmb/$n.c; regen
