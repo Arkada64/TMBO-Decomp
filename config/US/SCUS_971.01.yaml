@@ -159,7 +159,7 @@ segments:
       - [0xEAAE8, asm, tmb/pkta] # pkta.s HASM
       - [0xEB030, c, tmb/plight]
       - [0xEC2C8, asm, tmb/read]
-      - [0xEC5F8, asm, tmb/readbuf]
+      - [0xEC5F8, c, tmb/readbuf]
       - [0xEC708, asm, tmb/resetcom]
       - [0xECF60, asm, tmb/rigidbody]
       - [0xEE1A8, asm, tmb/smooth]
