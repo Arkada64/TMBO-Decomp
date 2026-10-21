@@ -987,7 +987,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001734B8);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00173500);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00173570);
+#include "m2c_macros.h"
+M2C_UNK func_00171B78_173570() __asm__("func_00171B78");
+
+void func_00173570(void* arg0, s32 arg1) {
+    M2C_FIELD(arg0, s32* , 0x1BB4) = arg1;
+    M2C_FIELD(M2C_FIELD(arg0, void** , 4), s32* , 0x204) = arg1;
+    if (M2C_FIELD(arg0, s32* , 0x1BB4) > 0) {
+        func_00171B78_173570(arg0, -1);
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001735A8);
 
@@ -1099,7 +1108,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001742B0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00174598);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00174608);
+#include "m2c_macros.h"
+void func_00174608(s32 arg0, s32 arg1) {
+    s32 var_v0;
+    s32* var_a0;
+
+    var_a0 = arg0 + 0xF94;
+    var_v0 = 7;
+    do {
+        *var_a0 = arg1;
+        var_v0 -= 1;
+        var_a0 -=0x88;
+    } while (var_v0 >= 0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00174638);
 
