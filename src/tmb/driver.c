@@ -22,9 +22,23 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverGetInitia
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverGetRandomNextPoint__6Driverb);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverGetFleeNextPoint__6Driver);
+#include "m2c_macros.h"
+M2C_UNK driverGetLongRangePoint__6DriverP8_fvectorii_Driver() __asm__("driverGetLongRangePoint__6DriverP8_fvectorii");
+s32 driverGetLookAheadPos__6DriverP8_fvectori_Driver() __asm__("driverGetLookAheadPos__6DriverP8_fvectori");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverGetCruiseNextPoint__6Driver);
+void driverGetFleeNextPoint__6Driver(void* arg0) {
+    u8 sp[0x10];
+    driverGetLongRangePoint__6DriverP8_fvectorii_Driver(arg0, sp, M2C_FIELD(arg0, s32* , 0x200), driverGetLookAheadPos__6DriverP8_fvectori_Driver(arg0, sp, M2C_FIELD(arg0, s32* , 0x210)));
+}
+
+#include "m2c_macros.h"
+M2C_UNK driverGetLongRangePoint__6DriverP8_fvectorii_Driver() __asm__("driverGetLongRangePoint__6DriverP8_fvectorii");
+s32 driverGetLookAheadPos__6DriverP8_fvectori_Driver() __asm__("driverGetLookAheadPos__6DriverP8_fvectori");
+
+void driverGetCruiseNextPoint__6Driver(void* arg0) {
+    u8 sp[0x10];
+    driverGetLongRangePoint__6DriverP8_fvectorii_Driver(arg0, sp, M2C_FIELD(arg0, s32* , 0x200), driverGetLookAheadPos__6DriverP8_fvectori_Driver(arg0, sp, M2C_FIELD(arg0, s32* , 0x210)));
+}
 
 #include "m2c_macros.h"
 s32 attractGetGroupTestPointIsIn__15AttractorPointsP8_fvector_Driver() __asm__("attractGetGroupTestPointIsIn__15AttractorPointsP8_fvector");
