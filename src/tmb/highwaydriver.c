@@ -1,6 +1,17 @@
 #include "common.h"
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", func_00142310);
+#include "m2c_macros.h"
+void func_00142310(void *arg0, s32 arg1, void *arg2)
+{
+  s32 new_var;
+  *((void **) (((u8 *) arg0) + 0x10)) = arg2;
+  new_var = (s32) (*((s32 *) (((u8 *) arg2) + 0x2028)));
+  *((s32 *) (((u8 *) arg0) + 0)) = new_var;
+  *((s32 *) (((u8 *) arg0) + 0x14)) = arg1;
+  *((s32 *) (((u8 *) arg0) + 0x18)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x1C)) = 0;
+  *((s32 *) (((u8 *) arg0) + 4)) = 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", setupCheapDriving__13HighwayDriver);
 
