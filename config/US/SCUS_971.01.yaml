@@ -144,7 +144,7 @@ segments:
       - [0xD0288, c, tmb/hdlos]
       - [0xD28E8, c, tmb/hierc]
       - [0xD51E0, asm, tmb/hiertrav] # hiertrav.s - hand-coded ASM
-      - [0xD5C08, asm, tmb/hoserInfo]
+      - [0xD5C08, c, tmb/hoserInfo]
       - [0xD61A8, asm, tmb/ieGs]
       - [0xD6A78, asm, tmb/ilnk]
       - [0xD6BC0, asm, tmb/input]
