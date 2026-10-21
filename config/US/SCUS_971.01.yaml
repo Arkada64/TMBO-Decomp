@@ -182,7 +182,7 @@ segments:
       - [0x101CD0, c, tmb/ctx]
       - [0x101D70, c, tmb/CsList]
       - [0x101E98, asm, tmb/hier] # hier.s HASM
-      - [0x102160, asm, tmb/vibuf] # TODO: this is probably two TUs
+      - [0x102160, c, tmb/vibuf] # TODO: this is probably two TUs
       # SDK TUs start here
       - [0x1033B0, asm, sdk/libgraph/graphdev]
       - [0x104E80, asm, sdk/libpad/libpad]
