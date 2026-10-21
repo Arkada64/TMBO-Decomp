@@ -163,8 +163,68 @@ void func_0013EC58(void) {
     func_00242658_13EC58(0, 0);
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013EC98);
+#include "m2c_macros.h"
+M2C_UNK hierSetCsDrawMe__FP3_csUc_13EC98() __asm__("hierSetCsDrawMe__FP3_csUc");
+M2C_UNK shadow2ndOnOff__7Vehiclei_13EC98() __asm__("shadow2ndOnOff__7Vehiclei");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", func_0013ED88);
+void func_0013EC98(void* arg0) {
+    s32 temp_a0;
+    s32 var_s2;
+    void* temp_s0;
+    void** var_s1;
+
+    var_s2 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x9FEE4) > 0) {
+        var_s1 = arg0 + 0x9E690;
+        do {
+            temp_s0 = *var_s1;
+            if ((M2C_FIELD(temp_s0, f32* , 0x404) > 0.0f) && (M2C_FIELD(temp_s0, s32* , 0x590) != 0)) {
+                hierSetCsDrawMe__FP3_csUc_13EC98(M2C_FIELD(temp_s0, s32* , 0x2028), 0);
+                temp_a0 = M2C_FIELD(temp_s0, s32* , 0x202C);
+                if (temp_a0 != 0) {
+                    hierSetCsDrawMe__FP3_csUc_13EC98(temp_a0, 0);
+                    shadow2ndOnOff__7Vehiclei_13EC98(temp_s0, 0);
+                }
+                if (M2C_FIELD(temp_s0, s32* , 0x20F4) == 0x100) {
+                    hierSetCsDrawMe__FP3_csUc_13EC98(M2C_FIELD(temp_s0, s32* , 0x2038), 0);
+                }
+            }
+            var_s2 += 1;
+            var_s1 +=0x1;
+        } while (var_s2 < M2C_FIELD(arg0, s32* , 0x9FEE4));
+    }
+}
+
+#include "m2c_macros.h"
+M2C_UNK hierSetCsDrawMe__FP3_csUc_13ED88() __asm__("hierSetCsDrawMe__FP3_csUc");
+M2C_UNK shadow2ndOnOff__7Vehiclei_13ED88() __asm__("shadow2ndOnOff__7Vehiclei");
+
+void func_0013ED88(void* arg0) {
+    s32 temp_a0;
+    s32 var_s2;
+    void* temp_s0;
+    void** var_s1;
+
+    var_s2 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x9FCAC) > 0) {
+        var_s1 = arg0 + 0x9E670;
+        do {
+            temp_s0 = *var_s1;
+            if ((M2C_FIELD(temp_s0, f32* , 0x404) > 0.0f) && (M2C_FIELD(temp_s0, s32* , 0x590) != 0)) {
+                hierSetCsDrawMe__FP3_csUc_13ED88(M2C_FIELD(temp_s0, s32* , 0x2028), 0);
+                temp_a0 = M2C_FIELD(temp_s0, s32* , 0x202C);
+                if (temp_a0 != 0) {
+                    hierSetCsDrawMe__FP3_csUc_13ED88(temp_a0, 0);
+                    shadow2ndOnOff__7Vehiclei_13ED88(temp_s0, 0);
+                }
+                if (M2C_FIELD(temp_s0, s32* , 0x20F4) == 0x100) {
+                    hierSetCsDrawMe__FP3_csUc_13ED88(M2C_FIELD(temp_s0, s32* , 0x2038), 0);
+                }
+            }
+            var_s2 += 1;
+            var_s1 +=0x1;
+        } while (var_s2 < M2C_FIELD(arg0, s32* , 0x9FCAC));
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/game", GetNumAIsHunting__7TheGame);
