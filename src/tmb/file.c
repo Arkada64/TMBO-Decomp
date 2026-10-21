@@ -27,7 +27,23 @@ s8 getResFilesLoaded__Fv(void) {
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", getNextNgpLoadAddr__Fv);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", getNextTexLoadAddr__Fv);
+#include "m2c_macros.h"
+extern M2C_UNK D_0048AC10_dr__Fv __asm__("D_0048AC10");
+
+s32 getNextTexLoadAddr__Fv(void)
+{
+  s8 new_var;
+  M2C_UNK *new_var2;
+  u8 *new_var3;
+  new_var3 = (u8 *) (&D_0048AC10_dr__Fv);
+  new_var = *((s8 *) (new_var3 + 0x38));
+  if (1)
+  {
+    new_var3 = &D_0048AC10_dr__Fv;
+    new_var2 = (new_var * 4) + new_var3;
+    return *new_var2;
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", getNextResLoadAddr__Fv);
 
