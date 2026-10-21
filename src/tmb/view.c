@@ -148,7 +148,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewSetTODBgColor
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetBgColor__FRiT0T0T0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetDb__Fi);
+#include "m2c_macros.h"
+extern volatile unsigned char D_004D0200_Db__Fi __asm__("D_004D0200");
+
+void *viewGetDb__Fi(s32 arg0)
+{
+  return (arg0 * 0x360) + (&D_004D0200_Db__Fi);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetNumViews__Fv);
 
