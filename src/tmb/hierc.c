@@ -107,7 +107,18 @@ M2C_UNK* hierGetBigBufAddr__Fv(void) {
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", func_00214290);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", func_00214298);
+#include "m2c_macros.h"
+s32 func_00214298(s32 arg0)
+{
+  int new_var;
+  s32 var_a1;
+  var_a1 = 0;
+  if (((u32) (arg0 + 0xFF680000)) <= 0x0128566FU)
+  {
+    var_a1 = (new_var = arg0 & 3) == 0;
+  }
+  return var_a1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", func_002142C8);
 
