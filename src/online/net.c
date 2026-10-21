@@ -81,7 +81,28 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001629C0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00162A00);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00162A38);
+#include "m2c_macros.h"
+void func_00163EB8_162A38() __asm__("func_00163EB8");
+M2C_UNK func_001641B8_162A38() __asm__("func_001641B8");
+extern s32 D_002C1690_162A38 __asm__("D_002C1690");
+
+void func_00162A38(s32 arg0, s32 arg1, s32 arg2, void *arg3)
+{
+  void *temp_a1;
+  func_00163EB8_162A38(&D_002C1690_162A38, *((s32 *) (((u8 *) arg3) + 0x18)));
+  if ((*((s32 *) (((u8 *) arg3) + 0x18))) == 0)
+  {
+    temp_a1 = arg3 + 0x1C;
+    if (temp_a1 != 0)
+    {
+      func_001641B8_162A38(&D_002C1690_162A38, temp_a1);
+    }
+  }
+  if ((*((s8 *) (((u8 *) arg3) + 0x11C))) != 0)
+  {
+    D_002C1690_162A38 = 1;
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00162AB0);
 
