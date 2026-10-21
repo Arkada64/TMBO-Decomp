@@ -54,7 +54,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", func_00242F30);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewSetAmbientVol__Fiffff);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetWeTrans__Fi);
+#include "m2c_macros.h"
+extern char D_0048CC90_ns__Fi __asm__("D_0048CC90");
+
+void *viewGetWeTrans__Fi(s32 arg0)
+{
+  return (arg0 * 0xF0) + (&D_0048CC90_ns__Fi);
+}
 
 #include "m2c_macros.h"
 extern volatile unsigned char D_0048CCA0_at__Fi __asm__("D_0048CCA0");
