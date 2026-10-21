@@ -146,7 +146,7 @@ segments:
       - [0xD51E0, asm, tmb/hiertrav] # hiertrav.s - hand-coded ASM
       - [0xD5C08, c, tmb/hoserInfo]
       - [0xD61A8, c, tmb/ieGs]
-      - [0xD6A78, asm, tmb/ilnk]
+      - [0xD6A78, c, tmb/ilnk]
       - [0xD6BC0, asm, tmb/input]
       - [0xD9C30, asm, tmb/LightVolume]
       - [0xDA1E8, cpp, tmb/mathf]
