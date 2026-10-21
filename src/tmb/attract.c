@@ -42,7 +42,12 @@ f32 attractGetMaxRangeForBeadBetweenGroups__15AttractorPointsii(s32 arg0, s32 ar
   return var_f0;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", attractGetClosestPoint__15AttractorPointsP8_fvector);
+#include "m2c_macros.h"
+M2C_UNK func_0010BA78_vector() __asm__("func_0010BA78");
+
+void attractGetClosestPoint__15AttractorPointsP8_fvector(void* arg0, void* arg1) {
+    func_0010BA78_vector(arg0, arg1, -1);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010BA78);
 
