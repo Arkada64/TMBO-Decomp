@@ -399,7 +399,19 @@ void initCraneSound__10CraneSound(void *arg0)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00196F10);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", initRainSound__9RainSound);
+#include "m2c_macros.h"
+void initRainSound__9RainSound(void *arg0)
+{
+  s32 *new_var;
+  *((s32 *) (((u8 *) arg0) + 0x14)) = 0;
+  new_var = (s32 *) (((u8 *) arg0) + 0xC);
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+  *((s32 *) (((u8 *) arg0) + 4)) = 0;
+  *((s32 *) (((u8 *) arg0) + 8)) = 0;
+  *new_var = 0;
+ do { } while (0);
+  *((s32 *) (((u8 *) arg0) + 0x10)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", updateRainSound__9RainSoundi);
 
