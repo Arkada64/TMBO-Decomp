@@ -53,7 +53,10 @@ void setNumSegments__15HighwayDirectori(void* arg0, s32 arg1) {
     M2C_FIELD_V1(arg0, s32* , 0x1E8) = (s32) ((s32) ((s32) M2C_FIELD_V1(temp_a2, s32* , 0x2454) / (s32) M2C_FIELD_V1(temp_a2, s32* , 0x2450)) / arg1);
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", setTrafficDensity__15HighwayDirectorf);
+#include "m2c_macros.h"
+void setTrafficDensity__15HighwayDirectorf(void* arg0, f32 arg1) {
+    M2C_FIELD(arg0, f32* , 0x1EC) = arg1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", getVehicleSection__15HighwayDirectorP7Vehicle);
 
@@ -72,7 +75,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", func_0
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", func_001B1B68);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", disable__15HighwayDirectorP7Vehicle);
+#include "m2c_macros.h"
+void vehicleDisable__7Vehicle_ehicle(void*) __asm__("vehicleDisable__7Vehicle");
+int disable__13HighwayDriver_ehicle(void*) __asm__("disable__13HighwayDriver");
+s32 disable__15HighwayDirectorP7Vehicle(void* arg0, void* arg1) {
+    void* temp_v0;
+
+    vehicleDisable__7Vehicle_ehicle(arg1);
+    disable__13HighwayDriver_ehicle(M2C_FIELD(arg1, void** , 0x201C));
+    temp_v0 = arg0 + (M2C_FIELD(arg0, s32* , 0x1B8) * 4);
+    M2C_FIELD(temp_v0, void** , 0x28) = arg1;
+    M2C_FIELD(arg0, s32* , 0x1B8) = (s32) (M2C_FIELD(arg0, s32* , 0x1B8) + 1);
+    return (s32) temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", func_001B1D20);
 
