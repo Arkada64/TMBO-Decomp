@@ -30,7 +30,14 @@ void updateCheapDriving__12FodderDriver(void** arg0) {
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", updatePosition__12FodderDriverb);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_001351B8);
+#include "m2c_macros.h"
+void vehicleSetToPosition__7VehicleP8_fvectorf_1351B8(void*, void*, float) __asm__("vehicleSetToPosition__7VehicleP8_fvectorf");
+void func_001351B8(void* arg0) {
+    void* temp_a1;
+
+    temp_a1 = M2C_FIELD(arg0, void** , 4);
+    vehicleSetToPosition__7VehicleP8_fvectorf_1351B8(M2C_FIELD(arg0, void** , 0), temp_a1 + 0x10, M2C_FIELD(temp_a1, f32* , 0x68));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", updateSteering__12FodderDriver);
 
