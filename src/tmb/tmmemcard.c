@@ -11,7 +11,16 @@ void* __17TwistedMemoryCard(void* arg0) {
     return arg0;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tmmemcard", prep__17TwistedMemoryCard);
+#include "m2c_macros.h"
+M2C_UNK initialize__10MemoryCardPcT1T1_ryCard() __asm__("initialize__10MemoryCardPcT1T1");
+
+s32 prep__17TwistedMemoryCard(void* arg0) {
+    if (M2C_FIELD(arg0, s32* , 0x78) != 0) {
+        M2C_FIELD(arg0, s32* , 0x78) = 0;
+        initialize__10MemoryCardPcT1T1_ryCard(arg0, "LISTICON.ICO", "COPYICON.ICO", "DELICON.ICO");
+    }
+    return 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tmmemcard", doesTwistedDirectoryExist__17TwistedMemoryCardR9_MCStatus);
 
