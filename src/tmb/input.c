@@ -110,4 +110,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputUsingTypeAW
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputGetLogitechCombo__Fi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputClearLogitechCombo__Fi);
+#include "m2c_macros.h"
+#include "m2c_macros.h"
+extern M2C_UNK D_00613AC0_bo__Fi __asm__("D_00613AC0");
+
+void inputClearLogitechCombo__Fi(s32 arg0)
+{
+  int new_var;
+  s32 new_var2;
+  new_var2 = arg0;
+  new_var = new_var2;
+  *(new_var + (&D_00613AC0_bo__Fi)) = 0;
+  new_var = new_var * 4;
+}
