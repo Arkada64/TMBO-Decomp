@@ -62,7 +62,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", func_00218600);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputScaleAnalogButton__Fiii);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputGetPadPort__Fi);
+#include "m2c_macros.h"
+#include "m2c_macros.h"
+extern M2C_UNK D_00612B60_rt__Fi __asm__("D_00612B60");
+
+s32 inputGetPadPort__Fi(s32 arg0)
+{
+  long new_var2;
+  int new_var;
+  new_var2 = new_var * 4;
+  new_var = new_var2;
+  new_var = arg0;
+  return *(new_var + (&D_00612B60_rt__Fi));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputGetPadSlot__Fi);
 
