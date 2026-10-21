@@ -607,7 +607,18 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019CC20);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", playShellCarsEngineSound__10ShellSoundi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019D110);
+#include "m2c_macros.h"
+void func_001A9600_19D110() __asm__("func_001A9600");
+
+void func_0019D110(void *arg0)
+{
+  void *new_var;
+  int new_var2;
+  new_var = arg0 + 0xC;
+  func_001A9600_19D110(new_var);
+  new_var2 = 0x24;
+  *((s32 *) (((u8 *) arg0) + new_var2)) = -1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019D140);
 
