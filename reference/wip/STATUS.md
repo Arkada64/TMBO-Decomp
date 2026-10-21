@@ -85,3 +85,16 @@
 ## Workflow
 - Per function: write C -> `python3 tools/apply_c.py src/online/net.c <file>` -> `ninja` -> `cmp`.
 - After a config or toolchain change: `./configure.py distclean && ./configure.py generate && ninja`.
+
+## Permuter pass (tools/perm_run.py)
+- Run 1 (60 closest near misses, <=1 insn off, 300s each, 4 threads): 13 solved directly + 10 more
+  recovered with `RETRY=1 python3 tools/perm_run.py` after fixing realias() = **23/60**.
+  The 10 "permuter hit 0 but the real build disagreed" cases were the permuter changing an extern's
+  type (e.g. `extern char D_x;` so `&D_x + i*4` stops scaling); realias() now carries changed
+  top-level declarations back into the aliased draft head.
+- "best score -" means the permuter found no improvement at all in 300s; those need hand work
+  (list in logs/perm_run.txt).
+- near.json: 430 same-size near misses; 263 are <=8 insns off. Run 2 (next 100) started overnight
+  2026-10-20: log in logs/perm_run2.txt / logs/perm_run.txt.
+- Needs pycparser 2.x in the venv (3.x dropped plyparser); m2c still works with it.
+- Resumable: logs/perm/done.txt. Deleting logs/perm/near.json forces a re-rank (~45 min).
