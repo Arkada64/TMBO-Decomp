@@ -106,7 +106,32 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", particleScrap
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", particleGetParticle__Fi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", func_0022A6D8);
+#include "m2c_macros.h"
+#include "m2c_macros.h"
+M2C_UNK plightDestroy__FP11_pointlight_22A6D8() __asm__("plightDestroy__FP11_pointlight");
+extern M2C_UNK D_00631D80_22A6D8 __asm__("D_00631D80");
+
+void func_0022A6D8(s32 arg0)
+{
+  s32 temp_a0;
+  u8 *new_var;
+  void *temp_s0;
+  if (arg0 > 0)
+  {
+    temp_s0 = &D_00631D80_22A6D8;
+    temp_s0 = (arg0 * 0x2E80) + temp_s0;
+    new_var = (u8 *) temp_s0;
+    temp_a0 = *((s32 *) (new_var + 0x2E6C));
+    *((s16 *) (new_var + 0x2D76)) = 0;
+    *((s32 *) (new_var + 0x2D70)) = (s32) ((*((s32 *) (new_var + 0x2D70))) | 4);
+ do { } while (0);
+    if (temp_a0 != 0)
+    {
+      plightDestroy__FP11_pointlight_22A6D8(temp_a0);
+      *((s32 *) (new_var + 0x2E6C)) = 0;
+    }
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", func_0022A730);
 
