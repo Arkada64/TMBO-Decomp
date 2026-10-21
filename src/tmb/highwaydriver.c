@@ -71,7 +71,17 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", updateCu
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", updateCurrentWaypointInArea__13HighwayDriver);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", getRangeToWaypoint2__13HighwayDriverPQ27Highway8Waypoint);
+#include "m2c_macros.h"
+f32 getRangeToWaypoint2__13HighwayDriverPQ27Highway8Waypoint(void **arg0, void *arg1)
+{
+  f32 temp_f0;
+  f32 temp_f1;
+  void *temp_v0;
+  temp_v0 = *arg0;
+  temp_f0 = (*((f32 *) (((u8 *) arg1) + 0))) - (*((f32 *) (((u8 *) temp_v0) + 0x10)));
+  temp_f1 = (*((f32 *) (((u8 *) arg1) + 4))) - (*((f32 *) (((u8 *) temp_v0) + 0x14)));
+  return (temp_f0 * temp_f0) + (temp_f1 * temp_f1);
+}
 
 #include "m2c_macros.h"
 M2C_UNK func_001430E0_Driver() __asm__("func_001430E0");
