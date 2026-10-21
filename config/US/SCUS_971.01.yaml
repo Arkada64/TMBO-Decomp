@@ -124,7 +124,7 @@ segments:
       - [0x8CD68, c, tmb/trafficdirector]
       - [0x8E948, c, tmb/ui]
       - [0x9E358, c, tmb/uimemcard]
-      - [0xA3B98, asm, tmb/vehicle]
+      - [0xA3B98, c, tmb/vehicle]
       - [0xB08E0, asm, tmb/watow]
       - [0xB0D60, asm, tmb/weap]
       - [0xBACA0, c, tmb/989snd]
