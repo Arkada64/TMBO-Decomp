@@ -155,7 +155,7 @@ segments:
       - [0xDED00, asm, tmb/memorystack]
       - [0xDED38, c, tmb/movie]
       - [0xDF890, c, tmb/particle]
-      - [0xE9AD8, asm, tmb/pkt]
+      - [0xE9AD8, c, tmb/pkt]
       - [0xEAAE8, asm, tmb/pkta] # pkta.s HASM
       - [0xEB030, asm, tmb/plight]
       - [0xEC2C8, asm, tmb/read]
