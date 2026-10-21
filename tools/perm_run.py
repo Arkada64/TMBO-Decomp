@@ -40,7 +40,9 @@ if not near_file.exists():
 near = json.loads(near_file.read_text())
 todo = sorted((v["diff"], n) for n, v in near.items() if v["diff"] <= MAXD)
 done = set((P / "done.txt").read_text().split()) if (P / "done.txt").exists() else set()
-todo = [n for d, n in todo if n not in done][:MAXF]
+def still_asm(n):   # skip functions matched since ranking (fixup, earlier runs)
+    return bool(re.search(rf'INCLUDE_ASM\("[^"]*", {re.escape(n)}\);', (R / near[n]["src"]).read_text()))
+todo = [n for d, n in todo if n not in done and still_asm(n)][:MAXF]
 print(f"{len(near)} near misses; {len(todo)} to permute (<= {MAXD} insns off)", flush=True)
 
 # ---- 2. job setup
