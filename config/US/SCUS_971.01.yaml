@@ -77,7 +77,7 @@ segments:
       - [0x2A3B8, asm, tmb/ferris]
       - [0x2ACC8, asm, tmb/flipbufferi]
       - [0x2ADF0, c, tmb/fodder]
-      - [0x2BDE0, asm, tmb/fodderdriver]
+      - [0x2BDE0, c, tmb/fodderdriver]
       - [0x2CE70, asm, tmb/forceField]
       - [0x2D858, asm, tmb/freeway]
       - [0x2E200, asm, tmb/freewaytrain]
