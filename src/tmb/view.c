@@ -48,7 +48,15 @@ s32 viewGetViewCs__Fi(s32 arg0)
   return *new_var;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetWorldCtx__Fi);
+#include "m2c_macros.h"
+extern unsigned char D_0048CC70_tx__Fi __asm__("D_0048CC70");
+
+void *viewGetWorldCtx__Fi(s32 arg0)
+{
+  M2C_UNK *new_var;
+  new_var = ((16 * (15 * arg0)) & 0xFFFFFFFFFFFFFFFFu) + (&D_0048CC70_tx__Fi);
+  return new_var;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", func_00242F30);
 
