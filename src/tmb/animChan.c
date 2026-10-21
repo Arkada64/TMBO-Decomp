@@ -97,7 +97,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FC558
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationGetDirection__FR11_animHandle);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FC688);
+#include "m2c_macros.h"
+f32 func_001FC688(void *arg0)
+{
+  void *temp_v1;
+  u8 *new_var;
+  temp_v1 = *((void **) (((u8 *) arg0) + 0));
+  if (temp_v1 != 0)
+  {
+    new_var = (u8 *) ((*((s32 *) (((u8 *) temp_v1) + 0x20))) + ((*((s16 *) (((u8 *) arg0) + 8))) * 4));
+    return *((f32 *) (((u8 *) (*((void **) (new_var + 8)))) + 8));
+  }
+  return 0.0f;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationIsRunning__FR11_animHandle);
 
