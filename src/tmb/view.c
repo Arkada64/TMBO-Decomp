@@ -211,4 +211,10 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetScreenDisp
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetDef__Fi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetDefByName__F10_viewports);
+#include "m2c_macros.h"
+extern volatile unsigned char D_004CEE40_wports __asm__("D_004CEE40");
+
+void *viewGetDefByName__F10_viewports(s32 arg0)
+{
+  return (arg0 * 0xB0) + (&D_004CEE40_wports);
+}
