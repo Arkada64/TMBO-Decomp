@@ -168,7 +168,7 @@ segments:
       - [0xEEB20, c, tmb/td]
       - [0xEF3A0, c, tmb/terrain]
       - [0xF6788, c, tmb/timer]
-      - [0xF6B58, asm, tmb/tod]
+      - [0xF6B58, c, tmb/tod]
       - [0xF8868, c, tmb/texm] # has C++ STL inlines
       - [0xFB9F0, asm, tmb/texa] # texa.s HASM
       - [0xFBD08, asm, tmb/utilities]
