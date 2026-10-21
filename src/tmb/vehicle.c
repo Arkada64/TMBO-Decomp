@@ -55,7 +55,45 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vehicle", func_001DCD48)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vehicle", func_001DCFC8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vehicle", func_001DD0C8);
+#include "m2c_macros.h"
+M2C_UNK func_001957E0_1DD0C8() __asm__("func_001957E0");
+M2C_UNK hierSetSwitch__FP11_hierswitchi_1DD0C8() __asm__("hierSetSwitch__FP11_hierswitchi");
+M2C_UNK updateShieldSound__11ShieldSoundP8_fvector_1DD0C8() __asm__("updateShieldSound__11ShieldSoundP8_fvector");
+
+void func_001DD0C8(void *arg0)
+{
+  u8 *new_var;
+  s32 temp_a0;
+  s32 temp_v1;
+  void *temp_a0_2;
+  if ((*((s8 *) (((u8 *) arg0) + 0x497))) != 0)
+  {
+    temp_a0 = *((s32 *) (((u8 *) arg0) + 0x2068));
+    if ((*((s32 *) (((u8 *) arg0) + 0x24B4))) != 0)
+    {
+      hierSetSwitch__FP11_hierswitchi_1DD0C8(temp_a0, 2);
+      hierSetSwitch__FP11_hierswitchi_1DD0C8(*((s32 *) (((u8 *) arg0) + 0x206C)), 2);
+    }
+    else
+    {
+      hierSetSwitch__FP11_hierswitchi_1DD0C8(temp_a0, 1);
+      hierSetSwitch__FP11_hierswitchi_1DD0C8(*((s32 *) (((u8 *) arg0) + 0x206C)), 1);
+    }
+    ;
+    *((s32 *) (((u8 *) arg0) + 0x464)) = (s32) ((*((s32 *) (((u8 *) arg0) + 0x464))) + (*((s32 *) (((u8 *) arg0) + 0x2114))));
+    updateShieldSound__11ShieldSoundP8_fvector_1DD0C8(arg0 + 0x2F50, arg0 + 0x1D0);
+    temp_v1 = *((s32 *) (((u8 *) arg0) + 0x20B4));
+    new_var = (u8 *) arg0;
+    if (((temp_v1 == 1) && ((*((s32 *) (((u8 *) arg0) + 0x464))) >= 0xB5)) || ((temp_v1 == 2) && ((*((s8 *) (0x498 + ((u8 *) arg0)))) == 0)))
+    {
+      *((s32 *) (((u8 *) arg0) + 0x464)) = 0;
+      *((s8 *) (new_var + 0x497)) = 0;
+      hierSetSwitch__FP11_hierswitchi_1DD0C8(*((s32 *) (((u8 *) arg0) + 0x2068)), 0);
+      hierSetSwitch__FP11_hierswitchi_1DD0C8(*((s32 *) (((u8 *) arg0) + ((unsigned int) 0x206C))), 0);
+      func_001957E0_1DD0C8(arg0 + 0x2F50);
+    }
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vehicle", func_001DD1B8);
 
