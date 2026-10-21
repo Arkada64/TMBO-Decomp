@@ -71,11 +71,24 @@ def setup(name, v):
     (d / "settings.toml").write_text(f'func_name = "{name}"\ncompiler_type = "gcc"\n')
     return True
 
-def realias(name, fn_text, v):
-    """Put the solved function back into the draft's aliased form for the real file."""
+def realias(name, fn_text, v, out_text=""):
+    """Put the solved function back into the draft's aliased form for the real file.
+    The permuter may also have changed the type of an extern/prototype: carry those over."""
     sfx = name[-6:]
     head = v["code"][:v["code"].find(f"{name}(")]
     head = head[:head.rfind("\n") + 1]                                    # declarations only
+    top = [l for l in out_text.split("\n") if l and not l[0].isspace() and l.rstrip().endswith(";")]
+    lines = []
+    for l in head.split("\n"):
+        m = re.search(rf'\b(\w+)_{sfx}\b.*__asm__\("(\w+)"\)', l)
+        if m and m.group(1) == m.group(2):
+            real = m.group(1)
+            new = [t for t in top if re.search(rf"\b{re.escape(real)}\b", t) and not t.startswith("typedef")]
+            if new:
+                t = re.sub(rf"\b{re.escape(real)}\b", f"{real}_{sfx}", new[-1].rstrip()[:-1])
+                l = f'{t} __asm__("{real}");'
+        lines.append(l)
+    head = "\n".join(lines)
     for real in re.findall(rf"\b(\w+)_{sfx}\b", head):
         fn_text = re.sub(rf"\b{re.escape(real)}\b", f"{real}_{sfx}", fn_text)
     return head + fn_text
@@ -89,31 +102,40 @@ def extract(src_text, name):
         if depth == 0: return src_text[m.start():j + 1] + "\n"
 
 # ---- 3. run
+RETRY = os.environ.get("RETRY") == "1"     # re-apply existing score-0 outputs, no permuting
+if RETRY:
+    todo = [n for n in sorted(done) if n in near and list((P / n).glob("output-0-*/source.c"))
+            and re.search(rf'INCLUDE_ASM\("[^"]*", {re.escape(n)}\);', (R / near[n]["src"]).read_text())]
+    print(f"RETRY: {len(todo)} score-0 outputs to re-apply", flush=True)
+TRAILER = ("\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n"
+           "Claude-Session: https://claude.ai/code/session_0163vgjiFyQy8GoFYgqXiav1")
 assert build_ok(), "build must be byte-identical before starting"
 solved, t0 = 0, time.time()
 for k, name in enumerate(todo, 1):
     v = near[name]
-    with open(P / "done.txt", "a") as f: f.write(name + "\n")
-    if not setup(name, v):
-        print(f"[{k}/{len(todo)}] {name}: setup failed", flush=True); continue
-    try:
-        sh(f"timeout {SECS} python3 tools/decomp-permuter/permuter.py {P / name} --stop-on-zero --best-only -j{THR}",
-           timeout=SECS + 60)
-    except subprocess.TimeoutExpired:
-        pass
+    if not RETRY:
+        with open(P / "done.txt", "a") as f: f.write(name + "\n")
+        if not setup(name, v):
+            print(f"[{k}/{len(todo)}] {name}: setup failed", flush=True); continue
+        try:
+            sh(f"timeout {SECS} python3 tools/decomp-permuter/permuter.py {P / name} --stop-on-zero --best-only -j{THR}",
+               timeout=SECS + 60)
+        except subprocess.TimeoutExpired:
+            pass
     outs = sorted((P / name).glob("output-0-*/source.c"))
     if not outs:
         best = sorted((P / name).glob("output-*"), key=lambda p: int(p.name.split("-")[1]))
         print(f"[{k}/{len(todo)}] {name}: {v['diff']} insns off -> best score {best[0].name.split('-')[1] if best else '-'}  "
               f"({solved} solved, {time.time() - t0:.0f}s)", flush=True); continue
-    fn = extract(outs[0].read_text(), name)
+    otext = outs[0].read_text()
+    fn = extract(otext, name)
     block = R / f"logs/perm/{name}.solved.c"
-    block.write_text(f"//@@ {name}\n#include \"m2c_macros.h\"\n{realias(name, fn, v)}") if fn else None
+    block.write_text(f"//@@ {name}\n{realias(name, fn, v, otext)}") if fn else None
     src = R / v["src"]; before = src.read_text()
     out = sh(f"python3 tools/batch_try.py {v['src']} {block}").stdout
     if fn and "kept 1" in out and build_ok():
         solved += 1
-        sh(f'git add -A && git -c user.name=tmbo -c user.email=tmbo@localhost commit -q --no-verify -m "Permuter match: {name}"')
+        sh(f'git add -A && git -c user.name=tmbo -c user.email=tmbo@localhost commit -q --no-verify -m "Permuter match: {name}{TRAILER}"')
         print(f"[{k}/{len(todo)}] {name}: SOLVED and verified  ({solved} solved)", flush=True)
     else:
         src.write_text(before); build_ok()

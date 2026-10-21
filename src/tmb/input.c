@@ -69,7 +69,25 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputGetPlayerPa
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputIsMtapConnected__Fv);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", func_00217BE8);
+#include "m2c_macros.h"
+s32 inputAnyKey__Fi_217BE8() __asm__("inputAnyKey__Fi");
+extern char D_00612C20_217BE8 __asm__("D_00612C20");
+
+s32 func_00217BE8(s32 arg0)
+{
+  s32 *temp_s0;
+  temp_s0 = (arg0 * 4) + (&D_00612C20_217BE8);
+  if ((*temp_s0) == 0)
+  {
+    if (inputAnyKey__Fi_217BE8(arg0, arg0) != 0)
+    {
+      *temp_s0 = 1;
+      return 1;
+    }
+    return 0;
+  }
+  return 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputGetInput__Fii);
 
