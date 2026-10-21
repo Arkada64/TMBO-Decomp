@@ -65,7 +65,17 @@ void func_00162950(s32 arg0, s32 arg1, s32 arg2, void *arg3)
   D_002C1690_162950 = 1;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00162988);
+#include "m2c_macros.h"
+void func_00163EB8_162988() __asm__("func_00163EB8");
+extern s32 D_002C1690_162988 __asm__("D_002C1690");
+
+void func_00162988(s32 arg0, s32 arg1, s32 arg2, void *arg3)
+{
+  u8 *new_var;
+  new_var = ((u8 *) arg3) + 0x18;
+  func_00163EB8_162988(&D_002C1690_162988, *((s32 *) new_var));
+  D_002C1690_162988 = 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001629C0);
 
