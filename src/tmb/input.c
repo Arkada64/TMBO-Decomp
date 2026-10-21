@@ -63,7 +63,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", func_00217A48);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputSetAlternateButtons__Fii);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputGetAlternateButtons__Fi);
+#include "m2c_macros.h"
+extern unsigned char D_004B1360_ns__Fi __asm__("D_004B1360");
+
+s32 inputGetAlternateButtons__Fi(s32 arg0)
+{
+  M2C_UNK *new_var;
+  new_var = (arg0 * 4) + (&D_004B1360_ns__Fi);
+  return *new_var;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputGetPlayerPad__Fi);
 
