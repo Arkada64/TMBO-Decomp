@@ -546,7 +546,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019B1A0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019B460);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", initJetSound__8JetSound);
+#include "m2c_macros.h"
+void initJetSound__8JetSound(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 0x18)) = 0;
+  *((f32 *) (((u8 *) arg0) + 0x20)) = 1024.0f;
+  *((s32 *) (((u8 *) arg0) + 8)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0xC)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x10)) = 0;
+ do { *((s32 *) (((u8 *) arg0) + 0x24)) = 0; } while (0);
+  *((s32 *) (((u8 *) arg0) + 0x14)) = 0;
+  *((s32 *) (((u8 *) arg0) + 4)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", terminateJetSound__8JetSoundP8_fvector);
 
