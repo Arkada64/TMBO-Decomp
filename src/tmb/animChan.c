@@ -83,7 +83,15 @@ void animationPause__FR11_animHandle(void* arg0) {
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationResume__FR11_animHandle);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationLoop__FR11_animHandleb);
+#include "m2c_macros.h"
+void animationLoop__FR11_animHandleb(void *arg0, unsigned int arg1)
+{
+  void **new_var;
+  if ((*((s32 *) (((u8 *) arg0) + 0))) != 0)
+  {
+    *((s8 *) (((u8 *) (*(new_var = &(*((void **) (((u8 *) arg0) + 4)))))) + 0x29)) = arg1;
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FC328);
 
