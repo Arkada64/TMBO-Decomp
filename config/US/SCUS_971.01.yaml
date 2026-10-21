@@ -116,7 +116,7 @@ segments:
       - [0x6A040, c, tmb/sound]
       - [0x870A0, c, tmb/suburb]
       - [0x87530, c, tmb/susp]
-      - [0x88BB0, asm, tmb/tankcar]
+      - [0x88BB0, c, tmb/tankcar]
       - [0x89040, asm, tmb/thunderstorm]
       - [0x89580, asm, tmb/timberdebris]
       - [0x89C90, asm, tmb/tire]
