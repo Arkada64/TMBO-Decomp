@@ -127,7 +127,7 @@ segments:
       - [0xA3B98, asm, tmb/vehicle]
       - [0xB08E0, asm, tmb/watow]
       - [0xB0D60, asm, tmb/weap]
-      - [0xBACA0, asm, tmb/989snd]
+      - [0xBACA0, c, tmb/989snd]
       - [0xBCEC8, asm, tmb/aa]
       - [0xBD530, asm, tmb/animChan]
       - [0xBFF98, asm, tmb/bound]
