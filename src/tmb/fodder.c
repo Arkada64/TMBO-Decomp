@@ -1,6 +1,14 @@
 #include "common.h"
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodder", func_00133EF0);
+#include "m2c_macros.h"
+M2C_UNK func_001D6F78_133EF0() __asm__("func_001D6F78");
+
+void func_00133EF0(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 0x590)) = 3;
+  func_001D6F78_133EF0();
+ do { *((s32 *) (((u8 *) arg0) + 0x1A54)) = 0; } while (0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodder", fodderUpdateCheapMode__7Vehicle);
 
