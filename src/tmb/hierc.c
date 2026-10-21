@@ -120,7 +120,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierSetTraversal
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierInitCs__FP3_cs);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierSetSwitch__FP11_hierswitchi);
+#include "m2c_macros.h"
+void hierSetSwitch__FP11_hierswitchi(void* arg0, s32 arg1) {
+    if ((arg0 != NULL) && ((M2C_FIELD(arg0, s32* , 0) & 0x3F) == 6) && (arg1 < (s32) M2C_FIELD(arg0, u8* , 0xB))) {
+        M2C_FIELD(arg0, s8* , 8) = (s8) arg1;
+    }
+}
 
 #include "m2c_macros.h"
 extern M2C_UNK D_004B12F0_ectori __asm__("D_004B12F0");
