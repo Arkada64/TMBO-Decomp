@@ -495,7 +495,14 @@ void setPizzaManDead__13PizzaManSound(void *arg0)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", updatePizzaManSound__13PizzaManSound);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", initSmasherSound__12SmasherSound);
+#include "m2c_macros.h"
+void initSmasherSound__12SmasherSound(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 8)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+ do { } while (0);
+  *((s32 *) (((u8 *) arg0) + 4)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019B048);
 
