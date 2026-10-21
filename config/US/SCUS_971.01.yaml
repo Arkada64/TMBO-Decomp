@@ -68,7 +68,7 @@ segments:
       - [0x20020, c, tmb/death2]
       - [0x20078, asm, tmb/death3]
       - [0x20228, asm, tmb/debris]
-      - [0x21298, asm, tmb/destruct]
+      - [0x21298, c, tmb/destruct]
       - [0x25740, asm, tmb/prison_h] # prison.h inlines
       - [0x25748, asm, tmb/drivein]
       - [0x25BB8, asm, tmb/driver]
