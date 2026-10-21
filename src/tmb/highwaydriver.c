@@ -19,7 +19,14 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", func_001
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", func_00142488);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", func_00142648);
+#include "m2c_macros.h"
+void vehicleSetToPosition__7VehicleP8_fvectorf_142648(void*, void*, float) __asm__("vehicleSetToPosition__7VehicleP8_fvectorf");
+void func_00142648(void* arg0) {
+    void* temp_a1;
+
+    temp_a1 = M2C_FIELD(arg0, void** , 0);
+    vehicleSetToPosition__7VehicleP8_fvectorf_142648(M2C_FIELD(arg0, void** , 0x10), temp_a1 + 0x10, M2C_FIELD(temp_a1, f32* , 0x68));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", func_00142670);
 
