@@ -322,7 +322,17 @@ void func_001A3E78(void) {
     func_001A9590_1A3E78();
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A3EA0);
+#include "m2c_macros.h"
+M2C_UNK func_001F9150_1A3EA0() __asm__("func_001F9150");
+extern M2C_UNK D_0045BBF0_1A3EA0 __asm__("D_0045BBF0");
+
+void func_001A3EA0(s32 arg0) {
+    s32* temp_s0;
+
+    temp_s0 = (arg0 * 0x1) + &D_0045BBF0_1A3EA0;
+    func_001F9150_1A3EA0(*temp_s0);
+    *temp_s0 = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A3ED8);
 
