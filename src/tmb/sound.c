@@ -465,7 +465,15 @@ void initPizzaManSound__13PizzaManSound(void* arg0) {
     M2C_FIELD_V1(arg0, s32* , 0x1C) = 0;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", setPizzaManDead__13PizzaManSound);
+#include "m2c_macros.h"
+s32 timerGetFieldCount__Fv_nSound() __asm__("timerGetFieldCount__Fv");
+
+void setPizzaManDead__13PizzaManSound(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 0x18)) = timerGetFieldCount__Fv_nSound();
+  *((s32 *) (((u8 *) arg0) + 0x14)) = 1;
+ do { *((s32 *) (((u8 *) arg0) + 0x1C)) = 1; } while (0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", updatePizzaManSound__13PizzaManSound);
 
