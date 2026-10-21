@@ -113,7 +113,7 @@ segments:
       - [0x63500, c, tmb/shelloverlays]
       - [0x68180, c, tmb/skidmark]
       - [0x69960, asm, tmb/smasher]
-      - [0x6A040, asm, tmb/sound]
+      - [0x6A040, c, tmb/sound]
       - [0x870A0, asm, tmb/suburb]
       - [0x87530, asm, tmb/susp]
       - [0x88BB0, asm, tmb/tankcar]
