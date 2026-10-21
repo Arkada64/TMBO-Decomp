@@ -13,7 +13,20 @@ void* __14StreamingSound(void* arg0) {
     return arg0;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A72F0);
+#include "m2c_macros.h"
+M2C_UNK __builtin_delete_1A72F0() __asm__("__builtin_delete");
+
+void func_001A72F0(s32 arg0, s32 arg1)
+{
+  s32 new_var;
+  s32 temp_a1;
+  temp_a1 = arg1 & 1;
+  if (0 != temp_a1)
+  {
+    __builtin_delete_1A72F0(new_var);
+  }
+  new_var = (float) temp_a1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", updateStreamingSound__14StreamingSound);
 
