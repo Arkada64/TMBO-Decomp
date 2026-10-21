@@ -26,7 +26,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021D6E8);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfScaleMatrix3x3__FPA3_fT0f);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021D798);
+#include "m2c_macros.h"
+void func_0021D798(void *arg0, void *arg1)
+{
+  *((f32 *) (((u8 *) arg0) + 0)) = (f32) (*((f32 *) (((u8 *) arg1) + 4)));
+  *((f32 *) (((u8 *) arg0) + 4)) = (f32) (-(*((f32 *) (((u8 *) arg1) + 0))));
+  *((s32 *) (((u8 *) arg0) + 8)) = 0;
+}
 
 #include "m2c_macros.h"
 void func_0021D7B8(void* arg0, void* arg1) {
