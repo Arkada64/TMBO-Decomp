@@ -54,7 +54,7 @@ segments:
       - [0x8350, asm, tmb/attach]
       - [0x8AF8, c, tmb/attract]
       - [0x9BB0, c, tmb/attracti]
-      - [0xB120, asm, tmb/attractped]
+      - [0xB120, c, tmb/attractped]
       - [0xE0D0, asm, tmb/axle]
       - [0xE8D0, asm, tmb/blimp]
       - [0x0F1C0, asm, tmb/boss]
