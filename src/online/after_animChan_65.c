@@ -1,6 +1,11 @@
 #include "common.h"
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_animChan_65", func_001FE0B8);
+#include "m2c_macros.h"
+extern M2C_UNK D_00465E68_1FE0B8 __asm__("D_00465E68");
+
+void func_001FE0B8(s32 arg0) {
+    *((arg0 * 0x1) + &D_00465E68_1FE0B8) = 0;
+}
 
 #include "m2c_macros.h"
 M2C_UNK __11MemoryStackPvUi_1FE0D0() __asm__("__11MemoryStackPvUi");
