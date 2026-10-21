@@ -51,7 +51,17 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", getMaxTexAddr__Fi
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", getMaxResAddr__Fi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", setMaxTexId__FiUs);
+#include "m2c_macros.h"
+extern unsigned char D_0048AC10___FiUs __asm__("D_0048AC10");
+
+void setMaxTexId__FiUs(s32 arg0, s16 arg1)
+{
+  unsigned char *new_var2;
+  int new_var;
+  new_var = arg0 * 2;
+  new_var2 = (&D_0048AC10___FiUs) - (-new_var);
+  *((s16 *) (((u8 *) new_var2) + 0x280)) = arg1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", setMaxTexAddr__FiUs);
 
