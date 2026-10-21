@@ -19,7 +19,16 @@ void initAnim__15TrafficDirector(void *arg0)
   *((s32 *) (((u8 *) arg0) + 0x450)) = 0;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", changeFodder__15TrafficDirectorP7Vehiclei);
+#include "m2c_macros.h"
+M2C_UNK changeFodder__15HighwayDirectorP7Vehiclei_hiclei() __asm__("changeFodder__15HighwayDirectorP7Vehiclei");
+
+void changeFodder__15TrafficDirectorP7Vehiclei(s32 arg0, s32 arg1, u32 arg2) {
+    s32 temp_s0;
+
+    temp_s0 = (s32) (arg2 + (arg2 >> 0x1F)) >> 1;
+    changeFodder__15HighwayDirectorP7Vehiclei_hiclei(arg0, arg1, temp_s0);
+    changeFodder__15HighwayDirectorP7Vehiclei_hiclei(arg0 + 0x230, (temp_s0 * 0x31B0) + arg1, arg2 - temp_s0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", func_001B0930);
 
