@@ -122,7 +122,7 @@ segments:
       - [0x89C90, asm, tmb/tire]
       - [0x8BCE8, c, tmb/tmmemcard]
       - [0x8CD68, c, tmb/trafficdirector]
-      - [0x8E948, asm, tmb/ui]
+      - [0x8E948, c, tmb/ui]
       - [0x9E358, asm, tmb/uimemcard]
       - [0xA3B98, asm, tmb/vehicle]
       - [0xB08E0, asm, tmb/watow]
