@@ -84,7 +84,7 @@ segments:
       - [0x2EA70, c, tmb/game]
       - [0x359E8, asm, tmb/gastank]
       - [0x36468, c, tmb/grim]
-      - [0x36C70, asm, tmb/healthstand]
+      - [0x36C70, c, tmb/healthstand]
       - [0x37BD8, asm, tmb/helicop]
       - [0x39580, asm, tmb/heliptool]
       - [0x39708, asm, tmb/highway]
