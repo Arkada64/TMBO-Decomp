@@ -145,7 +145,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationClea
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FCA80);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", evaluateBetweenKeyframes__FP8_animkeyf);
+#include "m2c_macros.h"
+f32 evaluateBetweenKeyframes__FP8_animkeyf(void* arg0, f32 arg1) {
+    f32 temp_f12;
+
+    temp_f12 = arg1 - M2C_FIELD(arg0, f32* , 0);
+    return (temp_f12 * ((temp_f12 * ((temp_f12 * M2C_FIELD(arg0, f32* , 4)) + M2C_FIELD(arg0, f32* , 8))) + M2C_FIELD(arg0, f32* , 0xC))) + M2C_FIELD(arg0, f32* , 0x10);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FCBD8);
 
@@ -157,7 +163,20 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FD180
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationAddToActiveTree__FR11_animHandle);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FD878);
+#include "m2c_macros.h"
+int animationPause__FR11_animHandle_1FD878(void*) __asm__("animationPause__FR11_animHandle");
+void func_001FD878(void* arg0) {
+    s32* temp_a1;
+    void* temp_s0;
+
+    temp_s0 = M2C_FIELD(arg0, void** , 0);
+    if ((temp_s0 != NULL) && (temp_a1 = M2C_FIELD(temp_s0, s32** , 0x24), (temp_a1 != NULL))) {
+        if (((*temp_a1 & 0x3F) == 0x21) && (M2C_FIELD(arg0, s32* , 4) == temp_a1)) {
+            animationPause__FR11_animHandle_1FD878(arg0);
+            M2C_FIELD(temp_s0, s32** , 0x24) = NULL;
+        }
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FD8D0);
 
