@@ -153,7 +153,7 @@ segments:
       - [0xDCB90, asm, tmb/mathv0] # Might need to be `hasm`, seems to be inline assembly.
       - [0xDCDC8, c, tmb/memCard]
       - [0xDED00, asm, tmb/memorystack]
-      - [0xDED38, asm, tmb/movie]
+      - [0xDED38, c, tmb/movie]
       - [0xDF890, asm, tmb/particle]
       - [0xE9AD8, asm, tmb/pkt]
       - [0xEAAE8, asm, tmb/pkta] # pkta.s HASM
