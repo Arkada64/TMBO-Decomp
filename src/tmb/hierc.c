@@ -92,7 +92,28 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierInitCs__FP3_
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierSetSwitch__FP11_hierswitchi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierSetCameraVehiclePos__FP8_fvectori);
+#include "m2c_macros.h"
+extern M2C_UNK D_004B12F0_ectori __asm__("D_004B12F0");
+
+void hierSetCameraVehiclePos__FP8_fvectori(void *arg0, s32 arg1)
+{
+  void *temp_a1;
+  u8 *new_var2;
+  M2C_UNK *new_var3;
+  u8 *new_var;
+  f32 *new_var4;
+  f32 *new_var5;
+  new_var3 = &D_004B12F0_ectori;
+  new_var = (u8 *) arg0;
+  temp_a1 = new_var3;
+  temp_a1 = (arg1 * 0x10) + temp_a1;
+  *((f32 *) (((u8 *) temp_a1) + 0)) = (f32) (*((f32 *) (new_var + 0)));
+  new_var2 = ((u8 *) temp_a1) + 8;
+  new_var5 = (f32 *) (((u8 *) temp_a1) + 4);
+  new_var4 = (f32 *) (new_var + 4);
+  *new_var5 = (f32) (*new_var4);
+  *((f32 *) new_var2) = (f32) (*((f32 *) (new_var + 8)));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierSetKlod__Ff);
 
