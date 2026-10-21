@@ -12,7 +12,18 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", particleLensF
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", particleGetLensFlareInfo__FPP17HierLensFlareListPii);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", particleSetLensFlareNumEntries__Fii);
+#include "m2c_macros.h"
+#include "m2c_macros.h"
+extern M2C_UNK D_004FB6E0_s__Fii __asm__("D_004FB6E0");
+
+void particleSetLensFlareNumEntries__Fii(s32 arg0, s32 arg1)
+{
+  unsigned char *new_var2;
+  M2C_UNK *new_var;
+  new_var2 = &D_004FB6E0_s__Fii;
+  new_var = ((arg1 & 1) * 4) + new_var2;
+  *new_var = arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/particle", func_00222FE0);
 
