@@ -38,7 +38,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewSetTrans__FP8
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetCurView__Fv);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetViewCs__Fi);
+#include "m2c_macros.h"
+extern unsigned char D_004CFB90_Cs__Fi __asm__("D_004CFB90");
+
+s32 viewGetViewCs__Fi(s32 arg0)
+{
+  M2C_UNK *new_var;
+  new_var = ((2 * arg0) * 8) + (&D_004CFB90_Cs__Fi);
+  return *new_var;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetWorldCtx__Fi);
 
