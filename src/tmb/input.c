@@ -16,7 +16,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputSetActuator
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputUsingActuator__Fi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputUseActuator__Fib);
+#include "m2c_macros.h"
+#include "m2c_macros.h"
+extern M2C_UNK D_00612CA0_r__Fib __asm__("D_00612CA0");
+
+void inputUseActuator__Fib(s32 arg0, s32 arg1)
+{
+  int new_var;
+  s32 new_var2;
+  new_var = new_var * 4;
+  new_var = arg0;
+  new_var2 = arg1;
+  *(new_var + (&D_00612CA0_r__Fib)) = new_var2;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputSetPlayerActuator__Fib);
 
