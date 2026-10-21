@@ -48,7 +48,20 @@ void todSetPlightsActive__Fii(s32 arg0, s32 arg1)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", func_0023C368);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", func_0023C3F8);
+#include "m2c_macros.h"
+M2C_UNK __builtin_delete_23C3F8() __asm__("__builtin_delete");
+
+void func_0023C3F8(s32 arg0, s32 arg1)
+{
+  s32 temp_a1;
+  s32 new_var;
+  ;
+  if ((arg1 & 1) != 0)
+  {
+    new_var = temp_a1;
+    __builtin_delete_23C3F8(new_var);
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", func_0023C420);
 
