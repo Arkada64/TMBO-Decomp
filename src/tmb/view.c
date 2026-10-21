@@ -32,7 +32,17 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetMat__Fi);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetTrans__Fi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewSetRot__FP8_fvectori);
+#include "m2c_macros.h"
+extern volatile unsigned char D_004CFB90_ectori __asm__("D_004CFB90");
+
+void viewSetRot__FP8_fvectori(void *arg0, s32 arg1)
+{
+  void **temp_a1;
+  temp_a1 = (arg1 * 0x10) + (&D_004CFB90_ectori);
+  *((f32 *) (((u8 *) (*temp_a1)) + 0x60)) = (f32) (*((f32 *) (((u8 *) arg0) + 0)));
+  *((f32 *) (((u8 *) (*temp_a1)) + 0x64)) = (f32) (*((f32 *) (((u8 *) arg0) + 4)));
+  *((f32 *) (((u8 *) (*temp_a1)) + 0x68)) = (f32) (*((f32 *) (((u8 *) arg0) + 8)));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewSetTrans__FP8_fvectori);
 
