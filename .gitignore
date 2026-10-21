@@ -16,3 +16,4 @@ objdiff.json
 permuter_settings.toml
 *.rom
 ctx*
+logs/
