@@ -103,6 +103,27 @@ stale ROM and produced false "matches"). `M2C_FIELD(expr, type, off)` takes a PO
 3. Version diff for the merge: which online-only systems retail needs (net layer + hooks).
 4. Medius/DME replacement design: lobby protocol to the PC-side Steam helper.
 
+## Feature notes (from analysis so far)
+- **Traffic + pedestrians online (wanted).** "Fodder" = civilian traffic cars (FodderDriver,
+  TrafficDirector, HighwayDirector). Network sync for them was built: `NetFodder` (44 bytes),
+  `netFodderUpdateCB` registered in `netInitDme`. Pedestrians (PedWorldManager, Pedestrian,
+  AttractPed: stander/runner/guard/skater) are in the online build, `PedWorldManager::init`
+  runs unconditionally at level load (in func_00137E08), and the online disc has `.PED`
+  placement files for every level incl. DEATH1-7, MINICITY, MINIBURB, JUNK2, ROOFTOP2.
+  Neither shows up in online play, so both are switched off downstream of init. Tasks:
+  find the switches; peds have no network object, so add one modelled on NetFodder
+  (host-driven) or keep them local-only; decode `.PED` to add peds to more places.
+- **Balance toggle (wanted).** Retail vs online car setups selectable; lobby setting owned by
+  the host (input-replicated physics must agree on every peer). Differences concentrated in
+  `tmb/vehicle` (42% shared), `rigidbody` (29%), `pickup` (35%). First task: a diff tool
+  comparing matched C of both builds.
+- **AI overhaul.** Vehicle methods in `ai.c`: `aiPerform` state machine (hunt/bait/flee/snipe/
+  pickup), weapon choice, fairness gate `aiIsPlayerLookingAtAIEnoughForAIToShoot`,
+  `aiSetAggressiveness`; movement via per-level attractor-point waypoint graphs
+  (`attracti.c`, `driver.c`). In co-op the host runs AI and sends it as NetVehicle.
+- **Ported names have confidence levels** (`reference/match/mapping.csv` `method`): exact/
+  masked/strings/callgraph are solid; fuzzy is good; order/global_fuzzy (~490) are hints only.
+
 ## Reporting
 Update `reference/wip/STATUS.md` at the end of each session (what was done, counts, what's
 next), commit, push. Ark mostly watches and pastes outputs; keep him informed briefly.
