@@ -65,7 +65,7 @@ segments:
       - [0x15B48, c, tmb/collis]
       - [0x1C718, cpp, tmb/combo]
       - [0x1F8E8, c, tmb/db]
-      - [0x20020, asm, tmb/death2]
+      - [0x20020, c, tmb/death2]
       - [0x20078, asm, tmb/death3]
       - [0x20228, asm, tmb/debris]
       - [0x21298, asm, tmb/destruct]
