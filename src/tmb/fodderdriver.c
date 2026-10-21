@@ -71,7 +71,13 @@ void forceFullCollis__12FodderDriver(void** arg0) {
     M2C_FIELD_V1(*arg0, s32* , 0x1A64) = 1;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", vectorCrossUp__12FodderDriverP8_fvectorT1);
+#include "m2c_macros.h"
+void vectorCrossUp__12FodderDriverP8_fvectorT1(s32 arg0, void *arg1, void *arg2)
+{
+  *((f32 *) (((u8 *) arg1) + 0)) = (f32) (*((f32 *) (((u8 *) arg2) + 4)));
+  *((f32 *) (((u8 *) arg1) + 4)) = (f32) (-(*((f32 *) (((u8 *) arg2) + 0))));
+  *((s32 *) (((u8 *) arg1) + 8)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", getHalfLaneWidth__12FodderDriverP12AttractPoint);
 
