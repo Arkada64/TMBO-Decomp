@@ -112,4 +112,47 @@ void func_001B2190(void *arg0)
   }
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", pruneSegment__15HighwayDirectori);
+#include "m2c_macros.h"
+M2C_UNK disable__15HighwayDirectorP7Vehicle_ectori() __asm__("disable__15HighwayDirectorP7Vehicle");
+
+void pruneSegment__15HighwayDirectori(void *arg0, s32 arg1)
+{
+  s32 temp_v0;
+  s32 temp_v0_2;
+  s32 temp_v1;
+  s32 var_s0;
+  void *temp_a0;
+  void *temp_a1;
+  void *var_s1;
+  temp_v1 = *((s32 *) (((u8 *) arg0) + 0x1E8));
+  temp_a0 = *((void **) (((u8 *) arg0) + 0));
+  temp_v0 = *((s32 *) (((u8 *) temp_a0) + 0x2450));
+  var_s0 = temp_v1 * temp_v0;
+  var_s1 = temp_a0 + ((((arg1 * temp_v1) * temp_v0) * 0x10) + 0x10);
+  if (var_s0 != 0)
+  {
+    do
+    {
+      temp_a1 = *((void **) (((u8 *) var_s1) + 0xC));
+      if ((temp_a1 != 0) && ((*((s32 *) (((u8 *) temp_a1) + 0x17D8))) >= 0x385))
+      {
+        if ((*((s32 *) (((u8 *) temp_a1) + 0x20AC))) == 0)
+        {
+          temp_v0_2 = *((s32 *) (((u8 *) temp_a1) + 0x2134));
+          if (temp_v0_2 > 0)
+          {
+            disable__15HighwayDirectorP7Vehicle_ectori(arg0, temp_a1);
+          }
+        }
+        else
+          if ((*((s32 *) (((u8 *) temp_a1) + 0x2134))) >= 0x385)
+        {
+          disable__15HighwayDirectorP7Vehicle_ectori(arg0, temp_a1);
+        }
+      }
+      var_s0 -= 1;
+      var_s1 += 0x10;
+    }
+    while (var_s0 != 0);
+  }
+}
