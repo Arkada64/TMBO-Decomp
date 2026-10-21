@@ -91,7 +91,7 @@ segments:
       - [0x39908, c, tmb/highwaydriver]
       - [0x3AAB8, asm, tmb/highwayptool]
       - [0x3ACA0, c, tmb/hud]
-      - [0x42CD8, asm, tmb/hwyloop]
+      - [0x42CD8, c, tmb/hwyloop]
       - [0x42D08, asm, tmb/interact]
       - [0x430F0, asm, tmb/junkjet]
       - [0x44098, asm, tmb/junkyard]
