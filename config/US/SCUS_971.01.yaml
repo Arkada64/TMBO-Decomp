@@ -87,7 +87,7 @@ segments:
       - [0x36C70, c, tmb/healthstand]
       - [0x37BD8, asm, tmb/helicop]
       - [0x39580, asm, tmb/heliptool]
-      - [0x39708, asm, tmb/highway]
+      - [0x39708, c, tmb/highway]
       - [0x39908, asm, tmb/highwaydriver]
       - [0x3AAB8, asm, tmb/highwayptool]
       - [0x3ACA0, asm, tmb/hud]
