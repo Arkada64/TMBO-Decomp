@@ -24,9 +24,30 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierBurnManKludg
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", func_00213218);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierKillLocator);
+#include "m2c_macros.h"
+M2C_UNK func_0022A6D8_ocator() __asm__("func_0022A6D8");
+extern M2C_UNK D_004AD3F0_ocator __asm__("D_004AD3F0");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierRegisterLocator__FUii);
+void hierKillLocator(s32 arg0, s32* arg1) {
+    s32** temp_s0;
+
+    temp_s0 = (arg0 * 0x1) + &D_004AD3F0_ocator;
+    func_0022A6D8_ocator(*temp_s0);
+    *temp_s0 = arg1;
+    *arg1 = (*arg1 & 0x3FFFF) | (arg0 << 0x12);
+}
+
+#include "m2c_macros.h"
+extern M2C_UNK D_004AD3F0___FUii __asm__("D_004AD3F0");
+
+void hierRegisterLocator__FUii(s32 arg0, s32 arg1) {
+    u32 temp_v1;
+
+    temp_v1 = arg0 - 0x1D4C;
+    if (temp_v1 < 0x20U) {
+        *((temp_v1 * 0x1) + &D_004AD3F0___FUii) = arg1;
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", func_002134D0);
 
