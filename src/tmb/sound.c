@@ -567,7 +567,20 @@ void func_0019C8F8(s32 arg0, s32 arg1)
   }
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019C920);
+#include "m2c_macros.h"
+s32 timerGetFieldCount__Fv_19C920() __asm__("timerGetFieldCount__Fv");
+
+void func_0019C920(void *arg0)
+{
+  s32 *new_var;
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+  *((s32 *) (((u8 *) arg0) + 4)) = 0;
+  *((s32 *) (((u8 *) arg0) + 8)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x24)) = -1;
+  *((s32 *) (((u8 *) arg0) + 0x14)) = timerGetFieldCount__Fv_19C920();
+ do { *((s32 *) (((u8 *) arg0) + 0x18)) = timerGetFieldCount__Fv_19C920(); *(new_var = (s32 *) (((u8 *) arg0) + 0x1C)) = 1; *((s32 *) (((u8 *) arg0) + 0x20)) = (long long) 0; *((s32 *) (((u8 *) arg0) + 0xC)) = 0; } while (0);
+  *((s32 *) (((u8 *) arg0) + 0x10)) = 0;
+}
 
 #include "m2c_macros.h"
 M2C_UNK func_0019CA78_19C978() __asm__("func_0019CA78");
