@@ -520,7 +520,11 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016C488);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016C590);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016C738);
+#include "m2c_macros.h"
+void func_0016C738(void *arg0)
+{
+  *((s8 *) (((u8 *) arg0) + 0x14)) = (*((s8 *) (((u8 *) arg0) + 4)) = 0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_0016C748);
 
