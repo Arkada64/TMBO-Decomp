@@ -44,7 +44,17 @@ void viewSetRot__FP8_fvectori(void *arg0, s32 arg1)
   *((f32 *) (((u8 *) (*temp_a1)) + 0x68)) = (f32) (*((f32 *) (((u8 *) arg0) + 8)));
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewSetTrans__FP8_fvectori);
+#include "m2c_macros.h"
+extern unsigned char D_004CFB90_ectori __asm__("D_004CFB90");
+
+void viewSetTrans__FP8_fvectori(void *arg0, s32 arg1)
+{
+  void **temp_a1;
+  temp_a1 = (arg1 * 0x10) + (&D_004CFB90_ectori);
+  *((f32 *) (((u8 *) (*temp_a1)) + 0x10)) = (f32) (*((f32 *) (((u8 *) arg0) + 0)));
+  *((f32 *) (((u8 *) (*temp_a1)) + 0x14)) = (f32) (*((f32 *) (((u8 *) arg0) + 4)));
+  *((f32 *) (((u8 *) (*temp_a1)) + 0x18)) = (f32) (*((f32 *) (((u8 *) arg0) + 8)));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetCurView__Fv);
 
