@@ -165,7 +165,7 @@ segments:
       - [0xEE1A8, asm, tmb/smooth]
       - [0xEE8D8, c, tmb/strfile]
       - [0xEEAD8, asm, tmb/sys] # sys.s HASM
-      - [0xEEB20, asm, tmb/td]
+      - [0xEEB20, c, tmb/td]
       - [0xEF3A0, asm, tmb/terrain]
       - [0xF6788, c, tmb/timer]
       - [0xF6B58, asm, tmb/tod]
