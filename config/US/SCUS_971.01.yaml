@@ -106,7 +106,7 @@ segments:
       - [0x59948, c, tmb/prisonShip]
       - [0x59CA8, asm, tmb/rigiddebris]
       - [0x5B450, asm, tmb/rt]
-      - [0x5BD90, asm, tmb/reset]
+      - [0x5BD90, c, tmb/reset]
       - [0x5CA70, asm, tmb/rooftop]
       - [0x5DE98, asm, tmb/shadow]
       - [0x5E5F8, asm, tmb/shell]
