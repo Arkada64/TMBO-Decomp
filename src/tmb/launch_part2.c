@@ -12,7 +12,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/launch_part2", func_0015
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/launch_part2", GetWeaponMapping__8Launcheri);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/launch_part2", RequestAnimation__8Launcherii);
+#include "m2c_macros.h"
+void RequestAnimation__8Launcherii(void *arg0, s32 arg1, s32 arg2)
+{
+  *((s32 *) (((u8 *) arg0) - -0xBC)) = arg1;
+  *((s32 *) (((u8 *) arg0) + 0xB8)) = arg2;
+  *((s32 *) (((u8 *) arg0) + 0xB4)) = 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/launch_part2", StartAnimation__8LauncherP7Vehicleif);
 
