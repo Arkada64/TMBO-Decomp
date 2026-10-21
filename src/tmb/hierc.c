@@ -105,7 +105,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierCsPoolInit__
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierCsGetList__Fv);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierSetCsDrawMe__FP3_csUc);
+#include "m2c_macros.h"
+void hierSetCsDrawMe__FP3_csUc(void *arg0, s32 arg1)
+{
+  int new_var;
+  new_var = arg1 & 0xFF;
+  if (arg0 != 0)
+  {
+    *((s8 *) (((u8 *) arg0) + 0xC)) = (s8) new_var;
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/hierc", hierSetTraversalCallback__FPFP3_csP11_hierobjectPA3_fP8_fvector_v);
 
