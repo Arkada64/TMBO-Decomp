@@ -45,7 +45,15 @@ void func_001628E0(s32 arg0, s32 arg1, s32 arg2, void *arg3)
   D_002C1690_1628E0 = 1;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00162918);
+#include "m2c_macros.h"
+void func_00163EB8_162918() __asm__("func_00163EB8");
+extern s32 D_002C1690_162918 __asm__("D_002C1690");
+
+void func_00162918(s32 arg0, s32 arg1, s32 arg2, void *arg3)
+{
+  func_00163EB8_162918(&D_002C1690_162918, *((s32 *) (((u8 *) arg3) + 0x18)));
+  D_002C1690_162918 = 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00162950);
 
