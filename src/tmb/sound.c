@@ -413,7 +413,25 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_001998D8);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", setACUnitDestroyed__19RooftopACUnitsSoundi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00199BD8);
+#include "m2c_macros.h"
+void func_00199BD8(void *arg0)
+{
+  int new_var;
+  s32 var_v0;
+  void *var_a0;
+  var_a0 = arg0;
+  new_var = 1;
+  var_v0 = 7;
+  do
+  {
+    *((s32 *) (((u8 *) var_a0) + 0)) = 0;
+    var_v0 -= new_var;
+    *((s32 *) (((u8 *) var_a0) + 0x20)) = new_var;
+    *((s32 *) (((u8 *) var_a0) + 0x40)) = 0;
+    var_a0 += 4;
+  }
+  while (var_v0 >= 0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00199C08);
 
