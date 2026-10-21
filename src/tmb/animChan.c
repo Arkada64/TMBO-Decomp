@@ -15,7 +15,28 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FBCF8
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationGetCurrentTime__FR11_animHandle);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationCalculatePlayTime__FR11_animHandle);
+#include "m2c_macros.h"
+f32 animationCalculatePlayTime__FR11_animHandle(void *arg0)
+{
+  f32 temp_f2;
+  f32 var_f0;
+  void *new_var;
+  void *temp_v0;
+  void *temp_v0_2;
+  var_f0 = 0.0f;
+  if ((*((s32 *) (((u8 *) arg0) + 0))) != 0)
+  {
+    temp_v0 = *((void **) (((u8 *) arg0) + 4));
+    new_var = *((void **) (((u8 *) temp_v0) + 4));
+    temp_f2 = *((f32 *) (((u8 *) temp_v0) + 0x1C));
+    temp_v0_2 = new_var;
+    if (temp_f2 != 0.0f)
+    {
+      var_f0 = ((*((f32 *) (((u8 *) temp_v0_2) + 8))) - (*((f32 *) (((u8 *) temp_v0_2) + 4)))) / fabsf(temp_f2);
+    }
+  }
+  return var_f0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationStart__FR11_animHandleb);
 
