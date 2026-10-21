@@ -75,6 +75,41 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", func_0
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", func_001B2110);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", func_001B2190);
+#include "m2c_macros.h"
+M2C_UNK disable__15HighwayDirectorP7Vehicle_1B2190() __asm__("disable__15HighwayDirectorP7Vehicle");
+
+void func_001B2190(void *arg0)
+{
+  s32 temp_v0;
+  s32 var_s1;
+  void *var_s0;
+  var_s1 = *((s32 *) (((u8 *) arg0) + 8));
+  var_s0 = *((void **) (((u8 *) arg0) + 4));
+  if (var_s1 != 0)
+  {
+    do
+    {
+      if (((*((s32 *) (((u8 *) var_s0) + 0x590))) != 0) && ((*((s32 *) (((u8 *) var_s0) + 0x17D8))) >= 0x385))
+      {
+        ;
+        if ((*((s32 *) (((u8 *) var_s0) + 0x20AC))) == 0)
+        {
+          if ((*((s32 *) (((u8 *) var_s0) + 0x2134))) > 0)
+          {
+            disable__15HighwayDirectorP7Vehicle_1B2190(arg0, var_s0);
+          }
+        }
+        else
+          if ((*((s32 *) (((u8 *) var_s0) + 0x2134))) >= 0x385)
+        {
+          disable__15HighwayDirectorP7Vehicle_1B2190(arg0, var_s0);
+        }
+      }
+      var_s1 -= 1;
+      var_s0 += 0x31B0;
+    }
+    while (var_s1 != 0);
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", pruneSegment__15HighwayDirectori);
