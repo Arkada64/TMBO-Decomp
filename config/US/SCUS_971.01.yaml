@@ -80,7 +80,7 @@ segments:
       - [0x2BDE0, c, tmb/fodderdriver]
       - [0x2CE70, c, tmb/forceField]
       - [0x2D858, c, tmb/freeway]
-      - [0x2E200, asm, tmb/freewaytrain]
+      - [0x2E200, c, tmb/freewaytrain]
       - [0x2EA70, asm, tmb/game]
       - [0x359E8, asm, tmb/gastank]
       - [0x36468, asm, tmb/grim]
