@@ -24,7 +24,20 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputUseLgActuat
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputAnyKey__Fi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputIsCtlAvailable__Fib);
+#include "m2c_macros.h"
+#include "m2c_macros.h"
+extern M2C_UNK D_00612CC0_e__Fib __asm__("D_00612CC0");
+
+s32 inputIsCtlAvailable__Fib(s32 arg0)
+{
+  s32 new_var;
+  M2C_UNK *new_var2;
+  M2C_UNK *new_var3;
+  new_var3 = &D_00612CC0_e__Fib;
+  new_var = 2 * (new_var * 2);
+  new_var2 = new_var3;
+  return *(arg0 + new_var2);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/input", inputGetPadButtons__Fi);
 
