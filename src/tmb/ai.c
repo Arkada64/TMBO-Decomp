@@ -137,7 +137,22 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", aiUsingNonLOSWeapon
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_00106A00);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_00106A60);
+#include "m2c_macros.h"
+s32 aiInWeaponRange__7Vehiclei_106A60() __asm__("aiInWeaponRange__7Vehiclei");
+M2C_UNK aiSetAttackState__7Vehicle12_attackState_106A60() __asm__("aiSetAttackState__7Vehicle12_attackState");
+
+void func_00106A60(void* arg0) {
+    void* temp_v1;
+
+    if (aiInWeaponRange__7Vehiclei_106A60(arg0, M2C_FIELD(arg0, s32* , 0x21B0)) != 0) {
+        aiSetAttackState__7Vehicle12_attackState_106A60(arg0, 5);
+    } else {
+        temp_v1 = M2C_FIELD(arg0, void** , 0x2014);
+        if ((M2C_FIELD(temp_v1, s32* , 0x488) >= 0x12D) && (M2C_FIELD(temp_v1, s32* , 0x594) != 0)) {
+            aiSetAttackState__7Vehicle12_attackState_106A60(arg0, 1);
+        }
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/ai", func_00106AC8);
 
