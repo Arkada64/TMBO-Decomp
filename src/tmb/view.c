@@ -220,7 +220,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", func_00243AA8);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetZBuffParams__FiPfT1);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetWorldToScreenMat__Fi);
+#include "m2c_macros.h"
+extern char D_004D00F0_at__Fi __asm__("D_004D00F0");
+
+void *viewGetWorldToScreenMat__Fi(s32 arg0)
+{
+  if (1)
+  {
+    return (arg0 << 6) + (&D_004D00F0_at__Fi);
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", func_00243B18);
 
