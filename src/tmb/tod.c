@@ -98,4 +98,11 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", FindFreeNode__12CT
 void SortList__12CTODLinkList(void) {
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", ClearNode__12CTODLinkListP9_LinkNode);
+#include "m2c_macros.h"
+void ClearNode__12CTODLinkListP9_LinkNode(s32 arg0, void *arg1)
+{
+  *((s32 *) (((u8 *) arg1) + 0x10)) = 0;
+  *((s32 *) (((u8 *) arg1) + 0xC)) = -1;
+ do { *((s32 *) (((u8 *) arg1) + 0)) = -1; *((s32 *) (((u8 *) arg1) + 4)) = -1; } while (0);
+  *((s32 *) (((u8 *) arg1) + 8)) = -1;
+}
