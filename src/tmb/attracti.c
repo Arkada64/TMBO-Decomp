@@ -18,7 +18,21 @@ s32 func_0010C8F8(void* arg0) {
     return var_v1;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", func_0010C930);
+#include "m2c_macros.h"
+s32 func_0010C930(s16* arg0) {
+    s16* var_a0;
+    s32 var_v1;
+
+    var_a0 = arg0;
+    var_v1 = 0;
+    if (*var_a0 >= 0) {
+        do {
+            var_a0 +=0x2;
+            var_v1 += 1;
+        } while (*var_a0 >= 0);
+    }
+    return var_v1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attracti", attractiInitLevelsGroups__FP8GroupDat);
 
