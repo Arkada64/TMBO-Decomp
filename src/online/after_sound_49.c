@@ -2,9 +2,21 @@
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_sound_49", func_001A5A38);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_sound_49", func_001A63B8);
+#include "m2c_macros.h"
+M2C_UNK func_001A6498_1A63B8() __asm__("func_001A6498");
+extern M2C_UNK D_0045BBF0_1A63B8 __asm__("D_0045BBF0");
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_sound_49", func_001A63E8);
+void func_001A63B8(s32 arg0, s32 arg1) {
+    func_001A6498_1A63B8(arg0, *((arg1 * 0x1) + &D_0045BBF0_1A63B8));
+}
+
+#include "m2c_macros.h"
+M2C_UNK func_001A6498_1A63E8() __asm__("func_001A6498");
+extern M2C_UNK D_0045AA70_1A63E8 __asm__("D_0045AA70");
+
+void func_001A63E8(s32 arg0, s32 arg1) {
+    func_001A6498_1A63E8(arg0, *((arg1 * 0x3) + &D_0045AA70_1A63E8));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_sound_49", func_001A6418);
 
