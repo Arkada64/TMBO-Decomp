@@ -53,13 +53,25 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", getCloses
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_00135718);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_00135940);
+#include "m2c_macros.h"
+s32 func_001359A8_135940() __asm__("func_001359A8");
+
+void func_00135940(void* arg0, M2C_UNK arg1) {
+    if ((func_001359A8_135940(arg0, arg1, M2C_FIELD(arg0, void** , 0x10)) == 0) && (func_001359A8_135940(arg0, arg1, M2C_FIELD(arg0, s32* , 0x14)) == 0)) {
+        func_001359A8_135940(arg0, arg1, M2C_FIELD(arg0, s32* , 0x18));
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_001359A8);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_00135B40);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", isFourWayIntersectionClear__12FodderDriver);
+#include "m2c_macros.h"
+M2C_UNK func_00135D68_Driver() __asm__("func_00135D68");
+
+void isFourWayIntersectionClear__12FodderDriver(void* arg0) {
+    func_00135D68_Driver(arg0, M2C_FIELD(arg0, s32* , 0x14));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/fodderdriver", func_00135D68);
 
