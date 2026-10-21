@@ -80,7 +80,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/videodec", func_00244510
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/videodec", videoDecFlush__FP8VideoDec);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/videodec", videoDecIsFlushed__FP8VideoDec);
+#include "m2c_macros.h"
+s32 sceMpegIsRefBuffEmpty_deoDec() __asm__("sceMpegIsRefBuffEmpty");
+s32 videoDecInputCount__FP8VideoDec_deoDec() __asm__("videoDecInputCount__FP8VideoDec");
+
+s32 videoDecIsFlushed__FP8VideoDec(s32 arg0) {
+    s32 var_v0;
+
+    var_v0 = 0;
+    if (videoDecInputCount__FP8VideoDec_deoDec(arg0) == 0) {
+        var_v0 = sceMpegIsRefBuffEmpty_deoDec(arg0) != 0;
+    }
+    return var_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/videodec", func_00244660);
 
