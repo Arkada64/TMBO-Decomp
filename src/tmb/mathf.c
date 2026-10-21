@@ -102,7 +102,17 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfDist2__FP8_
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfDist3__FP8_fvectorT0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", mathfDist2Squared__FP8_fvectorT0);
+#include "m2c_macros.h"
+f32 mathfDist2Squared__FP8_fvectorT0(void *arg0, void *arg1)
+{
+  f32 *new_var;
+  f32 temp_f0;
+  f32 temp_f1;
+  new_var = (f32 *) (((u8 *) arg1) + 0);
+  ;
+  temp_f0 = (*new_var) - (*((f32 *) (((u8 *) arg0) + 0)));
+  return (temp_f0 * temp_f0) + (((*((f32 *) (((u8 *) arg1) + 4))) - (*((f32 *) (((u8 *) arg0) + 4)))) * ((*((f32 *) (((u8 *) arg1) + 4))) - (*((f32 *) (((u8 *) arg0) + 4)))));
+}
 
 #include "m2c_macros.h"
 f32 mathfDist3Squared__FP8_fvectorT0(void* arg0, void* arg1) {
