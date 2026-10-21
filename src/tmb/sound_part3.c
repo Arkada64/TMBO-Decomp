@@ -67,7 +67,20 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", playPizzaM
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A8518);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A8548);
+#include "m2c_macros.h"
+M2C_UNK __builtin_delete_1A8548() __asm__("__builtin_delete");
+
+void func_001A8548(s32 arg0, s32 arg1)
+{
+  int new_var;
+  s32 temp_a1;
+  ;
+  temp_a1 = new_var;
+  if ((arg1 & 1) != 0)
+  {
+    __builtin_delete_1A8548(temp_a1);
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A8570);
 
