@@ -98,3 +98,14 @@
   2026-10-20: log in logs/perm_run2.txt / logs/perm_run.txt.
 - Needs pycparser 2.x in the venv (3.x dropped plyparser); m2c still works with it.
 - Resumable: logs/perm/done.txt. Deleting logs/perm/near.json forces a re-rank (~45 min).
+
+## Overnight 2026-10-20/21 results
+- Permuter run 2 (next 100 near misses): **61/100** solved and verified.
+- tools/fixup.py (new): rewrites every remaining draft for two systematic m2c mistakes and
+  fast_matches the variants: (P) m2c writes pointer arithmetic in bytes, C scales it by the
+  element size (`var += 0x10` on s32* -> 4; `(i*K) + &D` -> K/4); (A) m2c drops a pass-through
+  leading argument (prepend arg0 / arg0, arg1). 55 matched standalone, **50 kept** in the real
+  build by tools/apply_fix.sh (one commit per file).
+- Still INCLUDE_ASM: 2054 total, 176 in net.c.
+- Next: permuter run 3 on remaining <=8-insn near misses (resumable), re-rank after fixup
+  (delete logs/perm/near.json), then hand work on net.c.
