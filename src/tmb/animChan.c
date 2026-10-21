@@ -149,7 +149,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FDD48
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", animationRunGlobal__Fv);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FDE10);
+#include "m2c_macros.h"
+extern M2C_UNK D_00465EA0_1FDE10 __asm__("D_00465EA0");
+
+void func_001FDE10(s32 arg0, s32 arg1) {
+    *((arg1 * 0x1) + &D_00465EA0_1FDE10) = arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/animChan", func_001FDE28);
 
