@@ -16,7 +16,31 @@ s32 func_001192E8(s32 arg0) {
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_00119318);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_00119370);
+#include "m2c_macros.h"
+s32 mathfRand__Fii_119370() __asm__("mathfRand__Fii");
+s32 timerGetFieldCount__Fv_119370() __asm__("timerGetFieldCount__Fv");
+
+void func_00119370(void *arg0)
+{
+  s32 temp_v0;
+  s32 temp_v0_2;
+  *((s32 *) (((u8 *) arg0) + 8)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x1C)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0)) = 1;
+  *((s32 *) (((u8 *) arg0) + 0x14)) = 1;
+  *((s32 *) (((u8 *) arg0) + 0x10)) = -1;
+  temp_v0 = mathfRand__Fii_119370(0x2D, 0xB4) * 0x3C;
+  *((s32 *) (((u8 *) arg0) + 0x60)) = 0x1A4;
+  *((s32 *) (((u8 *) arg0) + 0x5C)) = temp_v0;
+  temp_v0_2 = mathfRand__Fii_119370(8, 0xC) * 0x3C;
+  *((s32 *) (((u8 *) arg0) + 0x6C)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x30)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x68)) = 0x78;
+  *((f32 *) (((u8 *) arg0) + 0x2C)) = 1.0f;
+  *((s32 *) (((u8 *) arg0) + 0x64)) = temp_v0_2;
+  *((s32 *) (((u8 *) arg0) + 0x38)) = timerGetFieldCount__Fv_119370();
+  *((s32 *) (((u8 *) arg0) + 0x34)) = mathfRand__Fii_119370(0x78, 0x168);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_00119420);
 
