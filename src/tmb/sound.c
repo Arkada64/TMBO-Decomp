@@ -379,7 +379,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", initRainSound__9
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", updateRainSound__9RainSoundi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", initShipLevelSound__14ShipLevelSound);
+#include "m2c_macros.h"
+void initShipLevelSound__14ShipLevelSound(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 8)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+ do { *((s32 *) (((u8 *) arg0) + 4)) = 0; } while (0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00197DB0);
 
