@@ -10,7 +10,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigidbody", func_0023085
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigidbody", initBlock__9RigidBodyffff);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigidbody", func_00230900);
+#include "m2c_macros.h"
+int setTensor__9RigidBodyfff_230900(void*, float, float, float) __asm__("setTensor__9RigidBodyfff");
+void func_00230900(f32* arg0, f32 fparg0, f32 fparg1) {
+    f32 temp_f0;
+
+    temp_f0 = (2.0f * fparg1 * fparg0 * fparg0) / 5.0f;
+    setTensor__9RigidBodyfff_230900(arg0, temp_f0, temp_f0, temp_f0);
+    *arg0 = 1.0f / fparg1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigidbody", initCylindrical__9RigidBodyffif);
 
