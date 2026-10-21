@@ -24,7 +24,24 @@ s32 func_002468C8(void *arg0, s32 arg1, s32 arg2, s32 arg3)
   return (temp_v0 < new_var) ^ 1;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/audiodec", audioDecReset__FP8AudioDec);
+#include "m2c_macros.h"
+M2C_UNK func_001FADF0_dioDec() __asm__("func_001FADF0");
+
+s32 audioDecReset__FP8AudioDec(void *arg0)
+{
+  s32 *new_var;
+  func_001FADF0_dioDec();
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x2C)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x34)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x38)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x40)) = 0;
+  new_var = (s32 *) (((u8 *) arg0) + 0x4C);
+  *((s32 *) (((u8 *) arg0) + 0x54)) = 0;
+  *new_var = 0;
+  *((s32 *) (((u8 *) arg0) + 0x50)) = 0;
+  return 1;
+}
 
 #include "m2c_macros.h"
 M2C_UNK func_001FADF0_246980() __asm__("func_001FADF0");
