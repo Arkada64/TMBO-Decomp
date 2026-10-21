@@ -293,7 +293,17 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A3
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A34F0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A3698);
+#include "m2c_macros.h"
+M2C_UNK *func_001A3698(s32 arg0, s32 arg1)
+{
+  int new_var;
+  if (arg1 != 0xE0)
+  {
+    return 0;
+  }
+ new_var = 0; do { } while (new_var);
+  return "SpPreaAI.bnk";
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part2", func_001A36B8);
 
