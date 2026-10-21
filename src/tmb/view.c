@@ -18,7 +18,15 @@ void viewSetTOD__FifPvf(void) {
     func_0023BAC0_FifPvf();
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetRot__Fi);
+#include "m2c_macros.h"
+extern char D_004CFB90_ot__Fi __asm__("D_004CFB90");
+
+s32 viewGetRot__Fi(s32 arg0)
+{
+  M2C_UNK *new_var;
+  new_var = (arg0 * 0x10) + (&D_004CFB90_ot__Fi);
+  return (*new_var) + 0x60;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetMat__Fi);
 
