@@ -59,7 +59,7 @@ segments:
       - [0xE8D0, asm, tmb/blimp]
       - [0x0F1C0, c, tmb/boss]
       - [0x12378, c, tmb/burnman]
-      - [0x12E50, asm, tmb/camera]
+      - [0x12E50, c, tmb/camera]
       - [0x15110, asm, tmb/city]
       - [0x151D8, asm, tmb/clapper]
       - [0x15B48, asm, tmb/collis]
