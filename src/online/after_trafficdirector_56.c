@@ -1,6 +1,19 @@
 #include "common.h"
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_trafficdirector_56", func_001B22F0);
+#include "m2c_macros.h"
+extern volatile unsigned char D_0045BF78_1B22F0 __asm__("D_0045BF78");
+
+s32 func_001B22F0(s32 arg0)
+{
+  s32 *new_var2;
+  s32 **new_var3;
+  s32 *new_var;
+  int new_var4;
+  new_var4 = 0x80;
+  new_var = (new_var2 = (s32 *) (((u8 *) ((&D_0045BF78_1B22F0) + (arg0 * 0x84))) + new_var4));
+  new_var3 = &new_var;
+  return *(*new_var3);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_trafficdirector_56", func_001B2310);
 
