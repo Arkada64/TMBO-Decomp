@@ -23,7 +23,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00162698);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001626F8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_00162778);
+#include "m2c_macros.h"
+void func_00163EB8_162778() __asm__("func_00163EB8");
+extern s32 D_002C1690_162778 __asm__("D_002C1690");
+
+void func_00162778(s32 arg0, s32 arg1, s32 arg2, void *arg3)
+{
+  func_00163EB8_162778(&D_002C1690_162778, *((s32 *) (((u8 *) arg3) + 0x18)));
+  D_002C1690_162778 = 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/net", func_001627B0);
 
