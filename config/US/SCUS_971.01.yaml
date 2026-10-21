@@ -110,7 +110,7 @@ segments:
       - [0x5CA70, asm, tmb/rooftop]
       - [0x5DE98, asm, tmb/shadow]
       - [0x5E5F8, c, tmb/shell]
-      - [0x63500, asm, tmb/shelloverlays]
+      - [0x63500, c, tmb/shelloverlays]
       - [0x68180, asm, tmb/skidmark]
       - [0x69960, asm, tmb/smasher]
       - [0x6A040, asm, tmb/sound]
