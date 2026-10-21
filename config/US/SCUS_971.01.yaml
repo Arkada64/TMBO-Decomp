@@ -111,7 +111,7 @@ segments:
       - [0x5DE98, asm, tmb/shadow]
       - [0x5E5F8, c, tmb/shell]
       - [0x63500, c, tmb/shelloverlays]
-      - [0x68180, asm, tmb/skidmark]
+      - [0x68180, c, tmb/skidmark]
       - [0x69960, asm, tmb/smasher]
       - [0x6A040, asm, tmb/sound]
       - [0x870A0, asm, tmb/suburb]
