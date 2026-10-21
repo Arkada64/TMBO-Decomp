@@ -1,6 +1,24 @@
 #include "common.h"
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigiddebris", func_00181D38);
+#include "m2c_macros.h"
+M2C_UNK func_001A8A28_181D38() __asm__("func_001A8A28");
+extern M2C_UNK D_00330D30_181D38 __asm__("D_00330D30");
+
+void func_00181D38(void) {
+    M2C_UNK* var_a0;
+    s32 var_v1;
+
+    var_v1 = 0x14;
+    var_a0 = &D_00330D30_181D38;
+    do {
+        M2C_FIELD(var_a0, s32* , 8) = 0;
+        var_v1 -= 1;
+        M2C_FIELD(var_a0, s32* , 0x110) = 0;
+        M2C_FIELD(var_a0, s32* , 0x70C) = 0;
+        var_a0 +=0x1c4;
+    } while (var_v1 != 0);
+    func_001A8A28_181D38(var_a0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigiddebris", takeHit__11RigidDebrisP12DestructiblefP8_fvectorP10TakeHitDat);
 
