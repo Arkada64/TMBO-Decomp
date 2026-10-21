@@ -6,7 +6,9 @@ python3 - <<'EOF'
 import json, subprocess, re
 from pathlib import Path
 R = Path.home() / "tmbo_decomp"
-tot = json.loads((R / "logs/fix/summary.json").read_text())
+import os
+FD = R / os.environ.get("FIXDIR", "logs/fix")
+tot = json.loads((FD / "summary.json").read_text())
 T = "\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_0163vgjiFyQy8GoFYgqXiav1"
 def ok():
     (R / "build/SCUS_971.96.rom").unlink(missing_ok=True)
@@ -15,7 +17,8 @@ def ok():
 n = 0
 for rel, names in tot.items():
     if not names: continue
-    mf = R / "logs/fix" / (rel.replace("/", "_") + ".matched.c")
+    mf = FD / (rel.replace("/", "_") + ".matched.c")
+    if not re.search(r"^//@@ ", mf.read_text(), re.M): continue
     before = (R / rel).read_text()
     out = subprocess.run(["python3", "tools/batch_try.py", rel, str(mf)], cwd=R, capture_output=True, text=True).stdout
     k = re.search(r"kept (\d+)", out); k = int(k.group(1)) if k else 0

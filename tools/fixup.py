@@ -60,6 +60,17 @@ def arg_variants(code):
             out.append(s + b)
     return out
 
+MODE = os.environ.get("MODE", "")
+if os.environ.get("FIXDIR"): OUT = R / os.environ["FIXDIR"]; OUT.mkdir(parents=True, exist_ok=True)
+def _sub(pairs):
+    def f(t):
+        for a, b in pairs: t = re.sub(rf"\b{a}\b", "\0" + b, t)
+        return t.replace("\0", "")
+    return f
+SIGN_FLIPS = [_sub([("s8", "u8"), ("s16", "u16")]),          # small loads unsigned
+              _sub([("u8", "s8"), ("u16", "s16")]),          # small loads signed
+              _sub([("s32", "u32")]),                        # 32-bit unsigned
+              _sub([("u32", "s32")])]
 NEAR = json.loads((R / "logs/perm/near.json").read_text()) if (R / "logs/perm/near.json").exists() else {}
 def main():
     tot = {}
@@ -79,8 +90,16 @@ def main():
             ls = code.rfind("\n", 0, fpos) + 1
             head, fn = code[:ls], code[ls:]
             p = scale_ptrs(fn, head)
-            cands = ([p] if p != fn else []) + arg_variants(fn) + ([q for q in arg_variants(p)] if p != fn else [])
-            for c in cands: var.append(f"//@@ {name}\n{head}{c}")
+            if MODE == "sign":
+                # signedness flips (lb/lbu, lh/lhu, slt/sltu, sra/srl, div/divu), on top of P
+                cands = []
+                for b in ([fn, p] if p != fn else [fn]):
+                    for flip in SIGN_FLIPS:
+                        h2, b2 = flip(head), flip(b)
+                        if b2 != b or h2 != head: cands.append((h2, b2))
+            else:
+                cands = [(head, c) for c in ([p] if p != fn else []) + arg_variants(fn) + ([q for q in arg_variants(p)] if p != fn else [])]
+            for h, c in cands: var.append(f"//@@ {name}\n{h}{c}")
         if not var: continue
         vf = OUT / f"{slug}.variants.c"; vf.write_text("".join(var))
         hdr = "online/net.h" if rel.as_posix() == "src/online/net.c" else "common.h"
