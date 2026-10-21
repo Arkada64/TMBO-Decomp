@@ -72,4 +72,10 @@ void handleEndOfHighway__13HighwayDriver(void* arg0) {
     func_001430E0_Driver(arg0, M2C_FIELD(arg0, void** , 0x14) + (((getWaypointIndex__7HighwayPQ27Highway8Waypoint_Driver(temp_s1, M2C_FIELD(arg0, s32* , 0x18)) % (s32) M2C_FIELD(temp_s1, s32* , 0x2450)) * 0x10) + 0x10));
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", getWaypointIndex__7HighwayPQ27Highway8Waypoint);
+#include "m2c_macros.h"
+s32 getWaypointIndex__7HighwayPQ27Highway8Waypoint(s32 arg0, s32 arg1)
+{
+  int new_var;
+  new_var = arg1 - 0x10;
+  return ((s32) (new_var - arg0)) >> 4;
+}
