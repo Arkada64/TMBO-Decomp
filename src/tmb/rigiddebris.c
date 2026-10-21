@@ -47,6 +47,10 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigiddebris", initCS__11
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigiddebris", configBox__11RigidDebrisfffffff);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigiddebris", func_001827F0);
+#include "m2c_macros.h"
+int configBox__11RigidDebrisfffffff_1827F0(void*, float, float, float, float, float, float, float) __asm__("configBox__11RigidDebrisfffffff");
+void func_001827F0(void* arg0, f32 fparg0, f32 fparg1, f32 fparg2, f32 fparg3) {
+    configBox__11RigidDebrisfffffff_1827F0(arg0, -fparg0, -fparg1, -fparg2, fparg0, fparg1, fparg2, fparg3);
+}
 
 INCLUDE_RODATA("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/rigiddebris", D_004E9A30);
