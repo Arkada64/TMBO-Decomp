@@ -92,7 +92,7 @@ segments:
       - [0x3AAB8, asm, tmb/highwayptool]
       - [0x3ACA0, c, tmb/hud]
       - [0x42CD8, c, tmb/hwyloop]
-      - [0x42D08, asm, tmb/interact]
+      - [0x42D08, c, tmb/interact]
       - [0x430F0, asm, tmb/junkjet]
       - [0x44098, asm, tmb/junkyard]
       - [0x44FF0, asm, tmb/launch]
