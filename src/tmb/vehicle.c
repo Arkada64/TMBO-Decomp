@@ -99,7 +99,55 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vehicle", func_001DD1B8)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vehicle", func_001DD5A8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vehicle", func_001DD708);
+#include "m2c_macros.h"
+float animationStartReverse__FR11_animHandleb_1DD708(void*, int) __asm__("animationStartReverse__FR11_animHandleb");
+int animationPause__FR11_animHandle_1DD708(void*) __asm__("animationPause__FR11_animHandle");
+int animationIsRunning__FR11_animHandle_1DD708(void*) __asm__("animationIsRunning__FR11_animHandle");
+M2C_UNK func_00110DC8_1DD708() __asm__("func_00110DC8");
+M2C_UNK func_0013FF38_1DD708() __asm__("func_0013FF38");
+M2C_UNK func_001E5420_1DD708() __asm__("func_001E5420");
+M2C_UNK func_001FBCF8_1DD708() __asm__("func_001FBCF8");
+M2C_UNK memset_1DD708() __asm__("memset");
+
+void func_001DD708(void* arg0) {
+    u8 sp[0x10];
+    s32 temp_v1;
+    s32 temp_v1_2;
+    s32 temp_v1_3;
+    u8 temp_s0;
+    u8 temp_s1;
+
+    if ((M2C_FIELD(arg0, s8* , 0x496) != 0) && ((temp_v1 = M2C_FIELD(arg0, s32* , 0x20B4), (temp_v1 == 1)) || (temp_v1 == 4))) {
+        temp_s1 = M2C_FIELD(arg0, u8* , 0x5A1);
+        temp_s0 = M2C_FIELD(arg0, u8* , 0x5A2);
+        M2C_FIELD(arg0, s32* , 0x45C) = (s32) (M2C_FIELD(arg0, s32* , 0x45C) + 1);
+        memset_1DD708(arg0 + 0x594, 0, 0x12);
+        M2C_FIELD(arg0, u8* , 0x5A1) = temp_s1;
+        M2C_FIELD(arg0, u8* , 0x5A2) = temp_s0;
+        if ((M2C_FIELD(arg0, s32* , 0x20F4) == 0xC0) && (M2C_FIELD(arg0, s32* , 0x24B4) != 0)) {
+            animationPause__FR11_animHandle_1DD708(arg0 + 0x2E98);
+        }
+        if (M2C_FIELD(arg0, s32* , 0x45C) >= 0xAB) {
+            func_001FBCF8_1DD708(sp, M2C_FIELD(arg0, s32* , 0x20F4) + 0xE, M2C_FIELD(arg0, s32* , 0x20F0), 0);
+            if (animationIsRunning__FR11_animHandle_1DD708(sp) == 0) {
+                animationStartReverse__FR11_animHandleb_1DD708(sp, 0);
+                if (M2C_FIELD(arg0, s32* , 0x2064) != 0) {
+                    func_001FBCF8_1DD708(sp, M2C_FIELD(arg0, s32* , 0x20F4) + 0xE, M2C_FIELD(arg0, s32* , 0x20F0), 1);
+                    animationStartReverse__FR11_animHandleb_1DD708(sp, 0);
+                }
+            }
+        }
+        if ((M2C_FIELD(arg0, s32* , 0x45C) >= 0xF1) && ((temp_v1_2 = M2C_FIELD(arg0, s32* , 0x20B4), (temp_v1_2 == 1)) || (temp_v1_2 == 4))) {
+            func_001E5420_1DD708(arg0);
+        }
+    }
+    temp_v1_3 = M2C_FIELD(arg0, s32* , 0x20F4);
+    if (temp_v1_3 == 0x140) {
+        func_0013FF38_1DD708(arg0);
+    } else if (temp_v1_3 == 0x160) {
+        func_00110DC8_1DD708(arg0);
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/vehicle", vehicleCheckSMC__7Vehicle);
 
