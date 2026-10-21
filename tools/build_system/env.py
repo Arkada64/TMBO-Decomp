@@ -211,8 +211,15 @@ class EnvironmentToolchain:
             ],
             ld_flags=[
                 "-EL",
-                f"-T {directories.config / 'undefined_syms_auto.txt'}",
-                f"-T {directories.config / 'undefined_funcs.txt'}",
+                # SHIFTABLE=1 (mod builds): splat's in-image absolute symbols redefined relative to real
+                # ones (tools/make_shiftable.py) so they move when code changes size.
+                *([f"-T {directories.config / 'undefined_syms_shiftable.txt'}"]
+                  if __import__("os").environ.get("SHIFTABLE") == "1" else
+                  [f"-T {directories.config / 'undefined_syms_auto.txt'}",
+                   f"-T {directories.config / 'undefined_funcs.txt'}"]),
+                # raw data pointers turned into symbols (tools/symbolize_data.py)
+                *([f"-T {directories.config / 'data_ptrs_shiftable.txt'}"]
+                  if (directories.config / "data_ptrs_shiftable.txt").exists() else []),
                 f"-Map {files.ldmap}",
                 "-nostdlib",
             ],

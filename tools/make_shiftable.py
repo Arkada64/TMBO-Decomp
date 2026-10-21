@@ -9,7 +9,8 @@ import re, sys, bisect
 from pathlib import Path
 R = Path.home() / "tmbo_decomp"
 nm = [l.split() for l in open(sys.argv[1]) if len(l.split()) == 3]
-real = sorted((int(a, 16), n) for a, t, n in nm if t not in "Aa" and not n.startswith((".", "$")))
+real = sorted((int(a, 16), n) for a, t, n in nm if t.isupper() and t != "A" and re.fullmatch(r"[A-Za-z_]\w*", n)
+              and not n.startswith("P_"))
 addrs = [a for a, _ in real]
 lo, hi = 0x100000, max(int(a, 16) for a, t, n in nm if n == "main_VRAM_END") if any(n == "main_VRAM_END" for _, _, n in nm) else 0x625694
 out, moved = [], 0
