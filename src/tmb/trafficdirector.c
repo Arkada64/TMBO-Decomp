@@ -30,7 +30,15 @@ void changeFodder__15TrafficDirectorP7Vehiclei(s32 arg0, s32 arg1, u32 arg2) {
     changeFodder__15HighwayDirectorP7Vehiclei_hiclei(arg0 + 0x230, (temp_s0 * 0x31B0) + arg1, arg2 - temp_s0);
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", func_001B0930);
+#include "m2c_macros.h"
+int disable__15HighwayDirectorP7Vehicle_1B0930(void*, void*) __asm__("disable__15HighwayDirectorP7Vehicle");
+void func_001B0930(s32* arg0, void* arg1) {
+    if (M2C_FIELD(M2C_FIELD(arg1, void** , 0x201C), s32* , 0x14) == *arg0) {
+        disable__15HighwayDirectorP7Vehicle_1B0930(arg0, arg1);
+        return;
+    }
+    disable__15HighwayDirectorP7Vehicle_1B0930(arg0 + 0x8c, arg1);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/trafficdirector", func_001B0978);
 
