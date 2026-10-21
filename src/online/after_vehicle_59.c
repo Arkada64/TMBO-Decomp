@@ -6,7 +6,16 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_vehicle_59", fu
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_vehicle_59", func_001E55A0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_vehicle_59", func_001E5758);
+#include "m2c_macros.h"
+M2C_UNK func_001DDC78_1E5758() __asm__("func_001DDC78");
+void vehicleSaveAndClearPadFlags__7Vehicle_1E5758() __asm__("vehicleSaveAndClearPadFlags__7Vehicle");
+
+void func_001E5758(void *arg0)
+{
+  vehicleSaveAndClearPadFlags__7Vehicle_1E5758();
+  *((s8 *) (((u8 *) arg0) + 0x59C)) = 1;
+  func_001DDC78_1E5758(arg0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_vehicle_59", func_001E5790);
 
