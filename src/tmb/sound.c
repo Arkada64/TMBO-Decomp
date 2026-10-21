@@ -336,7 +336,15 @@ void initTrainSound__10TrainSound(void* arg0) {
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00195F48);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", initBuildingFallingSound__20BuildingFallingSound);
+#include "m2c_macros.h"
+void initBuildingFallingSound__20BuildingFallingSound(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 0x14)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+  *((s32 *) (((u8 *) arg0) + 4)) = 0;
+ do { *((s32 *) (((u8 *) arg0) + 8)) = 0; *((s32 *) (((u8 *) arg0) + 0xC)) = 0; } while (0);
+  *((s32 *) (((u8 *) arg0) + 0x10)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_001961A8);
 
