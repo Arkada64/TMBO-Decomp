@@ -75,7 +75,19 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010BEF8)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010BFD8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", attractInitAfterDbLoad__18AttractPointGroups);
+#include "m2c_macros.h"
+M2C_UNK attractiInitGroupIndirection__FPii_Groups() __asm__("attractiInitGroupIndirection__FPii");
+s32 attractiInitLevelsGroups__FP8GroupDat_Groups() __asm__("attractiInitLevelsGroups__FP8GroupDat");
+
+void attractInitAfterDbLoad__18AttractPointGroups(void *arg0)
+{
+  s32 temp_v0;
+  void *new_var;
+  new_var = arg0 + 0x7080;
+  temp_v0 = attractiInitLevelsGroups__FP8GroupDat_Groups();
+  *((s32 *) (((u8 *) arg0) + 0x71A0)) = temp_v0;
+  attractiInitGroupIndirection__FPii_Groups(new_var, temp_v0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", attractGetCenterOfGroup__15AttractorPointsP8_fvectori);
 
