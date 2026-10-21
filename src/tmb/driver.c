@@ -107,7 +107,21 @@ void func_00130C00(void* arg0, void* arg1) {
     M2C_FIELD_V1(arg0, s32* , 0x164) = (s32) (temp_v1 + 0x10);
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", driverInitTurn__6Driver);
+#include "m2c_macros.h"
+void driverInitTurn__6Driver(void *arg0)
+{
+  void *temp_v1;
+  ;
+  *((s32 *) (((u8 *) arg0) + 0x22C)) = 0x64;
+  *((s32 *) (((u8 *) arg0) + 0x288)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x248)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x1B0)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x230)) = 0;
+  if ((*((void **) (((u8 *) arg0) + 0xB0))) != 0)
+  {
+    *((s32 *) (((u8 *) (*((void **) (((u8 *) arg0) + 0xB0)))) + 0x1A90)) = 0;
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/driver", func_00130C50);
 
