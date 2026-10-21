@@ -120,7 +120,7 @@ segments:
       - [0x89040, c, tmb/thunderstorm]
       - [0x89580, c, tmb/timberdebris]
       - [0x89C90, asm, tmb/tire]
-      - [0x8BCE8, asm, tmb/tmmemcard]
+      - [0x8BCE8, c, tmb/tmmemcard]
       - [0x8CD68, asm, tmb/trafficdirector]
       - [0x8E948, asm, tmb/ui]
       - [0x9E358, asm, tmb/uimemcard]
