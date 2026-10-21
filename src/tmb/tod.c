@@ -31,7 +31,20 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", func_0023C160);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", func_0023C290);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", todSetPlightsActive__Fii);
+#include "m2c_macros.h"
+extern volatile char D_004C1270_e__Fii __asm__("D_004C1270");
+
+void todSetPlightsActive__Fii(s32 arg0, s32 arg1)
+{
+  M2C_UNK *new_var;
+  s32 *new_var2;
+  new_var2 = &arg1;
+  if (1)
+  {
+    new_var = (arg0 * 4) + (&D_004C1270_e__Fii);
+    *new_var = *new_var2;
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", func_0023C368);
 
