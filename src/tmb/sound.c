@@ -230,7 +230,17 @@ void func_001950B8(void) {
     func_001A6620_1950B8();
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", initFinalBossSound__14FinalBossSound);
+#include "m2c_macros.h"
+void initFinalBossSound__14FinalBossSound(void *arg0)
+{
+  int new_var;
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x14)) = 1;
+ do { *((s32 *) (((u8 *) arg0) + 4)) = 0; } while (0);
+  new_var = 8;
+  *((s32 *) (((u8 *) arg0) + new_var)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0xC)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_001950F8);
 
