@@ -575,7 +575,25 @@ void func_0019CA18(void* arg0) {
     func_0019CA78_19CA18(arg0);
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019CA78);
+#include "m2c_macros.h"
+void func_001A9600_19CA78() __asm__("func_001A9600");
+M2C_UNK snd_SetReverbDepth_19CA78() __asm__("snd_SetReverbDepth");
+
+void func_0019CA78(void *arg0)
+{
+  int new_var3;
+  void **new_var2;
+  void *new_var;
+  func_001A9600_19CA78(new_var = arg0 + 0xC);
+  func_001A9600_19CA78(arg0 + 0x10);
+  func_001A9600_19CA78(arg0);
+  func_001A9600_19CA78(arg0 + 4);
+  new_var2 = &arg0;
+  new_var3 = 0;
+  func_001A9600_19CA78(arg0 + 8);
+  *((s32 *) (((u8 *) (*new_var2)) + 0x24)) = -1;
+  snd_SetReverbDepth_19CA78(3, 0, new_var3);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", playShellSFXSound__10ShellSoundi);
 
