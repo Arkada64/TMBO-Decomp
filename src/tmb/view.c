@@ -277,7 +277,17 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGameIsInRearV
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewIsRearViewSmall__Fi);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewIsRearViewLarge__Fi);
+#include "m2c_macros.h"
+extern char D_004CFB90_ge__Fi __asm__("D_004CFB90");
+
+s32 viewIsRearViewLarge__Fi(s32 arg0)
+{
+  s32 *new_var;
+  int new_var2;
+  new_var2 = 8;
+  new_var = (s32 *) (((u8 *) ((&D_004CFB90_ge__Fi) + (arg0 * 0x10))) + new_var2);
+  return (*new_var) == 0xF;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewIsRearLargeActive__Fv);
 
