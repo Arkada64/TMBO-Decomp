@@ -1,0 +1,12 @@
+gametitle=Twisted Metal: Black Online (NTSC-U) (SCUS-97196) [TMB-Reloaded test patches]
+
+[Pedestrians online]
+author=TMB-Reloaded
+description=InitAfterDbLoad unconditionally turns pedestrians off after init (PedWorldManager enabled flag at +0xB944 = 0). NOPs that store. Peds are NOT network-synced: each player sees their own.
+patch=1,EE,20138828,extended,00000000
+
+[Traffic online]
+author=TMB-Reloaded
+description=InitializeFodderCars skips traffic for 3+ players and for 2 players in game type 2. Removes both checks. Traffic sync (NetFodder) exists but is untested.
+patch=1,EE,2013ABE4,extended,1000000E
+patch=1,EE,2013AC2C,extended,28630009

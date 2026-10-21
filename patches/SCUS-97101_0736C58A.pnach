@@ -1,0 +1,12 @@
+gametitle=Twisted Metal: Black (NTSC-U) (SCUS-97101) [TMB-Reloaded test patches]
+
+[Pedestrians in 3-4 player split-screen]
+author=TMB-Reloaded
+description=Retail turns pedestrians off when 3+ players are in (InitAfterDbLoad: players < 3). Raises the limit to 8.
+patch=1,EE,2012F74C,extended,28630009
+
+[Traffic in 3-4 player split-screen and 2-player deathmatch]
+author=TMB-Reloaded
+description=InitializeFodderCars skips traffic for 3+ players and for 2 players in game type 2. Removes both checks.
+patch=1,EE,20131650,extended,10000015
+patch=1,EE,201316C8,extended,28420009
