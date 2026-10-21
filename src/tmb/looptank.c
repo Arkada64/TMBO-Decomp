@@ -1,6 +1,14 @@
 #include "common.h"
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/looptank", func_00161638);
+#include "m2c_macros.h"
+void func_00161638(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 0x80)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x188)) = -1;
+  *((s32 *) (((u8 *) arg0) + 0x84)) = 0;
+ do { } while (0);
+  *((s32 *) (((u8 *) arg0) + 0x10)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/looptank", func_00161650);
 
