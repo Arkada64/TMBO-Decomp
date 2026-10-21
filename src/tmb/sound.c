@@ -357,7 +357,13 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_001967C0);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00196948);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00196990);
+#include "m2c_macros.h"
+M2C_UNK func_001A9600_196990() __asm__("func_001A9600");
+
+void func_00196990(s32* arg0) {
+    *arg0 = 0;
+    func_001A9600_196990(arg0 + 0x1);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", updateCloudSound__10CloudSound);
 
@@ -706,13 +712,37 @@ void func_0019D548(void) {
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019D568);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019D638);
+#include "m2c_macros.h"
+void func_0019D638(s32 arg0) {
+    s32 var_v0;
+    s32* var_a0;
+
+    var_a0 = arg0 + 0x14;
+    var_v0 = 5;
+    do {
+        *var_a0 = 0;
+        var_v0 -= 1;
+        var_a0 -=0x1;
+    } while (var_v0 >= 0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019D668);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019D6B0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019D8E8);
+#include "m2c_macros.h"
+void func_0019D8E8(s32 arg0) {
+    s32 var_v0;
+    s32* var_a0;
+
+    var_a0 = arg0 + 0xC;
+    var_v0 = 3;
+    do {
+        *var_a0 = 0;
+        var_v0 -= 1;
+        var_a0 -=0x1;
+    } while (var_v0 >= 0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019D918);
 
