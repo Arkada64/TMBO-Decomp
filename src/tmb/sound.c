@@ -402,7 +402,12 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00198880);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00198D20);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", updateBlimpWeaponState__16PrisonLevelSoundii);
+#include "m2c_macros.h"
+void updateBlimpWeaponState__16PrisonLevelSoundii(void *arg0, s32 arg1, s32 arg2)
+{
+  u8 *new_var;
+ do { *((s32 *) (((u8 *) arg0) + 0x58)) = arg1; *((s32 *) (new_var = ((u8 *) arg0) + 0x5C)) = arg2; } while (0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_00198FD8);
 
