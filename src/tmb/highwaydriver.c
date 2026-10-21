@@ -51,7 +51,19 @@ void changeWaypoints__13HighwayDriverPQ27Highway8Waypoint(void* arg0, s32 arg1) 
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", func_001430E0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", getRangeToDriver2__13HighwayDriverP13HighwayDriver);
+#include "m2c_macros.h"
+f32 getRangeToDriver2__13HighwayDriverP13HighwayDriver(void **arg0, void **arg1)
+{
+  f32 temp_f0;
+  f32 temp_f1;
+  void *temp_v0;
+  void *temp_v1;
+  temp_v0 = *arg1;
+  temp_v1 = *arg0;
+  ;
+  temp_f0 = (*((f32 *) (((u8 *) temp_v0) + 0x10))) - (*((f32 *) (((u8 *) temp_v1) + 0x10)));
+  return (temp_f0 * temp_f0) + (((*((f32 *) (((u8 *) temp_v0) + 0x14))) - (*((f32 *) (((u8 *) temp_v1) + 0x14)))) * ((*((f32 *) (((u8 *) temp_v0) + 0x14))) - (*((f32 *) (((u8 *) temp_v1) + 0x14)))));
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/highwaydriver", getClosestVehicleInLane__13HighwayDriverRf);
 
