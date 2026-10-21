@@ -33,6 +33,7 @@ options:
   subalign: null
   migrate_rodata_to_functions: True
   named_regs_for_c_funcs: False
+  mips_abi_gpr: n32
   use_gp_rel_macro_nonmatching: False
   disassemble_all: True
 
