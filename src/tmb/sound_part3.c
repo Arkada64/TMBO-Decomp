@@ -65,7 +65,21 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", playBlimpE
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", playPizzaManExplosion__14ExplosionSoundP8_fvector);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound_part3", func_001A8518);
+#include "m2c_macros.h"
+void* func_001A8518(void* arg0) {
+    s32 var_v1;
+    s32* var_v0;
+
+    var_v1 = 0x31;
+    var_v0 = arg0 + 0xC4;
+    do {
+        *var_v0 = 0;
+        var_v1 -= 1;
+        var_v0 -=0x1;
+    } while (var_v1 >= 0);
+    M2C_FIELD(arg0, s32* , 0xC8) = 0;
+    return arg0;
+}
 
 #include "m2c_macros.h"
 M2C_UNK __builtin_delete_1A8548() __asm__("__builtin_delete");
