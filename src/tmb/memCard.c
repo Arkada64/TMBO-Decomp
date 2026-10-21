@@ -73,7 +73,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", func_00221470)
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", func_002215C8);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", setSlot__10MemoryCardii);
+#include "m2c_macros.h"
+void setSlot__10MemoryCardii(void *arg0, s32 arg1, s32 arg2)
+{
+  u8 *new_var;
+  new_var = (u8 *) arg0;
+  *((s32 *) (new_var + 0x50)) = arg1;
+  *((s32 *) (new_var + 0x4C)) = 1;
+ do { *((s32 *) (((u8 *) arg0) + 0x54)) = arg2; } while (0);
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/memCard", func_00221648);
 
