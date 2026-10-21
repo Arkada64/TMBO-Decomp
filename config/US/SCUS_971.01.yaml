@@ -76,7 +76,7 @@ segments:
       - [0x29568, c, tmb/envheli]
       - [0x2A3B8, asm, tmb/ferris]
       - [0x2ACC8, asm, tmb/flipbufferi]
-      - [0x2ADF0, asm, tmb/fodder]
+      - [0x2ADF0, c, tmb/fodder]
       - [0x2BDE0, asm, tmb/fodderdriver]
       - [0x2CE70, asm, tmb/forceField]
       - [0x2D858, asm, tmb/freeway]
