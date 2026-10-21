@@ -140,7 +140,7 @@ segments:
       - [0xC3E48, cpp, tmb/font]
       - [0xC4C38, c, tmb/hd]
       - [0xC8D40, asm, tmb/hdcar]
-      - [0xCEC90, asm, tmb/hdhat]
+      - [0xCEC90, c, tmb/hdhat]
       - [0xD0288, asm, tmb/hdlos]
       - [0xD28E8, asm, tmb/hierc]
       - [0xD51E0, asm, tmb/hiertrav] # hiertrav.s - hand-coded ASM
