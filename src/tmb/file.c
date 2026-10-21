@@ -65,7 +65,15 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", func_00200C50);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", func_00200C68);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", func_00200C80);
+#include "m2c_macros.h"
+extern volatile char D_0048AC10_200C80 __asm__("D_0048AC10");
+
+void func_00200C80(s32 arg0, s32 arg1)
+{
+  u8 *new_var;
+  new_var = (u8 *) ((&D_0048AC10_200C80) - (-(arg0 * 4)));
+  *((s32 *) (new_var + 0x2D4)) = arg1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/file", func_00200C98);
 
