@@ -531,7 +531,20 @@ s32 __10ShellSound(s32 arg0) {
     return arg0;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019C8F8);
+#include "m2c_macros.h"
+M2C_UNK __builtin_delete_19C8F8() __asm__("__builtin_delete");
+
+void func_0019C8F8(s32 arg0, s32 arg1)
+{
+  s32 new_var;
+  s32 temp_a1;
+  ;
+  if ((arg1 & 1) != 0)
+  {
+    new_var = temp_a1;
+    __builtin_delete_19C8F8(new_var);
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/sound", func_0019C920);
 
