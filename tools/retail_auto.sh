@@ -12,7 +12,7 @@ one() {
   [ -f "$d/$n.done" ] && exit 0
   python3 tools/auto_m2c.py "$f" "$d/$n.c" > "$d/$n.log" 2>&1
   NEAR_OUT="$d/$n.near.json" python3 tools/fast_match.py "$d/$n.c" "$d/$n.match.c" '' >> "$d/$n.log" 2>&1
-  m=$(grep -c '^//@@ ' "$d/$n.match.c" 2>/dev/null || echo 0)
+  m=$(grep -c "^//@@ " "$d/$n.match.c" 2>/dev/null); m=${m:-0}
   echo "$n: $m matched | $(head -1 "$d/$n.log" | cut -c1-90)" >> logs/retail_auto.txt
   touch "$d/$n.done"
 }
