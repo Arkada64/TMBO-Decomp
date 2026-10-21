@@ -72,7 +72,7 @@ segments:
       - [0x25740, asm, tmb/prison_h] # prison.h inlines
       - [0x25748, c, tmb/drivein]
       - [0x25BB8, c, tmb/driver]
-      - [0x28A78, asm, tmb/elevator]
+      - [0x28A78, c, tmb/elevator]
       - [0x29568, asm, tmb/envheli]
       - [0x2A3B8, asm, tmb/ferris]
       - [0x2ACC8, asm, tmb/flipbufferi]
