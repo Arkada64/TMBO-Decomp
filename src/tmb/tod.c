@@ -63,7 +63,22 @@ void func_0023C3F8(s32 arg0, s32 arg1)
   }
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/tod", func_0023C420);
+#include "m2c_macros.h"
+s32 FindFreeNode__12CTODLinkList_23C420() __asm__("FindFreeNode__12CTODLinkList");
+
+s32 func_0023C420(void *arg0)
+{
+  s32 temp_v0;
+  if (((*((s32 *) (((u8 *) arg0) + 0))) < 0xC) && ((temp_v0 = FindFreeNode__12CTODLinkList_23C420(), temp_v0 != (-1))))
+  {
+    if ((*((s32 *) (((u8 *) arg0) + 4))) == (-1))
+    {
+      *((s32 *) (((u8 *) arg0) + 8)) = (*((s32 *) (((u8 *) arg0) + 4)) = temp_v0);
+      *((s32 *) (((u8 *) arg0) + 0)) = (s32) ((*((s32 *) (((u8 *) arg0) + 0))) + 1);
+    }
+  }
+  return 0;
+}
 
 void DeleteEntry__12CTODLinkListi(void) {
 }
