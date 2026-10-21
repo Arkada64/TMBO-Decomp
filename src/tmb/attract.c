@@ -18,7 +18,21 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", attractGetGrou
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010B950);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", attractGetMaxRangeForBeadBetweenGroups__15AttractorPointsii);
+#include "m2c_macros.h"
+f32 attractGetMaxRangeForBeadBetweenGroups__15AttractorPointsii(s32 arg0, s32 arg1, s32 arg2)
+{
+  f32 var_f0;
+  void *temp_v1;
+  u8 *new_var;
+  var_f0 = 0.0f;
+  new_var = (u8 *) (arg0 + (arg1 * 4));
+  temp_v1 = *((void **) (new_var + 8));
+  if ((*((u8 *) (((u8 *) (temp_v1 + arg2)) + 0x140))) & 1)
+  {
+    var_f0 = *((f32 *) (((u8 *) temp_v1) + 0x18));
+  }
+  return var_f0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", attractGetClosestPoint__15AttractorPointsP8_fvector);
 
