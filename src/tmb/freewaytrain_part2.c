@@ -8,7 +8,14 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/freewaytrain_part2", fun
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/freewaytrain_part2", getPos__15FreewayTrainCarP8_fvector);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/freewaytrain_part2", initBefore__15FreewayTrainCar);
+#include "m2c_macros.h"
+void initBefore__15FreewayTrainCar(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 0x58)) = 0;
+ do { } while (0);
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x54)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/freewaytrain_part2", initAfter__15FreewayTrainCar);
 
