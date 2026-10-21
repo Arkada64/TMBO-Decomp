@@ -174,7 +174,7 @@ segments:
       - [0xFBD08, c, tmb/utilities]
       - [0xFCA00, c, tmb/view]
       - [0xFE590, c, tmb/videodec]
-      - [0xFED98, asm, tmb/vobuf]
+      - [0xFED98, c, tmb/vobuf]
       - [0xFEF78, asm, tmb/zip]
       - [0x100C08, c, tmb/audiodec]
       - [0x101310, asm, tmb/bsp]
