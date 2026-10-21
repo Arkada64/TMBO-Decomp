@@ -180,7 +180,7 @@ segments:
       - [0x101310, asm, tmb/bsp]
       - [0x101708, asm, tmb/charanim]
       - [0x101CD0, asm, tmb/ctx]
-      - [0x101D70, asm, tmb/CsList]
+      - [0x101D70, c, tmb/CsList]
       - [0x101E98, asm, tmb/hier] # hier.s HASM
       - [0x102160, asm, tmb/vibuf] # TODO: this is probably two TUs
       # SDK TUs start here
