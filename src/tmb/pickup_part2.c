@@ -15,7 +15,18 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/pickup_part2", func_0017
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/pickup_part2", func_0017AE20);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/pickup_part2", AddPickupsByTypeEntry__7Pickupsi);
+#include "m2c_macros.h"
+void AddPickupsByTypeEntry__7Pickupsi(s32 arg0, s32 arg1)
+{
+  s32 temp_v1;
+  int new_var;
+  s32 *temp_a2;
+  temp_v1 = (*((s32 *) (((u8 *) ((arg1 * 0x18) + arg0)) + 0x5C))) * 4;
+  new_var = 0x2804;
+  temp_a2 = (arg0 + new_var) + temp_v1;
+  *((s32 *) (((u8 *) (arg0 + (((*temp_a2) * 0x48) + temp_v1))) + 0xA7C)) = arg1;
+  *temp_a2 += 1;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/pickup_part2", func_0017AF50);
 
