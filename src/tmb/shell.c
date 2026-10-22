@@ -81,7 +81,20 @@ s32 ResetMultiPlayerGameStats__5Shell(void* arg0) {
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/shell", ResetShellStats__5Shell);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/shell", ResetShellOptions__5Shell);
+void viewSetAmbientFactor__Ff_10_49(float) __asm__("viewSetAmbientFactor__Ff");
+
+void ResetShellOptions__5Shell(void)
+{
+  unsigned int new_var;
+  int new_var2;
+  new_var2 = 0x3F800000;
+  new_var2 = 1;
+  if (new_var2)
+  {
+    new_var = new_var2;
+    viewSetAmbientFactor__Ff_10_49(new_var);
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/shell", BootInitUi__5Shell);
 
