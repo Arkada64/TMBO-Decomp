@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", Init__7TheGame);
 
@@ -50,7 +51,16 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", GetCameraMaxHeight
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", gameCheckNumFodder__7TheGame);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", gameCameraOffsetCallback__FPv);
+void SetCameraOffsets__7TheGamei_2C_84(void*, int) __asm__("SetCameraOffsets__7TheGamei");
+extern u8 cameraAddHeight_2C_84[4] __asm__("cameraAddHeight");
+extern u8 cameraToTweak_2C_84[4] __asm__("cameraToTweak");
+extern u8 game_2C_84[4] __asm__("game");
+extern u8 oldCameraAddHeight_2C_84[4] __asm__("oldCameraAddHeight");
+
+void gameCameraOffsetCallback__FPv(void) {
+    SetCameraOffsets__7TheGamei_2C_84((*(s32*)game_2C_84), (*(s32*)cameraToTweak_2C_84));
+    (*(s32*)oldCameraAddHeight_2C_84) = (*(s32*)cameraAddHeight_2C_84);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", SetCameraOffsets__7TheGamei);
 
@@ -82,7 +92,15 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", gameResolveCollisi
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", gameCheckTriggerTree__7TheGame);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", InitTakeHitInfo__7TheGame);
+M2C_UNK memset_3C_150() __asm__("memset");
+
+s32 InitTakeHitInfo__7TheGame(void* arg0) {
+    void* temp_s0;
+
+    temp_s0 = arg0 + 0x150560;
+    memset_3C_150(temp_s0, 0, 0x1C);
+    return (s32) temp_s0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", IsInteractiveAVehicle__7TheGameiPi);
 
@@ -108,9 +126,43 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", gameSpawnBurningMa
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", spawnBurningPed__7TheGameP7VehicleP8_fvector);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", gameUpdateBurningMan__7TheGame);
+int Update__7BurnMan_54_195(void*) __asm__("Update__7BurnMan");
+s32 gameUpdateBurningMan__7TheGame(void* arg0) {
+    s32 var_s1;
+    s32 var_v0;
+    s32* var_s0;
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", gameTerminateAllBurningMen__7TheGame);
+    var_s1 = 2;
+    var_s0 = arg0 + 0x1AACE0;
+    do {
+        var_v0 = *var_s0;
+        if (var_v0 != 0) {
+            var_v0 = Update__7BurnMan_54_195(var_s0);
+        }
+        var_s1 -= 1;
+        var_s0 +=0x14;
+    } while (var_s1 >= 0);
+    return var_v0;
+}
+
+int Terminate__7BurnMan_54_201(void*) __asm__("Terminate__7BurnMan");
+s32 gameTerminateAllBurningMen__7TheGame(void* arg0) {
+    s32 var_s1;
+    s32 var_v0;
+    s32* var_s0;
+
+    var_s1 = 2;
+    var_s0 = arg0 + 0x1AACE0;
+    do {
+        var_v0 = *var_s0;
+        if (var_v0 != 0) {
+            var_v0 = Terminate__7BurnMan_54_201(var_s0);
+        }
+        var_s1 -= 1;
+        var_s0 +=0x14;
+    } while (var_s1 >= 0);
+    return var_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/game", SavePlayerState__7TheGame);
 
