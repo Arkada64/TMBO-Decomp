@@ -104,7 +104,28 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", fileAddName__FPc);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", fileOnlyNgpFile__FPci);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", fileOnlyTexFile__FPci);
+extern u8 fileStatus_48_100[] __asm__("fileStatus");
+
+void fileOnlyTexFile__FPci(s32 arg0, s32 arg1)
+{
+  s32 temp_a1;
+  s32 temp_a2;
+  int new_var2;
+  u8 *new_var;
+  int new_var3;
+  new_var2 = arg0 + arg1;
+  temp_a1 = new_var2;
+  *((s32 *) (((u8 *) ((u8 *) fileStatus_48_100)) + 0)) = arg0;
+  new_var = ((u8 *) ((u8 *) fileStatus_48_100)) + 4;
+  temp_a2 = temp_a1 & 0x7F;
+  *((s8 *) (((u8 *) ((u8 *) fileStatus_48_100)) + 0x38)) = 1;
+  *((s32 *) (((u8 *) ((u8 *) fileStatus_48_100)) + 4)) = temp_a1;
+  if (temp_a2 != 0)
+  {
+    new_var3 = 0x80 - temp_a2;
+    *((s32 *) new_var) = (s32) ((temp_a1 + ((s8) new_var3)) + 0x70);
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", fileOnlyResFile__FPci);
 
