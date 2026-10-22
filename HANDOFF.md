@@ -127,3 +127,9 @@ stale ROM and produced false "matches"). `M2C_FIELD(expr, type, off)` takes a PO
 ## Reporting
 Update `reference/wip/STATUS.md` at the end of each session (what was done, counts, what's
 next), commit, push. Ark mostly watches and pastes outputs; keep him informed briefly.
+
+## Shiftable build (working, verified in PCSX2 2026-10-21)
+Code and data can now grow/move. After every `configure.py split/generate` run `bash tools/post_split.sh`
+(normal build stays byte-identical), then `bash tools/build_shiftable.sh` -> `build/SCUS_971.96.shift.elf`.
+What it fixes and how it was found: `reference/wip/SHIFT_NOTES.md`. Test helpers: `tools/shift/`.
+(The unattended PCSX2 test scripts launch PCSX2 on the user's desktop; ask before running them.)

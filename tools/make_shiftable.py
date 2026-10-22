@@ -1,30 +1,44 @@
 #!/usr/bin/env python3
+# ruff: noqa
 """
-make_shiftable.py NM_OF_MATCHING_ELF : rewrite splat's absolute auto symbols that point INSIDE the program
-image (0x100000 .. end of bss) as offsets from the nearest real symbol, so they move with the code/data
-when a function changes size. Hardware/scratchpad addresses stay absolute.
+make_shiftable.py MATCHING_ELF : rewrite splat's absolute auto symbols that point INSIDE the program image
+(0x100000 .. end of bss, inclusive) relative to the object they belong to (see symbase.py), so they move
+with code/data when something changes size. Hardware/scratchpad addresses stay absolute.
 Writes config/US/undefined_syms_shiftable.txt (use instead of undefined_syms_auto.txt + undefined_funcs.txt).
 """
-import re, sys, bisect
+
+import re
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+from symbase import Base
+
 R = Path.home() / "tmbo_decomp"
-nm = [l.split() for l in open(sys.argv[1]) if len(l.split()) == 3]
-real = sorted((int(a, 16), n) for a, t, n in nm if t.isupper() and t != "A" and re.fullmatch(r"[A-Za-z_]\w*", n)
-              and not n.startswith("P_"))
-addrs = [a for a, _ in real]
-lo, hi = 0x100000, max(int(a, 16) for a, t, n in nm if n == "main_VRAM_END") if any(n == "main_VRAM_END" for _, _, n in nm) else 0x625694
-out, moved = [], 0
+B = Base(sys.argv[1])
+lo, hi = 0x100000, 0x725694
+out, moved = [], []
 for f in ("undefined_syms_auto.txt", "undefined_funcs.txt"):
     for l in (R / "config/US" / f).read_text().splitlines():
         m = re.match(r"\s*(\w+)\s*=\s*(0x[0-9A-Fa-f]+)\s*;", l)
-        if not m: out.append(l); continue
+        if not m:
+            out.append(l)
+            continue
         name, v = m.group(1), int(m.group(2), 16)
-        if lo <= v < hi:
-            i = bisect.bisect_right(addrs, v) - 1
-            while i >= 0 and real[i][1] == name: i -= 1
-            base_a, base_n = real[i]
-            out.append(f"{name} = {base_n} + 0x{v - base_a:X};"); moved += 1
+        if lo <= v <= hi:
+            # _crt0 loads $gp from D_005015F0: it must stay equal to the linker's _gp, or every
+            # gp-relative access in the game is off by the shift
+            e = (
+                "_gp"
+                if v == 0x5015F0
+                else "main_VRAM_END"
+                if v == hi
+                else B.expr(v, avoid=name)
+            )
+            out.append(f"{name} = {e};")
+            moved.append(f"{name} = {e}")
         else:
             out.append(l)
 (R / "config/US/undefined_syms_shiftable.txt").write_text("\n".join(out) + "\n")
-print(f"{moved} in-image absolute symbols made relative; image range {lo:#x}-{hi:#x}")
+print(f"{len(moved)} in-image absolute symbols made relative")
+print(*moved, sep="\n")
