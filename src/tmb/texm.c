@@ -33,7 +33,16 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmUpdateLastUsed
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmFindVramSpace__Fi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmGetMipLevels__Fi);
+extern u8 texInfo_20_44[] __asm__("texInfo");
+
+s32 texmGetMipLevels__Fi(s32 arg0)
+{
+  u8 *new_var2;
+  int new_var;
+  new_var = 7;
+  new_var2 = (u8 *) ((arg0 * 0x10) + ((u8 *) texInfo_20_44));
+  return (((u32) (*((u32 *) (new_var2 + 4)))) >> 0x19) & new_var;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmAllocateBinSpace__FP8_texbins);
 
