@@ -151,7 +151,18 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputSetLgTurning
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputUsingTypeAWheel__Fi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputGetLogitechCombo__Fi);
+extern u8 lgCombo_18_159[] __asm__("lgCombo");
+
+s32 inputGetLogitechCombo__Fi(s32 arg0)
+{
+  s32 new_var2;
+  s32 *new_var;
+  u8 *new_var3;
+  new_var2 = *(new_var = &arg0);
+  new_var3 = (new_var2 * 4) + ((u8 *) lgCombo_18_159);
+  new_var = &(*new_var3);
+  return *new_var;
+}
 
 extern u8 lgCombo_18_162[] __asm__("lgCombo");
 
