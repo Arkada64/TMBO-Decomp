@@ -74,7 +74,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/memCard", Sjis2AsciiStrin
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/memCard", IsSjis__FPUc);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/memCard", IsAscii__FPc);
+s32 IsAscii__FPc(u8 *arg0)
+{
+  int new_var;
+  return (((u64) (*arg0)) >> (new_var = 7)) ^ 1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/memCard", Ascii2Sjis__FUc);
 
