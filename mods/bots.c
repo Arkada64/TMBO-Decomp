@@ -12,7 +12,10 @@
 typedef unsigned int u32;
 #define F(p, off) (*(int*)((char*)(p) + (off)))
 #define MAXBOTS 6
-#define TMBR_BOTDBG 0
+#define TMBR_BOTDBG 1
+#ifndef TMBR_NAV
+#define TMBR_NAV 1
+#endif
 #define LIST(g) ((char**)((g) + 0x9E690))
 #define SORT(g) ((int*)((g) + 0x9E6A8))
 #define NAI(g) F(g, 0x9FEE4)
@@ -21,6 +24,8 @@ extern char* D_004FA030;   /* game */
 extern char D_003156C0[];  /* net: 8 player slots x 0x220 from +0 */
 extern int D_002C07F8[];   /* radar name per character */
 extern int scePrintf(const char* fmt, ...);
+extern int tmbr_NavDrive(char* g, char* v, char* t);   /* nav.c */
+extern void tmbr_NavFrame(void);
 extern int inputGetPadButtons(int pad) __asm__("inputGetPadButtons__Fi");
 extern int netIsHost(void* net) __asm__("func_001734B8");
 extern int netSlotVehicle(void* net, int slot) __asm__("func_00174268");
@@ -172,6 +177,8 @@ extern void driverSetTarget(char* drv, char* target) __asm__("func_00130C00");
 extern int attractGroupAt(void* points, void* pos) __asm__("func_0010B950");
 extern float manhat(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
 static int thinkTick;
+static int dbgCalls[8], dbgHb[8];   /* TMBR_BOTDBG: AI frames seen by the hook, handbrake frames */
+static int dbgBits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 #define SPECIAL_CHANCE 35 /* % of the time a bot may pick its special when it chooses a weapon (FFA) */
 
 #define POS(v) ((void*)(F(v, 0x2028) + 0x10))
@@ -181,8 +188,11 @@ void tmbr_BotsThink(void)
 {
     char* g = D_004FA030;
     int i, k;
-    if (tmbr_botCount < 0 || !g || NAI(g) <= 0 || ++thinkTick % 30) return;
-    if (!netIsHost(D_003156C0)) return;
+    if (tmbr_botCount < 0 || !g || NAI(g) <= 0 || !netIsHost(D_003156C0)) return;
+#if TMBR_NAV
+    tmbr_NavFrame();
+#endif
+    if (++thinkTick % 30) return;
     F(g, 0x9A3D4) = tmbr_botDiff;   /* AI difficulty: 0 (online's value) never lets a bot line up a normal shot */
     for (i = 0; i < NAI(g); i++) {
         char *b = LIST(g)[i], *drv, *cur, *best = 0;
@@ -207,10 +217,14 @@ void tmbr_BotsThink(void)
             char *b = LIST(g)[i], *br, *dv, *t;
             if (!b || !(br = (char*)F(b, 0x2014)) || !(dv = (char*)F(b, 0x2018))) continue;
             t = (char*)F(dv, 0xB4);
-            scePrintf("TMBR botdbg %d: mode %d tgt %x(%d) dist %d ang %d | atk %d ok60C %d grp270 %d noLos %d see598 %d wpn %d drv %d/%d/%d diff %d tgt49B %d tgt496 %d\n",
-                i, F(dv, 4), (u32)t, t ? F(t, 0x590) : -1, (int)*(float*)(br + 0x20), (int)(*(float*)(br + 0x28) * 100),
-                F(br, 0x414), F(br, 0x60C), F(dv, 0x270), F(br, 0x4B0), F(br, 0x598), F(br, 0x47C),
-                F(dv, 0x250), F(dv, 0x254), F(dv, 0x258), F(g, 0x9A3D4), t ? *(char*)(t + 0x49B) : -1, t ? *(char*)(t + 0x496) : -1);
+            {
+                int vi = (int)(b - g) / 0x31B0 & 7;
+                unsigned char* pd = (unsigned char*)b + 0x594;
+                scePrintf("TMBR botdbg %d: mode %d tgt %x(%d) dist %d brg %08x | atk %d tmr %d ok %d grp %d noLos %d see %d stuck %d diff %d | calls %d hb %d pad %d%d%d%d%d%d\n",
+                    i, F(dv, 4), (u32)t, t ? F(t, 0x590) : -1, (int)*(float*)(br + 0x20), dbgBits(*(float*)(br + 0x24)),
+                    F(br, 0x414), F(br, 0x488), F(br, 0x60C), F(dv, 0x270), F(br, 0x4B0), F(br, 0x598), F(b, 0x444),
+                    F(g, 0x9A3D4), dbgCalls[vi], dbgHb[vi], pd[2], pd[4], pd[6], pd[8], pd[9], pd[0xA]);
+            }
         }
 }
 
@@ -252,6 +266,7 @@ static void aggressiveTurn(char* g, char* v, char* t)
         return;
     }
     if (++hbTimer[idx] > HB_HOLD) { hbTimer[idx] = -HB_REST; return; }
+    dbgHb[idx]++;
     pad[2] = 1;                                                 /* handbrake */
     if (b > 0) { pad[0xA] = 1; pad[9] = 0; } else { pad[9] = 1; pad[0xA] = 0; }  /* bearing > 0 = right */
     pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* gas, no brake */
@@ -263,6 +278,7 @@ int tmbr_AiUpdate(char* v)
     char* drv = (char*)F(v, 0x2018);
     char* t = drv ? (char*)F(drv, 0xB4) : 0;
     int k, save = 0, swap, r;
+    dbgCalls[(int)(v - g) / 0x31B0 & 7]++;
     if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) return aiFrame(v);
     swap = F(t, 0x590) == 2;
     k = F(t, 0x2100) & 7;
@@ -272,6 +288,9 @@ int tmbr_AiUpdate(char* v)
     }
     r = aiFrame(v);
     if (swap) F(g, 0x9FD40 + k * 4) = save;
+#if TMBR_NAV
+    if (tmbr_NavDrive(g, v, t)) return r;
+#endif
     aggressiveTurn(g, v, t);
     return r;
 }
