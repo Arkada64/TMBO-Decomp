@@ -170,6 +170,8 @@ extern void driverUpdate(char* drv) __asm__("func_0012E798");
 extern int attractGroupAt(void* points, void* pos) __asm__("func_0010B950");
 extern float manhat(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
 static int thinkTick;
+static int lastSpecial[MAXBOTS];
+#define SPECIAL_PCT 40   /* special-weapon timer speed for bots in free-for-all (100 = original) */
 
 #define POS(v) ((void*)(F(v, 0x2028) + 0x10))
 static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v, 0x2028); }
@@ -196,6 +198,16 @@ void tmbr_BotsThink(void)
         if (curD >= 0 && curD * 2 < bestD * 3) best = cur;  /* keep fighting unless clearly closer */
         if (F(drv, 4) != 5) driverSetMode(drv, 5);
         if ((char*)F(drv, 0xB4) != best) driverSetTarget(drv, best);
+    }
+    /* specials: func_001076E8 fires one when the brain timer +0x488 passes +0x478 x (difficulty factor);
+     * with bots now damaging each other, let that timer run at SPECIAL_PCT % speed */
+    for (i = 0; i < NAI(g) && i < MAXBOTS; i++) {
+        char *b = LIST(g)[i], *brain;
+        int cur;
+        if (!b || !(brain = (char*)F(b, 0x2014))) continue;
+        cur = F(brain, 0x488);
+        if (cur > lastSpecial[i]) F(brain, 0x488) = cur = lastSpecial[i] + (cur - lastSpecial[i]) * SPECIAL_PCT / 100;
+        lastSpecial[i] = cur;
     }
 }
 

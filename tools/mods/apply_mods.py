@@ -134,6 +134,8 @@ PATCHES = [
     (A("tmb/shell.s"), "0018890C", "jal", "jal        tmbr_LevelDbLoaded"),
     # ... and before the level's texture bins are built (level TEX init in func_00188930)
     (A("tmb/shell.s"), "001889E4", "jal", "jal        tmbr_LevelTexInitStub"),
+    # ... and the level RTX init (func_00188688), where the pack's CLUTs join the level's
+    (A("tmb/shell.s"), "0018873C", "jal", "jal        tmbr_LevelRtxStub"),
     # bots (mods/bots.c): AI list game+0x9E690 2 -> 6 entries, AI sort list 0x9FC98 -> 0x9E6A8
     (A("nonmatchings/online/after_freewaytrain_18/func_00137E08.s"), "00137E70", "addiu", "addiu      $3, $0, 0x6"),
     (A("nonmatchings/tmb/game/InitTypeOfVehicles__7TheGame.s"), "00138340", "slti", "slti       $2, $3, 0x6"),
@@ -154,6 +156,8 @@ PATCHES = [
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B39B4", "jal", "jal        tmbr_LobbyFrame"),
     # ... bot targets' attractor group while their hunters plan a route (bot vs bot)
     (A("nonmatchings/tmb/ai/func_00101F88.s"), "001021F8", "jal", "jal        tmbr_DriverUpdate"),
+    # ... bots hurt each other: func_001E1C40 zeroed damage from a bot to a bot (brain+0x598 unset)
+    (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E1DB8", "bne", "b          .L001E1E10"),
 ]
 # (file, address, label) - global label placed right before that instruction (return points)
 LABELS = [
