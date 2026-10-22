@@ -1,7 +1,12 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/readbuf", readBufCreate__FP7ReadBuf);
+s32 readBufCreate__FP7ReadBuf(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 0x50008)) = 0x50000;
+  *((s32 *) (((u8 *) arg0) + 0x50004)) = (*((s32 *) (((u8 *) arg0) + 0x50000)) = 0);
+  return 1;
+}
 
 void readBufDelete__FP7ReadBuf(void) {
 }
