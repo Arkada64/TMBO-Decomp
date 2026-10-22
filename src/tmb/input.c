@@ -29,7 +29,22 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputIsCtlAvailab
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputGetPadButtons__Fi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputGetPadType__Fi);
+extern u8 padId_18_48[] __asm__("padId");
+
+s32 inputGetPadType__Fi(s32 arg0)
+{
+  u8 *new_var5;
+  s32 *new_var;
+  int new_var4;
+  u8 *new_var2;
+  s32 *new_var3;
+  ;
+  new_var3 = (new_var = &arg0);
+  new_var4 = (*new_var3) * 4;
+  new_var5 = ((u8 *) padId_18_48) + new_var4;
+  new_var3 = new_var5;
+  return *new_var3;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputGetCtlPadState__Fi);
 
