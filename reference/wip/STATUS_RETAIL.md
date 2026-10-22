@@ -21,8 +21,20 @@
   - Mangled names give real prototypes (floats, char/short truncation) for every callee.
 - First sample (9 small files, 44 functions): 5 match standalone, most others within a few insns.
 
+- Whole-project run (`retail_auto.sh`, 7 min, 4 jobs): **468 functions match standalone**.
+- Integration: `integrate.py X` (all matches at once, bisects on sha1 failure) and
+  `retail_integrate.sh` (converts every segment with matches from `asm` to a `c` segment, splat
+  writes INCLUDE_ASM per function, then integrates + commits per segment, ~1 h).
+  Segments are **C, not C++**: drafts are C with mangled names as identifiers. Convert to real
+  C++ (classes, methods) later, when a file is cleaned up by hand.
+  Needs `migrate_rodata_to_functions: False` in the yaml: splat refuses c segments whose
+  rodata stays asm otherwise. Rodata/lit4 of converted segments are still asm.
+- **428 functions in the real build** (timer 10 + 418), ROM byte-identical. Plus upstream's 107.
+  Note: `report.json` progress still shows 2.54% (it doesn't count functions inside
+  partly-INCLUDE_ASM files); count matches with `git log`/`grep -c INCLUDE_ASM` instead.
+
 ## Next
-1. Ark runs `retail_auto.sh` (whole project), then look at the summary.
-2. Integration (batch_try equivalent): turning an asm segment into a `.cpp` with INCLUDE_ASM
-   per function (splat `cpp` segment) so matches go into the real build, verified by sha1.
-3. Port perm_run for the near misses (Ark runs it).
+1. Port perm_run for the near misses (`logs/drafts/*.near.json`); Ark runs it.
+2. m2c gave up on some functions (jump tables: drafts have no rodata). Feed m2c the segment's
+   rodata asm so switches decompile.
+3. Then step 3 of the handoff (port account 1's online matches to retail) and step 4 (UI).
