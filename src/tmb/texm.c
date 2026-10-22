@@ -11,7 +11,17 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmLoadTexture__F
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmSetupTexture__FiiiiiP6QwDataii);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmGetTextureDMATagAddress__FiPPUi);
+extern u8 texInfo_20_19[] __asm__("texInfo");
+
+void texmGetTextureDMATagAddress__FiPPUi(s32 arg0, s32 *arg1)
+{
+  u8 *new_var;
+  s32 *new_var2;
+  new_var = texInfo_20_19;
+  new_var2 = (arg0 * 0x10) + new_var;
+  *arg1 = *new_var2;
+  *(new_var2 = arg1) = (*arg1) + 0x10;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmGetTextureAddrs__FiP6QwDataP9Vu1DmaPkt);
 
