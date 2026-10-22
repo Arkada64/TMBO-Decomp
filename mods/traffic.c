@@ -171,6 +171,8 @@ static void setup(void)
 void tmbr_TrafficUpdate(void)
 {
     int j;
+    extern void tmbr_PackWatch(void);
+    tmbr_PackWatch();
     if (doneSerial != tmbr_levelSerial) {
         doneSerial = tmbr_levelSerial;
         setup();

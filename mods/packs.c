@@ -61,6 +61,37 @@ int tmbr_levelSerial;       /* bumped on every level load (traffic.c sets up on 
 int tmbr_levelIndex = -1;   /* shell level index of the level being loaded */
 static u32 texBase, clutStart;
 
+/* TEMP diagnostics */
+extern u32 D_004CEC70;    /* number of texture bins */
+extern u32 D_004CEB70[];  /* bins: (count, block size) */
+extern u32 D_004CEC84;    /* small-VRAM mode */
+extern u32 D_004CEC88[];  /* textures registered per file slot */
+static int diagPrisonLoads, diagFrame;
+static u32 diagSum[4], diagCnt[14];
+static Manifest* diagWatch;
+static u32 sum32(u32 a, u32 n)
+{
+    u32 s = 0, *p = (u32*)a;
+    for (n >>= 2; n; n--) s = (s << 1 | s >> 31) ^ *p++;
+    return s;
+}
+static int binFor(u32 bs)
+{
+    u32 i;
+    for (i = 0; i < D_004CEC70; i++) if (D_004CEB70[2 * i + 1] == bs) return i;
+    return -1;
+}
+static void diagBins(int vram, int level)
+{
+    u32 i, bytes = 0;
+    scePrintf("TMBR diag: level %d vram %x small %d bins %d:", level, vram, D_004CEC84, D_004CEC70);
+    for (i = 0; i < D_004CEC70; i++) {
+        scePrintf(" %dx%d", D_004CEB70[2 * i], D_004CEB70[2 * i + 1]);
+        bytes += D_004CEB70[2 * i] * D_004CEB70[2 * i + 1];
+    }
+    scePrintf(" | paging %x..%x (%d KB)\n", D_004CEC7C, D_004CEC78, bytes >> 10);
+}
+
 static Manifest* readPack(const char* blob0, u32 addr)
 {
     Manifest* m = (Manifest*)addr;
@@ -108,10 +139,20 @@ void tmbr_LevelTexInit(int vram, int slot, char* shell)
     if (slot == 0) { tmbr_levelIndex = level; tmbr_levelSerial++; }
     if (D_004FAE38 && slot == 0 && D_0048AC10[0] == LEVEL_TEX)
         for (i = 0; i < (int)(sizeof(PACKS) / sizeof(PACKS[0])); i++)
-            if (PACKS[i].level == level)
+            if (PACKS[i].level == level) {
+                if (level == 3 && (diagPrisonLoads++ & 1) == 0) {
+                    scePrintf("TMBR diag: Prison load %d WITHOUT pack (not even read)\n", diagPrisonLoads);
+                    break;
+                }
                 m = readPack(PACKS[i].blob0, PACKS[i].addr);
+            }
     if (m) binCounts((u32*)LEVEL_TEX, (u32*)m->tex, 1);
     texRegister(vram, slot); /* the original call: level textures + texture bins */
+    if (slot == 0) {
+        diagBins(vram, level);
+        for (i = 0; i < 14; i++) diagCnt[i] = 0;
+    }
+    diagWatch = 0;
     if (!m) return;
     binCounts((u32*)LEVEL_TEX, (u32*)m->tex, -1);
     texBase = getMaxTexId(0);
@@ -134,6 +175,32 @@ void tmbr_LevelTexInit(int vram, int slot, char* shell)
     setTexIdBase(PACK_SLOT, texBase);
     texRegister(vram, PACK_SLOT);
     pending = m;
+    diagWatch = m;
+    for (i = 0; i < (int)m->nblobs; i++) diagSum[i] = sum32(m->blob[i].addr, m->blob[i].size);
+}
+
+/* TEMP diagnostics (Prison car textures): called every game frame from tmbr_TrafficUpdate */
+void tmbr_PackWatch(void)
+{
+    u32 i, j, *h;
+    if (++diagFrame % 60) return;
+    for (i = 1; i <= 8; i++)
+        if (D_004CEC88[i] != diagCnt[i]) {
+            diagCnt[i] = D_004CEC88[i];
+            h = (u32*)D_0048AC10[i];
+            scePrintf("TMBR diag: car slot %d: %d textures, tex %p, idbase %d maxid %d, clut %x", i, diagCnt[i], h,
+                texIdBase(i), getMaxTexId(i), clutBase(i) >> 6);
+            if (h && h[0] < 16)
+                for (j = 0; j < h[0]; j++)
+                    scePrintf(" [%d x %d%s]", h[2 + 2 * j], h[3 + 2 * j], binFor(h[3 + 2 * j]) < 0 ? " NO BIN" : "");
+            scePrintf("\n");
+        }
+    if (diagWatch)
+        for (i = 0; i < diagWatch->nblobs; i++)
+            if (diagSum[i] != sum32(diagWatch->blob[i].addr, diagWatch->blob[i].size)) {
+                scePrintf("TMBR diag: blob %d (%x) CHANGED at frame %d\n", i, diagWatch->blob[i].addr, diagFrame);
+                diagSum[i] = sum32(diagWatch->blob[i].addr, diagWatch->blob[i].size);
+            }
 }
 
 void tmbr_LevelDbLoaded(int ngp, int vram, int slot)
@@ -183,4 +250,5 @@ void tmbr_LevelDbLoaded(int ngp, int vram, int slot)
     D_004F9714 = saveDb;
     scePrintf("TMBR pack: %d blobs, %d entry points, tex ids %d.., clut %d.. (%d), anims %d+%d, peds in pool %d -> %d\n",
         m->nblobs, hdr[0], texBase + 1, clutStart, m->clutBlocks, n, m->nanims, before, D_004FB748);
+    for (i = 0; i < m->nblobs; i++) diagSum[i] = sum32(m->blob[i].addr, m->blob[i].size); /* after our own patching */
 }
