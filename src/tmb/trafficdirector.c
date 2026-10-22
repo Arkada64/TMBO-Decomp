@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", init__15TrafficDirectorP7HighwayP7Vehiclei);
 
@@ -20,13 +21,27 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", init__1
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", init__15HighwayDirectorP7HighwayP7VehicleT2T2i);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", setNumSegments__15HighwayDirectori);
+s32 setNumSegments__15HighwayDirectori(void* arg0, s32 arg1) {
+    s32 temp_lo;
+    void* temp_a2;
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", setTrafficDensity__15HighwayDirectorf);
+    M2C_FIELD(arg0, s32* , 0x1E4) = arg1;
+    temp_a2 = M2C_FIELD(arg0, void** , 0);
+    temp_lo = (s32) ((s32) M2C_FIELD(temp_a2, s32* , 0x2444) / (s32) M2C_FIELD(temp_a2, s32* , 0x2440)) / arg1;
+    M2C_FIELD(arg0, s32* , 0x1E8) = temp_lo;
+    return temp_lo;
+}
+
+void setTrafficDensity__15HighwayDirectorf(void* arg0, f32 fparg0) {
+    M2C_FIELD(arg0, f32* , 0x1EC) = fparg0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", getVehicleSection__15HighwayDirectorP7Vehicle);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", getVehicleSegment__15HighwayDirectorP7Vehicle);
+int getVehicleSection__15HighwayDirectorP7Vehicle_38_35(void*, void*) __asm__("getVehicleSection__15HighwayDirectorP7Vehicle");
+s32 getVehicleSegment__15HighwayDirectorP7Vehicle(void* arg0, void* arg1) {
+    return getVehicleSection__15HighwayDirectorP7Vehicle_38_35(arg0, arg1) / (s32) M2C_FIELD(arg0, s32* , 0x1E8);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", getRangeFromStart__15HighwayDirectorP8_fvector);
 
