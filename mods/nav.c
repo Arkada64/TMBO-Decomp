@@ -40,7 +40,7 @@ extern void boundAngle(float* a) __asm__("boundFAngle__FPf");
 
 /* 0 zero, 1 ray height, 2 min cell, 3 max cell, 4 arrive (cells), 5 steer dead zone, 6 handbrake angle,
  * 7 waypoint height, 8 half, 9 steep (cells), 10 probe down (cells) */
-static float K[12] = { 0.0f, 3.0f, 14.0f, 40.0f, 0.8f, 0.12f, 1.6f, 2.0f, 0.5f, 1.2f, 2.0f, 0.0f };
+static float K[12] = { 0.0f, 3.0f, 14.0f, 40.0f, 0.8f, 0.12f, 1.6f, 2.0f, 0.5f, 0.7f, 2.0f, 0.0f };
 
 typedef struct {
     int st;          /* 0 idle, 1 waiting for the planner, 2 following */
@@ -144,6 +144,7 @@ static int edge(int c, int n, int* rays)
         ra.z = pz + P.cell; rb.z = pz - P.cell * K[10];
         (*rays)++;
         if (hdLos(&ra, &rb, res, 0)) cst[n] = 2;
+        else if (!drivableSlope(P.v, (fvec*)(res + 0x10))) cst[n] = 2;   /* ground too steep to drive (hills) */
         else { cst[n] = 1; cz[n] = ((fvec*)res)->z; }
     }
     if (cst[n] != 1) return 0;

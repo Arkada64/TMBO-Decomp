@@ -25,6 +25,7 @@ extern char D_003156C0[];  /* net: 8 player slots x 0x220 from +0 */
 extern int D_002C07F8[];   /* radar name per character */
 extern int scePrintf(const char* fmt, ...);
 extern int mathfRandI(int lo, int hi) __asm__("mathfRand__Fii");
+extern void pickCruiseZone(char* g, char* v, int i) __asm__("gamePickCruiseZone__7TheGameP7Vehiclei");
 extern int tmbr_NavDrive(char* g, char* v, char* t);   /* nav.c */
 extern void tmbr_NavFrame(void);
 extern int inputGetPadButtons(int pad) __asm__("inputGetPadButtons__Fi");
@@ -184,6 +185,8 @@ static int thinkTick;
 #define R_BRAWLER 0
 #define R_SNIPER 1
 #define R_ROAMER 2
+#define R_CRUISER 3    /* drives the map (game cruise mode 4) and fights whatever it runs into */
+#define CRUISE_SEE 350
 #define ROLE(v) (role[((int)((char*)(v) - D_004FA030) / 0x31B0) & 7])
 static int hunted[8], crowd[8];
 static signed char role[8];          /* by vehicle index */
@@ -194,7 +197,7 @@ static short roleT[8], rushT[8];     /* think ticks (0.5 s) until the next role 
  * (target < 150 for 3 s) turns brawler on the spot. */
 static void rollRole(char* g, int k)
 {
-    int r = mathfRandI(0, 99), n = r < 45 ? R_BRAWLER : r < 75 ? R_SNIPER : R_ROAMER, i, same = 0, bots = 0;
+    int r = mathfRandI(0, 99), n = r < 35 ? R_BRAWLER : r < 55 ? R_SNIPER : r < 75 ? R_ROAMER : R_CRUISER, i, same = 0, bots = 0;
     for (i = 0; i < NAI(g); i++) {
         char* b = LIST(g)[i];
         int j;
@@ -202,13 +205,13 @@ static void rollRole(char* g, int k)
         bots++;
         if (role[j] == n) same++;
     }
-    if (bots && same == bots) n = (n + 1 + mathfRandI(0, 1)) % 3;
+    if (bots && same == bots) n = (n + 1 + mathfRandI(0, 2)) % 4;
     role[k] = n;
     roleT[k] = 30 + mathfRandI(0, 50);
     rushT[k] = 0;
-    if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d role %s\n", k, n == R_BRAWLER ? "brawler" : n == R_SNIPER ? "sniper" : "roamer");
+    if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d role %s\n", k, n == R_BRAWLER ? "brawler" : n == R_SNIPER ? "sniper" : n == R_ROAMER ? "roamer" : "cruiser");
 }
-static int dbgCalls[8], dbgHb[8], dbgWhy[8];   /* TMBR_BOTDBG: AI frames seen by the hook, handbrake frames */
+static int dbgCalls[8], dbgHb[8], dbgWhy[8], dbgShots[8];   /* TMBR_BOTDBG: AI frames seen by the hook, handbrake frames */
 static int dbgBits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 #define SPECIAL_CHANCE 50 /* % of the time a bot may pick its special when it chooses a weapon (FFA) */
 
@@ -262,7 +265,8 @@ void tmbr_BotsThink(void)
             if (v == b || !live(v)) continue;
             d = (int)manhat(POS(b), POS(v));
             others = hunted[k] - (k == ci);              /* other bots already on it */
-            if (rl == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
+            if (rl == R_CRUISER) sc = d;
+            else if (rl == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
             else if (rl == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
             else sc = d + others * 200;                                                   /* brawler */
             if (v == cur) curS = sc;
@@ -270,6 +274,14 @@ void tmbr_BotsThink(void)
         }
         if (!best) continue;
         if (curS >= 0 && curS * 2 < bestS * 3) best = cur;  /* keep fighting unless clearly better */
+        if (rl == R_CRUISER) {
+            /* cruise the map until someone is close, then fight it (hunt) until it gets away */
+            int bd = (int)manhat(POS(b), POS(best));
+            if (bd > CRUISE_SEE * 2 || (F(drv, 4) == 4 && bd > CRUISE_SEE)) {
+                if (F(drv, 4) != 4) { driverSetMode(drv, 4); pickCruiseZone(g, b, 0); }
+                continue;
+            }
+        }
         if (F(drv, 4) != 5) driverSetMode(drv, 5);
         if ((char*)F(drv, 0xB4) != best) driverSetTarget(drv, best);
     }
@@ -282,10 +294,10 @@ void tmbr_BotsThink(void)
             {
                 int vi = (int)(b - g) / 0x31B0 & 7;
                 unsigned char* pd = (unsigned char*)b + 0x594;
-                scePrintf("TMBR botdbg %d: mode %d tgt %x(%d) dist %d brg %08x | atk %d tmr %d ok %d grp %d noLos %d see %d stuck %d diff %d | calls %d hb %d why %d pad %d%d%d%d%d%d\n",
+                scePrintf("TMBR botdbg %d: mode %d tgt %x(%d) dist %d brg %08x | atk %d tmr %d ok %d grp %d noLos %d see %d stuck %d diff %d | calls %d hb %d shots %d why %d pad %d%d%d%d%d%d\n",
                     i, F(dv, 4), (u32)t, t ? F(t, 0x590) : -1, (int)*(float*)(br + 0x20), dbgBits(*(float*)(br + 0x24)),
                     F(br, 0x414), F(br, 0x488), F(br, 0x60C), F(dv, 0x270), F(br, 0x4B0), F(br, 0x598), F(b, 0x444),
-                    F(g, 0x9A3D4), dbgCalls[vi], dbgHb[vi], dbgWhy[vi], pd[2], pd[4], pd[6], pd[8], pd[9], pd[0xA]);
+                    F(g, 0x9A3D4), dbgCalls[vi], dbgHb[vi], dbgShots[vi], dbgWhy[vi], pd[2], pd[4], pd[6], pd[8], pd[9], pd[0xA]);
             }
         }
 }
@@ -312,17 +324,20 @@ extern int aiFrame(char* v) __asm__("func_00101F88");
 #define HB_HOLD 24
 #define HB_REST 20
 #define STALL 240
+#define FIRE_ANG 0x3F19999A   /* 0.6 rad, ~34 deg */
+#define FIRE_DIST 0x43FA0000  /* 500.0 */
 #define CS_PIVOT 0x3F800000  /* 1.0 rad, ~57 deg */
 #define REVERSE 40
 #define DF_CLOSE 0x42F00000  /* 120.0: closer than this with the target way off the nose = overshoot */
 #define DF_ROOM 0x43480000   /* 200.0: enough room to swing back */
 #define DF_LINED 0x3E99999A  /* 0.3 rad: the target's nose points at us (brain+0x28) */
 #define DF_EXT 50
+#define DF_REV 0x42700000   /* 60.0 */
 #define SN_MIN 0x43480000    /* 200.0 */
 #define SN_FAR 0x43AF0000    /* 350.0 */
 #define SN_MAX 0x440C0000    /* 560.0 */
 #define SN_BEHIND 0x40200000 /* 2.5 rad */
-#define DF_SWING 45
+#define DF_SWING 30
 static signed char ph[8];
 static short phT[8];
 static signed char hbTimer[8];
@@ -344,6 +359,12 @@ static void aggressiveTurn(char* g, char* v, char* t)
     if (hbTimer[idx] < 0) hbTimer[idx]++;
     if (st == 6 && F(br, 0x488) > STALL) { dbgWhy[idx] = 4; aiSetAttackState(v, 1); return; }
     if (F(drv, 4) != 5) { dbgWhy[idx] = 10 + F(drv, 4); return; }
+    /* Trigger-happy: the original only fires once aiLineUpShot is satisfied (aimed within 35 deg, per-weapon
+     * bearing / pitch / range, fairness gate), so in a moving fight state 7 almost never comes (1 sample in
+     * 600 in Ark's log). Most weapons home: fire when roughly lined up, in range, and in sight. */
+    if ((st == 5 || st == 6) && a < FIRE_ANG && d >= 0 && d < FIRE_DIST && (F(br, 0x598) || F(br, 0x4B0) < 10)) {
+        aiSetAttackState(v, 7); dbgShots[idx]++;
+    }
     if (F(v, 0x444) >= 60) { dbgWhy[idx] = 3; return; }        /* stuck: the AI's own reverse/turn */
     if (d < 0 || d > CS_DIST) { dbgWhy[idx] = 5; ph[idx] = 0; return; }
     pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* in a fight: stay on the gas */
@@ -393,7 +414,7 @@ static void aggressiveTurn(char* g, char* v, char* t)
         dbgWhy[idx] = 21;
         if (a < CS_HB) ph[idx] = 0;
         else if (++phT[idx] > DF_SWING) {                    /* nose did not come round */
-            if (d < DF_ROOM) { ph[idx] = 3; phT[idx] = REVERSE; } else { ph[idx] = 0; hbTimer[idx] = -HB_REST; }
+            if (d < DF_REV) { ph[idx] = 3; phT[idx] = REVERSE; } else { ph[idx] = 0; hbTimer[idx] = -HB_REST; }
         }
         return;
     }
@@ -419,7 +440,7 @@ int tmbr_AiUpdate(char* v)
          * fleeHealth; online there is no health pickup to flee to, and our think tick forced hunt back every
          * 0.5 s: stop-and-go. fleeHealth (brain+0x48) = 0.0 */
         F(F(v, 0x2014), 0x48) = 0;
-        if (drv && t && F(drv, 4) >= 2 && F(drv, 4) <= 4) { driverSetMode(drv, 5); driverSetTarget(drv, t); }
+        if (drv && t && F(drv, 4) >= 2 && F(drv, 4) <= 4 && !(F(drv, 4) == 4 && ROLE(v) == R_CRUISER)) { driverSetMode(drv, 5); driverSetTarget(drv, t); }
     }
     if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) return aiFrame(v);
     swap = F(t, 0x590) == 2;
