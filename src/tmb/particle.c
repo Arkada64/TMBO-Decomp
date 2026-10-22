@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", utilGenerateRandomNormalizedVector__FP8_fvectorf);
 
@@ -62,7 +63,21 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleInit__
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleInitAfter__Fv);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleSetBurningManPoint__FP8_fvectori);
+void mathfCopyVector__FP8_fvectorT0_70_112(void*, void*) __asm__("mathfCopyVector__FP8_fvectorT0");
+extern u8 burningManSkelNew_70_112[] __asm__("burningManSkelNew");
+extern u8 burningManSkelOld_70_112[] __asm__("burningManSkelOld");
+
+void particleSetBurningManPoint__FP8_fvectori(void* arg0, s32 arg1) {
+    s32 temp_v0;
+    void* temp_s0;
+
+    if (arg1 < 0xF) {
+        temp_v0 = arg1 * 0x10;
+        temp_s0 = temp_v0 + ((u8*)burningManSkelNew_70_112);
+        mathfCopyVector__FP8_fvectorT0_70_112(temp_v0 + ((u8*)burningManSkelOld_70_112), temp_s0);
+        mathfCopyVector__FP8_fvectorT0_70_112(temp_s0, arg0);
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleEmitFromBurningMan__FP13_ParticleTypeiiffP8_fvectorT5T5);
 
@@ -90,9 +105,33 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleCreate
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleScrapeSparks__FP8_fvectorT0T0);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleGetParticle__Fi);
+extern u8 fx_24_137[] __asm__("fx");
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleKillFx__Fi);
+s32 particleGetParticle__Fi(s32 arg0) {
+    if (arg0 <= 0) {
+        return 0;
+    }
+    return (s32) ((arg0 * 0x2E80) + ((u8*)fx_24_137));
+}
+
+void plightDestroy__FP11_pointlight_58_140(void*) __asm__("plightDestroy__FP11_pointlight");
+extern u8 fx_58_140[] __asm__("fx");
+
+void particleKillFx__Fi(s32 arg0) {
+    void* temp_a0;
+    void* temp_s0;
+
+    if (arg0 > 0) {
+        temp_s0 = (arg0 * 0x2E80) + ((u8*)fx_58_140);
+        temp_a0 = M2C_FIELD(temp_s0, void** , 0x2E6C);
+        M2C_FIELD(temp_s0, s16* , 0x2D76) = 0;
+        M2C_FIELD(temp_s0, s32* , 0x2D70) = (s32) (M2C_FIELD(temp_s0, s32* , 0x2D70) | 4);
+        if (temp_a0 != NULL) {
+            plightDestroy__FP11_pointlight_58_140(temp_a0);
+            M2C_FIELD(temp_s0, void** , 0x2E6C) = NULL;
+        }
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleKillAllFx__Fv);
 
@@ -115,7 +154,52 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particlePrecip
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleRainSetPrecipitation__Ff);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleUpdateRain__Fv);
+int mathfAddVector__FP8_fvectorT0T0_130_163(void*, void*, void*) __asm__("mathfAddVector__FP8_fvectorT0T0");
+extern u8 modRainPos_130_163[] __asm__("modRainPos");
+extern u8 rainVel_130_163[4] __asm__("rainVel");
+extern u8 smokeWind_130_163[] __asm__("smokeWind");
+
+s32 particleUpdateRain__Fv(void) {
+    f32 temp_f0;
+    f32 temp_f0_2;
+    f32 temp_f0_3;
+    f32 var_f1;
+    f32 var_f3;
+    f32 var_f4;
+    s32 temp_v0;
+
+    M2C_FIELD((*(void**)rainVel_130_163), f32* , 0) = (f32) M2C_FIELD(((u8*)smokeWind_130_163), f32* , 0);
+    M2C_FIELD((*(void**)rainVel_130_163), f32* , 4) = (f32) M2C_FIELD(((u8*)smokeWind_130_163), f32* , 4);
+    temp_v0 = mathfAddVector__FP8_fvectorT0T0_130_163(((u8*)modRainPos_130_163), ((u8*)modRainPos_130_163), (*(void**)rainVel_130_163));
+    var_f4 = M2C_FIELD(((u8*)modRainPos_130_163), f32* , 0);
+    if (var_f4 < 0.0f) {
+        temp_f0 = var_f4 + 80.0f;
+        M2C_FIELD(((u8*)modRainPos_130_163), f32* , 0) = temp_f0;
+        var_f4 = temp_f0;
+    }
+    var_f3 = M2C_FIELD(((u8*)modRainPos_130_163), f32* , 4);
+    if (var_f3 < 0.0f) {
+        temp_f0_2 = var_f3 + 80.0f;
+        M2C_FIELD(((u8*)modRainPos_130_163), f32* , 4) = temp_f0_2;
+        var_f3 = temp_f0_2;
+    }
+    var_f1 = M2C_FIELD(((u8*)modRainPos_130_163), f32* , 8);
+    if (var_f1 < 0.0f) {
+        temp_f0_3 = var_f1 + 80.0f;
+        M2C_FIELD(((u8*)modRainPos_130_163), f32* , 8) = temp_f0_3;
+        var_f1 = temp_f0_3;
+    }
+    if (var_f4 >= 80.0f) {
+        M2C_FIELD(((u8*)modRainPos_130_163), f32* , 0) = (f32) (var_f4 - 80.0f);
+    }
+    if (var_f3 >= 80.0f) {
+        M2C_FIELD(((u8*)modRainPos_130_163), f32* , 4) = (f32) (var_f3 - 80.0f);
+    }
+    if (var_f1 >= 80.0f) {
+        M2C_FIELD(((u8*)modRainPos_130_163), f32* , 8) = (f32) (var_f1 - 80.0f);
+    }
+    return temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/particle", particleUpdateRainViewport__FiP3_csb);
 
