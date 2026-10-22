@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/camera", Init__6Camera);
 
@@ -20,7 +21,9 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/camera", SetDeathPOV__6Ca
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/camera", SetCameraOffsets__6Cameraiffffff);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/camera", GetClosestVehicleInFov__6Camerai);
+s32 GetClosestVehicleInFov__6Camerai(void* arg0, s32 arg1) {
+    return 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/camera", cameraCheckForcePOV__6Camerai);
 
