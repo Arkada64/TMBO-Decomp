@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/disp", dispCreate__FP8_Displayii);
 
@@ -24,7 +25,15 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/disp", vblankHandler__Fi)
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/disp", handler_endimage__Fi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/disp", startDisplay__Fi);
+s32 sceGsSyncV_34_29() __asm__("sceGsSyncV");
+extern u8 isCountVblank_34_29[4] __asm__("isCountVblank");
+
+void startDisplay__Fi(s32 arg0) {
+    do {
+
+    } while (sceGsSyncV_34_29(0) == arg0);
+    (*(s32*)isCountVblank_34_29) = 1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/disp", endDisplay__Fv);
 
