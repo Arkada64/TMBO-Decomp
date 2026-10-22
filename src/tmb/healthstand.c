@@ -75,7 +75,34 @@ s32 CheckTweakers__12HealthStands(void* arg0) {
     return var_v0;
 }
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/healthstand", addStand__12HealthStandsP9_hierheadP8_fvectorPA3_f);
+s32 healthStandInit__FP8_fvectorPA3_f_A8_32(void *, void *) __asm__("healthStandInit__FP8_fvectorPA3_f");
+void healthStandSetPrimed__Fi_A8_32(int) __asm__("healthStandSetPrimed__Fi");
+void mathfCopyMatrix__FPA3_fT0_A8_32(void *, void *) __asm__("mathfCopyMatrix__FPA3_fT0");
+void mathfCopyVector__FP8_fvectorT0_A8_32(void *, void *) __asm__("mathfCopyVector__FP8_fvectorT0");
+
+void addStand__12HealthStandsP9_hierheadP8_fvectorPA3_f(s32 arg0, u32 *arg1, s32 arg2, s32 arg3)
+{
+  s32 temp_s1;
+  s32 temp_s2;
+  int new_var;
+  s32 temp_v0_2;
+  u32 temp_v0;
+  void *temp_s0;
+  temp_v0 = (((u32) (*arg1)) >> 7) & 0x7FF;
+  if (temp_v0 < 4U)
+  {
+    new_var = (temp_v0 << 7) + 0x10;
+    temp_s0 = arg0 + new_var;
+    temp_s1 = temp_s0 + 0x50;
+    temp_s2 = temp_s0 + 0x10;
+    mathfCopyVector__FP8_fvectorT0_A8_32(temp_s1, arg2);
+    mathfCopyMatrix__FPA3_fT0_A8_32(temp_s2, arg3);
+    temp_v0_2 = healthStandInit__FP8_fvectorPA3_f_A8_32(temp_s1, temp_s2);
+    *((s32 *) (((u8 *) temp_s0) + 4)) = temp_v0_2;
+    healthStandSetPrimed__Fi_A8_32(temp_v0_2);
+    *arg1 &= 0x7F;
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/healthstand", InitAfterDbLoad__12HealthStandsi);
 
