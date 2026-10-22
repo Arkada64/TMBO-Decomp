@@ -1,0 +1,5 @@
+# Sections of mods/tmbr.pnach baked into every TMB-Reloaded build (our own fixed versions of community codes).
+# TODO: turn the TMA rules into host-owned lobby options. Respawn Shield is ported in mods/shield.s.
+TMA Ruleset/ No ENV Pickups (always on)
+TMA Ruleset/ No Health Pickups (always on)
+Pedestrians Online (not synced)

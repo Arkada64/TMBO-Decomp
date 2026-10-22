@@ -1,0 +1,29 @@
+gametitle=TMB-Reloaded baked rules (addresses are for the ORIGINAL online ELF; tools/mods/apply_pnach.py relocates them)
+
+[TMA Ruleset/ No ENV Pickups (always on)]
+author=Aced14 (community TMA ruleset), baked by TMB-Reloaded
+description=The boot state of "TMA Ruleset/ Remove ENV Pickups" without the START+SELECT/SELECT toggle.
+patch=0,EE,203303E4,extended,00000000
+patch=0,EE,20155140,extended,00000000
+
+[TMA Ruleset/ No Health Pickups (always on)]
+author=Darkscorpius, Aced14 (community TMA ruleset), baked by TMB-Reloaded
+description=The boot state of "TMA Ruleset/ Remove Health Pickups" without the toggle (pickup handler returns at once).
+patch=0,EE,201E32D8,extended,03E00008
+patch=0,EE,201E32DC,extended,00000000
+
+[Spectator/ Helicopter View]
+author=Aced14, baked by TMB-Reloaded
+description=Community default spectator camera ("Alternate View 5 (Helicopter)").
+patch=1,EE,10139218,extended,00000005
+
+[Pedestrians Online (not synced)]
+author=TMB-Reloaded
+description=(1) Stop InitAfterDbLoad clearing the PedWorldManager enabled flag. (2) Level loader (func_00127650) sends pedestrian nodes (ids 3000-3999) to a stub in unused func_00111ED8 that calls addPedEpNode(node). Same size as the original code, so nothing moves. Peds are NOT network-synced.
+patch=1,EE,20138828,extended,00000000
+patch=1,EE,20127788,extended,5440A9D3
+patch=1,EE,2012778C,extended,00000000
+patch=1,EE,20111ED8,extended,0C05E092
+patch=1,EE,20111EDC,extended,0220202D
+patch=1,EE,20111EE0,extended,08049EB9
+patch=1,EE,20111EE4,extended,00000000

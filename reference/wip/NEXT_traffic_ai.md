@@ -28,6 +28,21 @@
   (libmpeg clamp mask), and a 0x28-byte growth gave full-screen green bars. apply_mods asserts this.
   build_shiftable aligns the mods' .text to 128.
 
+## UPDATE 2026-10-22 00:40: why traffic can't spawn online
+- **No free slot.** Online AddFodder (func_0013A640) puts the car into vehicle slot game[0x98000+0x7CA4].
+  Online has only 8 vehicle slots (0x31B0 each), all taken by the 8 network player slots. The log shows
+  every AddFodder going to slot 8, i.e. out of bounds.
+  - Retail has many slots: stride 0x2D00, InitializeFodderCars thresholds at 15 and 33.
+  - Retail AddFodder also increments the slot count; online's doesn't.
+- mods/traffic.s now skips AddFodder when the slot is >= 8 and logs it. That copy is in the TMB Decomp
+  folder only, not committed: the permuter was running in the repo at the time.
+- The remaining hierTraverseAsm / 0x1464AC faults come from swapping retail's SUBURB files onto the
+  online disc. They happen even with zero cars added, and the normal online disc has none.
+- **Real traffic needs a bigger vehicle array.** Online's TheGame keeps 8 slots with fields after them,
+  and every vehicle loop is `slti 8`. That's a structural change best done once game.c/vehicle code is
+  in C. Same 8-slot design is probably behind the online AI limit too.
+- Builds while the permuter runs: `mods_copy_build.sh` builds in ~/modshome/tmbo_decomp (private copy).
+
 ## AI count limit online (2 AI with 1 human, 1 with 2, 0 with 3+): NOT located yet
 - The player/vehicle array is 8 slots × 0x31B0 at game + 0x98000-ish (see func_0013A9E0, which turns a
   vehicle slot into an AI car: "Setting vehicle %d to AI car %d (%s)"). It is only called from the

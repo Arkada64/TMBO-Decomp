@@ -1,0 +1,6 @@
+# Word patches applied to the linked shiftable ELF (build_shiftable.sh). The game's code and data keep their
+# original addresses (mods live after .bss), so these are plain original-ELF addresses.
+# Format: ADDRESS  EXPECTED_ORIGINAL_WORD  NEW   (NEW = hex word, or "j SYMBOL" / "jal SYMBOL")
+# Respawn Shield length (pnach "TMA Ruleset/ Respawn Shield" 0x1DD0D8 + 0x1DD158; routine in mods/shield.s)
+001DD0D8  7FB10010  j tmbr_shield_timer
+001DD158  284200B5  0059102A      # slti $2, $2, 0xB5 -> slt $2, $2, $25

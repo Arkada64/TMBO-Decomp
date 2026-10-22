@@ -55,6 +55,21 @@ tmbr_FodderParse:                       # (TheGame *game, _hierhead *h)
 .Lfp_counted:
     bnez    $17, .Lfp_attach
     nop
+    # Online's AddFodder puts the car into vehicle slot game[0x98000+0x7CA4] of the 8-slot vehicle
+    # array (0x31B0 each) without any bounds check. With no free slot it writes past the array.
+    lw      $4, %gp_rel(D_004FA030)($28)
+    lui     $3, 0x9
+    ori     $3, $3, 0x8000
+    addu    $3, $4, $3
+    lw      $6, 0x7CA4($3)              # next vehicle slot
+    lui     $4, %hi(tmbr_add_msg)
+    addiu   $4, $4, %lo(tmbr_add_msg)
+    daddu   $5, $19, $0
+    jal     scePrintf
+    daddu   $16, $6, $0                 # keep slot in $16 (loop counter no longer needed)
+    slti    $2, $16, 0x8
+    beqz    $2, .Lfp_ret                # no free vehicle slot: skip instead of corrupting memory
+    nop
     jal     tmbr_FodderCs               # cs for this fodder car's model
     daddu   $4, $20, $0
     beqz    $2, .Lfp_ret
@@ -164,6 +179,9 @@ tmbr_LoaderDbg:
     j       func_00127650
     addiu   $29, $29, 0x50
 .end tmbr_LoaderDbg
+tmbr_add_msg:
+    .asciz "TMBR AddFodder name %d -> vehicle slot %d\n"
+.align 3
 tmbr_node_msg:
     .asciz "TMBR node %d op %d\n"
 .align 3
