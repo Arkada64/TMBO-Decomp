@@ -218,18 +218,61 @@ void tmbr_BotsThink(void)
  * game+0x9FD40[target AI/human index] (aiOkToHuntUsingLOS, func_0012E798, ...), which only holds humans'
  * groups: for a bot target put its own group there for the duration of the frame. */
 extern int aiFrame(char* v) __asm__("func_00101F88");
+
+/* Handbrake turns. Left alone, a bot whose target is off to the side brakes and slowly swings round
+ * (func_00102948), and only AI 0 ever pulls the handbrake (func_00130D68 checks aiOrPlayerIdx == 0, and only
+ * past 120 deg). With a chosen count, after the AI frame has written its pad bytes (vehicle+0x594, read by the
+ * physics later in the frame): when a hunting bot is in its attack states, the target is near and 40..150 deg
+ * off the nose, pull the handbrake (pad[2]), steer hard toward it and stay on the gas. Bursts of at most
+ * HB_HOLD frames then HB_REST frames of normal driving, so it whips round instead of spinning in place.
+ * Floats are compared as bit patterns (no .lit4 literals): positive IEEE floats order like ints. */
+#define PAD(v) ((unsigned char*)(v) + 0x594)
+#define HB_MIN  0x3F333333   /* 0.7 rad, ~40 deg */
+#define HB_MAX  0x40266666   /* 2.6 rad, ~150 deg (beyond that the AI's own rear/reverse logic is better) */
+#define HB_DIST 0x43FA0000   /* 500.0 */
+#define HB_HOLD 18
+#define HB_REST 40
+static signed char hbTimer[8];
+static int fbits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
+
+static void aggressiveTurn(char* g, char* v, char* t)
+{
+    char* br = (char*)F(v, 0x2014);
+    char* drv = (char*)F(v, 0x2018);
+    unsigned char* pad = PAD(v);
+    int idx = (int)(v - g) / 0x31B0, st, b, a, d;
+    if (idx < 0 || idx > 7 || !br || !drv) return;
+    if (hbTimer[idx] < 0) { hbTimer[idx]++; return; }           /* resting */
+    st = F(br, 0x414);
+    b = fbits(*(float*)(br + 0x24));
+    a = b & 0x7FFFFFFF;
+    d = fbits(*(float*)(br + 0x20));
+    if (F(drv, 4) != 5 || st < 4 || st > 7 || F(v, 0x444) >= 60 || d < 0 || d > HB_DIST || a < HB_MIN || a > HB_MAX) {
+        if (hbTimer[idx] > 0) hbTimer[idx] = -HB_REST;          /* a burst just ended */
+        return;
+    }
+    if (++hbTimer[idx] > HB_HOLD) { hbTimer[idx] = -HB_REST; return; }
+    pad[2] = 1;                                                 /* handbrake */
+    if (b > 0) { pad[0xA] = 1; pad[9] = 0; } else { pad[9] = 1; pad[0xA] = 0; }  /* bearing > 0 = right */
+    pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* gas, no brake */
+}
+
 int tmbr_AiUpdate(char* v)
 {
     char* g = D_004FA030;
     char* drv = (char*)F(v, 0x2018);
     char* t = drv ? (char*)F(drv, 0xB4) : 0;
-    int k, save, r;
-    if (tmbr_botCount < 0 || !t || F(t, 0x590) != 2 || !F(t, 0x2028)) return aiFrame(v);
+    int k, save = 0, swap, r;
+    if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) return aiFrame(v);
+    swap = F(t, 0x590) == 2;
     k = F(t, 0x2100) & 7;
-    save = F(g, 0x9FD40 + k * 4);
-    F(g, 0x9FD40 + k * 4) = attractGroupAt(g + 0x30970, POS(t));
+    if (swap) {
+        save = F(g, 0x9FD40 + k * 4);
+        F(g, 0x9FD40 + k * 4) = attractGroupAt(g + 0x30970, POS(t));
+    }
     r = aiFrame(v);
-    F(g, 0x9FD40 + k * 4) = save;
+    if (swap) F(g, 0x9FD40 + k * 4) = save;
+    aggressiveTurn(g, v, t);
     return r;
 }
 
