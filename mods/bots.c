@@ -33,6 +33,7 @@ extern void vehicleDisable(char* v) __asm__("vehicleDisable__7Vehicle");
 extern void radarName(int slot, int name) __asm__("func_0014ECE8");
 
 int tmbr_botCount = -1;    /* -1: original rule */
+int tmbr_botDiff = 1;      /* AI difficulty (game+0x9A3D4) used with a chosen count: 0 easy, 1 medium, 2 hard */
 static int prevPad;
 
 static int humans(void)
@@ -145,6 +146,7 @@ static void balance(int mid)
 /* game start (func_001399A8, host only; replaces the two func_00175588 calls) */
 int tmbr_BotsSpawn(void* net, int slot)
 {
+    if (tmbr_botCount >= 0) F(D_004FA030, 0x9A3D4) = tmbr_botDiff;
     balance(0);
     scePrintf("TMBR bots: start, %d humans, %d bots (setting %d)\n", humans(), NAI(D_004FA030), tmbr_botCount);
     return 1;
@@ -182,6 +184,7 @@ void tmbr_BotsThink(void)
     int i, k;
     if (tmbr_botCount < 0 || !g || NAI(g) <= 0 || ++thinkTick % 30) return;
     if (!netIsHost(D_003156C0)) return;
+    F(g, 0x9A3D4) = tmbr_botDiff;   /* AI difficulty: 0 (online's value) never lets a bot line up a normal shot */
     for (i = 0; i < NAI(g); i++) {
         char *b = LIST(g)[i], *drv, *cur, *best = 0;
         int d, bestD = 0x7FFFFFF, curD = -1;   /* ints: float literals would need .lit4 (gp) */
@@ -199,6 +202,17 @@ void tmbr_BotsThink(void)
         if (F(drv, 4) != 5) driverSetMode(drv, 5);
         if ((char*)F(drv, 0xB4) != best) driverSetTarget(drv, best);
     }
+    /* TEMP: why bots don't shoot each other (every 2 s) */
+    if (thinkTick % 120 == 0)
+        for (i = 0; i < NAI(g) && i < MAXBOTS; i++) {
+            char *b = LIST(g)[i], *br, *dv, *t;
+            if (!b || !(br = (char*)F(b, 0x2014)) || !(dv = (char*)F(b, 0x2018))) continue;
+            t = (char*)F(dv, 0xB4);
+            scePrintf("TMBR botdbg %d: mode %d tgt %x(%d) dist %d ang %d | atk %d ok60C %d grp270 %d noLos %d see598 %d wpn %d drv %d/%d/%d diff %d tgt49B %d tgt496 %d\n",
+                i, F(dv, 4), (u32)t, t ? F(t, 0x590) : -1, (int)*(float*)(br + 0x20), (int)(*(float*)(br + 0x28) * 100),
+                F(br, 0x414), F(br, 0x60C), F(dv, 0x270), F(br, 0x4B0), F(br, 0x598), F(br, 0x47C),
+                F(dv, 0x250), F(dv, 0x254), F(dv, 0x258), F(g, 0x9A3D4), t ? *(char*)(t + 0x49B) : -1, t ? *(char*)(t + 0x496) : -1);
+        }
     /* specials: func_001076E8 fires one when the brain timer +0x488 passes +0x478 x (difficulty factor);
      * with bots now damaging each other, let that timer run at SPECIAL_PCT % speed */
     for (i = 0; i < NAI(g) && i < MAXBOTS; i++) {
@@ -237,18 +251,23 @@ void tmbr_LobbyFrame(void)
     char buf[48];
     lobbyFrame();
     if (!netIsHost(D_003156C0)) return;
-    pad = inputGetPadButtons(0) & 0xC04;  /* raw pad, active high: R3 0x4, L1 0x400, R1 0x800 */
+    pad = inputGetPadButtons(0) & 0xF04;  /* raw pad, active high: R3 0x4, L2 0x100, R2 0x200, L1 0x400, R1 0x800 */
     pressed = pad & ~prevPad;
     prevPad = pad;
-    if ((pad & 0x4) && (pressed & 0xC00)) {
+    if ((pad & 0x4) && (pressed & 0xF00)) {
         if (pressed & 0x800) tmbr_botCount++;
         if (pressed & 0x400) tmbr_botCount--;
+        if (pressed & 0x200) tmbr_botDiff++;
+        if (pressed & 0x100) tmbr_botDiff--;
         if (tmbr_botCount < -1) tmbr_botCount = -1;
         if (tmbr_botCount > MAXBOTS) tmbr_botCount = MAXBOTS;
-        scePrintf("TMBR bots: lobby setting %d\n", tmbr_botCount);
+        if (tmbr_botDiff < 0) tmbr_botDiff = 0;
+        if (tmbr_botDiff > 2) tmbr_botDiff = 2;
+        scePrintf("TMBR bots: lobby setting %d, difficulty %d\n", tmbr_botCount, tmbr_botDiff);
     }
     if (tmbr_botCount < 0) sprintf(buf, "BOTS : AUTO  (R3 + L1/R1)");
-    else sprintf(buf, "BOTS : %d  (R3 + L1/R1)", tmbr_botCount);
+    else sprintf(buf, "BOTS : %d  %s  (R3 + L1/R1, L2/R2)", tmbr_botCount,
+        tmbr_botDiff == 0 ? "EASY" : tmbr_botDiff == 1 ? "MEDIUM" : "HARD");
     fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 10 * 0x100);
     fontPrint(0, buf);
 }
