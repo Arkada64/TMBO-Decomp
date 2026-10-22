@@ -35,7 +35,20 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attract", attractGetGroup
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attract", attractGetClosestGroupToTestPoint__15AttractorPointsP8_fvector);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attract", attractGetMaxRangeForBeadBetweenGroups__15AttractorPointsii);
+f32 attractGetMaxRangeForBeadBetweenGroups__15AttractorPointsii(s32 arg0, s32 arg1, s32 arg2)
+{
+  u8 *new_var;
+  f32 var_f0;
+  void *temp_v1;
+  var_f0 = 0.0f;
+  new_var = ((u8 *) (arg0 + (arg1 * 4))) + 8;
+  temp_v1 = *((void **) new_var);
+  if ((*((u8 *) (((u8 *) (temp_v1 + arg2)) + 0x140))) & 1)
+  {
+    var_f0 = *((f32 *) (((u8 *) temp_v1) + 0x18));
+  }
+  return var_f0;
+}
 
 int attractGetClosestPointInGroup__15AttractorPointsP8_fvectori_1C_19(void*, void*, int) __asm__("attractGetClosestPointInGroup__15AttractorPointsP8_fvectori");
 s32 attractGetClosestPoint__15AttractorPointsP8_fvector(void* arg0, void* arg1) {
