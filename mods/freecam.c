@@ -52,13 +52,16 @@ static float stick(int axis)
 extern void tmbr_TrafficUpdate(void);
 extern void tmbr_BotsThink(void);
 
+#ifndef TMBR_TRAFFIC_ON
+#define TMBR_TRAFFIC_ON 0   /* traffic (traffic.c) per-frame update; the TRAFFIC_DIAG build sets 1 */
+#endif
 void tmbr_CameraUpdate(char *cam)
 {
     int b, pad, pressed, i;
     float *m, *out, lx, ly, rx, ry, speed;
     char *cs;
 
-#ifdef TMBR_TRAFFIC
+#if TMBR_TRAFFIC_ON
     tmbr_TrafficUpdate(); /* traffic.c: per-frame traffic cars (after the game's vehicle loops); off in stable */
 #endif
 #ifndef TMBR_PNACH

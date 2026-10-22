@@ -168,6 +168,10 @@ static void setup(void)
         tmbr_levelIndex, type, ncars, nhw, active, points, F(game, 0x9FCAC), cars);
 }
 
+#define TRAFFIC_DBG 1   /* car state every 2 s (first 4 cars) */
+static int dbgTick;
+static int fb(float f) { union { float f; int i; } u; u.f = f; return u.i; }
+
 void tmbr_TrafficUpdate(void)
 {
     int j;
@@ -185,4 +189,13 @@ void tmbr_TrafficUpdate(void)
             vehicleAfterNewPos(v);
         }
     }
+    if (TRAFFIC_DBG && ncars && ++dbgTick % 120 == 0)
+        for (j = 0; j < ncars && j < 4; j++) {
+            char *v = cars + j * VSIZE, *cs = (char*)F(v, 0x2028);
+            scePrintf("TMBR trafdbg %d: kind %d hidden %d b485 %d b488 %d t2150 %d own %d hw %x st %x cs %x [%d %d %d] pos %08x %08x spd %08x pad %d%d%d\n",
+                j, F(v, 0x590), F(v, 0x2158), *(unsigned char*)(v + 0x485), *(unsigned char*)(v + 0x488), F(v, 0x2150),
+                F(v, 0x20B4), F(v, 0x201C), F(v, 0x2020), (u32)cs, cs ? cs[0xC] : -1, cs ? cs[0xD] : -1, cs ? cs[0xE] : -1,
+                cs ? fb(*(float*)(cs + 0x10)) : 0, cs ? fb(*(float*)(cs + 0x14)) : 0, fb(*(float*)(v + 0x2D4)),
+                *(unsigned char*)(v + 0x598), *(unsigned char*)(v + 0x59A), *(unsigned char*)(v + 0x59D));
+        }
 }
