@@ -20,7 +20,7 @@ extern char* D_004FA030;   /* game */
 extern char D_003156C0[];  /* net: 8 player slots x 0x220 from +0 */
 extern int D_002C07F8[];   /* radar name per character */
 extern int scePrintf(const char* fmt, ...);
-extern int inputGetInput(int mask, int pad) __asm__("inputGetInput__Fii");
+extern int inputGetPadButtons(int pad) __asm__("inputGetPadButtons__Fi");
 extern int netIsHost(void* net) __asm__("func_001734B8");
 extern int netSlotVehicle(void* net, int slot) __asm__("func_00174268");
 extern char* gameMakeAI(char* game, int v, int name, int v2, int cam, int ai) __asm__("func_0013A7B8");
@@ -158,6 +158,60 @@ void tmbr_BotsRebalance(void* net)
     scePrintf("TMBR bots: rebalance, %d humans, %d bots\n", humans(), NAI(D_004FA030));
 }
 
+/* ---- free-for-all brains (only when the host picked a number, AUTO = original behaviour) ----
+ * The original only lets bots hunt humans (func_00130E88 mode 5 picks the nearest net player; new bots start
+ * aimed at vehicle 0 = the host: the dogpile). Every half second each bot hunts the nearest other live car,
+ * bot or human (sticky unless something is clearly closer). The driver plans its route with the target's
+ * attractor group game+0x9FD40[target AI/human index], which only holds humans' groups: tmbr_DriverUpdate
+ * (hooked over func_00101F88's call of func_0012E798) puts the bot target's own group there for the call. */
+extern void driverSetMode(char* drv, int mode) __asm__("func_00130E88");
+extern void driverSetTarget(char* drv, char* target) __asm__("func_00130C00");
+extern void driverUpdate(char* drv) __asm__("func_0012E798");
+extern int attractGroupAt(void* points, void* pos) __asm__("func_0010B950");
+extern float manhat(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
+static int thinkTick;
+
+#define POS(v) ((void*)(F(v, 0x2028) + 0x10))
+static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v, 0x2028); }
+
+void tmbr_BotsThink(void)
+{
+    char* g = D_004FA030;
+    int i, k;
+    if (tmbr_botCount < 0 || !g || NAI(g) <= 0 || ++thinkTick % 30) return;
+    if (!netIsHost(D_003156C0)) return;
+    for (i = 0; i < NAI(g); i++) {
+        char *b = LIST(g)[i], *drv, *cur, *best = 0;
+        int d, bestD = 0x7FFFFFF, curD = -1;   /* ints: float literals would need .lit4 (gp) */
+        if (!b || !live(b) || !(drv = (char*)F(b, 0x2018))) continue;
+        cur = (char*)F(drv, 0xB4);
+        for (k = 0; k < 8; k++) {
+            char* v = g + k * 0x31B0;
+            if (v == b || !live(v)) continue;
+            d = (int)manhat(POS(b), POS(v));
+            if (v == cur) curD = d;
+            if (d < bestD) { bestD = d; best = v; }
+        }
+        if (!best) continue;
+        if (curD >= 0 && curD * 2 < bestD * 3) best = cur;  /* keep fighting unless clearly closer */
+        if (F(drv, 4) != 5) driverSetMode(drv, 5);
+        if ((char*)F(drv, 0xB4) != best) driverSetTarget(drv, best);
+    }
+}
+
+void tmbr_DriverUpdate(char* drv)
+{
+    char* g = D_004FA030;
+    char* t = (char*)F(drv, 0xB4);
+    int k, save;
+    if (tmbr_botCount < 0 || !t || F(t, 0x590) != 2 || !F(t, 0x2028)) { driverUpdate(drv); return; }
+    k = F(t, 0x2100) & 7;
+    save = F(g, 0x9FD40 + k * 4);
+    F(g, 0x9FD40 + k * 4) = attractGroupAt(g + 0x30970, POS(t));
+    driverUpdate(drv);
+    F(g, 0x9FD40 + k * 4) = save;
+}
+
 extern void lobbyFrame(void) __asm__("func_001C5768");
 extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
 extern void fontPrint(int font, const char* s) __asm__("func_00203150");
@@ -171,9 +225,7 @@ void tmbr_LobbyFrame(void)
     char buf[48];
     lobbyFrame();
     if (!netIsHost(D_003156C0)) return;
-    if (inputGetInput(0x4, 0)) pad |= 0x4;
-    if (inputGetInput(0x800, 0)) pad |= 0x800;
-    if (inputGetInput(0x400, 0)) pad |= 0x400;
+    pad = inputGetPadButtons(0) & 0xC04;  /* raw pad, active high: R3 0x4, L1 0x400, R1 0x800 */
     pressed = pad & ~prevPad;
     prevPad = pad;
     if ((pad & 0x4) && (pressed & 0xC00)) {

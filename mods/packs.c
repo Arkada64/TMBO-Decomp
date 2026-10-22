@@ -27,6 +27,8 @@ extern int getMaxTexId(int i) __asm__("getMaxTexId__Fi");
 extern int texIdBase(int slot) __asm__("func_00200C20");
 extern void setTexIdBase(int slot, int base) __asm__("func_00200C80");
 extern u32 clutBase(int slot) __asm__("func_00200C68");
+extern u32 resBase(int slot) __asm__("func_00200C50");
+extern void setClutBase(int slot, u32 words) __asm__("func_00200CC8");
 extern void rtxUpload(void* rtx) __asm__("func_0023E628");
 extern void texRegister(int vram, int slot) __asm__("func_0023D560");
 extern void dbsTraverse(void* ep, void* cb, void* vec) __asm__("func_001FE4D0");
@@ -42,6 +44,7 @@ extern u32 D_00465E68[];  /* global animation table per db (op7 nodes) */
 extern unsigned char D_004FB748; /* PedPimp: number of peds in the pool */
 
 #define PACK_SLOT 9
+#define TMBR_PRISON_BISECT 0  /* 1: Prison loads cycle read-only / CLUTs only / textures only / full */
 #define MAGIC 0x50424D54
 #define LEVEL_TEX 0x1C05670
 typedef struct { char name[16]; u32 addr, size; } Blob;
@@ -141,15 +144,24 @@ void tmbr_LevelTexInit(int vram, int slot, char* shell)
         for (i = 0; i < (int)(sizeof(PACKS) / sizeof(PACKS[0])); i++)
             if (PACKS[i].level == level) {
                 m = readPack(PACKS[i].blob0, PACKS[i].addr);
-                diagMode = 2;
-                if (m && level == 3) {
-                    diagMode = diagPrisonLoads++ % 3;
+                scePrintf("TMBR step: pack read %x\n", (u32)m);
+                if (m && level == 3 && TMBR_PRISON_BISECT) {
+                    diagMode = diagPrisonLoads++ % 4;
                     scePrintf("TMBR diag: Prison load %d, mode %d (%s)\n", diagPrisonLoads, diagMode,
-                        diagMode == 0 ? "pack read only" : diagMode == 1 ? "+ CLUTs and textures, no peds" : "full");
+                        diagMode == 0 ? "pack read only" : diagMode == 1 ? "CLUT upload only" :
+                        diagMode == 2 ? "texture registration only" : "full");
                     if (diagMode == 0) m = 0;
-                }
+                } else diagMode = 3;
             }
-    if (m) binCounts((u32*)LEVEL_TEX, (u32*)m->tex, 1);
+    if (m && diagMode == 1) binCounts((u32*)LEVEL_TEX, (u32*)m->tex, 0);
+    else if (m) binCounts((u32*)LEVEL_TEX, (u32*)m->tex, 1);
+    /* our CLUTs go to the start of the texture paging area (clutBase(9)), which moves up by whole pages before
+     * texm builds its bins: VRAM right after the level's CLUTs (D_006F268C) is used by something car-related
+     * (uploading there corrupted car textures on PRISON) */
+    if (m) {
+        clutStart = clutBase(PACK_SLOT) >> 6;
+        setClutBase(PACK_SLOT, clutBase(PACK_SLOT) + ((m->clutBlocks + 31) & ~31) * 64);
+    }
     texRegister(vram, slot); /* the original call: level textures + texture bins */
     if (slot == 0) {
         diagBins(vram, level);
@@ -157,10 +169,9 @@ void tmbr_LevelTexInit(int vram, int slot, char* shell)
     }
     diagWatch = 0;
     if (!m) return;
-    binCounts((u32*)LEVEL_TEX, (u32*)m->tex, -1);
+    binCounts((u32*)LEVEL_TEX, (u32*)m->tex, diagMode == 1 ? 0 : -1);
     texBase = getMaxTexId(0);
-    clutStart = D_006F268C;
-    if (texBase + m->ntex >= (u32)texIdBase(1) || clutStart + m->clutBlocks > (clutBase(1) >> 6)) {
+    if (texBase + m->ntex >= (u32)texIdBase(1)) {
         scePrintf("TMBR pack: no room (tex id %d+%d, clut %d+%d)\n", texBase, m->ntex, clutStart, m->clutBlocks);
         return;
     }
@@ -171,12 +182,18 @@ void tmbr_LevelTexInit(int vram, int slot, char* shell)
         r += *(u32*)r * 4;
     }
     s78 = D_004CEC78; s7C = D_004CEC7C;
-    rtxUpload((void*)m->rtx);
+    if (diagMode != 2) rtxUpload((void*)m->rtx);
     D_004CEC78 = s78; D_004CEC7C = s7C;
+    scePrintf("TMBR step: cluts %s\n", diagMode != 2 ? "uploaded" : "skipped");
     /* textures: file slot 9, ids after the level's */
-    D_0048AC10[PACK_SLOT] = m->tex;
-    setTexIdBase(PACK_SLOT, texBase);
-    texRegister(vram, PACK_SLOT);
+    if (diagMode != 1) {
+        D_0048AC10[PACK_SLOT] = m->tex;
+        setTexIdBase(PACK_SLOT, texBase);
+        texRegister(vram, PACK_SLOT);
+    }
+    scePrintf("TMBR step: textures %s; res base 0:%x 1:%x 8:%x 9:%x, clut base 1:%x 9:%x\n",
+        diagMode != 1 ? "registered" : "skipped", resBase(0), resBase(1), resBase(8), resBase(9),
+        clutBase(1) >> 6, clutBase(9) >> 6);
     pending = m;
     diagWatch = m;
     for (i = 0; i < (int)m->nblobs; i++) diagSum[i] = sum32(m->blob[i].addr, m->blob[i].size);
@@ -191,11 +208,11 @@ void tmbr_PackWatch(void)
         if (D_004CEC88[i] != diagCnt[i]) {
             diagCnt[i] = D_004CEC88[i];
             h = (u32*)D_0048AC10[i];
-            scePrintf("TMBR diag: car slot %d: %d textures, tex %p, idbase %d maxid %d, clut %x", i, diagCnt[i], h,
-                texIdBase(i), getMaxTexId(i), clutBase(i) >> 6);
+            scePrintf("TMBR diag: car slot %d: %d textures, tex %x, idbase %d maxid %d, clut %d res %d", i, diagCnt[i],
+                (u32)h, texIdBase(i), getMaxTexId(i), clutBase(i) >> 6, resBase(i));
             if (h && h[0] < 16)
                 for (j = 0; j < h[0]; j++)
-                    scePrintf(" [%d x %d%s]", h[2 + 2 * j], h[3 + 2 * j], binFor(h[3 + 2 * j]) < 0 ? " NO BIN" : "");
+                    scePrintf(" [%d x %d bin %d]", h[2 + 2 * j], h[3 + 2 * j], binFor(h[3 + 2 * j]));
             scePrintf("\n");
         }
     if (diagWatch)
@@ -211,10 +228,12 @@ void tmbr_LevelDbLoaded(int ngp, int vram, int slot)
     Manifest* m = pending;
     u32 i, j, n, *p, *hdr, *lvl, *tab, *chr;
     int saveDb, before;
+    if (slot == 0) scePrintf("TMBR step: db init (pack %x)\n", m);
     dbInitSlot(ngp, vram, slot);
     if (!m || slot != 0) return;
     pending = 0;
-    if (diagMode == 1) return;
+    scePrintf("TMBR step: db init done\n");
+    if (diagMode != 3) return;
     /* model texture-id slots + GS TEX0 CBPs */
     p = (u32*)m->pairs;
     for (i = 0; i < m->npairs; i++, p += 2) {
@@ -244,6 +263,7 @@ void tmbr_LevelDbLoaded(int ngp, int vram, int slot)
     } else {
         scePrintf("TMBR pack: animation table not merged (level %p, %d + %d > %d)\n", lvl, n, m->nanims, m->animCap);
     }
+    scePrintf("TMBR step: pairs + anims done\n");
     /* walk the entry points with the level loader callback (peds -> addPedEpNode) */
     hdr = (u32*)m->hdr;
     saveDb = D_004F9714;

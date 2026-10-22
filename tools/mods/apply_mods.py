@@ -152,6 +152,8 @@ PATCHES = [
     (A("nonmatchings/online/after_game_19/func_0013EED0.s"), "0013EED4", "sq", "nop"),
     # ... bot count picked in the waiting room
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B39B4", "jal", "jal        tmbr_LobbyFrame"),
+    # ... bot targets' attractor group while their hunters plan a route (bot vs bot)
+    (A("nonmatchings/tmb/ai/func_00101F88.s"), "001021F8", "jal", "jal        tmbr_DriverUpdate"),
 ]
 # (file, address, label) - global label placed right before that instruction (return points)
 LABELS = [
