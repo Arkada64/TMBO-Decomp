@@ -3,7 +3,21 @@
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", init__15TrafficDirectorP7HighwayP7Vehiclei);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", initAnim__15TrafficDirector);
+int animationGetHandle__FP11_animHandleUiUiUi_C8_3(void *, unsigned int, unsigned int, unsigned int) __asm__("animationGetHandle__FP11_animHandleUiUiUi");
+s32 initAnim__15TrafficDirector(void *arg0)
+{
+  s32 temp_v0;
+  animationGetHandle__FP11_animHandleUiUiUi_C8_3(arg0 + 0x1F0, 0x283FU, 0U, 1U);
+  animationGetHandle__FP11_animHandleUiUiUi_C8_3(arg0 + 0x1FC, 0x283FU, 0U, 2U);
+  animationGetHandle__FP11_animHandleUiUiUi_C8_3(arg0 + 0x208, 0x2840U, 0U, 1U);
+  animationGetHandle__FP11_animHandleUiUiUi_C8_3(arg0 + 0x214, 0x2840U, 0U, 2U);
+  animationGetHandle__FP11_animHandleUiUiUi_C8_3(arg0 + 0x420, 0x283DU, 0U, 1U);
+  animationGetHandle__FP11_animHandleUiUiUi_C8_3(arg0 + 0x42C, 0x283DU, 0U, 2U);
+  animationGetHandle__FP11_animHandleUiUiUi_C8_3(arg0 + 0x438, 0x283EU, 0U, 1U);
+  temp_v0 = animationGetHandle__FP11_animHandleUiUiUi_C8_3(arg0 + 0x444, 0x283EU, 0U, 2U);
+  *((s32 *) (((u8 *) arg0) + 0x450)) = (*((s32 *) (((u8 *) arg0) + 0x220)) = 0);
+  return temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", changeFodder__15TrafficDirectorP7Vehiclei);
 
