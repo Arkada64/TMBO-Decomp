@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/terrain", SignOfFloat__Ff);
 
@@ -7,11 +8,19 @@ void terrainTestCollision__Fv(void) {
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/terrain", terrainAddTerrainNode__FP12_terrainnode);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/terrain", terrainInitBeforeDbLoad__Fv);
+extern u8 numParsedNodes_8_8[4] __asm__("numParsedNodes");
+
+void terrainInitBeforeDbLoad__Fv(void) {
+    (*(s32*)numParsedNodes_8_8) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/terrain", terrainInitialize__Fv);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/terrain", terrainSetContext__FP12_terrainnode);
+extern u8 currentContext_C_11[4] __asm__("currentContext");
+
+void terrainSetContext__FP12_terrainnode(void* arg0) {
+    (*(void**)currentContext_C_11) = arg0 + 0x10;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/terrain", terrainGetHAT__FP8_fvectorfP9_hdResultP14ColorUnionType);
 
@@ -77,7 +86,21 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/terrain", terrainDrawGrid
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/terrain", terrainModify__FP8_fvector);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/terrain", terrainWaveInit__Fv);
+extern u8 twave_34_93[] __asm__("twave");
+
+s32 terrainWaveInit__Fv(void) {
+    M2C_UNK* var_v1;
+    s32 temp_v0;
+
+    var_v1 = ((u8*)twave_34_93);
+    do {
+        M2C_FIELD(var_v1, s32* , 0) = 0;
+        M2C_FIELD(var_v1, s32* , 4) = 0;
+        var_v1 +=0xec;
+        temp_v0 = (s32) var_v1 < (s32) (((u8*)twave_34_93) + 0x24E0);
+    } while (temp_v0 != 0);
+    return temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/terrain", terrainRestoreGrid__Fi);
 
