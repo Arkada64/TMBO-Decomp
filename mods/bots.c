@@ -238,6 +238,19 @@ void tmbr_DriverUpdate(char* drv)
     F(g, 0x9FD40 + k * 4) = save;
 }
 
+/* Fairness gate (aiLineUpShot, func_00106D50, func_00107048): a bot only fires a normal weapon when its target
+ * "looks at it" (angle of the target's heading toward the bot, scaled by the bot's state). Fine against humans;
+ * two bots circling each other almost never both qualify, so after the opening head-on pass they only fire
+ * specials. With a chosen count, a bot target is always fair game. */
+extern int aiFairToShoot(char* v) __asm__("aiIsPlayerLookingAtAIEnoughForAIToShoot__7Vehicle");
+int tmbr_AiMayShoot(char* v)
+{
+    char* drv = (char*)F(v, 0x2018);
+    char* t = drv ? (char*)F(drv, 0xB4) : 0;
+    if (tmbr_botCount >= 0 && t && F(t, 0x590) == 2) return 1;
+    return aiFairToShoot(v);
+}
+
 extern void lobbyFrame(void) __asm__("func_001C5768");
 extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
 extern void fontPrint(int font, const char* s) __asm__("func_00203150");

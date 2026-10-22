@@ -158,6 +158,10 @@ PATCHES = [
     (A("nonmatchings/tmb/ai/func_00101F88.s"), "001021F8", "jal", "jal        tmbr_DriverUpdate"),
     # ... bots hurt each other: func_001E1C40 zeroed damage from a bot to a bot (brain+0x598 unset)
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E1DB8", "bne", "b          .L001E1E10"),
+    # ... bots may shoot bots without the "is the player looking at me" fairness gate
+    (A("nonmatchings/tmb/ai/func_00107048.s"), "001071A4", "jal", "jal        tmbr_AiMayShoot"),
+    (A("nonmatchings/tmb/ai/aiLineUpShot__7Vehicle.s"), "00106C40", "jal", "jal        tmbr_AiMayShoot"),
+    (A("nonmatchings/tmb/ai/func_00106D50.s"), "00106F0C", "jal", "jal        tmbr_AiMayShoot"),
 ]
 # (file, address, label) - global label placed right before that instruction (return points)
 LABELS = [
