@@ -238,8 +238,8 @@ extern int aiFrame(char* v) __asm__("func_00101F88");
  * 35 deg ahead) and never times out, while the hunt driving at close range only brakes. And the original only
  * lets AI 0 pull the handbrake (func_00130D68 checks aiOrPlayerIdx == 0, past 120 deg).
  * After the AI frame has written its pad bytes (vehicle+0x594, read by the physics later in the frame), when
- * a hunting bot is in its attack states (4..7), its target is within CS_DIST and more than CS_AIM off the nose:
- * steer hard toward it, stay on the gas, no brake; past CS_HB pull the handbrake (pad[2]) in bursts of HB_HOLD
+ * a hunting bot's target is within CS_DIST: gas on, no brake (the AI's close-range driving brakes to a halt);
+ * more than CS_AIM off the nose: steer hard toward it; past CS_HB pull the handbrake (pad[2]) in bursts of HB_HOLD
  * frames with HB_REST frames between, so it whips round instead of spinning. Inside CS_AIM the AI aims.
  * Watchdog: state 6 for more than STALL frames goes back to weapon choice (state 1).
  * Floats are compared as bit patterns (no .lit4 literals): positive IEEE floats order like ints. */
@@ -266,15 +266,14 @@ static void aggressiveTurn(char* g, char* v, char* t)
     a = b & 0x7FFFFFFF;
     d = fbits(*(float*)(br + 0x20));
     if (hbTimer[idx] < 0) hbTimer[idx]++;
-    if (F(drv, 4) != 5) { dbgWhy[idx] = 1; return; }
-    if (st < 4 || st > 7) { dbgWhy[idx] = 2; return; }
-    if (F(v, 0x444) >= 60) { dbgWhy[idx] = 3; return; }        /* stuck: the AI's own reverse/turn */
     if (st == 6 && F(br, 0x488) > STALL) { dbgWhy[idx] = 4; aiSetAttackState(v, 1); return; }
+    if (F(drv, 4) != 5) { dbgWhy[idx] = 10 + F(drv, 4); return; }
+    if (F(v, 0x444) >= 60) { dbgWhy[idx] = 3; return; }        /* stuck: the AI's own reverse/turn */
     if (d < 0 || d > CS_DIST) { dbgWhy[idx] = 5; return; }
+    pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* in a fight: stay on the gas */
     if (a < CS_AIM) { dbgWhy[idx] = 6; return; }               /* nearly lined up: the AI aims */
     dbgWhy[idx] = 7;
     if (b > 0) { pad[0xA] = 1; pad[9] = 0; } else { pad[9] = 1; pad[0xA] = 0; }  /* bearing > 0 = right */
-    pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* gas, no brake */
     pad[2] = 0;
     if (a >= CS_HB && hbTimer[idx] >= 0) {
         if (++hbTimer[idx] > HB_HOLD) hbTimer[idx] = -HB_REST;
@@ -289,6 +288,13 @@ int tmbr_AiUpdate(char* v)
     char* t = drv ? (char*)F(drv, 0xB4) : 0;
     int k, save = 0, swap, r;
     dbgCalls[(int)(v - g) / 0x31B0 & 7]++;
+    if (tmbr_botCount >= 0 && F(v, 0x2014)) {
+        /* No fleeing: hunt mode (func_00108618) switches to flee (mode 3, then cruise) when healthScore <
+         * fleeHealth; online there is no health pickup to flee to, and our think tick forced hunt back every
+         * 0.5 s: stop-and-go. fleeHealth (brain+0x48) = 0.0 */
+        F(F(v, 0x2014), 0x48) = 0;
+        if (drv && t && F(drv, 4) >= 2 && F(drv, 4) <= 4) { driverSetMode(drv, 5); driverSetTarget(drv, t); }
+    }
     if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) return aiFrame(v);
     swap = F(t, 0x590) == 2;
     k = F(t, 0x2100) & 7;
