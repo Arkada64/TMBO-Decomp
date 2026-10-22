@@ -154,8 +154,10 @@ PATCHES = [
     (A("nonmatchings/online/after_game_19/func_0013EED0.s"), "0013EED4", "sq", "nop"),
     # ... bot count picked in the waiting room
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B39B4", "jal", "jal        tmbr_LobbyFrame"),
-    # ... bot targets' attractor group while their hunters plan a route (bot vs bot)
-    (A("nonmatchings/tmb/ai/func_00101F88.s"), "001021F8", "jal", "jal        tmbr_DriverUpdate"),
+    # ... bot targets' attractor group during the hunter's whole AI frame (bot vs bot)
+    (A("nonmatchings/tmb/vehicle/func_001DC760.s"), "001DCB64", "jal", "jal        tmbr_AiUpdate"),
+    # ... specials offered less often to bots (free-for-all)
+    (A("nonmatchings/tmb/ai/func_00106440.s"), "001064E8", "jal", "jal        tmbr_AiGoodWeapon"),
     # ... bots hurt each other: func_001E1C40 zeroed damage from a bot to a bot (brain+0x598 unset)
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E1DB8", "bne", "b          .L001E1E10"),
     # ... bots may shoot bots without the "is the player looking at me" fairness gate

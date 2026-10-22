@@ -165,16 +165,14 @@ void tmbr_BotsRebalance(void* net)
  * The original only lets bots hunt humans (func_00130E88 mode 5 picks the nearest net player; new bots start
  * aimed at vehicle 0 = the host: the dogpile). Every half second each bot hunts the nearest other live car,
  * bot or human (sticky unless something is clearly closer). The driver plans its route with the target's
- * attractor group game+0x9FD40[target AI/human index], which only holds humans' groups: tmbr_DriverUpdate
- * (hooked over func_00101F88's call of func_0012E798) puts the bot target's own group there for the call. */
+ * attractor group game+0x9FD40[target AI/human index], which only holds humans' groups: tmbr_AiUpdate
+ * (hooked over vehicleUpdate's call of the AI frame) puts the bot target's own group there for the frame. */
 extern void driverSetMode(char* drv, int mode) __asm__("func_00130E88");
 extern void driverSetTarget(char* drv, char* target) __asm__("func_00130C00");
-extern void driverUpdate(char* drv) __asm__("func_0012E798");
 extern int attractGroupAt(void* points, void* pos) __asm__("func_0010B950");
 extern float manhat(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
 static int thinkTick;
-static int lastSpecial[MAXBOTS];
-#define SPECIAL_PCT 40   /* special-weapon timer speed for bots in free-for-all (100 = original) */
+#define SPECIAL_CHANCE 35 /* % of the time a bot may pick its special when it chooses a weapon (FFA) */
 
 #define POS(v) ((void*)(F(v, 0x2028) + 0x10))
 static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v, 0x2028); }
@@ -214,29 +212,35 @@ void tmbr_BotsThink(void)
                 F(br, 0x414), F(br, 0x60C), F(dv, 0x270), F(br, 0x4B0), F(br, 0x598), F(br, 0x47C),
                 F(dv, 0x250), F(dv, 0x254), F(dv, 0x258), F(g, 0x9A3D4), t ? *(char*)(t + 0x49B) : -1, t ? *(char*)(t + 0x496) : -1);
         }
-    /* specials: func_001076E8 fires one when the brain timer +0x488 passes +0x478 x (difficulty factor);
-     * with bots now damaging each other, let that timer run at SPECIAL_PCT % speed */
-    for (i = 0; i < NAI(g) && i < MAXBOTS; i++) {
-        char *b = LIST(g)[i], *brain;
-        int cur;
-        if (!b || !(brain = (char*)F(b, 0x2014))) continue;
-        cur = F(brain, 0x488);
-        if (cur > lastSpecial[i]) F(brain, 0x488) = cur = lastSpecial[i] + (cur - lastSpecial[i]) * SPECIAL_PCT / 100;
-        lastSpecial[i] = cur;
-    }
 }
 
-void tmbr_DriverUpdate(char* drv)
+/* The whole AI frame (func_00101F88, called from vehicleUpdate) reads the target's attractor group as
+ * game+0x9FD40[target AI/human index] (aiOkToHuntUsingLOS, func_0012E798, ...), which only holds humans'
+ * groups: for a bot target put its own group there for the duration of the frame. */
+extern int aiFrame(char* v) __asm__("func_00101F88");
+int tmbr_AiUpdate(char* v)
 {
     char* g = D_004FA030;
-    char* t = (char*)F(drv, 0xB4);
-    int k, save;
-    if (tmbr_botCount < 0 || !t || F(t, 0x590) != 2 || !F(t, 0x2028)) { driverUpdate(drv); return; }
+    char* drv = (char*)F(v, 0x2018);
+    char* t = drv ? (char*)F(drv, 0xB4) : 0;
+    int k, save, r;
+    if (tmbr_botCount < 0 || !t || F(t, 0x590) != 2 || !F(t, 0x2028)) return aiFrame(v);
     k = F(t, 0x2100) & 7;
     save = F(g, 0x9FD40 + k * 4);
     F(g, 0x9FD40 + k * 4) = attractGroupAt(g + 0x30970, POS(t));
-    driverUpdate(drv);
+    r = aiFrame(v);
     F(g, 0x9FD40 + k * 4) = save;
+    return r;
+}
+
+/* Weapon choice (attack state 1, func_00106440): with the fairness gate gone for bot targets, specials would
+ * dominate; let a bot take its special only SPECIAL_CHANCE % of the times it is offered. */
+extern int aiGoodWeapon(char* v, int w) __asm__("aiGoodWeaponToPick__7Vehiclei");
+extern int mathfRand(int lo, int hi) __asm__("mathfRand__Fii");
+int tmbr_AiGoodWeapon(char* v, int w)
+{
+    if (tmbr_botCount >= 0 && w == 1 && mathfRand(0, 99) >= SPECIAL_CHANCE) return 0;
+    return aiGoodWeapon(v, w);
 }
 
 /* Fairness gate (aiLineUpShot, func_00106D50, func_00107048): a bot only fires a normal weapon when its target
