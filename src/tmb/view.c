@@ -57,7 +57,25 @@ s32 viewGetWorldCtx__Fi(s32 arg0) {
     return (s32) ((arg0 * 0xF0) + ((u8*)worldCtx_18_32));
 }
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/view", viewSetWorldEpNode__FP9_hierhead);
+extern u8 worldCtx_34_35[] __asm__("worldCtx");
+
+s32 viewSetWorldEpNode__FP9_hierhead(void *arg0)
+{
+  s32 var_v1;
+  u8 *new_var;
+  void **var_v0;
+  var_v1 = 3;
+  new_var = (u8 *) worldCtx_34_35;
+  var_v0 = new_var + 0x2D0;
+  do
+  {
+    *var_v0 = arg0;
+    var_v1 -= 1;
+    var_v0 -= 0x3c;
+  }
+  while (var_v1 >= 0);
+  return (s32) var_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/view", viewSetAmbientVol__Fiffff);
 
