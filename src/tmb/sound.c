@@ -838,7 +838,12 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playTunnelDoorClo
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playPizzaManHatSound__Fv);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initElevatorSound__13ElevatorSound);
+void initElevatorSound__13ElevatorSound(void *arg0)
+{
+  u8 *new_var;
+ do { new_var = (u8 *) arg0; *((s32 *) (4 + ((u8 *) arg0))) = 0; } while (0);
+  *((s32 *) (new_var + 0)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", startElevatorSound__13ElevatorSoundii);
 
