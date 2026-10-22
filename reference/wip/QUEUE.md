@@ -60,3 +60,11 @@ Already baked in: DNS, Bugfixes, Skip Intros, No-Interlacing, 16:9, the 3 Balanc
    table, and net messages that can name more than 2 bots (owner -2/-3 encoding in weapon / kill events).
 4. Peds on ASYLUM (hall) and SHIP (prison ship): both are parts of Prison Passage as separate maps; check if
    PRISON's retail ped data (inmates) can be placed there.
+5. Lost / Harbor City content (Ark's ideas, after 1-4):
+   - First: Extra Twisted Edition disc image -> is Lost its own (TMB-engine) program? same NGP/TEX/RTX/PTR formats?
+   - Gold Tooth = skin of Sweet Tooth (asset conversion + skin pick in menu/lobby).
+   - 12 Pak = new character: donor car for handling/stats, imported model, new select entry; special = the
+     reticle skill weapon with a longer max charge (find the charge cap in the special code, make it per-car).
+   - Lost maps: pickups (placement data may be missing/different) and skill weapons; AI route graph; spawns.
+   - Harbor City (PS2 prototype): e.g. Pit Viper with Spectre's special.
+   - Memory: test PCSX2 "128MB RAM (dev console)" from mod code (write/read above 32 MB) before laying out.
