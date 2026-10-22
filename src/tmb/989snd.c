@@ -19,7 +19,20 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_GetTick_CB);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_GotReturns);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_PrepareReturnBuffer);
+extern u8 gAwaitingInts_24_18[] __asm__("gAwaitingInts");
+extern u8 gCommBusy_24_18[] __asm__("gCommBusy");
+
+void snd_PrepareReturnBuffer(s32 *arg0, s32 arg1)
+{
+  u8 *new_var;
+  u8 *new_var2;
+  new_var = gAwaitingInts_24_18;
+  *((s32 *) new_var) = arg1;
+  new_var = arg0;
+  *((s32 *) (((u8 *) ((4 * arg1) + new_var)) + 4)) = 0;
+  *((s32 **) (new_var2 = gCommBusy_24_18)) = arg0;
+  *arg0 = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_BankLoad);
 
