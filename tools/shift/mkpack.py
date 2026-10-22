@@ -132,7 +132,18 @@ def build(lvl, name, kind, per_type=None):
     bad = [s for s in nslots if not BASE <= w(out, s) < BASE + len(out)]
     v = traverse(bytes(out), [4 + 4 * i for i in range(len(eps))])
     ids = collections.Counter(i1 for o, op, i1, i2 in v if i1)
-    rep = {"level": lvl, "kind": kind, "eps": [hex(e) for e in eps], "tops": len(tops), "wanted_nodes": len(wanted),
+    # animation characters of the wanted ids: retail's op7 (global animation table) entries; animationGetHandle
+    # finds a ped's clips by (id1, id2) in these tables, so the loader must add them to table 0
+    anims = []
+    for e in [w(ngp, 4 + 4 * i) - BASE for i in range(w(ngp, 0))]:
+        if head(w(ngp, e))[0] != 7: continue
+        for i in range(w(ngp, e + 4)):
+            a = w(ngp, e + 8 + 4 * i) - BASE
+            if lo <= head(w(ngp, a))[2] < hi:
+                na = new(a)
+                assert na is not None, f"anim entry {hex(a)} not in the pack"
+                anims.append(na)
+    rep = {"anims": anims, "level": lvl, "kind": kind, "eps": [hex(e) for e in eps], "tops": len(tops), "wanted_nodes": len(wanted),
            "ngp_bytes": len(out), "chunks": len(chunks), "runs": len(runs), "ptr_slots": len(nslots),
            "tex_pairs": len(npairs), "dangling": dangling, "bad_ptrs": len(bad),
            "ids_seen": sorted(ids.items()), "texids": sorted({struct.unpack_from("<H", out, a)[0] for a, b in npairs if a})}

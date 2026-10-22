@@ -65,9 +65,25 @@ def build(lvl, name):
     MAN = 64 + 24 * len(ar)
     man_size = MAN + 8 * len(pairs)
     hdr_size = A128(4 + 4 * neps)
+    # animation table merge area: online level's op7 entries + ours (loader builds it, sets table 0)
+    from ngpdb import get, head as _head
+    on = get("online", lvl, "NGP")
+    lvl_anims = 0
+    for k in range(w(on, 0)):
+        e = w(on, 4 + 4 * k) - BASE
+        if _head(w(on, e))[0] == 7: lvl_anims = w(on, e + 4)
+    anims = rep.get("anims", [])
+    anim_cap = lvl_anims + len(anims) + 8                 # a little slack
+    anim_size = A128(4 * len(anims)) + A128(8 + 4 * anim_cap)
+    # the online level TEX must already have bins of the pack's block sizes (the loader enlarges them)
+    lt = get("online", lvl, "TEX")
+    lsizes = {struct.unpack_from("<II", lt, 8 + 8 * k)[1] for k in range(w(lt, 0))}
+    psizes = [struct.unpack_from("<II", tex, 8 + 8 * k)[1] for k in range(w(tex, 0))]
+    assert all(s in lsizes for s in psizes), f"pack TEX classes {psizes} not all in level {sorted(lsizes)}"
     small = sorted(free, key=lambda i: free[i][2])
-    b0 = next(i for i in small if room(i) >= A128(man_size) + hdr_size + len(rtx) + 256)
+    b0 = next(i for i in small if room(i) >= A128(man_size) + hdr_size + len(rtx) + anim_size + 256)
     man_at = put(b0, A128(man_size)); hdr_at = put(b0, hdr_size); rtx_at = put(b0, len(rtx))
+    alist_at = put(b0, A128(4 * len(anims))); atab_at = put(b0, A128(8 + 4 * anim_cap))
     order = [b0] + [i for i in free if i != b0]
     tex_at = None
     for i in sorted(order, key=lambda i: -room(i)):
@@ -115,8 +131,9 @@ def build(lvl, name):
         assert size <= ar[i][1], "sector padding overruns the area"
         blobs.append((f"{name}{k}.BIN", free[i][0], size, i))
     man = bytearray(man_size)
-    struct.pack_into("<10I", man, 0, 0x50424D54, 1, len(blobs), hdr_at, man_at + MAN, len(apairs), tex_at, rtx_at,
-                     rep["clut_blocks"], rep["tex_ids"])
+    struct.pack_into("<14I", man, 0, 0x50424D54, 2, len(blobs), hdr_at, man_at + MAN, len(apairs), tex_at, rtx_at,
+                     rep["clut_blocks"], rep["tex_ids"], alist_at, len(anims), atab_at, anim_cap)
+    wr(alist_at, b"".join(struct.pack("<I", absaddr(a)) for a in anims))
     for k, (fn, addr, size, i) in enumerate(blobs):
         struct.pack_into("<16sII", man, 64 + 24 * k, fn.encode(), addr, size)
     for k, (a, g) in enumerate(apairs): struct.pack_into("<II", man, MAN + 8 * k, a, g)
@@ -125,7 +142,8 @@ def build(lvl, name):
         open(OUT + fn, "wb").write(bytes(img[i]) + b"\0" * (size - len(img[i])))
     lay = {"level": lvl, "areas": [(hex(a), cap, nm) for a, cap, nm in ar], "blobs": [(fn, hex(addr), size) for fn, addr, size, i in blobs],
            "manifest": hex(man_at), "hdr": hex(hdr_at), "tex": hex(tex_at), "rtx": hex(rtx_at), "segments": len(segs), "cuts": len(place),
-           "holes": holes, "relocated": nrel, "pairs": len(apairs), "used": {ar[i][2]: free[i][1] - free[i][0] for i in free}}
+           "holes": holes, "relocated": nrel, "pairs": len(apairs), "used": {ar[i][2]: free[i][1] - free[i][0] for i in free},
+           "anims": len(anims), "level_anims": lvl_anims, "anim_table": hex(atab_at), "tex_classes": psizes}
     json.dump(lay, open(OUT + name + ".layout.json", "w"), indent=1)
     return lay
 
