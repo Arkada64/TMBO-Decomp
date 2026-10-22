@@ -66,7 +66,7 @@ extern u32 D_004CEC70;    /* number of texture bins */
 extern u32 D_004CEB70[];  /* bins: (count, block size) */
 extern u32 D_004CEC84;    /* small-VRAM mode */
 extern u32 D_004CEC88[];  /* textures registered per file slot */
-static int diagPrisonLoads, diagFrame;
+static int diagPrisonLoads, diagFrame, diagMode;
 static u32 diagSum[4], diagCnt[14];
 static Manifest* diagWatch;
 static u32 sum32(u32 a, u32 n)
@@ -139,8 +139,16 @@ void tmbr_LevelTexInit(int vram, int slot, char* shell)
     if (slot == 0) { tmbr_levelIndex = level; tmbr_levelSerial++; }
     if (D_004FAE38 && slot == 0 && D_0048AC10[0] == LEVEL_TEX)
         for (i = 0; i < (int)(sizeof(PACKS) / sizeof(PACKS[0])); i++)
-            if (PACKS[i].level == level)
+            if (PACKS[i].level == level) {
                 m = readPack(PACKS[i].blob0, PACKS[i].addr);
+                diagMode = 2;
+                if (m && level == 3) {
+                    diagMode = diagPrisonLoads++ % 3;
+                    scePrintf("TMBR diag: Prison load %d, mode %d (%s)\n", diagPrisonLoads, diagMode,
+                        diagMode == 0 ? "pack read only" : diagMode == 1 ? "+ CLUTs and textures, no peds" : "full");
+                    if (diagMode == 0) m = 0;
+                }
+            }
     if (m) binCounts((u32*)LEVEL_TEX, (u32*)m->tex, 1);
     texRegister(vram, slot); /* the original call: level textures + texture bins */
     if (slot == 0) {
@@ -206,6 +214,7 @@ void tmbr_LevelDbLoaded(int ngp, int vram, int slot)
     dbInitSlot(ngp, vram, slot);
     if (!m || slot != 0) return;
     pending = 0;
+    if (diagMode == 1) return;
     /* model texture-id slots + GS TEX0 CBPs */
     p = (u32*)m->pairs;
     for (i = 0; i < m->npairs; i++, p += 2) {

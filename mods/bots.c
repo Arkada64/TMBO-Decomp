@@ -4,8 +4,8 @@
  * Here: the AI list grows to MAXBOTS entries (into game+0x9E698.., unused online: retail's longer list) and the
  * AI sort list game+0x9FC98 (2 entries, then the level type) moves to game+0x9E6A8 (apply_mods.py patches).
  * Count: tmbr_botCount < 0 = the original rule; otherwise that many bots (capped by free player slots) in every
- * mode, whatever "USE BOTS" says. In a match the host holds R3 and taps R1 (+1 bot) / L1 (-1 bot); the count is
- * kept for the next matches. Bots are made by the game's own code (func_0013A7B8 + func_001756A0), so they are
+ * mode, whatever "USE BOTS" says. In the waiting room the host holds R3 and taps R1 / L1 (AUTO, 0..6; shown as a
+ * "BOTS" line); the count is kept for the next matches. Bots are made by the game's own code (func_0013A7B8 + func_001756A0), so they are
  * synced to clients as before.
  * Not yet: remote players only see the weapons of bots 1-2 correctly (the net weapon/kill messages encode the
  * owner as -2/-3); bot-vs-bot targeting. */
@@ -158,22 +158,33 @@ void tmbr_BotsRebalance(void* net)
     scePrintf("TMBR bots: rebalance, %d humans, %d bots\n", humans(), NAI(D_004FA030));
 }
 
-/* every game frame: host hotkeys R3 + R1/L1 */
-void tmbr_BotsFrame(void)
+extern void lobbyFrame(void) __asm__("func_001C5768");
+extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
+extern void fontPrint(int font, const char* s) __asm__("func_00203150");
+extern int sprintf(char* d, const char* f, ...);
+
+/* waiting room (func_001B2B68 -> func_001C5768 every frame): host hotkeys R3 + R1/L1 and a "BOTS" line.
+ * Count steps AUTO (original rule) -> 0 .. MAXBOTS. */
+void tmbr_LobbyFrame(void)
 {
     int pad = 0, pressed;
+    char buf[48];
+    lobbyFrame();
+    if (!netIsHost(D_003156C0)) return;
     if (inputGetInput(0x4, 0)) pad |= 0x4;
     if (inputGetInput(0x800, 0)) pad |= 0x800;
     if (inputGetInput(0x400, 0)) pad |= 0x400;
     pressed = pad & ~prevPad;
     prevPad = pad;
-    if (!(pad & 0x4) || !(pressed & 0xC00)) return;
-    if (!netIsHost(D_003156C0)) return;
-    if (tmbr_botCount < 0) tmbr_botCount = NAI(D_004FA030);
-    if (pressed & 0x800) tmbr_botCount++;
-    if (pressed & 0x400) tmbr_botCount--;
-    if (tmbr_botCount < 0) tmbr_botCount = 0;
-    if (tmbr_botCount > MAXBOTS) tmbr_botCount = MAXBOTS;
-    balance(1);
-    scePrintf("TMBR bots: set %d -> %d bots\n", tmbr_botCount, NAI(D_004FA030));
+    if ((pad & 0x4) && (pressed & 0xC00)) {
+        if (pressed & 0x800) tmbr_botCount++;
+        if (pressed & 0x400) tmbr_botCount--;
+        if (tmbr_botCount < -1) tmbr_botCount = -1;
+        if (tmbr_botCount > MAXBOTS) tmbr_botCount = MAXBOTS;
+        scePrintf("TMBR bots: lobby setting %d\n", tmbr_botCount);
+    }
+    if (tmbr_botCount < 0) sprintf(buf, "BOTS : AUTO  (R3 + L1/R1)");
+    else sprintf(buf, "BOTS : %d  (R3 + L1/R1)", tmbr_botCount);
+    fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 10 * 0x100);
+    fontPrint(0, buf);
 }
