@@ -54,7 +54,19 @@ s32 clearRoadblock__7Highwayi(void* arg0, s32 arg1) {
     return var_v0;
 }
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highway", setRoadblock__7Highwayi);
+s32 isRoadblockSet__7Highwayi_50_16() __asm__("isRoadblockSet__7Highwayi");
+
+void setRoadblock__7Highwayi(void *arg0, s32 arg1)
+{
+  void *new_var;
+  u8 *new_var2;
+  if (isRoadblockSet__7Highwayi_50_16() == 0)
+  {
+    *((s32 *) ((new_var2 = (u8 *) (arg0 + ((*((s32 *) (((u8 *) arg0) + 0x2448))) * 4))) + 0x244C)) = arg1;
+    new_var = arg0;
+    *((s32 *) (((u8 *) arg0) + 0x2448)) = (s32) ((*((s32 *) (((u8 *) new_var) + 0x2448))) + 1);
+  }
+}
 
 s32 isRoadblockSet__7Highwayi(void* arg0, s32 arg1) {
     s32 var_v1;
