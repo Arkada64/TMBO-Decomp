@@ -1,6 +1,19 @@
 #include "common.h"
+#include "m2c_macros.h"
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hdlos", hdLosCsTest__FP8_fvectorT0P9_hdResultii);
+int hdLosTest__FP8_fvectorT0P9_hdResulti_2C_0(void*, void*, void*, int) __asm__("hdLosTest__FP8_fvectorT0P9_hdResulti");
+extern u8 doCSTest_2C_0[4] __asm__("doCSTest");
+extern u8 hdIgnoreInteractive_hdlos_2C_0[4] __asm__("hdIgnoreInteractive_hdlos");
+
+s32 hdLosCsTest__FP8_fvectorT0P9_hdResultii(void* arg0, void* arg1, void* arg2, s32 arg3, s32 arg4) {
+    s32 temp_v0;
+
+    (*(s32*)hdIgnoreInteractive_hdlos_2C_0) = arg3;
+    (*(s32*)doCSTest_2C_0) = 1;
+    temp_v0 = hdLosTest__FP8_fvectorT0P9_hdResulti_2C_0(arg0, arg1, arg2, arg4);
+    (*(s32*)doCSTest_2C_0) = 0;
+    return temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hdlos", hdLosTest__FP8_fvectorT0P9_hdResulti);
 
@@ -24,4 +37,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hdlos", hdBspNode_hdlos__
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hdlos", hdLosResult__FP20_hiercollisionvolumei);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hdlos", hdSetModelMode__FP9_hierhead);
+extern u8 hdModelMode_10_29[4] __asm__("hdModelMode");
+extern u8 worldEpNode_10_29[4] __asm__("worldEpNode");
+
+s32 hdSetModelMode__FP9_hierhead(void* arg0) {
+    (*(void**)worldEpNode_10_29) = arg0;
+    (*(s32*)hdModelMode_10_29) = 1;
+    return 1;
+}
