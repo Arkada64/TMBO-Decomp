@@ -296,7 +296,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateCloudSound_
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", triggerCloudEnvironmentWeaponSound__10CloudSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initCraneSound__10CraneSound);
+void initCraneSound__10CraneSound(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+  *((s32 *) (((u8 *) arg0) + 4)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateCraneSound__10CraneSound);
 
