@@ -67,7 +67,16 @@ s32 viewGetWeMat__Fi(s32 arg0) {
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/view", viewSetSkyEntry__FP9_hierheadi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/view", viewGetSky__Fi);
+extern u8 worldCtx_1C_53[] __asm__("worldCtx");
+
+s32 viewGetSky__Fi(s32 arg0)
+{
+  u8 *new_var;
+  u8 *new_var2;
+  new_var2 = (u8 *) ((arg0 * 0xF0) + ((u8 *) worldCtx_1C_53));
+  new_var = new_var2 + 4;
+  return *((s32 *) new_var);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/view", viewSetSkyTrans__FP8_fvectori);
 
