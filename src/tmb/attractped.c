@@ -1,12 +1,35 @@
 #include "common.h"
+#include "m2c_macros.h"
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", isIn__15PedAttractGroupP8_fvector);
+s32 isIn__15PedAttractGroupP8_fvector(void* arg0, void* arg1) {
+    f32 temp_f1;
+    f32 temp_f1_2;
+    f32 temp_f1_3;
+    s32 var_v0;
+
+    temp_f1 = M2C_FIELD(arg1, f32* , 0);
+    var_v0 = 0;
+    if ((M2C_FIELD(arg0, f32* , 0x10) < temp_f1) && (temp_f1 < M2C_FIELD(arg0, f32* , 0x20))) {
+        temp_f1_2 = M2C_FIELD(arg1, f32* , 4);
+        if ((M2C_FIELD(arg0, f32* , 0x14) < temp_f1_2) && (temp_f1_2 < M2C_FIELD(arg0, f32* , 0x24))) {
+            temp_f1_3 = M2C_FIELD(arg1, f32* , 8);
+            if ((M2C_FIELD(arg0, f32* , 0x18) < temp_f1_3) && (temp_f1_3 < M2C_FIELD(arg0, f32* , 0x28))) {
+                var_v0 = 1;
+            }
+        }
+    }
+    return var_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", init__10AttractPedP10PedestrianP15PedAttractGroupiQ210AttractPed8Behavior);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", update__10AttractPed);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", shutdown__10AttractPed);
+M2C_UNK killPed__10AttractPed_8_8() __asm__("killPed__10AttractPed");
+
+void shutdown__10AttractPed(void) {
+    killPed__10AttractPed_8_8();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", testBehaviorInit__10AttractPed);
 
@@ -90,16 +113,50 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", getAnimConfi
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", getAnimForState__10AttractPedi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", setAnimForState__10AttractPedii);
+void setAnimForState__10AttractPedii(void* arg0, s32 arg1, s32 arg2) {
+    M2C_FIELD((arg0 + arg2), s8* , 0x80) = (s8) arg1;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", getState__10AttractPed);
+s32 getState__10AttractPed(void* arg0) {
+    return M2C_FIELD(arg0, s32* , 0x28);
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", isDying__10AttractPed);
+s32 isDying__10AttractPed(void* arg0) {
+    s32 var_v1;
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", isDead__10AttractPed);
+    var_v1 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x20) != 0) {
+        var_v1 = M2C_FIELD(arg0, s32* , 0x24) > 0;
+    }
+    return var_v1;
+}
+
+s32 isDead__10AttractPed(void* arg0) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if (M2C_FIELD(arg0, s32* , 0x20) != 0) {
+        var_v1 = M2C_FIELD(arg0, s32* , 0x24) < 1;
+    }
+    return var_v1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", __10AttractPed);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", __tf10AttractPed);
+M2C_UNK __rtti_si_50_106() __asm__("__rtti_si");
+M2C_UNK __tf14CorpseStrategy_50_106() __asm__("__tf14CorpseStrategy");
+extern u8 D_004E4BD0_50_106[] __asm__("D_004E4BD0");
+extern u8 __ti10AttractPed_50_106[] __asm__("__ti10AttractPed");
+extern u8 __ti14CorpseStrategy_50_106[] __asm__("__ti14CorpseStrategy");
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", getDbId__10Pedestrian);
+s32* __tf10AttractPed(void) {
+    if ((*(s32*)__ti10AttractPed_50_106) == 0) {
+        __tf14CorpseStrategy_50_106();
+        __rtti_si_50_106(((u8*)__ti10AttractPed_50_106), ((u8*)D_004E4BD0_50_106), ((u8*)__ti14CorpseStrategy_50_106));
+    }
+    return ((u8*)__ti10AttractPed_50_106);
+}
+
+s32 getDbId__10Pedestrian(void* arg0) {
+    return (s32) ((u32) **M2C_FIELD(arg0, u32*** , 4) >> 0x12);
+}
