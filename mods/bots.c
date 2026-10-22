@@ -177,6 +177,14 @@ extern void driverSetTarget(char* drv, char* target) __asm__("func_00130C00");
 extern int attractGroupAt(void* points, void* pos) __asm__("func_0010B950");
 extern float manhat(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
 static int thinkTick;
+/* Roles (by AI index, so 3 bots get one of each): brawler = closest target, gets in close (dogfight);
+ * sniper = targets ~450 away, holds a 250..550 band and backs off when rushed; roamer = picks the most
+ * isolated car nobody else is on, fights like a brawler. Spreads the bots out instead of one mosh pit. */
+#define R_BRAWLER 0
+#define R_SNIPER 1
+#define R_ROAMER 2
+#define ROLE(v) (F(v, 0x2100) % 3)
+static int hunted[8], crowd[8];
 static int dbgCalls[8], dbgHb[8], dbgWhy[8];   /* TMBR_BOTDBG: AI frames seen by the hook, handbrake frames */
 static int dbgBits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 #define SPECIAL_CHANCE 50 /* % of the time a bot may pick its special when it chooses a weapon (FFA) */
@@ -194,20 +202,43 @@ void tmbr_BotsThink(void)
 #endif
     if (++thinkTick % 30) return;
     F(g, 0x9A3D4) = tmbr_botDiff;   /* AI difficulty: 0 (online's value) never lets a bot line up a normal shot */
+    /* how many bots hunt each car, how crowded each car is */
+    for (k = 0; k < 8; k++) { hunted[k] = 0; crowd[k] = 0; }
+    for (i = 0; i < NAI(g); i++) {
+        char *b = LIST(g)[i], *dv, *t;
+        if (b && live(b) && (dv = (char*)F(b, 0x2018)) && (t = (char*)F(dv, 0xB4))) {
+            k = (int)(t - g) / 0x31B0;
+            if (k >= 0 && k < 8) hunted[k]++;
+        }
+    }
+    for (k = 0; k < 8; k++) {
+        char* v = g + k * 0x31B0;
+        int j;
+        if (!live(v)) continue;
+        for (j = 0; j < 8; j++)
+            if (j != k && live(g + j * 0x31B0) && (int)manhat(POS(v), POS(g + j * 0x31B0)) < 400) crowd[k]++;
+    }
     for (i = 0; i < NAI(g); i++) {
         char *b = LIST(g)[i], *drv, *cur, *best = 0;
-        int d, bestD = 0x7FFFFFF, curD = -1;   /* ints: float literals would need .lit4 (gp) */
+        int d, sc, bestS = 0x7FFFFFF, curS = -1, role, ci = -1;   /* ints: float literals would need .lit4 (gp) */
         if (!b || !live(b) || !(drv = (char*)F(b, 0x2018))) continue;
         cur = (char*)F(drv, 0xB4);
+        role = ROLE(b);
+        if (cur) ci = (int)(cur - g) / 0x31B0;
         for (k = 0; k < 8; k++) {
             char* v = g + k * 0x31B0;
+            int others;
             if (v == b || !live(v)) continue;
             d = (int)manhat(POS(b), POS(v));
-            if (v == cur) curD = d;
-            if (d < bestD) { bestD = d; best = v; }
+            others = hunted[k] - (k == ci);              /* other bots already on it */
+            if (role == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
+            else if (role == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
+            else sc = d + others * 200;                                                   /* brawler */
+            if (v == cur) curS = sc;
+            if (sc < bestS) { bestS = sc; best = v; }
         }
         if (!best) continue;
-        if (curD >= 0 && curD * 2 < bestD * 3) best = cur;  /* keep fighting unless clearly closer */
+        if (curS >= 0 && curS * 2 < bestS * 3) best = cur;  /* keep fighting unless clearly better */
         if (F(drv, 4) != 5) driverSetMode(drv, 5);
         if ((char*)F(drv, 0xB4) != best) driverSetTarget(drv, best);
     }
@@ -256,6 +287,10 @@ extern int aiFrame(char* v) __asm__("func_00101F88");
 #define DF_ROOM 0x43480000   /* 200.0: enough room to swing back */
 #define DF_LINED 0x3E99999A  /* 0.3 rad: the target's nose points at us (brain+0x28) */
 #define DF_EXT 50
+#define SN_MIN 0x43480000    /* 200.0 */
+#define SN_FAR 0x43AF0000    /* 350.0 */
+#define SN_MAX 0x440C0000    /* 560.0 */
+#define SN_BEHIND 0x40200000 /* 2.5 rad */
 #define DF_SWING 45
 static signed char ph[8];
 static short phT[8];
@@ -281,7 +316,22 @@ static void aggressiveTurn(char* g, char* v, char* t)
     if (F(v, 0x444) >= 60) { dbgWhy[idx] = 3; return; }        /* stuck: the AI's own reverse/turn */
     if (d < 0 || d > CS_DIST) { dbgWhy[idx] = 5; ph[idx] = 0; return; }
     pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* in a fight: stay on the gas */
-    if (a < CS_AIM && ph[idx] != 1) { dbgWhy[idx] = 6; ph[idx] = 0; return; }               /* nearly lined up: the AI aims */
+    if (ROLE(v) == R_SNIPER) {
+        /* sniper: rushed (< SN_MIN) -> run (target behind us) until SN_FAR, then swing round; in the band,
+         * coast so it lingers and shoots; beyond the band, the attack logic below closes in */
+        if (ph[idx] == 4) {
+            if (d > SN_FAR) { ph[idx] = 2; phT[idx] = 0; }
+            else {
+                pad[2] = 0; pad[9] = 0; pad[0xA] = 0;
+                if (a < SN_BEHIND) { if (b > 0) pad[9] = 1; else pad[0xA] = 1; }  /* turn away */
+                else if (tf < DF_LINED) { if ((thinkTick / 12) & 1) pad[9] = 1; else pad[0xA] = 1; }
+                dbgWhy[idx] = 30;
+                return;
+            }
+        } else if (d < SN_MIN && ph[idx] == 0) { ph[idx] = 4; return; }
+        else if (d < SN_MAX && a < CS_HB) pad[4] = 0;          /* in the band, roughly facing: coast */
+    }
+    if (a < CS_AIM && ph[idx] != 1 && ph[idx] != 4) { dbgWhy[idx] = 6; ph[idx] = 0; return; }               /* nearly lined up: the AI aims */
     /* ---- dogfight: like PvP, keep speed and fight for the angle ----
      * phase 0 attack: gas, steer at the target, handbrake bursts past CS_HB (as before).
      * Target far off the nose (> CS_PIVOT): if it is close (< DF_CLOSE) we overshot, so EXTEND: drive on,
