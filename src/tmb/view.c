@@ -17,7 +17,15 @@ void viewSetTOD__FifPvf(void) {
     todSetTOD__FifPvf_8_10();
 }
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/view", viewGetRot__Fi);
+extern u8 viewInfo_1C_11[] __asm__("viewInfo");
+
+s32 viewGetRot__Fi(s32 arg0)
+{
+  u8 *new_var3;
+  int *new_var2;
+  int new_var;
+ new_var3 = (arg0 * 0x10) + ((u8 *) viewInfo_1C_11); do { new_var2 = new_var3; new_var = (*new_var2) + 0x60; new_var2 = &new_var; return *new_var2; } while (0);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/view", viewGetMat__Fi);
 
