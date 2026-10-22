@@ -160,7 +160,33 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputStartLgLarge
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputStopLgLargeActuatorEffect__Fi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputStopLgEffect__FiPi);
+M2C_UNK lgDevStopForceEffect_3C_148() __asm__("lgDevStopForceEffect");
+extern u8 usbDeviceId_3C_148[] __asm__("usbDeviceId");
+
+void inputStopLgEffect__FiPi(s32 arg0, s32 *arg1)
+{
+  s32 *new_var2;
+  s32 temp_a0;
+  s32 temp_a1;
+  int new_var3;
+  s32 *new_var;
+  new_var = (arg0 * 4) + ((u8 *) usbDeviceId_3C_148);
+  temp_a0 = *new_var;
+  new_var3 = -1;
+  new_var2 = arg1;
+  if (temp_a0 != new_var3)
+  {
+    new_var = new_var2;
+    temp_a1 = *new_var;
+    if (temp_a1 != (-1))
+    {
+      if (!arg1)
+      {
+      }
+      lgDevStopForceEffect_3C_148(temp_a0, temp_a1);
+    }
+  }
+}
 
 s32 lgDevStartForceEffect_78_151() __asm__("lgDevStartForceEffect");
 extern u8 usbDeviceId_78_151[] __asm__("usbDeviceId");
