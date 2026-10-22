@@ -24,6 +24,7 @@ extern char* D_004FA030;   /* game */
 extern char D_003156C0[];  /* net: 8 player slots x 0x220 from +0 */
 extern int D_002C07F8[];   /* radar name per character */
 extern int scePrintf(const char* fmt, ...);
+extern int mathfRandI(int lo, int hi) __asm__("mathfRand__Fii");
 extern int tmbr_NavDrive(char* g, char* v, char* t);   /* nav.c */
 extern void tmbr_NavFrame(void);
 extern int inputGetPadButtons(int pad) __asm__("inputGetPadButtons__Fi");
@@ -183,8 +184,30 @@ static int thinkTick;
 #define R_BRAWLER 0
 #define R_SNIPER 1
 #define R_ROAMER 2
-#define ROLE(v) (F(v, 0x2100) % 3)
+#define ROLE(v) (role[((int)((char*)(v) - D_004FA030) / 0x31B0) & 7])
 static int hunted[8], crowd[8];
+static signed char role[8];          /* by vehicle index */
+static short roleT[8], rushT[8];     /* think ticks (0.5 s) until the next role roll; sniper rushed ticks */
+
+/* Roles change during the match: every 15..40 s a bot rolls a new one (brawler 45 %, sniper 30 %, roamer
+ * 25 %, re-rolled once if every other bot already has it), and a sniper that keeps getting caught up close
+ * (target < 150 for 3 s) turns brawler on the spot. */
+static void rollRole(char* g, int k)
+{
+    int r = mathfRandI(0, 99), n = r < 45 ? R_BRAWLER : r < 75 ? R_SNIPER : R_ROAMER, i, same = 0, bots = 0;
+    for (i = 0; i < NAI(g); i++) {
+        char* b = LIST(g)[i];
+        int j;
+        if (!b || (j = (int)(b - g) / 0x31B0) == k || j < 0 || j > 7) continue;
+        bots++;
+        if (role[j] == n) same++;
+    }
+    if (bots && same == bots) n = (n + 1 + mathfRandI(0, 1)) % 3;
+    role[k] = n;
+    roleT[k] = 30 + mathfRandI(0, 50);
+    rushT[k] = 0;
+    if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d role %s\n", k, n == R_BRAWLER ? "brawler" : n == R_SNIPER ? "sniper" : "roamer");
+}
 static int dbgCalls[8], dbgHb[8], dbgWhy[8];   /* TMBR_BOTDBG: AI frames seen by the hook, handbrake frames */
 static int dbgBits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 #define SPECIAL_CHANCE 50 /* % of the time a bot may pick its special when it chooses a weapon (FFA) */
@@ -220,10 +243,18 @@ void tmbr_BotsThink(void)
     }
     for (i = 0; i < NAI(g); i++) {
         char *b = LIST(g)[i], *drv, *cur, *best = 0;
-        int d, sc, bestS = 0x7FFFFFF, curS = -1, role, ci = -1;   /* ints: float literals would need .lit4 (gp) */
+        int d, sc, bestS = 0x7FFFFFF, curS = -1, rl, ci = -1;   /* ints: float literals would need .lit4 (gp) */
         if (!b || !live(b) || !(drv = (char*)F(b, 0x2018))) continue;
         cur = (char*)F(drv, 0xB4);
-        role = ROLE(b);
+        {
+            int k2 = (int)(b - g) / 0x31B0 & 7;
+            if (--roleT[k2] <= 0) rollRole(g, k2);
+            if (role[k2] == R_SNIPER && cur && (int)manhat(POS(b), POS(cur)) < 150) {
+                if (++rushT[k2] >= 6) { role[k2] = R_BRAWLER; roleT[k2] = 30 + mathfRandI(0, 30);
+                    if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d sniper rushed -> brawler\n", k2); }
+            } else rushT[k2] = 0;
+        }
+        rl = ROLE(b);
         if (cur) ci = (int)(cur - g) / 0x31B0;
         for (k = 0; k < 8; k++) {
             char* v = g + k * 0x31B0;
@@ -231,8 +262,8 @@ void tmbr_BotsThink(void)
             if (v == b || !live(v)) continue;
             d = (int)manhat(POS(b), POS(v));
             others = hunted[k] - (k == ci);              /* other bots already on it */
-            if (role == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
-            else if (role == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
+            if (rl == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
+            else if (rl == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
             else sc = d + others * 200;                                                   /* brawler */
             if (v == cur) curS = sc;
             if (sc < bestS) { bestS = sc; best = v; }
