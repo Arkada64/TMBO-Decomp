@@ -1,7 +1,14 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/drivein", InitDriveInBefore__7DriveIn);
+void InitDriveInBefore__7DriveIn(void *arg0)
+{
+  u8 *new_var;
+  *((s32 *) (((u8 *) arg0) + 0x50)) = 0;
+  *((s32 *) (((u8 *) arg0) - -0x54)) = 0;
+ do { } while (0);
+  *((s32 *) (new_var = ((u8 *) arg0) + 0x58)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/drivein", InitDriveInAfter__7DriveIn);
 
