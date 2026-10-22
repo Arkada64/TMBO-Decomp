@@ -33,8 +33,16 @@
   Note: `report.json` progress still shows 2.54% (it doesn't count functions inside
   partly-INCLUDE_ASM files); count matches with `git log`/`grep -c INCLUDE_ASM` instead.
 
+- auto_m2c.py also takes a converted segment's dir (`asm/nonmatchings/tmb/X`, only functions
+  still INCLUDE_ASM). `WITH_RODATA=1` adds 'R' variants with the segment's rodata given to m2c:
+  on ui+sound it fixed every m2c failure but gave 1 new match and doubled the time, and R matches
+  can't enter the build anyway while rodata is asm (integrate.py skips them unless ALLOW_R=1).
+  Real fix = rodata migration (C owns each function's rodata), a bigger change for later.
+- `perm_run.py [MAXD SECS MAXF THREADS]`: permuter over `logs/drafts/*.near.json` (469 near
+  misses), solved ones go in via integrate.py + commit. Needs pycparser 2.x (installed 2.23 in
+  the venv; m2c still fine). Smoke test: IsAscii__FPc solved in 30 s.
+
 ## Next
-1. Port perm_run for the near misses (`logs/drafts/*.near.json`); Ark runs it.
-2. m2c gave up on some functions (jump tables: drafts have no rodata). Feed m2c the segment's
-   rodata asm so switches decompile.
+1. Ark runs perm_run.py (long). Then RETRY=1 if anything hit 0 but didn't apply.
+2. Rodata migration, so switch/literal functions can be matched.
 3. Then step 3 of the handoff (port account 1's online matches to retail) and step 4 (UI).

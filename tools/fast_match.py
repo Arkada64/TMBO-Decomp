@@ -74,7 +74,11 @@ def check(name, code):
               (struct.unpack_from("<I", ROM, a - BASE + i)[0] & ~mask.get(off + i, 0)) for i in range(0, s, 4))
     return "MATCH" if bad == 0 else f"{bad} insns differ"
 
-blocks = re.split(r"^//@@ (\S+)[^\n]*\n", Path(sys.argv[1]).read_text(), flags=re.M)[1:]
+parts = re.split(r"^//@@ (\S+)([^\n]*)\n", Path(sys.argv[1]).read_text(), flags=re.M)[1:]
+label = {}
+blocks = []
+for n, lab, c in zip(parts[0::3], parts[1::3], parts[2::3]):
+    blocks += [n, c]; label.setdefault((n, c), lab.strip())
 matched, results, t0 = {}, {}, time.time()
 only = set(os.environ["ONLY_NAMES"].split(",")) if os.environ.get("ONLY_NAMES") else None
 near = {}
@@ -88,7 +92,7 @@ for name, code in zip(blocks[0::2], blocks[1::2]):
         near[name] = (int(m.group(1)), code)
 if os.environ.get("NEAR_OUT"):
     Path(os.environ["NEAR_OUT"]).write_text(json.dumps({n: {"diff": d, "code": c} for n, (d, c) in near.items()}))
-Path(sys.argv[2]).write_text("".join(f"//@@ {n}\n{c.rstrip()}\n" for n, c in matched.items()))
+Path(sys.argv[2]).write_text("".join(f"//@@ {n} {label.get((n, c), '')}\n{c.rstrip()}\n" for n, c in matched.items()))
 tally = collections.Counter("MATCH" if "MATCH" in rs else re.sub(r"\d+", "N", rs[-1]) for rs in results.values())
 print(f"checked {len(results)} functions in {time.time() - t0:.0f}s: {dict(tally)}")
 deltas = {}

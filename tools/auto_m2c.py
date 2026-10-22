@@ -21,9 +21,29 @@ from gcc2_mangle import params as mangled_params
 asm, out = Path(sys.argv[1]), Path(sys.argv[2])
 max_size = int(sys.argv[3]) if len(sys.argv) > 3 else 1 << 30
 TMP = Path.home() / "tmb_decomp/logs/m2c_tmp"; TMP.mkdir(parents=True, exist_ok=True)
-text = asm.read_text(errors="replace").split(".section .rodata")[0]
+R0 = Path.home() / "tmb_decomp"
+if asm.is_dir():
+    # converted segment: asm/nonmatchings/tmb/X/NAME.s, only functions still INCLUDE_ASM in src/tmb/X.c
+    seg = asm.name
+    src = R0 / f"src/tmb/{seg}.c"
+    left = set(re.findall(r'^INCLUDE_ASM\("[^"]*", (\S+)\);', src.read_text(), re.M)) if src.exists() else None
+    text = "".join(p.read_text(errors="replace") for p in sorted(asm.glob("*.s")) if left is None or p.stem in left)
+else:
+    seg = asm.stem
+    text = asm.read_text(errors="replace").split(".section .rodata")[0]
 parts = re.split(r"^(?:\.align \d+\n)?nonmatching (\S+), (0x[0-9A-Fa-f]+)\n", text, flags=re.M)
-funcs = [(parts[i], int(parts[i + 1], 16), parts[i + 2]) for i in range(1, len(parts), 3)]
+funcs = [(parts[i], int(parts[i + 1], 16), parts[i + 2].split(".section .rodata")[0])
+         for i in range(1, len(parts), 3)]
+# the segment's rodata/lit4 (jump tables, float constants, strings) for the 'R' variants
+RODATA = []
+for kind in ("rodata", "lit4"):
+    p = R0 / f"asm/data/tmb/{seg}.{kind}.s"
+    # opt-in: on ui+sound it fixed every m2c failure but gave no new matches and doubled the time
+    if p.exists() and os.environ.get("WITH_RODATA") == "1":
+        q = TMP / f"_{seg}.{kind}.s"
+        q.write_text("".join(l for l in p.read_text(errors="replace").splitlines(True)
+                             if not l.startswith(("nonmatching", ".include"))))
+        RODATA.append(str(q))
 _c = os.environ.get("M2C_CONTEXT", str(Path.home() / "tmb_decomp/logs/ctx/retail_protos.h"))
 ctx = ["--context", _c] if _c and Path(_c).exists() else []   # M2C_CONTEXT= (empty) to skip
 
@@ -116,22 +136,30 @@ blocks, stats = [], {"ok": 0, "error": 0, "too_big": 0, "failed": 0}
 for name, size, body_s in funcs:
     if size > max_size: stats["too_big"] += 1; continue
     tmp = TMP / f"{name[:120]}.s"
-    tmp.write_text('.set noat\n.set noreorder\n.section .text, "ax"\n' + body_s)
+    tmp.write_text('.set noat\n.set noreorder\n.section .text, "ax"\n' +
+                   "".join(l for l in body_s.splitlines(True) if not l.startswith(".include")))
     seen, err = [], ""
-    def m2c(c):
+    def m2c(c, ro=()):
         return subprocess.run([sys.executable, "-m", "m2c.main", "-t", os.environ.get("M2C_TARGET", "mipsee-gcc-c"),
-                               "--valid-syntax", "--pointer-style", "left", *c, str(tmp), "-f", name],
+                               "--valid-syntax", "--pointer-style", "left", *c, str(tmp), *ro, "-f", name],
                               capture_output=True, text=True)
     rn = m2c([])
     # ctx: m2c reads the decoded prototypes (args it can't see set, float args) + our proto decls;
-    # proto: no context, but prototypes added to the draft; plain: m2c's own declarations
-    for v, r in (("ctx", m2c(ctx) if ctx else None), ("proto", rn), ("plain", rn)):
+    # proto: no context, but prototypes added to the draft; plain: m2c's own declarations;
+    # ...R: same with the segment's rodata given to m2c (switches, literals). Last, because their
+    # literals/jump tables are emitted by our object: fine standalone, but the build only accepts
+    # them once the segment's rodata is owned by C.
+    runs = [("ctx", m2c(ctx) if ctx else None), ("proto", rn), ("plain", rn)]
+    if RODATA:
+        rr = m2c([], RODATA)
+        runs += [("ctxR", m2c(ctx, RODATA) if ctx else None), ("protoR", rr), ("plainR", rr)]
+    for v, r in runs:
         if r is None: continue
         if r.returncode or not r.stdout.strip() or "M2C_ERROR" in r.stdout:
             err = "error" if "M2C_ERROR" in r.stdout else "failed"
             if os.environ.get("SHOW_ERR"): print(name, v, r.stderr[-800:])
             continue
-        b = build(name, r.stdout, body_s, f"{size:X}_{len(blocks)}", v != "plain")
+        b = build(name, r.stdout, body_s, f"{size:X}_{len(blocks)}", not v.startswith("plain"))
         for vv, bb in ((v, b), (v + "P", scale_ptrs(b))):
             if bb in seen: continue
             seen.append(bb)

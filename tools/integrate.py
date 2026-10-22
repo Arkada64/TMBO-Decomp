@@ -12,8 +12,12 @@ SHA1 = re.search(r"^sha1: (\w+)", (R / "config/US/SCUS_971.01.yaml").read_text()
 seg = sys.argv[1]
 src = R / f"src/tmb/{seg}.c"
 mf = Path(sys.argv[2]) if len(sys.argv) > 2 else R / f"logs/drafts/{seg}.match.c"
-blocks = re.split(r"^//@@ (\S+)[^\n]*\n", mf.read_text(), flags=re.M)[1:]
-matches = {n: c.replace('#include "m2c_macros.h"\n', "").strip() for n, c in zip(blocks[0::2], blocks[1::2])}
+import os
+parts = re.split(r"^//@@ (\S+)([^\n]*)\n", mf.read_text(), flags=re.M)[1:]
+# variants ending in R were drafted with the segment's rodata: they emit their own literals/jump
+# tables, which the build can't place while the segment's rodata is still asm (ALLOW_R=1 to try)
+matches = {n: c.replace('#include "m2c_macros.h"\n', "").strip() for n, lab, c in zip(parts[0::3], parts[1::3], parts[2::3])
+           if os.environ.get("ALLOW_R") == "1" or not lab.strip().rstrip("P").endswith("R")}
 base = src.read_text()
 present = set(re.findall(r'^INCLUDE_ASM\("[^"]*", (\S+)\);', base, re.M))
 cands = [n for n in matches if n in present]
