@@ -55,6 +55,9 @@ typedef struct {
 static const struct { int level; const char* blob0; u32 addr; u32 classes[6]; } PACKS[] = {
     { 2, "\\PCAR\\ZFP0.BIN;1", 0x1E7F280, { 2, 0, 3, 4096, 8, 2048 } }, /* FREEWAY */
     { 3, "\\PCAR\\ZRP0.BIN;1", 0x15FB980, { 2, 0, 4, 4096, 7, 2048 } }, /* PRISON */
+    /* retail PRISON's inmates (ped types 9-11) on the two Prison Passage maps (they only have type 2) */
+    { 15, "\\PCAR\\ZSP0.BIN;1", 0x1B93480, { 2, 0, 3, 4096, 5, 2048 } }, /* SHIP */
+    { 16, "\\PCAR\\ZAP0.BIN;1", 0x1B93480, { 2, 0, 3, 4096, 5, 2048 } }, /* ASYLUM */
 };
 static float zeroVec[4];
 static int pack = -1;       /* PACKS index of the level being loaded */
