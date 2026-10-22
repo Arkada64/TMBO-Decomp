@@ -43,6 +43,7 @@ extern unsigned char D_004FB748; /* PedPimp: number of peds in the pool */
 #define PACK_SLOT 9
 #define MAGIC 0x50424D54
 #define LEVEL_TEX 0x1C05670
+#define RTX_SCRATCH (LEVEL_TEX + 0x200000)  /* level RTX files are < 1 MB, the slot is 0x288D80 */
 typedef struct { char name[16]; u32 addr, size; } Blob;
 typedef struct {
     u32 magic, version, nblobs, hdr, pairs, npairs, tex, rtx, clutBlocks, ntex;
@@ -61,9 +62,9 @@ int tmbr_levelSerial;       /* bumped on every level load (traffic.c sets up on 
 int tmbr_levelIndex = -1;   /* shell level index of the level being loaded */
 static u32 clutStart;       /* GS block of the pack's first CLUT */
 
-static Manifest* readBlob0(int p)
+static Manifest* readBlob0(int p, u32 at)
 {
-    Manifest* m = (Manifest*)PACKS[p].addr;
+    Manifest* m = (Manifest*)at;
     int got = fileRead(PACKS[p].blob0, m);
     if (got <= 0 || m->magic != MAGIC || m->version != 2 || m->nblobs > 4 || m->blob[0].addr != PACKS[p].addr) {
         scePrintf("TMBR pack %s: not on disc or bad (%d)\n", PACKS[p].blob0, got);
@@ -74,7 +75,7 @@ static Manifest* readBlob0(int p)
 
 static Manifest* readPack(int p)
 {
-    Manifest* m = readBlob0(p);
+    Manifest* m = readBlob0(p, PACKS[p].addr);
     u32 i;
     int got;
     if (!m) return 0;
@@ -110,7 +111,9 @@ void tmbr_LevelRtxInit(int vram, char* rtx, int slot, char* shell)
     if (D_004FAE38 && slot == 0)
         for (i = 0; i < (int)(sizeof(PACKS) / sizeof(PACKS[0])); i++)
             if (PACKS[i].level == level) pack = i;
-    if (pack >= 0 && (m = readBlob0(pack)) != 0) {
+    /* blob 0 goes to a scratch spot in the level TEX/RTX slot (free until the TEX is inflated over it), not to
+     * its home: FREEWAY's is the TEX slot tail, which still holds loading-screen data at this point */
+    if (pack >= 0 && (m = readBlob0(pack, RTX_SCRATCH)) != 0) {
         /* where the game will put the next CLUT: after the record with the highest address (as func_0023EC80
          * computes D_006F268C), then the terminator (size 0), which our records replace */
         r = rtx + *(u32*)(rtx + 4) * 16;
@@ -124,7 +127,7 @@ void tmbr_LevelRtxInit(int vram, char* rtx, int slot, char* shell)
             }
             r += RSIZE(r);
         }
-        for (q = (char*)m->rtx; RSIZE(q); q += RSIZE(q)) {
+        for (q = (char*)m + (m->rtx - PACKS[pack].addr); RSIZE(q); q += RSIZE(q)) {
             for (i = 0; i < (int)RSIZE(q); i++) r[i] = q[i];
             RADDR(r) += end;
             r += RSIZE(r);
