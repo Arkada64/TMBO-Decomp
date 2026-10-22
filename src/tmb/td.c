@@ -1,8 +1,17 @@
 #include "common.h"
+#include "m2c_macros.h"
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/td", tdInit__Fv);
+extern u8 tdEpNode_8_0[4] __asm__("tdEpNode");
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/td", tdSetEpNode__FP9_hierhead);
+void tdInit__Fv(void) {
+    (*(s32*)tdEpNode_8_0) = 0;
+}
+
+extern u8 tdEpNode_8_3[4] __asm__("tdEpNode");
+
+void tdSetEpNode__FP9_hierhead(void* arg0) {
+    (*(void**)tdEpNode_8_3) = arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/td", tdTest__FP8_fvectorP9_tdResult);
 
