@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/collis", collisInitFirstFrame__7Vehicle);
 
@@ -48,7 +49,17 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/collis", collisAxleSmash_
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/collis", collisGetOutOfCollisionVolume__7VehicleP8_fvectorf);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/collis", collisReverseHeadingMatrix__7VehiclePA3_fT1);
+void collisReverseHeadingMatrix__7VehiclePA3_fT1(s32 arg0, void* arg1, void* arg2) {
+    M2C_FIELD(arg1, f32* , 0) = (f32) -M2C_FIELD(arg2, f32* , 0);
+    M2C_FIELD(arg1, f32* , 4) = (f32) -M2C_FIELD(arg2, f32* , 4);
+    M2C_FIELD(arg1, f32* , 8) = (f32) -M2C_FIELD(arg2, f32* , 8);
+    M2C_FIELD(arg1, f32* , 0x10) = (f32) -M2C_FIELD(arg2, f32* , 0x10);
+    M2C_FIELD(arg1, f32* , 0x14) = (f32) -M2C_FIELD(arg2, f32* , 0x14);
+    M2C_FIELD(arg1, f32* , 0x18) = (f32) -M2C_FIELD(arg2, f32* , 0x18);
+    M2C_FIELD(arg1, f32* , 0x20) = (f32) M2C_FIELD(arg2, f32* , 0x20);
+    M2C_FIELD(arg1, f32* , 0x24) = (f32) M2C_FIELD(arg2, f32* , 0x24);
+    M2C_FIELD(arg1, f32* , 0x28) = (f32) M2C_FIELD(arg2, f32* , 0x28);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/collis", collisResolveCsToCsCollisions__7Vehicle);
 
