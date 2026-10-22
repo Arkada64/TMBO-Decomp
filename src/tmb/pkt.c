@@ -1,8 +1,32 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/pkt", pktInitVu1Dma__FP9Vu1DmaPktP6QwDataT1);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/pkt", pktClipUVScroll__FPfT0);
+void pktClipUVScroll__FPfT0(f32* arg0, f32* arg1) {
+    f32 temp_f1;
+    f32 temp_f1_2;
+    f32 var_f0;
+
+    temp_f1 = *arg0;
+    if (temp_f1 >= 0.5f) {
+        var_f0 = temp_f1 - 1.0f;
+        goto block_4;
+    }
+    if (temp_f1 <= -0.5f) {
+        var_f0 = temp_f1 + 1.0f;
+block_4:
+        *arg0 = var_f0;
+    }
+    temp_f1_2 = *arg1;
+    if (temp_f1_2 > 0.5f) {
+        *arg1 = temp_f1_2 - 1.0f;
+        return;
+    }
+    if (temp_f1_2 < -0.5f) {
+        *arg1 = temp_f1_2 + 1.0f;
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/pkt", pktAddVu1Obj__FP9Vu1DmaPktP6QwDataP11_hierobjecti);
 
