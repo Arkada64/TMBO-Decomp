@@ -642,7 +642,13 @@ s32 terminateFanSound__15RooftopFanSound(void* arg0) {
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateFanSound__15RooftopFanSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initCarRevealSound__14CarRevealSoundfff);
+void initCarRevealSound__14CarRevealSoundfff(void *arg0, f32 fparg0, f32 fparg1, f32 fparg2)
+{
+  *((f32 *) (((u8 *) arg0) + 0x10)) = fparg0;
+  *((f32 *) (((u8 *) arg0) + 0x14)) = fparg1;
+  *((f32 *) (((u8 *) arg0) + 0x18)) = fparg2;
+  *((s32 *) (((u8 *) arg0) + 0)) = (*((s32 *) (((u8 *) arg0) + 4)) = 0);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateCarRevealSound__14CarRevealSound);
 
