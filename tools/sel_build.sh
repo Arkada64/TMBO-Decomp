@@ -4,7 +4,7 @@
 cd '/mnt/c/Users/Ark/Desktop/TMB Decomp'
 N=$1; S=$2; shift 2; [ "$S" = - ] && S=""     # "-" = skip nothing
 env TMBR_TEST=1 TMBR_SKIP="$S" "$@" bash mods_copy_build.sh > copybuild_$N.log 2>&1
-echo "$N: done=$(grep -c COPYDONE copybuild_$N.log) $(grep -E 'hooks left out|text pad|rror|FAILED' copybuild_$N.log | head -3 | tr '\n' ' ')"
+echo "$N: done=$(grep -c COPYDONE copybuild_$N.log) $(grep -E 'hooks left out|text pad|^stack|no peds|no postlink|rror|FAILED|Pedestrians' copybuild_$N.log | head -5 | tr '\n' ' ')"
 if [ "$N" = normal ]; then cp test/TRAFFIC_TEST.ELF test/FREECAM_TEST.ELF; exit; fi
 cp test/TRAFFIC_TEST.ELF test/SEL_$N.ELF
 sed "s/TRAFFIC_TEST.ELF/SEL_$N.ELF/" "test/Run TRAFFIC_TEST.bat" > "test/Run SEL_$N.bat"

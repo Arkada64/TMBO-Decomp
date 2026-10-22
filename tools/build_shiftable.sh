@@ -27,6 +27,10 @@ if [ -n "$TMBR_TEXT_PAD" ]; then   # test: grow .text by N bytes at its end (mov
   touch $LD; echo "text pad $TMBR_TEXT_PAD"
 fi
 if [ "$MODS" = 1 ]; then
+  # bisect knobs (the private build copy is re-synced every time, so editing its mods/ is fine)
+  [ -n "$TMBR_STACK" ] && sed -i "s/^.set TMBR_STACK_SIZE, .*/.set TMBR_STACK_SIZE, $TMBR_STACK/" mods/memory.s && echo "stack $TMBR_STACK"
+  [ "$TMBR_NO_PEDS" = 1 ] && sed -i '/^Pedestrians Online/d' mods/tmbr_sections.txt && echo "no peds"
+  [ "$TMBR_NO_POSTLINK" = 1 ] && : > mods/postlink.txt && echo "no postlink"
   python3 tools/mods/apply_mods.py apply
   mkdir -p build/mods; TXT=""; BSS=""
   printf '.section .text, "ax"\n.align 3\n.globl tmbr_version\ntmbr_version:\n    .asciz "%s"\n.align 3\n' "$VERSION" > build/mods/version.s
@@ -48,7 +52,9 @@ if [ "$MODS" = 1 ]; then
   # addresses. (Putting them after .text moved all data, and something in the shiftable build still points
   # at old data addresses: the map selector crashed even with no mods, just from data moving.)
   # main_VRAM_END (= start of the heap, crt0) comes after them.
-  sed -i "s#^    __romPos += SIZEOF(.main);#    .tmbr_mods : AT(ADDR(.tmbr_mods))\n    {\n        . = ALIGN(., 128);\n        tmbr_MODS_START = .;\n$TXT$BSS        . = ALIGN(., 128);\n        tmbr_MODS_END = .;\n    }\n&#" $LD
+  # Gap of >= 0x40 bytes first: crt0's .bss clear writes 16-byte blocks and overshoots the .bss end by up to
+  # 16 bytes (it zeroed the first instructions of tmbr_InitPOV -> crash when a match started).
+  sed -i "s#^    __romPos += SIZEOF(.main);#    .tmbr_mods ALIGN(. + 0x40, 0x80) : AT(ADDR(.tmbr_mods))\n    {\n        tmbr_MODS_START = .;\n$TXT$BSS        . = ALIGN(0x80);\n        tmbr_MODS_END = .;\n    }\n&#" $LD
   grep -q tmbr_MODS_START $LD || { echo "mods section not inserted"; exit 1; }
   # After every game .text object, pad so the next object keeps its original address mod 128. Any growth
   # from mod patches (asm or C) is then rounded up to 128 bytes: some code is followed by data read with

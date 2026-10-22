@@ -157,6 +157,11 @@ ASM_TEXT = [
     # abort -> exit to the PS2 menu). TMBR_STACK_SIZE (mods/memory.s) is smaller than the original 0x40000.
     (CRT0, "%hi(D_40000)", "%hi(TMBR_STACK_SIZE)", 1),
     (CRT0, "%lo(D_40000)", "%lo(TMBR_STACK_SIZE)", 1),
+    # crt0 zeroes .bss from D_004FB400 up to D_725694 (= main_VRAM_END, the end of everything) - that would
+    # wipe the mods, which now sit after .bss. Clear only up to the game's own .bss end; the heap still
+    # starts at main_VRAM_END (the second D_725694 pair, $a0).
+    (CRT0, "$v1, %hi(D_725694)", "$v1, %hi(main_BSS_END)", 1),
+    (CRT0, "$v1, $v1, %lo(D_725694)", "$v1, $v1, %lo(main_BSS_END)", 1),
 ]
 DBG = os.environ.get("TMBR_DEBUG_LOADER") == "1"
 # Traffic/peds level-loader hooks: OFF by default. They add 0x80 bytes inside the loader (moves all code and
