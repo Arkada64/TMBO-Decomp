@@ -153,4 +153,15 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputUsingTypeAWh
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputGetLogitechCombo__Fi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputClearLogitechCombo__Fi);
+extern u8 lgCombo_18_162[] __asm__("lgCombo");
+
+s32 inputClearLogitechCombo__Fi(s32 arg0)
+{
+  u8 *new_var2;
+  s32 *new_var;
+  new_var2 = (u8 *) lgCombo_18_162;
+  ;
+  new_var = ((*(&arg0)) * 4) + new_var2;
+  *new_var = 0;
+  return (s32) new_var2;
+}
