@@ -51,7 +51,20 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", update_
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", notifyOfOncoming__15HighwayDirectorP7Vehicle);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", disable__15HighwayDirectorP7Vehicle);
+void disable__13HighwayDriver_54_51(void *) __asm__("disable__13HighwayDriver");
+void vehicleDisable__7Vehicle_54_51(void *) __asm__("vehicleDisable__7Vehicle");
+
+volatile unsigned int disable__15HighwayDirectorP7Vehicle(void *arg0, void *arg1)
+{
+  u8 *new_var;
+  s32 temp_v0;
+  vehicleDisable__7Vehicle_54_51(arg1);
+  disable__13HighwayDriver_54_51(*((s32 *) (((u8 *) arg1) + 0x200C)));
+  temp_v0 = *((s32 *) (((u8 *) arg0) + 0x1B8));
+  *((s32 *) (((u8 *) arg0) + 0x1B8)) = (s32) (temp_v0 + 1);
+  new_var = (u8 *) (arg0 + (temp_v0 * 4));
+  *((void **) (new_var + 0x28)) = arg1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", clearSegment__15HighwayDirectori);
 
