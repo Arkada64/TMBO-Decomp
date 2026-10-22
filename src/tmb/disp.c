@@ -17,7 +17,13 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/disp", setTRXPOS__FPUiUiU
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/disp", setTRXREG__FPUiUiUi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/disp", setTRXDIR__FPUiUi);
+int setGIFad__FPUiUiUl_24_22(void *, unsigned int, volatile unsigned long) __asm__("setGIFad__FPUiUiUl");
+s32 setTRXDIR__FPUiUi(void *arg0, u32 arg1)
+{
+  u64 new_var;
+  new_var = (u64) (((s64) arg1) << 0x20);
+  return setGIFad__FPUiUiUl_24_22(arg0, 0x53U, (u32) (new_var >> 0x20));
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/disp", setPMODE__F12PMODESetting);
 
