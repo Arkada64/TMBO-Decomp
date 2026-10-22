@@ -7,7 +7,12 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/plight", plightInit__Fv);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/plight", plightCreate__Fv);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/plight", plightDestroy__FP11_pointlight);
+void plightDestroy__FP11_pointlight(void *arg0)
+{
+ do { } while (0);
+  *((s32 *) (arg0 + 0x34)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x30)) = 0;
+}
 
 extern u8 doParaLights_C_20[4] __asm__("doParaLights");
 
