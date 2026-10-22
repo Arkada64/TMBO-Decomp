@@ -22,10 +22,10 @@ typedef struct { float x, y, z, w; } __attribute__((aligned(16))) fvec;
 #define CS(v) ((char*)F(v, 0x2028))
 #define POSV(v) ((fvec*)(CS(v) + 0x10))
 #define PAD(v) ((unsigned char*)(v) + 0x594)
-#define NAV_RAYS 20      /* collision rays per frame for planning (all bots together) */
+#define NAV_RAYS 12      /* collision rays per frame for planning (all bots together) */
 #define NAV_EXP 700      /* A* expansions per plan */
 #define NAV_ALWAYS 0
-#define NAVDBG 1         /* one log line per plan (emulog) */
+#define NAVDBG 0         /* one log line per plan (emulog) */
 #define G 40
 #define NC (G * G)
 #define MAXWP 40

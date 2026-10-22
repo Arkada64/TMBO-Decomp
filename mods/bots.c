@@ -12,7 +12,7 @@
 typedef unsigned int u32;
 #define F(p, off) (*(int*)((char*)(p) + (off)))
 #define MAXBOTS 6
-#define TMBR_BOTDBG 1
+#define TMBR_BOTDBG 0
 #ifndef TMBR_NAV
 #define TMBR_NAV 1
 #endif
@@ -190,7 +190,8 @@ static int thinkTick;
 #define ROLE(v) (role[((int)((char*)(v) - D_004FA030) / 0x31B0) & 7])
 static int hunted[8], crowd[8];
 static signed char role[8];          /* by vehicle index */
-static short roleT[8], rushT[8];     /* think ticks (0.5 s) until the next role roll; sniper rushed ticks */
+static short roleT[8], rushT[8];
+static short fightT[8], leaveT[8];  /* think ticks (0.5 s) in a fight / left of a breakaway */
 
 /* Roles change during the match: every 15..40 s a bot rolls a new one (brawler 45 %, sniper 30 %, roamer
  * 25 %, re-rolled once if every other bot already has it), and a sniper that keeps getting caught up close
@@ -258,6 +259,25 @@ void tmbr_BotsThink(void)
             } else rushT[k2] = 0;
         }
         rl = ROLE(b);
+        {
+            /* Breakaway: like players leaving a brawl, a bot that has been fighting for a while, or is in a
+             * pile-up (3+ other cars within 400), may drive off for 8-15 s (game cruise mode, ignores targets)
+             * and come back fresh. Checked every 0.5 s: after 20 s of fighting 10 %, in a pile-up 6 %. */
+            int k2 = (int)(b - g) / 0x31B0 & 7, pile = crowd[k2] >= 3;
+            if (leaveT[k2] > 0) {
+                leaveT[k2]--;
+                if (F(drv, 4) != 4) { driverSetMode(drv, 4); pickCruiseZone(g, b, 0); }
+                continue;
+            }
+            if (cur && (int)manhat(POS(b), POS(cur)) < 600) fightT[k2]++; else fightT[k2] = 0;
+            if ((fightT[k2] > 40 && mathfRandI(0, 99) < 10) || (pile && fightT[k2] > 10 && mathfRandI(0, 99) < 6)) {
+                leaveT[k2] = 16 + mathfRandI(0, 14);
+                fightT[k2] = 0;
+                driverSetMode(drv, 4); pickCruiseZone(g, b, 0);
+                if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d breaks away (%s)\n", k2, pile ? "pile-up" : "long fight");
+                continue;
+            }
+        }
         if (cur) ci = (int)(cur - g) / 0x31B0;
         for (k = 0; k < 8; k++) {
             char* v = g + k * 0x31B0;
@@ -440,7 +460,7 @@ int tmbr_AiUpdate(char* v)
          * fleeHealth; online there is no health pickup to flee to, and our think tick forced hunt back every
          * 0.5 s: stop-and-go. fleeHealth (brain+0x48) = 0.0 */
         F(F(v, 0x2014), 0x48) = 0;
-        if (drv && t && F(drv, 4) >= 2 && F(drv, 4) <= 4 && !(F(drv, 4) == 4 && ROLE(v) == R_CRUISER)) { driverSetMode(drv, 5); driverSetTarget(drv, t); }
+        if (drv && t && F(drv, 4) >= 2 && F(drv, 4) <= 4 && !(F(drv, 4) == 4 && (ROLE(v) == R_CRUISER || leaveT[(int)(v - g) / 0x31B0 & 7] > 0))) { driverSetMode(drv, 5); driverSetTarget(drv, t); }
     }
     if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) return aiFrame(v);
     swap = F(t, 0x590) == 2;
