@@ -84,7 +84,14 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", getMaxResAddr__Fi)
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", setMaxTexId__FiUs);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", setMaxTexAddr__FiUs);
+extern u8 fileStatus_18_55[] __asm__("fileStatus");
+
+void setMaxTexAddr__FiUs(s32 arg0, s16 arg1)
+{
+  u8 *new_var;
+  new_var = (u8 *) (((u8 *) fileStatus_18_55) - (-(arg0 * 2)));
+  *((s16 *) (new_var + 0x14C)) = arg1;
+}
 
 extern u8 fileStatus_18_58[] __asm__("fileStatus");
 
