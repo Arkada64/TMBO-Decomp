@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", fileReadf__FPcPv);
 
@@ -6,13 +7,60 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", fileReads__FPcPvUi
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", fileWritef__FPcPvi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", fileInitializeCd__Fv);
+void fileMakeDirTree__Fv_A4_9(void) __asm__("fileMakeDirTree__Fv");
+s32 sceCdDiskReady_A4_9() __asm__("sceCdDiskReady");
+M2C_UNK sceCdInit_A4_9() __asm__("sceCdInit");
+M2C_UNK sceCdMmode_A4_9() __asm__("sceCdMmode");
+M2C_UNK sceFsReset_A4_9() __asm__("sceFsReset");
+M2C_UNK sceSifInitRpc_A4_9() __asm__("sceSifInitRpc");
+s32 sceSifRebootIop_A4_9() __asm__("sceSifRebootIop");
+s32 sceSifSyncIop_A4_9() __asm__("sceSifSyncIop");
+extern u8 D_004F2150_A4_9[] __asm__("D_004F2150");
+extern u8 cdHasBeenInitialized_A4_9[4] __asm__("cdHasBeenInitialized");
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", getTexFilesLoaded__Fv);
+s32 fileInitializeCd__Fv(void) {
+    s32 temp_v0;
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", getNgpFilesLoaded__Fv);
+    sceSifInitRpc_A4_9(0);
+    sceCdInit_A4_9(0);
+    do {
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", getResFilesLoaded__Fv);
+    } while (sceSifRebootIop_A4_9(((u8*)D_004F2150_A4_9)) == 0);
+    do {
+
+    } while (sceSifSyncIop_A4_9() == 0);
+    sceSifInitRpc_A4_9(0);
+    sceCdInit_A4_9(0);
+    sceCdMmode_A4_9(2);
+    sceFsReset_A4_9();
+    do {
+
+    } while (sceCdDiskReady_A4_9(0) != 2);
+    fileMakeDirTree__Fv_A4_9();
+    (*(s32*)cdHasBeenInitialized_A4_9) = 1;
+    do {
+        temp_v0 = sceCdDiskReady_A4_9(0);
+    } while (temp_v0 != 2);
+    return temp_v0;
+}
+
+extern u8 fileStatus_C_12[] __asm__("fileStatus");
+
+s32 getTexFilesLoaded__Fv(void) {
+    return (s32) M2C_FIELD(((u8*)fileStatus_C_12), s8* , 0x38);
+}
+
+extern u8 fileStatus_C_15[] __asm__("fileStatus");
+
+s32 getNgpFilesLoaded__Fv(void) {
+    return (s32) M2C_FIELD(((u8*)fileStatus_C_15), s8* , 0x74);
+}
+
+extern u8 fileStatus_C_18[] __asm__("fileStatus");
+
+s32 getResFilesLoaded__Fv(void) {
+    return (s32) M2C_FIELD(((u8*)fileStatus_C_18), s8* , 0xB0);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/file", getNextNgpLoadAddr__Fv);
 
