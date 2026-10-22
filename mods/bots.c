@@ -179,7 +179,7 @@ extern float manhat(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
 static int thinkTick;
 static int dbgCalls[8], dbgHb[8], dbgWhy[8];   /* TMBR_BOTDBG: AI frames seen by the hook, handbrake frames */
 static int dbgBits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
-#define SPECIAL_CHANCE 35 /* % of the time a bot may pick its special when it chooses a weapon (FFA) */
+#define SPECIAL_CHANCE 50 /* % of the time a bot may pick its special when it chooses a weapon (FFA) */
 
 #define POS(v) ((void*)(F(v, 0x2028) + 0x10))
 static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v, 0x2028); }
@@ -250,6 +250,10 @@ extern int aiFrame(char* v) __asm__("func_00101F88");
 #define HB_HOLD 24
 #define HB_REST 20
 #define STALL 240
+#define CS_PIVOT 0x3F800000  /* 1.0 rad, ~57 deg */
+#define ORBIT 75
+#define REVERSE 40
+static short orbitT[8], revT[8];
 static signed char hbTimer[8];
 static int fbits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 extern void aiSetAttackState(char* v, int st) __asm__("aiSetAttackState__7Vehicle12_attackState");
@@ -273,8 +277,25 @@ static void aggressiveTurn(char* g, char* v, char* t)
     pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* in a fight: stay on the gas */
     if (a < CS_AIM) { dbgWhy[idx] = 6; return; }               /* nearly lined up: the AI aims */
     dbgWhy[idx] = 7;
+    if (revT[idx] > 0) {                                        /* reverse out of an orbit */
+        revT[idx]--;
+        pad[4] = 0; pad[8] = 0; pad[6] = 1; pad[2] = 0;
+        if (b > 0) { pad[9] = 1; pad[0xA] = 0; } else { pad[0xA] = 1; pad[9] = 0; }  /* reversing: steer the other way */
+        dbgWhy[idx] = 9;
+        return;
+    }
     if (b > 0) { pad[0xA] = 1; pad[9] = 0; } else { pad[9] = 1; pad[0xA] = 0; }  /* bearing > 0 = right */
     pad[2] = 0;
+    if (a >= CS_PIVOT) {
+        /* Way off the nose: at speed the turning circle is about as wide as the gap, so a bot steering at
+         * full lock just orbits its target. Lift, brake and handbrake to pivot; if it is still orbiting
+         * after ORBIT frames, back out with the wheel the other way (a 3-point turn). */
+        pad[4] = 0; pad[8] = 1; pad[2] = 1; dbgHb[idx]++;
+        dbgWhy[idx] = 8;
+        if (++orbitT[idx] > ORBIT) { orbitT[idx] = 0; revT[idx] = REVERSE; }
+        return;
+    }
+    orbitT[idx] = 0;
     if (a >= CS_HB && hbTimer[idx] >= 0) {
         if (++hbTimer[idx] > HB_HOLD) hbTimer[idx] = -HB_REST;
         else { pad[2] = 1; dbgHb[idx]++; }                      /* handbrake */
