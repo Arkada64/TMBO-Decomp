@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmInit__F10_vramAddrs);
 
@@ -14,7 +15,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmGetTextureDMAT
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmGetTextureAddrs__FiP6QwDataP9Vu1DmaPkt);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmPrepTexInfoZero__FP11tGS_DISPFB2);
+extern u8 displayBuffer_14_25[4] __asm__("displayBuffer");
+
+void texmPrepTexInfoZero__FP11tGS_DISPFB2(s32* arg0) {
+    (*(s32*)displayBuffer_14_25) = (*arg0 & 0x1FF) << 5;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmParticleTexture__FiP6QwDataT1);
 
@@ -48,7 +53,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmResRelocate__F
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmCacheForAsm__FP6QwData);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", texmRestoreCache__FP6QwData);
+extern u8 texLastUsedCnt_C_81[4] __asm__("texLastUsedCnt");
+
+void texmRestoreCache__FP6QwData(void* arg0) {
+    (*(s32*)texLastUsedCnt_C_81) = M2C_FIELD(arg0, s32* , 0x44);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", func_001FA830);
 
@@ -60,7 +69,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", _S_chunk_alloc__t2
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", _S_refill__t24__default_alloc_template2b0i0Ui);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", destroy_node__t8_Rb_tree5ZUiZt4pair2ZCUiZUsZt10_Select1st1Zt4pair2ZCUiZUsZt4less1ZUiZt9allocator1ZUsPt13_Rb_tree_node1Zt4pair2ZCUiZUs);
+M2C_UNK _M_put_node__t19_Rb_tree_alloc_base3Zt4pair2ZCUiZUsZt9allocator1ZUsb1Pt13_Rb_tree_node1Zt4pair2ZCUiZUs_8_94() __asm__("_M_put_node__t19_Rb_tree_alloc_base3Zt4pair2ZCUiZUsZt9allocator1ZUsb1Pt13_Rb_tree_node1Zt4pair2ZCUiZUs");
+
+void destroy_node__t8_Rb_tree5ZUiZt4pair2ZCUiZUsZt10_Select1st1Zt4pair2ZCUiZUsZt4less1ZUiZt9allocator1ZUsPt13_Rb_tree_node1Zt4pair2ZCUiZUs(void) {
+    _M_put_node__t19_Rb_tree_alloc_base3Zt4pair2ZCUiZUsZt9allocator1ZUsb1Pt13_Rb_tree_node1Zt4pair2ZCUiZUs_8_94();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", _M_erase__t8_Rb_tree5ZUiZt4pair2ZCUiZUsZt10_Select1st1Zt4pair2ZCUiZUsZt4less1ZUiZt9allocator1ZUsPt13_Rb_tree_node1Zt4pair2ZCUiZUs);
 
@@ -68,7 +81,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", deallocate__t12sim
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", _M_put_node__t19_Rb_tree_alloc_base3Zt4pair2ZCUsZUsZt9allocator1ZUsb1Pt13_Rb_tree_node1Zt4pair2ZCUsZUs);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", destroy_node__t8_Rb_tree5ZUsZt4pair2ZCUsZUsZt10_Select1st1Zt4pair2ZCUsZUsZt4less1ZUsZt9allocator1ZUsPt13_Rb_tree_node1Zt4pair2ZCUsZUs);
+M2C_UNK _M_put_node__t19_Rb_tree_alloc_base3Zt4pair2ZCUsZUsZt9allocator1ZUsb1Pt13_Rb_tree_node1Zt4pair2ZCUsZUs_8_106() __asm__("_M_put_node__t19_Rb_tree_alloc_base3Zt4pair2ZCUsZUsZt9allocator1ZUsb1Pt13_Rb_tree_node1Zt4pair2ZCUsZUs");
+
+void destroy_node__t8_Rb_tree5ZUsZt4pair2ZCUsZUsZt10_Select1st1Zt4pair2ZCUsZUsZt4less1ZUsZt9allocator1ZUsPt13_Rb_tree_node1Zt4pair2ZCUsZUs(void) {
+    _M_put_node__t19_Rb_tree_alloc_base3Zt4pair2ZCUsZUsZt9allocator1ZUsb1Pt13_Rb_tree_node1Zt4pair2ZCUsZUs_8_106();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", _M_erase__t8_Rb_tree5ZUsZt4pair2ZCUsZUsZt10_Select1st1Zt4pair2ZCUsZUsZt4less1ZUsZt9allocator1ZUsPt13_Rb_tree_node1Zt4pair2ZCUsZUs);
 
@@ -100,7 +117,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", deallocate__t12sim
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", deallocate__t24__default_alloc_template2b0i0PvUi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", deallocate__t23__malloc_alloc_template1i0PvUi);
+M2C_UNK free_8_154() __asm__("free");
+
+void deallocate__t23__malloc_alloc_template1i0PvUi(void) {
+    free_8_154();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/texm", _$_t3map4ZUiZUsZt4less1ZUiZt9allocator1ZUs);
 
