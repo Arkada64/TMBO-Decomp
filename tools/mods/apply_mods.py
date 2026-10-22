@@ -130,6 +130,8 @@ PATCHES = [
         "j          tmbr_shield_e",
     ),
     (A("tmb/collis.s"), "00122D88", "lw", "j          tmbr_shield_h"),
+    # retail content packs (mods/packs.c): after LoadLevelDB's level db init, load this level's pack
+    (A("tmb/shell.s"), "0018890C", "jal", "jal        tmbr_LevelDbLoaded"),
 ]
 # (file, address, label) - global label placed right before that instruction (return points)
 LABELS = [
@@ -176,6 +178,7 @@ GROUPS = {
     "freecam": {"001395E0", "00139218"},
     "tick": {"00249F2C"},
     "qm": {"0017BF78", "0017BF00"},
+    "packs": {"0018890C"},
     "shield": {
         "001DC07C",
         "001E1CBC",

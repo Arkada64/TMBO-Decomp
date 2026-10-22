@@ -1,0 +1,21 @@
+ASYLUM    peds retail  3 online  3 missing [] | fodder ids retail   0 online   0 missing 0
+CITY      peds retail 13 online 13 missing [] | fodder ids retail  72 online  72 missing 0
+DEATH1    peds retail  3 online  3 missing [] | fodder ids retail   0 online   0 missing 0
+DEATH2    peds retail  3 online  3 missing [] | fodder ids retail   0 online   0 missing 0
+DEATH3    peds retail  3 online  3 missing [] | fodder ids retail   0 online   0 missing 0
+DEATH4    peds retail  3 online  3 missing [] | fodder ids retail   0 online   0 missing 0
+DEATH5    peds retail  3 online  3 missing [] | fodder ids retail   0 online   0 missing 0
+DEATH6    peds retail  9 online  9 missing [] | fodder ids retail   0 online   0 missing 0
+FREEWAY   peds retail 11 online  0 missing [3016, 3017, 3018, 3025, 3112, 3113, 3120, 3121, 3128, 3129] | fodder ids retail  60 online  60 missing 0
+JUNK2     peds retail  9 online  9 missing [] | fodder ids retail   0 online   0 missing 0
+JUNKYARD  peds retail  9 online  9 missing [] | fodder ids retail   0 online   0 missing 0
+LOOP      peds retail  3 online  3 missing [] | fodder ids retail  72 online  72 missing 0
+MINIBURB  peds retail 17 online 17 missing [] | fodder ids retail  72 online  72 missing 0
+MINICITY  peds retail 13 online 13 missing [] | fodder ids retail  72 online  72 missing 0
+PRISON    peds retail 10 online  0 missing [3016, 3017, 3018, 3072, 3073, 3074, 3080, 3081, 3088, 3089] | fodder ids retail   0 online   0 missing 0
+ROOFBOSS  peds retail  6 online  6 missing [] | fodder ids retail   0 online   0 missing 0
+ROOFTOP   peds retail  3 online  3 missing [] | fodder ids retail   0 online   0 missing 0
+ROOFTOP2  peds retail  3 online  3 missing [] | fodder ids retail   0 online   0 missing 0
+SHIP      peds retail  3 online  3 missing [] | fodder ids retail   0 online   0 missing 0
+STADIUM   peds retail  3 online  3 missing [] | fodder ids retail   0 online   0 missing 0
+SUBURB    peds retail 17 online 17 missing [] | fodder ids retail  72 online   0 missing 72
