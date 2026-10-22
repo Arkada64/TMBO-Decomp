@@ -1,6 +1,9 @@
 # TMB-Reloaded TODO (2026-10-22)
 
 ## Peds on Freeway / Prison Passage
+- 2026-10-22 night (account 2): analysis done, see reference/wip/PEDS_PLAN.md. Retail FREEWAY/PRISON
+  have one ped type (3016-3018), 74 KB incl. a 66 KB anim/skeleton part online lacks entirely. Plan:
+  a car-style extra db (NGP/PTR/RTX/TEX) with only the ped nodes, added after LoadCarsDB.
 - Fact (SEL_PEDLOG run): the online level loader gets 17 ped spawn nodes (ids 3016-3066) on Suburbs,
   **none** on Freeway and none on Prison. The online versions of those maps had their ped data stripped
   (retail has it). Suburbs/Junkyard work with our ped patch.
