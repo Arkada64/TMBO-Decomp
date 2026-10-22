@@ -1,10 +1,17 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_StartSoundSystem);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_FlushSoundCommands);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_StopSoundSystem);
+M2C_UNK snd_SendIOPCommandAndWait_2C_6() __asm__("snd_SendIOPCommandAndWait");
+extern u8 gStreamingInited_2C_6[] __asm__("gStreamingInited");
+
+void snd_StopSoundSystem(void) {
+    snd_SendIOPCommandAndWait_2C_6(1, 0, 0);
+    (*(s32*)gStreamingInited_2C_6) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_GetTick);
 
@@ -136,7 +143,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_PostMessage)
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_SendCurrentBatch);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_StartCaching);
+extern u8 gCaching_10_207[] __asm__("gCaching");
+
+void snd_StartCaching(void) {
+    (*(s32*)gCaching_10_207) = 1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_SendCache);
 
@@ -146,7 +157,17 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_StopVAGStrea
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_StopAllStreams);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_CloseVAGStreaming);
+M2C_UNK snd_SendIOPCommandNoWait_58_222() __asm__("snd_SendIOPCommandNoWait");
+M2C_UNK snd_StreamSafeCdSync_58_222() __asm__("snd_StreamSafeCdSync");
+extern u8 gStreamingInited_58_222[] __asm__("gStreamingInited");
+
+void snd_CloseVAGStreaming(void) {
+    if ((*(s32*)gStreamingInited_58_222) != 0) {
+        snd_StreamSafeCdSync_58_222(0);
+        (*(s32*)gStreamingInited_58_222) = 0;
+        snd_SendIOPCommandNoWait_58_222(0x35, 0, 0, 0, 0);
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_PlayVAGStreamByLoc);
 
@@ -182,11 +203,34 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_StreamSafeCd
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_StreamSafeCdSync);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_StreamSafeCdBreak);
+s32 sceCdBreak_4C_276() __asm__("sceCdBreak");
+M2C_UNK snd_SendIOPCommandNoWait_4C_276() __asm__("snd_SendIOPCommandNoWait");
+extern u8 gStreamingInited_4C_276[] __asm__("gStreamingInited");
+
+s32 snd_StreamSafeCdBreak(void) {
+    if ((*(s32*)gStreamingInited_4C_276) == 0) {
+        return sceCdBreak_4C_276();
+    }
+    snd_SendIOPCommandNoWait_4C_276(0x37, 0, 0, 0, 0);
+    return 1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_StreamSafeCdGetError);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_StreamSafeCdCallback);
+s32 sceCdCallback_3C_282() __asm__("sceCdCallback");
+extern u8 gCdCallback_3C_282[] __asm__("gCdCallback");
+extern u8 gStreamingInited_3C_282[] __asm__("gStreamingInited");
+
+s32 snd_StreamSafeCdCallback(s32 arg0) {
+    s32 temp_v0;
+
+    if ((*(s32*)gStreamingInited_3C_282) == 0) {
+        return sceCdCallback_3C_282();
+    }
+    temp_v0 = (*(s32*)gCdCallback_3C_282);
+    (*(s32*)gCdCallback_3C_282) = arg0;
+    return temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_SetReverbType);
 
@@ -220,4 +264,6 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_StartMovieSo
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_GetTransStatus);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/989snd", snd_GetDopplerPitchMod);
+s32 snd_GetDopplerPitchMod(s32 arg0) {
+    return (s32) (arg0 * 0x5F4) / 741;
+}
