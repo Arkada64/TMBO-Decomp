@@ -29,7 +29,13 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highwaydriver", isAnyoneE
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highwaydriver", dodgeVehicle__13HighwayDriverP7Vehicle);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highwaydriver", enable__13HighwayDriverPQ27Highway8Waypoint);
+void teleport__13HighwayDriverPQ27Highway8Waypoint_2C_22() __asm__("teleport__13HighwayDriverPQ27Highway8Waypoint");
+
+void enable__13HighwayDriverPQ27Highway8Waypoint(void *arg0)
+{
+  teleport__13HighwayDriverPQ27Highway8Waypoint_2C_22();
+  *((s32 *) (((u8 *) arg0) + 4)) = 2;
+}
 
 void removeOccupant__Q27Highway8WaypointP7Vehicle_40_23(void*, void*) __asm__("removeOccupant__Q27Highway8WaypointP7Vehicle");
 s32 disable__13HighwayDriver(void* arg0) {
