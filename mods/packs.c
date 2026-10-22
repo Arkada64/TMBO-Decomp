@@ -139,13 +139,8 @@ void tmbr_LevelTexInit(int vram, int slot, char* shell)
     if (slot == 0) { tmbr_levelIndex = level; tmbr_levelSerial++; }
     if (D_004FAE38 && slot == 0 && D_0048AC10[0] == LEVEL_TEX)
         for (i = 0; i < (int)(sizeof(PACKS) / sizeof(PACKS[0])); i++)
-            if (PACKS[i].level == level) {
-                if (level == 3 && (diagPrisonLoads++ & 1) == 0) {
-                    scePrintf("TMBR diag: Prison load %d WITHOUT pack (not even read)\n", diagPrisonLoads);
-                    break;
-                }
+            if (PACKS[i].level == level)
                 m = readPack(PACKS[i].blob0, PACKS[i].addr);
-            }
     if (m) binCounts((u32*)LEVEL_TEX, (u32*)m->tex, 1);
     texRegister(vram, slot); /* the original call: level textures + texture bins */
     if (slot == 0) {

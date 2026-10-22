@@ -48,6 +48,7 @@ static float stick(int axis)
 }
 
 extern void tmbr_TrafficUpdate(void);
+extern void tmbr_BotsFrame(void);
 
 void tmbr_CameraUpdate(char *cam)
 {
@@ -56,6 +57,7 @@ void tmbr_CameraUpdate(char *cam)
     char *cs;
 
     tmbr_TrafficUpdate(); /* traffic.c: per-frame traffic cars (after the game's vehicle loops) */
+    tmbr_BotsFrame();     /* bots.c: host bot-count hotkeys */
     cameraUpdate(cam);
 
     b = 0;

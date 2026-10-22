@@ -134,6 +134,22 @@ PATCHES = [
     (A("tmb/shell.s"), "0018890C", "jal", "jal        tmbr_LevelDbLoaded"),
     # ... and before the level's texture bins are built (level TEX init in func_00188930)
     (A("tmb/shell.s"), "001889E4", "jal", "jal        tmbr_LevelTexInitStub"),
+    # bots (mods/bots.c): AI list game+0x9E690 2 -> 6 entries, AI sort list 0x9FC98 -> 0x9E6A8
+    (A("nonmatchings/online/after_freewaytrain_18/func_00137E08.s"), "00137E70", "addiu", "addiu      $3, $0, 0x6"),
+    (A("nonmatchings/tmb/game/InitTypeOfVehicles__7TheGame.s"), "00138340", "slti", "slti       $2, $3, 0x6"),
+    (A("nonmatchings/online/net/func_001756A0.s"), "0017576C", "slti", "slti       $2, $18, 0x6"),
+    (A("nonmatchings/tmb/game/func_001399A8.s"), "00139B0C", "sw", "sw         $16, 0x18($3)"),
+    (A("nonmatchings/tmb/game/func_0013BEA0.s"), "0013C178", "addiu", "addiu      $12, $13, 0x66A8"),
+    # ... game start: any mode (also Last Man Standing), our count instead of "3 - humans"
+    (A("nonmatchings/tmb/game/func_001399A8.s"), "00139A50", "beqz", "nop"),
+    (A("nonmatchings/tmb/game/func_001399A8.s"), "00139A98", "beqz", "nop"),
+    (A("nonmatchings/tmb/game/func_001399A8.s"), "00139AA4", "jal", "jal        tmbr_BotsSpawn"),
+    (A("nonmatchings/tmb/game/func_001399A8.s"), "00139AB0", "beqz", "b          .L00139AC0"),
+    # ... joins/leaves and bot removal for any number of bots
+    (A("nonmatchings/online/net/func_00176EA0.s"), "00176EA0", "addiu", "j          tmbr_BotsRebalance"),
+    (A("nonmatchings/online/net/func_00176EA0.s"), "00176EA4", "lui", "nop"),
+    (A("nonmatchings/online/after_game_19/func_0013EED0.s"), "0013EED0", "addiu", "j          tmbr_BotRemove"),
+    (A("nonmatchings/online/after_game_19/func_0013EED0.s"), "0013EED4", "sq", "nop"),
 ]
 # (file, address, label) - global label placed right before that instruction (return points)
 LABELS = [
