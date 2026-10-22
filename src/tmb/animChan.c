@@ -44,7 +44,17 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/animChan", animationPause
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/animChan", animationResume__FR11_animHandle);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/animChan", animationLoop__FR11_animHandleb);
+s32 animationLoop__FR11_animHandleb(void *arg0, unsigned int arg1)
+{
+  void *var_v0;
+  var_v0 = *((void **) (((u8 *) arg0) + 0));
+  if (var_v0 != 0)
+  {
+    var_v0 = *((void **) (((u8 *) arg0) + 4));
+    *((u8 *) (((u8 *) var_v0) + 0x29)) = arg1;
+  }
+  return (s32) var_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/animChan", animationSetSpeed__FR11_animHandlef);
 
