@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/rigiddebris", init__11RigidDebris);
 
@@ -16,7 +17,15 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/rigiddebris", debrisDestr
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/rigiddebris", createInstance__11RigidDebris);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/rigiddebris", destroyInstance__11RigidDebrisP11RigidDebris);
+s32 destroyInstance__11RigidDebrisP11RigidDebris(void* arg0, void* arg1) {
+    void* temp_v0;
+
+    temp_v0 = M2C_FIELD(arg0, void** , 0x110);
+    M2C_FIELD(temp_v0, s8* , 0xC) = 0;
+    M2C_FIELD(M2C_FIELD(arg0, void** , 0x110), s8* , 0xD) = 0;
+    M2C_FIELD(arg0, s32* , 8) = 0;
+    return (s32) temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/rigiddebris", getExistingInstance__11RigidDebrisUi);
 
