@@ -74,7 +74,20 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", __12CTODLinkList);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", _$_12CTODLinkList);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", AddEntry__12CTODLinkList);
+int FindFreeNode__12CTODLinkList_6C_65(void *) __asm__("FindFreeNode__12CTODLinkList");
+s32 AddEntry__12CTODLinkList(void *arg0)
+{
+  s32 temp_v0;
+  if (((*((s32 *) (((u8 *) arg0) + 0))) < 0xC) && ((temp_v0 = FindFreeNode__12CTODLinkList_6C_65(arg0), temp_v0 != (-1))))
+  {
+    if ((*((s32 *) (((u8 *) arg0) + 4))) == (-1))
+    {
+      *((s32 *) (((u8 *) arg0) + 8)) = (*((s32 *) (((u8 *) arg0) - -4)) = temp_v0);
+      *((s32 *) (((u8 *) arg0) + 0)) = (s32) ((*((s32 *) (((u8 *) arg0) + 0))) + 1);
+    }
+  }
+  return 0;
+}
 
 void DeleteEntry__12CTODLinkListi(void) {
 }
