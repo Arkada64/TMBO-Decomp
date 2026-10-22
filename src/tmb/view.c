@@ -41,7 +41,15 @@ s32 viewGetCurView__Fv(void) {
     return (*(s32*)viewCurView_8_26);
 }
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/view", viewGetViewCs__Fi);
+extern unsigned int viewInfo_18_29[] __asm__("viewInfo");
+
+s32 viewGetViewCs__Fi(s32 arg0)
+{
+  unsigned int *new_var;
+  ;
+  new_var = &(*((arg0 * 0x10) + ((u8 *) viewInfo_18_29)));
+  return *new_var;
+}
 
 extern u8 worldCtx_18_32[] __asm__("worldCtx");
 
