@@ -35,7 +35,20 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hierc", hierLightNode);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hierc", hierKillLocator);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hierc", hierRegisterLocator__FUii);
+extern u8 FxToKill_28_37[] __asm__("FxToKill");
+
+void hierRegisterLocator__FUii(s32 arg0, s32 arg1)
+{
+  u32 *new_var;
+  u32 temp_v1;
+  temp_v1 = arg0 - 0x1D4C;
+  if (temp_v1 < 0x20U)
+  {
+    ;
+    new_var = ((*(&temp_v1)) * 4) + ((u8 *) FxToKill_28_37);
+    *new_var = arg1;
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hierc", hierClearLocatorListForReplay__Fv);
 
