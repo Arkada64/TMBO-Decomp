@@ -49,3 +49,14 @@ Already baked in: DNS, Bugfixes, Skip Intros, No-Interlacing, 16:9, the 3 Balanc
 - **Probable design:** a separate, larger array for non-network vehicles (traffic, extra AI). The 8 net
   slots stay as they are, so net code and fields past the array don't move. That still needs the 27
   8-slot loops (collision, targeting, HUD, update) to also walk the new array.
+
+## Account 2 queue (set by Ark, 2026-10-22)
+1. Push the untested bot changes (433b442) into `TMB Decomp/mods` on the PC (bots.c + the two apply_mods.py
+   lines), build, test.
+2. Traffic: same approach as the AI: decompile fodder/fodderdriver/highwaydriver/trafficdirector + the game's
+   fodder setup into readable C (reference/ai_decomp style), then rebuild traffic for online's 8 vehicle
+   slots. Includes the Suburb traffic pack.
+3. Bots deeper rework: per-frame perception refresh (not one bot per frame), per-vehicle attractor group
+   table, and net messages that can name more than 2 bots (owner -2/-3 encoding in weapon / kill events).
+4. Peds on ASYLUM (hall) and SHIP (prison ship): both are parts of Prison Passage as separate maps; check if
+   PRISON's retail ped data (inmates) can be placed there.
