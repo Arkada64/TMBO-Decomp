@@ -59,7 +59,16 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todSetSkyEntry__FP9
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todSetSkyObjects__Fiffffff);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todSetPlightsActive__Fii);
+extern u8 s_todPlightsEnabled_18_53[] __asm__("s_todPlightsEnabled");
+
+s32 todSetPlightsActive__Fii(s32 arg0, s32 arg1)
+{
+  s32 *new_var;
+  ;
+  new_var = ((*(&arg0)) * 4) + ((u8 *) s_todPlightsEnabled_18_53);
+  *new_var = arg1;
+  return (s32) ((u8 *) s_todPlightsEnabled_18_53);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", __12CTODLinkList);
 
