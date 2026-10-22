@@ -129,4 +129,18 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/weap", func_001F29C8);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/weap", GetWreckingBallReticle__7WeaponsP6Weapon);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/weap", func_001F2B00);
+#include "m2c_macros.h"
+void func_001F2B00(s32 arg0, void *arg1)
+{
+  s32 temp_a0;
+  int new_var;
+  s32 temp_v1;
+  new_var = 4;
+  temp_a0 = *((s32 *) (((u8 *) arg1) + 0x4C));
+  if (temp_a0 >= 0)
+  {
+    temp_v1 = arg0 + 0x18000;
+    *((s32 *) (((u8 *) (temp_v1 + (temp_a0 * new_var))) + 0x1E20)) = 0;
+    *((s8 *) (((u8 *) (*((void **) (((u8 *) (temp_v1 + ((*((s32 *) (((u8 *) arg1) + 0x4C))) * new_var))) + 0x1E00)))) + 0xC)) = 0;
+  }
+}
