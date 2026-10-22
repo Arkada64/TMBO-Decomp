@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/drivein", InitDriveInBefore__7DriveIn);
 
@@ -8,4 +9,9 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/drivein", UpdateDriveIn__
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/drivein", UpdateFalling__7DriveIn);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/drivein", AddEpNode__7DriveIniP9_hierhead);
+s32 AddEpNode__7DriveIniP9_hierhead(void* arg0, s32 arg1, void* arg2) {
+    if (arg1 == 0x179F) {
+        M2C_FIELD(arg0, void** , 0x58) = arg2;
+    }
+    return 0x179F;
+}
