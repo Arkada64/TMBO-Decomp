@@ -17,7 +17,7 @@ O=$(mktemp -d)
 mips-linux-gnu-as -EL -march=5900 -G0 -no-pad-sections -mabi=eabi $O/cave.s -o $O/cave.o
 cd $T
 tools/sn_cc.sh -c -Iinclude -isystem include/gcc -isystem include/gcc/gcc-lib -isystem include/sdk \
-  -isystem include/sdk/common -isystem include/sdk/ee -O2 -G0 -fno-common "$W/mods/freecam.c" -o $O/freecam.o
+  -isystem include/sdk/common -isystem include/sdk/ee -O2 -G0 -fno-common -DTMBR_PNACH "$W/mods/freecam.c" -o $O/freecam.o
 cat > $O/cave.ld <<EOF
 SECTIONS {
   . = $CAVE;

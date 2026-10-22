@@ -12,7 +12,9 @@
  *   the update copies cs+0x20 to cam+0x4060 + 0x40i (64 bytes). */
 typedef struct { float x, y, z, w; } fvec;
 extern int inputGetCtlPadAnalogAxis(int axis, int pad) __asm__("inputGetCtlPadAnalogAxis__Fii");
-extern int inputGetInput(int mask, int pad) __asm__("inputGetInput__Fii");
+/* raw pad bits, active high (SELECT 0x1, L3 0x2, L2 0x100, R2 0x200, R1 0x800). inputGetInput takes a
+ * game-action id, not a button mask: with it Select/L2/R2/R1 never registered. */
+extern int inputGetPadButtons(int pad) __asm__("inputGetPadButtons__Fi");
 extern void mathfRotMatrixRPH(float *m, fvec *angles) __asm__("mathfRotMatrixRPH__FPA3_fP8_fvector");
 extern void cameraUpdate(char *cam) __asm__("func_001166B8");
 
@@ -52,19 +54,20 @@ extern void tmbr_BotsThink(void);
 
 void tmbr_CameraUpdate(char *cam)
 {
-    int b, pressed, i;
+    int b, pad, pressed, i;
     float *m, *out, lx, ly, rx, ry, speed;
     char *cs;
 
 #ifdef TMBR_TRAFFIC
     tmbr_TrafficUpdate(); /* traffic.c: per-frame traffic cars (after the game's vehicle loops); off in stable */
 #endif
-    tmbr_BotsThink();     /* bots.c: free-for-all targets */
+#ifndef TMBR_PNACH
+    tmbr_BotsThink();     /* bots.c: free-for-all targets (not in the pnach build) */
+#endif
     cameraUpdate(cam);
 
-    b = 0;
-    if (inputGetInput(IN_SELECT, 0)) b |= IN_SELECT;
-    if (inputGetInput(IN_L3, 0)) b |= IN_L3;
+    pad = inputGetPadButtons(0);
+    b = pad & (IN_SELECT | IN_L3);
     pressed = b & ~prev_buttons;
     prev_buttons = b;
 #ifdef TMBR_FREECAM_ANYTIME
@@ -89,13 +92,13 @@ void tmbr_CameraUpdate(char *cam)
     if (fc_ang.x > K_PMAX) fc_ang.x = K_PMAX;
     if (fc_ang.x < -K_PMAX) fc_ang.x = -K_PMAX;
     mathfRotMatrixRPH(m, &fc_ang);
-    speed = inputGetInput(IN_R1, 0) ? K_FAST : K_SLOW;
+    speed = (pad & IN_R1) ? K_FAST : K_SLOW;
     /* RPH matrix: world Z is up; row 1 = forward (cos p sin h, cos p cos h, sin p), row 0 = right */
     fc_pos.x += (m[4] * -ly + m[0] * lx) * speed;
     fc_pos.y += (m[5] * -ly + m[1] * lx) * speed;
     fc_pos.z += (m[6] * -ly + m[2] * lx) * speed;
-    if (inputGetInput(IN_R2, 0)) fc_pos.z += speed;
-    if (inputGetInput(IN_L2, 0)) fc_pos.z -= speed;
+    if (pad & IN_R2) fc_pos.z += speed;
+    if (pad & IN_L2) fc_pos.z -= speed;
     /* (the matrix keeps a zero translation, like the game's: the position lives in cs+0x10) */
     *(fvec *)(cs + 0x10) = fc_pos;
     *(fvec *)(cs + 0x60) = fc_ang;
