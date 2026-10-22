@@ -77,7 +77,17 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputFixAnalogVal
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputScaleAnalogButton__Fiii);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputGetPadPort__Fi);
+extern u8 padPortMap_18_97[] __asm__("padPortMap");
+
+volatile int inputGetPadPort__Fi(s32 arg0)
+{
+  s32 *new_var2;
+  u8 *new_var;
+  new_var2 = &arg0;
+  new_var = ((*new_var2) * 4) + ((u8 *) padPortMap_18_97);
+  new_var2 = &(*new_var);
+  return *new_var2;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputGetPadSlot__Fi);
 
