@@ -257,7 +257,20 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewSetBgColor__F
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewSetTODBgColor__FUlUlUlUl);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/view", viewGetBgColor__FRiT0T0T0);
+#include "m2c_macros.h"
+extern M2C_UNK D_004D0200_T0T0T0 __asm__("D_004D0200");
+
+void viewGetBgColor__FRiT0T0T0(s32 *arg0, s32 *arg1, s32 *arg2, s32 *arg3)
+{
+  char pad;
+  u8 *new_var;
+  u8 *new_var2;
+  new_var2 = (u8 *) (&D_004D0200_T0T0T0);
+  *arg0 = (s32) (*((u8 *) ((new_var = new_var2) + 0x1B0)));
+  *arg1 = (s32) (*((u8 *) (new_var2 + 0x1B1)));
+  *arg2 = (s32) (*((u8 *) (new_var2 + 0x1B2)));
+  *arg3 = (s32) (*((u8 *) (((u8 *) (&D_004D0200_T0T0T0)) + 0x1B3)));
+}
 
 #include "m2c_macros.h"
 extern volatile unsigned char D_004D0200_Db__Fi __asm__("D_004D0200");
