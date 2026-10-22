@@ -12,6 +12,7 @@
 typedef unsigned int u32;
 #define F(p, off) (*(int*)((char*)(p) + (off)))
 #define MAXBOTS 6
+#define TMBR_BOTDBG 0
 #define LIST(g) ((char**)((g) + 0x9E690))
 #define SORT(g) ((int*)((g) + 0x9E6A8))
 #define NAI(g) F(g, 0x9FEE4)
@@ -202,8 +203,8 @@ void tmbr_BotsThink(void)
         if (F(drv, 4) != 5) driverSetMode(drv, 5);
         if ((char*)F(drv, 0xB4) != best) driverSetTarget(drv, best);
     }
-    /* TEMP: why bots don't shoot each other (every 2 s) */
-    if (thinkTick % 120 == 0)
+    /* debug: per-bot state every 2 s (TMBR_BOTDBG) */
+    if (TMBR_BOTDBG && thinkTick % 120 == 0)
         for (i = 0; i < NAI(g) && i < MAXBOTS; i++) {
             char *b = LIST(g)[i], *br, *dv, *t;
             if (!b || !(br = (char*)F(b, 0x2014)) || !(dv = (char*)F(b, 0x2018))) continue;

@@ -56,7 +56,9 @@ void tmbr_CameraUpdate(char *cam)
     float *m, *out, lx, ly, rx, ry, speed;
     char *cs;
 
-    tmbr_TrafficUpdate(); /* traffic.c: per-frame traffic cars (after the game's vehicle loops) */
+#ifdef TMBR_TRAFFIC
+    tmbr_TrafficUpdate(); /* traffic.c: per-frame traffic cars (after the game's vehicle loops); off in stable */
+#endif
     tmbr_BotsThink();     /* bots.c: free-for-all targets */
     cameraUpdate(cam);
 
