@@ -9,9 +9,7 @@ address (this broke the controller state machine). Rewrite the raw immediate as 
 immediate is exactly SYM's address. Same bytes in a normal build. Idempotent.
 """
 
-import re
-import sys
-import subprocess
+import re, sys, subprocess
 from pathlib import Path
 
 R = Path.home() / "tmbo_decomp"
@@ -182,6 +180,15 @@ for f in (R / "asm").rglob("*.s"):
             L[i] = f"{m.group(1)}{op}{m.group(3)}{new}"
             changed = True
             n += 1
+        # register copies of a lui'd value (`daddu $s4, $v0, $zero`) carry the %hi along
+        if (
+            op in ("daddu", "addu", "or")
+            and len(ops) == 3
+            and ops[2] in ("$zero", "$0")
+            and ops[1] in reg
+        ):
+            reg[ops[0]] = reg[ops[1]]
+            continue
         if op not in NODEST and ops:
             d = ops[0]
             if (
