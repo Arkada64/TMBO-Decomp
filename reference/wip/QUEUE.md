@@ -76,3 +76,15 @@ Already baked in: DNS, Bugfixes, Skip Intros, No-Interlacing, 16:9, the 3 Balanc
      func_00102D78 follow) and where groups are tested (attractGetGroupTestPointIsIn); keep the
      attractor graph as fallback and aiHuntUsingLOS (direct steering) for open line of sight.
    - Needs from Ark: list of maps/spots where bots get stuck or route wrong.
+
+## Status 2026-10-22 afternoon (account 2)
+- Bots: combat steering (gas on, handbrake swings, extend + jink, reverse as last resort), trigger-happy
+  firing (34 deg, in sight, < 500), no fleeing, roles (brawler / sniper / roamer / cruiser) rerolled every
+  15-40 s, breakaway from long fights / pile-ups, nav fallback (mods/nav.c, lazy grid A* on hdLosTest rays).
+  Net: bots 0-5 named -2..-7 in weapon / kill messages (mods/botnet.s). Not done: host migration with bots
+  (func_00168C30 / func_00168DE0 only re-own ais[0..1]).
+- Traffic: TRAFFIC_DIAG.ELF (TMBR_TRAFFIC_ON in freecam.c, no loader growth) logs per-car state every 2 s;
+  needs Ark's runs on FREEWAY, MINIBURB, CITY before the real fixes. Known: traffic_nodes.c holds absolute
+  node addresses + free-memory ranges per level, computed offline before the packs existed.
+- Peds: ASYLUM and SHIP already have retail's type-2 peds (3016-3018, same as retail). Retail PRISON's inmates
+  (types 9-11) are packed for them: ZAP (ASYLUM, level 16) / ZSP (SHIP, level 15) in TMBO_PEDS_TEST.iso.
