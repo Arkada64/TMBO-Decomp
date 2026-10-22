@@ -101,7 +101,14 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", handleDestru
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", BlowDebris__7TheGameP9_hierheadP8_fvectorT2fT2ffif);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", getNeighbor__10AttractPedi);
+s32 getNeighbor__10AttractPedi(void *arg0, int arg1)
+{
+  int new_var2;
+  void *new_var;
+  new_var = arg0;
+  new_var2 = ((*((u8 *) (((u8 *) ((*((s32 *) (((u8 *) new_var) + 0x74))) + arg1)) + 0x18))) << 5) + 0x30;
+  return (*((s32 *) (((u8 *) new_var) + 0x6C))) + new_var2;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attractped", getPt__10AttractPedi);
 
