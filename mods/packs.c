@@ -57,6 +57,8 @@ static const struct { int level; const char* blob0; u32 addr; } PACKS[] = {
 };
 static float zeroVec[4];
 static Manifest* pending;   /* loaded at TEX init, finished at db init */
+int tmbr_levelSerial;       /* bumped on every level load (traffic.c sets up on the next game frame) */
+int tmbr_levelIndex = -1;   /* shell level index of the level being loaded */
 static u32 texBase, clutStart;
 
 static Manifest* readPack(const char* blob0, u32 addr)
@@ -103,6 +105,7 @@ void tmbr_LevelTexInit(int vram, int slot, char* shell)
     Manifest* m = 0;
     char* r;
     pending = 0;
+    if (slot == 0) { tmbr_levelIndex = level; tmbr_levelSerial++; }
     if (D_004FAE38 && slot == 0 && D_0048AC10[0] == LEVEL_TEX)
         for (i = 0; i < (int)(sizeof(PACKS) / sizeof(PACKS[0])); i++)
             if (PACKS[i].level == level)
