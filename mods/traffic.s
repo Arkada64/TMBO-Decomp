@@ -26,7 +26,7 @@ tmbr_FodderParse:                       # (TheGame *game, _hierhead *h)
     srl     $19, $2, 18                 # id
     lui     $4, %hi(tmbr_fodder_msg)    # debug: shows in PCSX2's EE console / emulog.txt
     addiu   $4, $4, %lo(tmbr_fodder_msg)
-    jal     printf
+    jal     scePrintf
     daddu   $5, $19, $0
     addiu   $4, $19, -0x7D0             # rel = id - 2000
     addiu   $2, $19, -0x7B1             # rel + 31
@@ -132,6 +132,40 @@ tmbr_FodderCs:                          # (_hierhead *h) -> _cs*   (online dbGet
 
 tmbr_fodder_msg:
     .asciz "TMBR fodder node %d\n"
+.align 3
+
+# DEBUG: level-loader callback wrapper. Prints every db node with id 0x401..0xF9F (fodder + ped range)
+# that the traversal hands to the loader, then continues into the real loader func_00127650.
+.globl tmbr_LoaderDbg
+.ent tmbr_LoaderDbg
+tmbr_LoaderDbg:
+    addiu   $29, $29, -0x50
+    sq      $31, 0x40($29)
+    sq      $4, 0x00($29)
+    sq      $5, 0x10($29)
+    sq      $6, 0x20($29)
+    sq      $7, 0x30($29)
+    lw      $2, 0x0($4)
+    srl     $5, $2, 18
+    andi    $6, $2, 0x3F
+    addiu   $3, $5, -0x401
+    sltiu   $3, $3, (0xFA0 - 0x401)
+    beqz    $3, .Lld_go
+    nop
+    lui     $4, %hi(tmbr_node_msg)
+    jal     scePrintf
+    addiu   $4, $4, %lo(tmbr_node_msg)
+.Lld_go:
+    lq      $4, 0x00($29)
+    lq      $5, 0x10($29)
+    lq      $6, 0x20($29)
+    lq      $7, 0x30($29)
+    lq      $31, 0x40($29)
+    j       func_00127650
+    addiu   $29, $29, 0x50
+.end tmbr_LoaderDbg
+tmbr_node_msg:
+    .asciz "TMBR node %d op %d\n"
 .align 3
 
 .section .bss

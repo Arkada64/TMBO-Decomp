@@ -54,7 +54,26 @@ def sub_line(text, addr, old, new):
     return "\n".join(out)
 
 
+DBG = os.environ.get("TMBR_DEBUG_LOADER") == "1"
+CALLERS = [
+    R / f"asm/nonmatchings/online/after_prison_10/{n}.s"
+    for n in ("func_001274D0", "func_00127188", "func_00127330")
+]
+
+
 def apply():
+    if DBG:  # route the db traversal callback through tmbr_LoaderDbg
+        for f in CALLERS:
+            bak = f.with_suffix(".s.orig")
+            if not bak.exists():
+                shutil.copy(f, bak)
+            t = bak.read_text()
+            assert (
+                t.count("%hi(func_00127650)") == 1
+                and t.count("%lo(func_00127650)") == 1
+            ), f
+            f.write_text(t.replace("(func_00127650)", "(tmbr_LoaderDbg)"))
+        print("debug: loader callback wrapped")
     for f in (LOADER, GAME):
         bak = f.with_suffix(".s.orig")
         if not bak.exists():
@@ -80,7 +99,7 @@ def apply():
 
 
 def revert():
-    for f in (LOADER, GAME):
+    for f in (LOADER, GAME, *CALLERS):
         bak = f.with_suffix(".s.orig")
         if bak.exists():
             shutil.copy(bak, f)
