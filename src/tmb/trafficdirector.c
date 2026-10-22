@@ -74,7 +74,32 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", getSegm
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", populateSegment__15HighwayDirectorii);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", spawn__15HighwayDirectorPQ27Highway8Waypoint);
+void vehicleResetStrength__7Vehicle_7C_68(void *) __asm__("vehicleResetStrength__7Vehicle");
+void initVehicleSound__12VehicleSoundP7Vehicle_7C_68(void *, void *) __asm__("initVehicleSound__12VehicleSoundP7Vehicle");
+void enable__13HighwayDriverPQ27Highway8Waypoint_7C_68(void *, void *) __asm__("enable__13HighwayDriverPQ27Highway8Waypoint");
+M2C_UNK vehicleEnable__7Vehicle12VehicleTypes_7C_68() __asm__("vehicleEnable__7Vehicle12VehicleTypes");
+
+s32 spawn__15HighwayDirectorPQ27Highway8Waypoint(void *arg0, void *arg1)
+{
+  u8 *new_var;
+  s32 temp_v0;
+  s32 temp_v0_2;
+  void *temp_s0;
+  temp_v0 = *((s32 *) (((u8 *) arg0) + 0x1B8));
+  if (temp_v0 <= 0)
+  {
+    return 0;
+  }
+  temp_v0_2 = temp_v0 - 1;
+  *((s32 *) (((u8 *) arg0) + 0x1B8)) = temp_v0_2;
+  new_var = ((u8 *) (arg0 + (temp_v0_2 * 4))) + 0x28;
+  temp_s0 = *((void **) new_var);
+  vehicleEnable__7Vehicle12VehicleTypes_7C_68(temp_s0, 3);
+  vehicleResetStrength__7Vehicle_7C_68(temp_s0);
+  enable__13HighwayDriverPQ27Highway8Waypoint_7C_68(*((void **) (((u8 *) temp_s0) + 0x200C)), arg1);
+  initVehicleSound__12VehicleSoundP7Vehicle_7C_68(temp_s0 + 0x2B20, temp_s0);
+  return 1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/trafficdirector", pruneAllVehicles__15HighwayDirector);
 
