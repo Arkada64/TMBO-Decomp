@@ -1,38 +1,87 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiReadPointsFromDisk__Fv);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiWritePointsToDisk__Fv);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiCountPoints__FP12AttractPoint);
+s32 attractiCountPoints__FP12AttractPoint(void* arg0) {
+    s32 var_v1;
+    void* var_a0;
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiCountStartPoints__FP10StartPoint);
+    var_a0 = arg0;
+    var_v1 = 0;
+    if (M2C_FIELD(var_a0, s8* , 0x1C) != 0) {
+        do {
+            var_a0 += 0x20;
+            var_v1 += 1;
+        } while (M2C_FIELD(var_a0, s8* , 0x1C) != 0);
+    }
+    return var_v1;
+}
+
+s32 attractiCountStartPoints__FP10StartPoint(s16* arg0) {
+    s16* var_a0;
+    s32 var_v1;
+
+    var_a0 = arg0;
+    var_v1 = 0;
+    if (*var_a0 >= 0) {
+        do {
+            var_a0 +=0x2;
+            var_v1 += 1;
+        } while (*var_a0 >= 0);
+    }
+    return var_v1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitLevelsGroups__FP8GroupDat);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiCheckGroups__FP8GroupDat);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitSuburbGroups__FP8GroupDat);
+s32 attractiInitSuburbGroups__FP8GroupDat(void* arg0) {
+    return 0x3A;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitJunkyardGroups__FP8GroupDat);
+s32 attractiInitJunkyardGroups__FP8GroupDat(void* arg0) {
+    return 0x2E;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitFreewayGroups__FP8GroupDat);
+s32 attractiInitFreewayGroups__FP8GroupDat(void* arg0) {
+    return 0x3E;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitPrisonGroups__FP8GroupDat);
+s32 attractiInitPrisonGroups__FP8GroupDat(void* arg0) {
+    return 0x3D;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitRoofbossGroups__FP8GroupDat);
+s32 attractiInitRoofbossGroups__FP8GroupDat(void* arg0) {
+    return 2;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitRooftopGroups__FP8GroupDat);
+s32 attractiInitRooftopGroups__FP8GroupDat(void* arg0) {
+    return 0x26;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitCityGroups__FP8GroupDat);
+s32 attractiInitCityGroups__FP8GroupDat(void* arg0) {
+    return 0x2D;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitLoopGroups__FP8GroupDat);
+s32 attractiInitLoopGroups__FP8GroupDat(void* arg0) {
+    return 0x13;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitAlpineGroups__FP8GroupDat);
+s32 attractiInitAlpineGroups__FP8GroupDat(void* arg0) {
+    return 0xB;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitDriveInGroups__FP8GroupDat);
+s32 attractiInitDriveInGroups__FP8GroupDat(void* arg0) {
+    return 0xE;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitStadiumGroups__FP8GroupDat);
+s32 attractiInitStadiumGroups__FP8GroupDat(void* arg0) {
+    return 0x1D;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attracti", attractiInitDefaultGroups__FP8GroupDat);
 
