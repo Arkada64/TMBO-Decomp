@@ -251,9 +251,14 @@ extern int aiFrame(char* v) __asm__("func_00101F88");
 #define HB_REST 20
 #define STALL 240
 #define CS_PIVOT 0x3F800000  /* 1.0 rad, ~57 deg */
-#define ORBIT 75
 #define REVERSE 40
-static short orbitT[8], revT[8];
+#define DF_CLOSE 0x42F00000  /* 120.0: closer than this with the target way off the nose = overshoot */
+#define DF_ROOM 0x43480000   /* 200.0: enough room to swing back */
+#define DF_LINED 0x3E99999A  /* 0.3 rad: the target's nose points at us (brain+0x28) */
+#define DF_EXT 50
+#define DF_SWING 45
+static signed char ph[8];
+static short phT[8];
 static signed char hbTimer[8];
 static int fbits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 extern void aiSetAttackState(char* v, int st) __asm__("aiSetAttackState__7Vehicle12_attackState");
@@ -263,39 +268,58 @@ static void aggressiveTurn(char* g, char* v, char* t)
     char* br = (char*)F(v, 0x2014);
     char* drv = (char*)F(v, 0x2018);
     unsigned char* pad = PAD(v);
-    int idx = (int)(v - g) / 0x31B0, st, b, a, d;
+    int idx = (int)(v - g) / 0x31B0, st, b, a, d, tf;
     if (idx < 0 || idx > 7 || !br || !drv) return;
     st = F(br, 0x414);
     b = fbits(*(float*)(br + 0x24));
     a = b & 0x7FFFFFFF;
     d = fbits(*(float*)(br + 0x20));
+    tf = fbits(*(float*)(br + 0x28)) & 0x7FFFFFFF;
     if (hbTimer[idx] < 0) hbTimer[idx]++;
     if (st == 6 && F(br, 0x488) > STALL) { dbgWhy[idx] = 4; aiSetAttackState(v, 1); return; }
     if (F(drv, 4) != 5) { dbgWhy[idx] = 10 + F(drv, 4); return; }
     if (F(v, 0x444) >= 60) { dbgWhy[idx] = 3; return; }        /* stuck: the AI's own reverse/turn */
-    if (d < 0 || d > CS_DIST) { dbgWhy[idx] = 5; return; }
+    if (d < 0 || d > CS_DIST) { dbgWhy[idx] = 5; ph[idx] = 0; return; }
     pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* in a fight: stay on the gas */
-    if (a < CS_AIM) { dbgWhy[idx] = 6; return; }               /* nearly lined up: the AI aims */
+    if (a < CS_AIM && ph[idx] != 1) { dbgWhy[idx] = 6; ph[idx] = 0; return; }               /* nearly lined up: the AI aims */
+    /* ---- dogfight: like PvP, keep speed and fight for the angle ----
+     * phase 0 attack: gas, steer at the target, handbrake bursts past CS_HB (as before).
+     * Target far off the nose (> CS_PIVOT): if it is close (< DF_CLOSE) we overshot, so EXTEND: drive on,
+     * wheel straight, weaving if the target has us lined up, until there is room (> DF_ROOM) or DF_EXT frames;
+     * then SWING: gas + handbrake + full lock (a high-speed handbrake turn) until the nose is within CS_HB or
+     * DF_SWING frames. A swing that did not bring the nose round goes to REVERSE (3-point turn) once. */
     dbgWhy[idx] = 7;
-    if (revT[idx] > 0) {                                        /* reverse out of an orbit */
-        revT[idx]--;
+    if (ph[idx] == 3) {                                         /* reverse out */
+        if (--phT[idx] <= 0) ph[idx] = 0;
         pad[4] = 0; pad[8] = 0; pad[6] = 1; pad[2] = 0;
-        if (b > 0) { pad[9] = 1; pad[0xA] = 0; } else { pad[0xA] = 1; pad[9] = 0; }  /* reversing: steer the other way */
+        if (b > 0) { pad[9] = 1; pad[0xA] = 0; } else { pad[0xA] = 1; pad[9] = 0; }
         dbgWhy[idx] = 9;
+        return;
+    }
+    if (ph[idx] == 1) {                                         /* extend */
+        pad[2] = 0; pad[9] = 0; pad[0xA] = 0;
+        if (tf < DF_LINED) {                                    /* they have us lined up: jink */
+            if ((phT[idx] / 12) & 1) pad[9] = 1; else pad[0xA] = 1;
+        }
+        dbgWhy[idx] = 20;
+        if (++phT[idx] > DF_EXT || d > DF_ROOM || a < CS_HB) { ph[idx] = 2; phT[idx] = 0; }
         return;
     }
     if (b > 0) { pad[0xA] = 1; pad[9] = 0; } else { pad[9] = 1; pad[0xA] = 0; }  /* bearing > 0 = right */
     pad[2] = 0;
-    if (a >= CS_PIVOT) {
-        /* Way off the nose: at speed the turning circle is about as wide as the gap, so a bot steering at
-         * full lock just orbits its target. Lift, brake and handbrake to pivot; if it is still orbiting
-         * after ORBIT frames, back out with the wheel the other way (a 3-point turn). */
-        pad[4] = 0; pad[8] = 1; pad[2] = 1; dbgHb[idx]++;
-        dbgWhy[idx] = 8;
-        if (++orbitT[idx] > ORBIT) { orbitT[idx] = 0; revT[idx] = REVERSE; }
+    if (ph[idx] == 2) {                                         /* swing */
+        pad[2] = 1; dbgHb[idx]++;
+        dbgWhy[idx] = 21;
+        if (a < CS_HB) ph[idx] = 0;
+        else if (++phT[idx] > DF_SWING) {                    /* nose did not come round */
+            if (d < DF_ROOM) { ph[idx] = 3; phT[idx] = REVERSE; } else { ph[idx] = 0; hbTimer[idx] = -HB_REST; }
+        }
         return;
     }
-    orbitT[idx] = 0;
+    if (a >= CS_PIVOT) {
+        ph[idx] = d < DF_CLOSE ? 1 : 2; phT[idx] = 0;
+        return;
+    }
     if (a >= CS_HB && hbTimer[idx] >= 0) {
         if (++hbTimer[idx] > HB_HOLD) hbTimer[idx] = -HB_REST;
         else { pad[2] = 1; dbgHb[idx]++; }                      /* handbrake */
