@@ -106,7 +106,22 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/weap", func_001F25D8);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/weap", GetGasCanReticle__7WeaponsP6Weapon);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/weap", func_001F28D0);
+#include "m2c_macros.h"
+void func_001F28D0(s32 arg0, void *arg1)
+{
+  s32 temp_a0;
+  int new_var;
+  unsigned char new_var2;
+  s32 temp_v1;
+  temp_a0 = *((s32 *) (((u8 *) arg1) + 0x4C));
+  if (temp_a0 >= 0)
+  {
+    temp_v1 = arg0 + 0x18000;
+    new_var = temp_a0 * (new_var2 = 4);
+    *((s32 *) (((u8 *) (temp_v1 + new_var)) + 0x1D58)) = 0;
+    *((s8 *) (((u8 *) (*((void **) (((u8 *) (temp_v1 + ((*((s32 *) (((u8 *) arg1) + 0x4C))) * new_var2))) + 0x1D38)))) + 0xC)) = 0;
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/weap", GetSatelliteReticle__7WeaponsP7Vehicle);
 
