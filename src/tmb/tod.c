@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todBoundAngle__FPf);
 
@@ -11,9 +12,17 @@ void todInitStats__Fv(void) {
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todUpdate__Fi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todActive__Fv);
+extern u8 todTimeOfDayOn_8_17[4] __asm__("todTimeOfDayOn");
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todSetTimeActive__Fv);
+s32 todActive__Fv(void) {
+    return (*(s32*)todTimeOfDayOn_8_17);
+}
+
+extern u8 todSetTimeOfDay_8_20[4] __asm__("todSetTimeOfDay");
+
+s32 todSetTimeActive__Fv(void) {
+    return (*(s32*)todSetTimeOfDay_8_20);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todGetTOD__FPiPfP10_todInfo14);
 
@@ -21,11 +30,30 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todSetTOD__FifPvf);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todGetCurrentTOD__Fv);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todSetCurrentTOD__Ff);
+extern u8 hour_C_38[4] __asm__("hour");
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todDisable__Fv);
+s32 todSetCurrentTOD__Ff(f32 fparg0) {
+    (*(f32*)hour_C_38) = fparg0;
+    return 1;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todGetAmbient__FPfT0T0);
+extern u8 todSetTimeOfDay_C_41[4] __asm__("todSetTimeOfDay");
+extern u8 todTimeOfDayOn_C_41[4] __asm__("todTimeOfDayOn");
+
+void todDisable__Fv(void) {
+    (*(s32*)todTimeOfDayOn_C_41) = 0;
+    (*(s32*)todSetTimeOfDay_C_41) = 0;
+}
+
+extern u8 todAmbientBlue_1C_45[4] __asm__("todAmbientBlue");
+extern u8 todAmbientGreen_1C_45[4] __asm__("todAmbientGreen");
+extern u8 todAmbientRed_1C_45[4] __asm__("todAmbientRed");
+
+void todGetAmbient__FPfT0T0(f32* arg0, f32* arg1, f32* arg2) {
+    *arg0 = (*(f32*)todAmbientRed_1C_45);
+    *arg1 = (*(f32*)todAmbientGreen_1C_45);
+    *arg2 = (*(f32*)todAmbientBlue_1C_45);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", todSetSkyEntry__FP9_hierhead);
 
@@ -42,9 +70,13 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", AddEntry__12CTODLin
 void DeleteEntry__12CTODLinkListi(void) {
 }
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", GetNumEntries__12CTODLinkList);
+s32 GetNumEntries__12CTODLinkList(s32* arg0) {
+    return *arg0;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", FindNodeByTime__12CTODLinkListf);
+s32 FindNodeByTime__12CTODLinkListf(void* arg0, f32 fparg0) {
+    return 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tod", FindFreeNode__12CTODLinkList);
 
