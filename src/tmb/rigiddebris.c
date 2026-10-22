@@ -11,7 +11,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/rigiddebris", initFromDes
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/rigiddebris", initFromCS__11RigidDebrisP3_cs);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/rigiddebris", setFriction__11RigidDebrisff);
+void setFriction__11RigidDebrisff(void *arg0, f32 fparg0, f32 fparg1)
+{
+  *((f32 *) (((u8 *) arg0) + 0x700)) = fparg0;
+  *((f32 *) (((u8 *) arg0) + 0x704)) = fparg1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/rigiddebris", debrisDestructible__11RigidDebrisP12DestructiblefP8_fvector);
 
