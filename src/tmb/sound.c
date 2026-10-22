@@ -1073,7 +1073,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateErrantLoops
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", soundPlayHealthStandSparky__FP8_fvector);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initHealthStandSound__16HealthStandSound);
+void initHealthStandSound__16HealthStandSound(void *arg0)
+{
+  *((s32 *) (((u8 *) arg0) + 4)) = 0;
+ do { *((s32 *) (((u8 *) arg0) + 0)) = 0; } while (0);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateHealthStandSound__16HealthStandSoundP8_fvectori);
 
