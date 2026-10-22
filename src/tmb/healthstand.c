@@ -3,7 +3,14 @@
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/healthstand", healthStandInit__FP8_fvectorPA3_f);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/healthstand", healthStandSetInert__Fi);
+extern u8 healthStand_1C_7[] __asm__("healthStand");
+
+void healthStandSetInert__Fi(s32 arg0)
+{
+  int new_var;
+  new_var = 0x68;
+  *((s32 *) (((u8 *) ((arg0 * 0x70) + ((u8 *) healthStand_1C_7))) + new_var)) = 0;
+}
 
 extern u8 healthStand_24_10[] __asm__("healthStand");
 
