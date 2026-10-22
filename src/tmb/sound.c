@@ -959,7 +959,21 @@ s32 __19AmbientSoundManager(void* arg0) {
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", setReverbDepth__19AmbientSoundManagerffii);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", evaluateStreamState__19AmbientSoundManagerP14StreamingSound);
+void evaluateStreamState__19AmbientSoundManagerP14StreamingSound(s32 arg0, void *arg1)
+{
+  s32 temp_v0;
+  int new_var;
+  if ((*((s32 *) (((u8 *) arg1) + 0x40))) == 4)
+  {
+    temp_v0 = *((s32 *) (((u8 *) arg1) + 0x14));
+    new_var = 8;
+    if (temp_v0 != (-1))
+    {
+      *((s32 *) (((u8 *) (arg0 + (temp_v0 * new_var))) + 0x3C)) = 1;
+      *((s32 *) (((u8 *) arg1) + 0x14)) = -1;
+    }
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", evaluateSFXState__19AmbientSoundManagerP17SFXStreamingSound);
 
