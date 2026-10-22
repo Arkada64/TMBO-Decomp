@@ -68,3 +68,11 @@ Already baked in: DNS, Bugfixes, Skip Intros, No-Interlacing, 16:9, the 3 Balanc
    - Lost maps: pickups (placement data may be missing/different) and skill weapons; AI route graph; spawns.
    - Harbor City (PS2 prototype): e.g. Pit Viper with Spectre's special.
    - Memory: test PCSX2 "128MB RAM (dev console)" from mod code (write/read above 32 MB) before laying out.
+6. Navmesh for bots (needed: bots hit pathfinding bugs engaging targets on some maps). Plan:
+   - Offline tool: walkable surfaces from each level's collision/terrain data (the hd* / terrain nodes the
+     game's collision uses) -> navmesh (Recast-style voxelize + regions + polygons) -> per-level pack file.
+   - Runtime (mod C, host only): load the pack, A* over polygons (+ string pulling) from bot to target.
+   - Plug in where the driver picks its next route point (driverGetNextPoint / ...InFrontOfVehicle,
+     func_00102D78 follow) and where groups are tested (attractGetGroupTestPointIsIn); keep the
+     attractor graph as fallback and aiHuntUsingLOS (direct steering) for open line of sight.
+   - Needs from Ark: list of maps/spots where bots get stuck or route wrong.
