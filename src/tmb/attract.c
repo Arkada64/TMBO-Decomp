@@ -27,7 +27,14 @@ s32 getNumOccupants__12AttractPoint(void* arg0) {
     return var_v0;
 }
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attract", attractInitBeforeDbLoad__15AttractorPointsP12AttractPointP10StartPoint);
+void attractInitBeforeDbLoad__15AttractorPointsP12AttractPointP10StartPoint(void *arg0, void *arg1, void *arg2)
+{
+  *((void **) (((u8 *) arg0) + 4)) = arg2;
+  *((void **) (((u8 *) arg0) + 0)) = arg1;
+  *((s32 *) (((u8 *) arg0) + 0x24C)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x250)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x248)) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/attract", attractInitAfterDbLoad__15AttractorPoints);
 
