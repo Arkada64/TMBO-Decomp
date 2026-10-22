@@ -173,7 +173,25 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/animChan", animationRunGl
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/animChan", animationInitialize__FP10_animationP17_animCharInstancei);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/animChan", animationInitGlobal__Fv);
+extern u8 globalAnimation_34_121[] __asm__("globalAnimation");
+
+s32 animationInitGlobal__Fv(void)
+{
+  u8 *new_var;
+  s32 var_v1;
+  s32 *var_v0;
+  new_var = (u8 *) globalAnimation_34_121;
+  var_v1 = 0xD;
+  var_v0 = new_var + 0x34;
+  do
+  {
+    *var_v0 = 0;
+    var_v1 -= 1;
+    var_v0 -= 0x1;
+  }
+  while (var_v1 >= 0);
+  return (s32) var_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/animChan", animationSetGlobal__FP9_hierheadi);
 
