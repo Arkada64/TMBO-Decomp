@@ -1,17 +1,67 @@
 #include "common.h"
+#include "m2c_macros.h"
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highway", isValid__7HighwayPQ27Highway8Waypoint);
+s32 isValid__7HighwayPQ27Highway8Waypoint(void* arg0, void* arg1) {
+    s32 var_v1;
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highway", addOccupant__Q27Highway8WaypointP7Vehicle);
+    var_v1 = 0;
+    if ((u32) arg1 >= (u32) arg0) {
+        var_v1 = (u32) arg1 < (u32) (arg0 + (M2C_FIELD(arg0, s32* , 0x2444) * 0x10));
+    }
+    return var_v1;
+}
+
+s32 addOccupant__Q27Highway8WaypointP7Vehicle(void* arg0, void* arg1) {
+    void* temp_v0;
+
+    temp_v0 = M2C_FIELD(arg0, void** , 0xC);
+    M2C_FIELD(arg1, void** , 0x2014) = temp_v0;
+    M2C_FIELD(arg0, void** , 0xC) = arg1;
+    return (s32) temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highway", removeOccupant__Q27Highway8WaypointP7Vehicle);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highway", getNumOccupants__Q27Highway8Waypoint);
+s32 getNumOccupants__Q27Highway8Waypoint(void* arg0) {
+    s32 var_v0;
+    void* var_v1;
+
+    var_v1 = M2C_FIELD(arg0, void** , 0xC);
+    var_v0 = 0;
+    if (var_v1 != NULL) {
+        do {
+            var_v1 = M2C_FIELD(var_v1, void** , 0x2014);
+            var_v0 += 1;
+        } while (var_v1 != NULL);
+    }
+    return var_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highway", clearWaypoints__7Highway);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highway", clearRoadblock__7Highwayi);
+int isRoadblockSet__7Highwayi_58_11(void*, int) __asm__("isRoadblockSet__7Highwayi");
+s32 clearRoadblock__7Highwayi(void* arg0, s32 arg1) {
+    s32 var_v0;
+
+    var_v0 = isRoadblockSet__7Highwayi_58_11(arg0, arg1);
+    if (var_v0 != 0) {
+        if (M2C_FIELD(arg0, s32* , 0x244C) == arg1) {
+            M2C_FIELD(arg0, s32* , 0x244C) = (s32) M2C_FIELD(arg0, s32* , 0x2450);
+        }
+        var_v0 = M2C_FIELD(arg0, s32* , 0x2448) - 1;
+        M2C_FIELD(arg0, s32* , 0x2448) = var_v0;
+    }
+    return var_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highway", setRoadblock__7Highwayi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/highway", isRoadblockSet__7Highwayi);
+s32 isRoadblockSet__7Highwayi(void* arg0, s32 arg1) {
+    s32 var_v1;
+
+    var_v1 = 0;
+    if ((M2C_FIELD(arg0, s32* , 0x244C) == arg1) || (M2C_FIELD(arg0, s32* , 0x2450) == arg1)) {
+        var_v1 = 1;
+    }
+    return var_v1;
+}
