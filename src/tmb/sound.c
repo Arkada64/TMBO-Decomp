@@ -336,7 +336,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updatePrisonFirst
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateFoldingRampSound__16PrisonLevelSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateBlimpWeaponState__16PrisonLevelSoundii);
+void updateBlimpWeaponState__16PrisonLevelSoundii(void *arg0, s32 arg1, s32 arg2)
+{
+  *((s32 *) (((u8 *) arg0) + 0x5C)) = arg2;
+  *((s32 *) (((u8 *) arg0) + 0x58)) = arg1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updatePrisonLevelSound__16PrisonLevelSoundifiii);
 
