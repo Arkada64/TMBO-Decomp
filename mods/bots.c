@@ -177,7 +177,7 @@ extern void driverSetTarget(char* drv, char* target) __asm__("func_00130C00");
 extern int attractGroupAt(void* points, void* pos) __asm__("func_0010B950");
 extern float manhat(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
 static int thinkTick;
-static int dbgCalls[8], dbgHb[8];   /* TMBR_BOTDBG: AI frames seen by the hook, handbrake frames */
+static int dbgCalls[8], dbgHb[8], dbgWhy[8];   /* TMBR_BOTDBG: AI frames seen by the hook, handbrake frames */
 static int dbgBits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 #define SPECIAL_CHANCE 35 /* % of the time a bot may pick its special when it chooses a weapon (FFA) */
 
@@ -220,10 +220,10 @@ void tmbr_BotsThink(void)
             {
                 int vi = (int)(b - g) / 0x31B0 & 7;
                 unsigned char* pd = (unsigned char*)b + 0x594;
-                scePrintf("TMBR botdbg %d: mode %d tgt %x(%d) dist %d brg %08x | atk %d tmr %d ok %d grp %d noLos %d see %d stuck %d diff %d | calls %d hb %d pad %d%d%d%d%d%d\n",
+                scePrintf("TMBR botdbg %d: mode %d tgt %x(%d) dist %d brg %08x | atk %d tmr %d ok %d grp %d noLos %d see %d stuck %d diff %d | calls %d hb %d why %d pad %d%d%d%d%d%d\n",
                     i, F(dv, 4), (u32)t, t ? F(t, 0x590) : -1, (int)*(float*)(br + 0x20), dbgBits(*(float*)(br + 0x24)),
                     F(br, 0x414), F(br, 0x488), F(br, 0x60C), F(dv, 0x270), F(br, 0x4B0), F(br, 0x598), F(b, 0x444),
-                    F(g, 0x9A3D4), dbgCalls[vi], dbgHb[vi], pd[2], pd[4], pd[6], pd[8], pd[9], pd[0xA]);
+                    F(g, 0x9A3D4), dbgCalls[vi], dbgHb[vi], dbgWhy[vi], pd[2], pd[4], pd[6], pd[8], pd[9], pd[0xA]);
             }
         }
 }
@@ -233,21 +233,26 @@ void tmbr_BotsThink(void)
  * groups: for a bot target put its own group there for the duration of the frame. */
 extern int aiFrame(char* v) __asm__("func_00101F88");
 
-/* Handbrake turns. Left alone, a bot whose target is off to the side brakes and slowly swings round
- * (func_00102948), and only AI 0 ever pulls the handbrake (func_00130D68 checks aiOrPlayerIdx == 0, and only
- * past 120 deg). With a chosen count, after the AI frame has written its pad bytes (vehicle+0x594, read by the
- * physics later in the frame): when a hunting bot is in its attack states, the target is near and 40..150 deg
- * off the nose, pull the handbrake (pad[2]), steer hard toward it and stay on the gas. Bursts of at most
- * HB_HOLD frames then HB_REST frames of normal driving, so it whips round instead of spinning in place.
+/* Combat steering. The log (Ark, 2026-10-22) showed bots parked in attack state 6 (aiLineUpShot) for 20+ s
+ * at 20-300 units from their target, braking with no steer: state 6 waits for brain->aimed (target within
+ * 35 deg ahead) and never times out, while the hunt driving at close range only brakes. And the original only
+ * lets AI 0 pull the handbrake (func_00130D68 checks aiOrPlayerIdx == 0, past 120 deg).
+ * After the AI frame has written its pad bytes (vehicle+0x594, read by the physics later in the frame), when
+ * a hunting bot is in its attack states (4..7), its target is within CS_DIST and more than CS_AIM off the nose:
+ * steer hard toward it, stay on the gas, no brake; past CS_HB pull the handbrake (pad[2]) in bursts of HB_HOLD
+ * frames with HB_REST frames between, so it whips round instead of spinning. Inside CS_AIM the AI aims.
+ * Watchdog: state 6 for more than STALL frames goes back to weapon choice (state 1).
  * Floats are compared as bit patterns (no .lit4 literals): positive IEEE floats order like ints. */
 #define PAD(v) ((unsigned char*)(v) + 0x594)
-#define HB_MIN  0x3F333333   /* 0.7 rad, ~40 deg */
-#define HB_MAX  0x40266666   /* 2.6 rad, ~150 deg (beyond that the AI's own rear/reverse logic is better) */
-#define HB_DIST 0x43FA0000   /* 500.0 */
-#define HB_HOLD 18
-#define HB_REST 40
+#define CS_AIM  0x3EB33333   /* 0.35 rad, ~20 deg */
+#define CS_HB   0x3F333333   /* 0.7 rad, ~40 deg */
+#define CS_DIST 0x44160000   /* 600.0 */
+#define HB_HOLD 24
+#define HB_REST 20
+#define STALL 240
 static signed char hbTimer[8];
 static int fbits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
+extern void aiSetAttackState(char* v, int st) __asm__("aiSetAttackState__7Vehicle12_attackState");
 
 static void aggressiveTurn(char* g, char* v, char* t)
 {
@@ -256,20 +261,25 @@ static void aggressiveTurn(char* g, char* v, char* t)
     unsigned char* pad = PAD(v);
     int idx = (int)(v - g) / 0x31B0, st, b, a, d;
     if (idx < 0 || idx > 7 || !br || !drv) return;
-    if (hbTimer[idx] < 0) { hbTimer[idx]++; return; }           /* resting */
     st = F(br, 0x414);
     b = fbits(*(float*)(br + 0x24));
     a = b & 0x7FFFFFFF;
     d = fbits(*(float*)(br + 0x20));
-    if (F(drv, 4) != 5 || st < 4 || st > 7 || F(v, 0x444) >= 60 || d < 0 || d > HB_DIST || a < HB_MIN || a > HB_MAX) {
-        if (hbTimer[idx] > 0) hbTimer[idx] = -HB_REST;          /* a burst just ended */
-        return;
-    }
-    if (++hbTimer[idx] > HB_HOLD) { hbTimer[idx] = -HB_REST; return; }
-    dbgHb[idx]++;
-    pad[2] = 1;                                                 /* handbrake */
+    if (hbTimer[idx] < 0) hbTimer[idx]++;
+    if (F(drv, 4) != 5) { dbgWhy[idx] = 1; return; }
+    if (st < 4 || st > 7) { dbgWhy[idx] = 2; return; }
+    if (F(v, 0x444) >= 60) { dbgWhy[idx] = 3; return; }        /* stuck: the AI's own reverse/turn */
+    if (st == 6 && F(br, 0x488) > STALL) { dbgWhy[idx] = 4; aiSetAttackState(v, 1); return; }
+    if (d < 0 || d > CS_DIST) { dbgWhy[idx] = 5; return; }
+    if (a < CS_AIM) { dbgWhy[idx] = 6; return; }               /* nearly lined up: the AI aims */
+    dbgWhy[idx] = 7;
     if (b > 0) { pad[0xA] = 1; pad[9] = 0; } else { pad[9] = 1; pad[0xA] = 0; }  /* bearing > 0 = right */
     pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* gas, no brake */
+    pad[2] = 0;
+    if (a >= CS_HB && hbTimer[idx] >= 0) {
+        if (++hbTimer[idx] > HB_HOLD) hbTimer[idx] = -HB_REST;
+        else { pad[2] = 1; dbgHb[idx]++; }                      /* handbrake */
+    } else if (hbTimer[idx] > 0) hbTimer[idx] = -HB_REST;
 }
 
 int tmbr_AiUpdate(char* v)
