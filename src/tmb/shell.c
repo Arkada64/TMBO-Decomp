@@ -200,4 +200,16 @@ void _GLOBAL_$I$commandLinePageCars(void) {
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/shell", func_001634C0);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/shell", func_001634E0);
+M2C_UNK __builtin_delete_1C_128() __asm__("__builtin_delete");
+
+void func_001634E0(s32 arg0, s32 arg1)
+{
+  s32 new_var;
+  s32 temp_a1;
+  ;
+  if ((arg1 & 1) != 0)
+  {
+    new_var = temp_a1;
+    __builtin_delete_1C_128(new_var);
+  }
+}
