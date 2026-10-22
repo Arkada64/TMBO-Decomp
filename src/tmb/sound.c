@@ -1,10 +1,15 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", soundPlaySkillCountOneShot__FP7Vehicle);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initAnimationSound__14AnimationSoundP7Vehicle);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", stopAnimationSounds__14AnimationSound);
+M2C_UNK terminateLoop__FPUi_8_7() __asm__("terminateLoop__FPUi");
+
+void stopAnimationSounds__14AnimationSound(void) {
+    terminateLoop__FPUi_8_7();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playAxleAnimationSound__14AnimationSound);
 
@@ -86,7 +91,35 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playVehicleCollis
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playCollisionSound__12VehicleSoundii);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initProjectileSound__15ProjectileSound);
+void animationGetHandle__FP11_animHandleUiUiUi_84_123(void*, unsigned int, unsigned int, unsigned int) __asm__("animationGetHandle__FP11_animHandleUiUiUi");
+s32 timerGetFieldCount__Fv_84_123(void) __asm__("timerGetFieldCount__Fv");
+extern u8 NormalMineHandle_84_123[] __asm__("NormalMineHandle");
+
+void initProjectileSound__15ProjectileSound(void* arg0) {
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
+
+    M2C_FIELD(arg0, s32* , 0x20) = 0;
+    M2C_FIELD(arg0, s32* , 0x18) = 0;
+    M2C_FIELD(arg0, s32* , 0x1C) = 0;
+    temp_v0 = timerGetFieldCount__Fv_84_123();
+    M2C_FIELD(arg0, s32* , 0x28) = 0;
+    M2C_FIELD(arg0, s32* , 0x24) = temp_v0;
+    temp_v0_2 = timerGetFieldCount__Fv_84_123();
+    M2C_FIELD(arg0, s32* , 4) = 0;
+    M2C_FIELD(arg0, s32* , 0x38) = 0;
+    M2C_FIELD(arg0, s32* , 0x3C) = 0;
+    M2C_FIELD(arg0, s32* , 0x10) = temp_v0_2;
+    temp_v0_3 = timerGetFieldCount__Fv_84_123();
+    M2C_FIELD(arg0, s32* , 8) = 0;
+    M2C_FIELD(arg0, s32* , 0xC) = 0;
+    M2C_FIELD(arg0, s32* , 0x14) = 0;
+    M2C_FIELD(arg0, s32* , 0x34) = temp_v0_3;
+    M2C_FIELD(arg0, s32* , 0x30) = 0x3FFF;
+    M2C_FIELD(arg0, s32* , 0x2C) = timerGetFieldCount__Fv_84_123();
+    animationGetHandle__FP11_animHandleUiUiUi_84_123(((u8*)NormalMineHandle_84_123), 0xFDB, 0, 0);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateProjectileSound__15ProjectileSoundi);
 
@@ -100,7 +133,16 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", triggerAxleShockW
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateProjectileSound__15ProjectileSoundP8_fvectoriP7Vehicleii);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initHudSound__8HudSound);
+int timerGetFieldCount__Fv_30_140(void) __asm__("timerGetFieldCount__Fv");
+s32 initHudSound__8HudSound(void* arg0) {
+    s32 temp_v0;
+
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    M2C_FIELD(arg0, s32* , 8) = 0;
+    temp_v0 = timerGetFieldCount__Fv_30_140();
+    M2C_FIELD(arg0, s32* , 0x10) = temp_v0;
+    return temp_v0;
+}
 
 void updateHudSound__8HudSoundP7Vehicle(void) {
 }
@@ -115,9 +157,18 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playLowHealthBeep
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", activateSpectreLockedOnWarning__8HudSoundP7Vehicle);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateHudSounds__8HudSound);
+M2C_UNK terminateLoop__FPUi_28_162() __asm__("terminateLoop__FPUi");
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateSpectreLockedOnWarning__8HudSound);
+void terminateHudSounds__8HudSound(s32 arg0) {
+    terminateLoop__FPUi_28_162();
+    terminateLoop__FPUi_28_162(arg0 + 8);
+}
+
+M2C_UNK terminateLoop__FPUi_8_165() __asm__("terminateLoop__FPUi");
+
+void terminateSpectreLockedOnWarning__8HudSound(void) {
+    terminateLoop__FPUi_8_165();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initFinalBossSound__14FinalBossSound);
 
@@ -140,9 +191,15 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playRicoReloadSou
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateBossSound__14FinalBossSoundP8_fvectoriii);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initShieldSound__11ShieldSound);
+void initShieldSound__11ShieldSound(s32* arg0) {
+    *arg0 = 0;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateShieldSound__11ShieldSound);
+M2C_UNK terminateLoop__FPUi_8_198() __asm__("terminateLoop__FPUi");
+
+void terminateShieldSound__11ShieldSound(void) {
+    terminateLoop__FPUi_8_198();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateShieldSound__11ShieldSoundP8_fvector);
 
@@ -154,23 +211,41 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updatePrisonFence
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateAxleSpecial__13LauncherSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initFerrisWheelSound__16FerrisWheelSound);
+void initFerrisWheelSound__16FerrisWheelSound(s32* arg0) {
+    *arg0 = 0;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateFerrisWheelSound__16FerrisWheelSound);
+M2C_UNK terminateLoop__FPUi_8_218() __asm__("terminateLoop__FPUi");
+
+void terminateFerrisWheelSound__16FerrisWheelSound(void) {
+    terminateLoop__FPUi_8_218();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateFerrisWheelSound__16FerrisWheelSoundP8_fvector);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initOceanSound__10OceanSound);
+void initOceanSound__10OceanSound(s32* arg0) {
+    *arg0 = 0;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateOceanSound__10OceanSound);
+M2C_UNK terminateLoop__FPUi_8_226() __asm__("terminateLoop__FPUi");
+
+void terminateOceanSound__10OceanSound(void) {
+    terminateLoop__FPUi_8_226();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateOceanSound__10OceanSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initHouseSound__10HouseSound);
+s32 initHouseSound__10HouseSound(void* arg0) {
+    M2C_FIELD(arg0, s32* , 4) = 0;
+    M2C_FIELD(arg0, s32* , 0) = 1;
+    return 1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateHouseSound__10HouseSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initTrainSound__10TrainSound);
+void initTrainSound__10TrainSound(void* arg0) {
+    M2C_FIELD(arg0, s32* , 4) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateTrainSound__10TrainSoundi);
 
@@ -178,19 +253,42 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initBuildingFalli
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateBuildingFallingSound__20BuildingFallingSoundi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", startBuildingFallingSound__20BuildingFallingSoundi);
+void startBuildingFallingSound__20BuildingFallingSoundi(void* arg0, s32 arg1) {
+    if (arg1 == 0) {
+        M2C_FIELD(arg0, s32* , 0x10) = 1;
+        return;
+    }
+    M2C_FIELD(arg0, s32* , 0x14) = 1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateBuildingFallingSound__20BuildingFallingSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initWreckingBallSound__17WreckingBallSound);
+void initWreckingBallSound__17WreckingBallSound(s32* arg0) {
+    *arg0 = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateWreckingBallSound__17WreckingBallSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initDeath4Sound__11Death4Sound);
+void initDeath4Sound__11Death4Sound(s32* arg0) {
+    *arg0 = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateDeath4Elevator__11Death4Sound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initCloudSound__10CloudSound);
+int timerGetFieldCount__Fv_48_258(void) __asm__("timerGetFieldCount__Fv");
+s32 initCloudSound__10CloudSound(void* arg0) {
+    f32 temp_f0;
+    s32 temp_v0;
+
+    M2C_FIELD(arg0, s32* , 4) = 0;
+    M2C_FIELD(arg0, s32* , 0xC) = 0;
+    M2C_FIELD(arg0, s32* , 8) = timerGetFieldCount__Fv_48_258();
+    temp_v0 = timerGetFieldCount__Fv_48_258();
+    temp_f0 = (f32) temp_v0;
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    M2C_FIELD(arg0, f32* , 0x14) = temp_f0;
+    return temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateCloudSound__10CloudSound);
 
@@ -210,11 +308,15 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initShipLevelSoun
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateShipLevelSound__14ShipLevelSoundf);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initAsylumLevelSound__16AsylumLevelSound);
+void initAsylumLevelSound__16AsylumLevelSound(s32* arg0) {
+    *arg0 = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateAsylumLevelSound__16AsylumLevelSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initLoopLevelSound__14LoopLevelSound);
+void initLoopLevelSound__14LoopLevelSound(s32* arg0) {
+    *arg0 = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateLoopLevelSound__14LoopLevelSoundiP8_fvector);
 
@@ -239,7 +341,19 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", startSecretDoorSo
 void setACUnitDestroyed__16PrisonLevelSoundi(void) {
 }
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", __10PhoneSound);
+s32 __10PhoneSound(void* arg0) {
+    s32 var_a1;
+    s32* var_v1;
+
+    var_a1 = 9;
+    var_v1 = arg0 + 0x4C;
+    do {
+        *var_v1 = 0;
+        var_a1 -= 1;
+        var_v1 -=0x1;
+    } while (var_a1 >= 0);
+    return (s32) arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initPhoneSound__10PhoneSoundifff);
 
@@ -257,7 +371,22 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initWindSound__9W
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateWindSound__9WindSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initPizzaManSound__13PizzaManSound);
+s32 mathfRand__Fii_54_351(int, int) __asm__("mathfRand__Fii");
+s32 timerGetFieldCount__Fv_54_351(void) __asm__("timerGetFieldCount__Fv");
+
+void initPizzaManSound__13PizzaManSound(void* arg0) {
+    s32 temp_v0;
+
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    M2C_FIELD(arg0, s32* , 4) = 0;
+    M2C_FIELD(arg0, s32* , 8) = 0;
+    M2C_FIELD(arg0, s32* , 0xC) = timerGetFieldCount__Fv_54_351();
+    temp_v0 = mathfRand__Fii_54_351(5, 0xA);
+    M2C_FIELD(arg0, s32* , 0x14) = 0;
+    M2C_FIELD(arg0, s32* , 0x10) = temp_v0;
+    M2C_FIELD(arg0, s32* , 0x18) = timerGetFieldCount__Fv_54_351();
+    M2C_FIELD(arg0, s32* , 0x1C) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", setPizzaManDead__13PizzaManSound);
 
@@ -277,47 +406,132 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateJetSound
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateJetSound__8JetSoundP8_fvector);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initHelicopterSound__15HelicopterSound);
+void initHelicopterSound__15HelicopterSound(s32* arg0) {
+    *arg0 = 0;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateHelicopterSound__15HelicopterSound);
+M2C_UNK terminateLoop__FPUi_8_369() __asm__("terminateLoop__FPUi");
+
+void terminateHelicopterSound__15HelicopterSound(void) {
+    terminateLoop__FPUi_8_369();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateHelicopterSound__15HelicopterSoundP8_fvectorii);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initBlimpSound__10BlimpSound);
+void initBlimpSound__10BlimpSound(s32* arg0) {
+    *arg0 = 0;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateBlimpSound__10BlimpSound);
+M2C_UNK terminateLoop__FPUi_8_379() __asm__("terminateLoop__FPUi");
+
+void terminateBlimpSound__10BlimpSound(void) {
+    terminateLoop__FPUi_8_379();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateBlimpSound__10BlimpSoundP8_fvectori);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initTransformerSound__16TransformerSound);
+void initTransformerSound__16TransformerSound(s32* arg0) {
+    *arg0 = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateTransformerSound__16TransformerSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initFireSound__9FireSoundfffii);
+void initFireSound__9FireSoundfffii(void* arg0, s32 arg1, s32 arg2, f32 fparg0, f32 fparg1, f32 fparg2) {
+    M2C_FIELD(arg0, f32* , 0x10) = fparg0;
+    M2C_FIELD(arg0, s32* , 0) = 1;
+    M2C_FIELD(arg0, f32* , 0x14) = fparg1;
+    M2C_FIELD(arg0, f32* , 0x18) = fparg2;
+    M2C_FIELD(arg0, s32* , 8) = arg1;
+    M2C_FIELD(arg0, s32* , 0xC) = arg2;
+    M2C_FIELD(arg0, s32* , 4) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateFireSound__9FireSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initTimedFireSound__14TimedFireSoundfffii);
+int timerGetFieldCount__Fv_44_396(void) __asm__("timerGetFieldCount__Fv");
+s32 initTimedFireSound__14TimedFireSoundfffii(void* arg0, f32 fparg0, f32 fparg1, f32 fparg2, s32 arg1, s32 arg2) {
+    s32 temp_v0;
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", activateTimedFireSound__14TimedFireSound);
+    M2C_FIELD(arg0, s32* , 0) = 0;
+    M2C_FIELD(arg0, s32* , 0xC) = 0;
+    M2C_FIELD(arg0, f32* , 0x20) = fparg0;
+    M2C_FIELD(arg0, f32* , 0x24) = fparg1;
+    M2C_FIELD(arg0, f32* , 0x28) = fparg2;
+    M2C_FIELD(arg0, s32* , 4) = arg1;
+    M2C_FIELD(arg0, s32* , 8) = arg2;
+    temp_v0 = timerGetFieldCount__Fv_44_396();
+    M2C_FIELD(arg0, s32* , 0x10) = temp_v0;
+    return temp_v0;
+}
+
+int timerGetFieldCount__Fv_30_399(void) __asm__("timerGetFieldCount__Fv");
+s32 activateTimedFireSound__14TimedFireSound(void* arg0) {
+    s32 temp_v0;
+
+    M2C_FIELD(arg0, s32* , 0xC) = 1;
+    temp_v0 = timerGetFieldCount__Fv_30_399();
+    M2C_FIELD(arg0, s32* , 0x10) = temp_v0;
+    return temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateTimedFireSound__14TimedFireSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", __10ShellSound);
+s32 __10ShellSound(void* arg0) {
+    return (s32) arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", _$_10ShellSound);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initShellSound__10ShellSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", cleanUpShellSound__10ShellSound);
+M2C_UNK terminateShellSound__10ShellSound_8_415() __asm__("terminateShellSound__10ShellSound");
+
+void cleanUpShellSound__10ShellSound(void) {
+    terminateShellSound__10ShellSound_8_415();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", startShellMusic__10ShellSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", stopShellMusic__10ShellSound);
+M2C_UNK snd_SetReverbDepth_58_420() __asm__("snd_SetReverbDepth");
+void soundStopSound__FPUi_58_420(void*) __asm__("soundStopSound__FPUi");
+void terminateShellSound__10ShellSound_58_420(void*) __asm__("terminateShellSound__10ShellSound");
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateShellSound__10ShellSound);
+void stopShellMusic__10ShellSound(void* arg0) {
+    s32 temp_v1;
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playShellSFXSound__10ShellSoundi);
+    M2C_FIELD(arg0, s32* , 0x1C) = 0;
+    temp_v1 = M2C_FIELD(arg0, s32* , 0x10);
+    M2C_FIELD(arg0, s32* , 0x20) = 0;
+    if ((temp_v1 != 0xFFFFFFFF) && (temp_v1 != 0)) {
+        snd_SetReverbDepth_58_420(3, 0, 0);
+        soundStopSound__FPUi_58_420(arg0 + 0x10);
+    }
+    terminateShellSound__10ShellSound_58_420(arg0);
+}
+
+M2C_UNK snd_SetReverbDepth_5C_423() __asm__("snd_SetReverbDepth");
+void terminateLoop__FPUi_5C_423(void*) __asm__("terminateLoop__FPUi");
+
+void terminateShellSound__10ShellSound(void* arg0) {
+    terminateLoop__FPUi_5C_423(arg0 + 0xC);
+    terminateLoop__FPUi_5C_423(arg0 + 0x10);
+    terminateLoop__FPUi_5C_423(arg0);
+    terminateLoop__FPUi_5C_423(arg0 + 4);
+    terminateLoop__FPUi_5C_423(arg0 + 8);
+    M2C_FIELD(arg0, s32* , 0x24) = -1;
+    snd_SetReverbDepth_5C_423(3, 0, 0);
+}
+
+M2C_UNK snd_PlaySoundVolPanPMPB_A_48_427() __asm__("snd_PlaySoundVolPanPMPB_A");
+M2C_UNK stopShellMusic__10ShellSound_48_427() __asm__("stopShellMusic__10ShellSound");
+extern u8 gShellSFXBank_48_427[4] __asm__("gShellSFXBank");
+
+void playShellSFXSound__10ShellSoundi(s32 arg0, s32 arg1) {
+    if (arg1 == 0xD) {
+        stopShellMusic__10ShellSound_48_427();
+    }
+    snd_PlaySoundVolPanPMPB_A_48_427((*(s32*)gShellSFXBank_48_427), arg1, 0x400, 0, 0, 0);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playRTShellSound__Fi);
 
@@ -329,33 +543,102 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateShellSFXSou
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playShellCarsEngineSound__10ShellSoundi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateShellCarsEngineSound__10ShellSound);
+void terminateLoop__FPUi_30_444(void*) __asm__("terminateLoop__FPUi");
+
+void terminateShellCarsEngineSound__10ShellSound(void* arg0) {
+    terminateLoop__FPUi_30_444(arg0 + 0xC);
+    M2C_FIELD(arg0, s32* , 0x24) = -1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playCarsGetInfoSound__10ShellSoundi);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateShellSound__10ShellSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initFlameSound__10FlameSound);
+void initFlameSound__10FlameSound(s32* arg0) {
+    *arg0 = 0;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateFlameSound__10FlameSound);
+M2C_UNK terminateLoop__FPUi_8_456() __asm__("terminateLoop__FPUi");
+
+void terminateFlameSound__10FlameSound(void) {
+    terminateLoop__FPUi_8_456();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateFlameSound__10FlameSoundP8_fvector);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initAmbientTrafficSound__19AmbientTrafficSound);
+void initAmbientTrafficSound__19AmbientTrafficSound(s32* arg0) {
+    *arg0 = 0;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateAmbientTrafficSound__19AmbientTrafficSound);
+M2C_UNK terminateLoop__FPUi_8_464() __asm__("terminateLoop__FPUi");
+
+void terminateAmbientTrafficSound__19AmbientTrafficSound(void) {
+    terminateLoop__FPUi_8_464();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateAmbientTrafficSound__19AmbientTrafficSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initFanSound__8FanSound);
+s32 initFanSound__8FanSound(void* arg0) {
+    s32 var_v0;
+    s32* var_a0;
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateFanSound__8FanSound);
+    var_a0 = arg0 + 0x14;
+    var_v0 = 5;
+    do {
+        *var_a0 = 0;
+        var_v0 -= 1;
+        var_a0 -=0x1;
+    } while (var_v0 >= 0);
+    return var_v0;
+}
+
+int terminateLoop__FPUi_40_472(void*) __asm__("terminateLoop__FPUi");
+s32 terminateFanSound__8FanSound(void* arg0) {
+    s32 temp_v0;
+    s32 var_s1;
+    void* var_s0;
+
+    var_s1 = 5;
+    var_s0 = arg0;
+    do {
+        var_s1 -= 1;
+        temp_v0 = terminateLoop__FPUi_40_472(var_s0);
+        var_s0 += 4;
+    } while (var_s1 >= 0);
+    return temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateFanSound__8FanSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initRooftopFanSound__15RooftopFanSound);
+s32 initRooftopFanSound__15RooftopFanSound(void* arg0) {
+    s32 var_v0;
+    s32* var_a0;
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateFanSound__15RooftopFanSound);
+    var_a0 = arg0 + 0xC;
+    var_v0 = 3;
+    do {
+        *var_a0 = 0;
+        var_v0 -= 1;
+        var_a0 -=0x1;
+    } while (var_v0 >= 0);
+    return var_v0;
+}
+
+int terminateLoop__FPUi_40_485(void*) __asm__("terminateLoop__FPUi");
+s32 terminateFanSound__15RooftopFanSound(void* arg0) {
+    s32 temp_v0;
+    s32 var_s1;
+    void* var_s0;
+
+    var_s1 = 3;
+    var_s0 = arg0;
+    do {
+        var_s1 -= 1;
+        temp_v0 = terminateLoop__FPUi_40_485(var_s0);
+        var_s0 += 4;
+    } while (var_s1 >= 0);
+    return temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateFanSound__15RooftopFanSound);
 
@@ -367,9 +650,71 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initLevelObjectSo
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateLevelObjectSound__16LevelObjectSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initLauncherSound__13LauncherSoundP8Launcher);
+int timerGetFieldCount__Fv_B8_497(void) __asm__("timerGetFieldCount__Fv");
+s32 initLauncherSound__13LauncherSoundP8Launcher(void* arg0, void* arg1) {
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 temp_v0_3;
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", stopLauncherSounds__13LauncherSound);
+    M2C_FIELD(arg0, s32* , 0x14) = 0;
+    M2C_FIELD(arg0, s32* , 0x60) = 0;
+    M2C_FIELD(arg0, s32* , 0x18) = 0;
+    M2C_FIELD(arg0, s32* , 0x1C) = 0;
+    M2C_FIELD(arg0, s32* , 0x20) = 0;
+    M2C_FIELD(arg0, s32* , 0x64) = 0;
+    M2C_FIELD(arg0, s32* , 0x30) = 0;
+    M2C_FIELD(arg0, s32* , 0x34) = 0;
+    M2C_FIELD(arg0, s32* , 0x38) = 0;
+    M2C_FIELD(arg0, s32* , 0x24) = 0;
+    M2C_FIELD(arg0, void** , 0x8C) = arg1;
+    M2C_FIELD(arg0, s32* , 0) = timerGetFieldCount__Fv_B8_497();
+    temp_v0_2 = timerGetFieldCount__Fv_B8_497();
+    M2C_FIELD(arg0, s32* , 0x68) = 0;
+    M2C_FIELD(arg0, s32* , 0x6C) = 0;
+    M2C_FIELD(arg0, s32* , 0x70) = 0;
+    M2C_FIELD(arg0, s32* , 0x74) = 0;
+    M2C_FIELD(arg0, s32* , 0x3C) = 0;
+    M2C_FIELD(arg0, s32* , 0x40) = 0;
+    M2C_FIELD(arg0, s32* , 0x2C) = 0;
+    M2C_FIELD(arg0, s32* , 0x44) = 0;
+    M2C_FIELD(arg0, s32* , 0xC) = 0;
+    M2C_FIELD(arg0, s32* , 0x5C) = 0;
+    M2C_FIELD(arg0, s32* , 4) = temp_v0_2;
+    temp_v0_3 = timerGetFieldCount__Fv_B8_497();
+    M2C_FIELD(arg0, s32* , 0x10) = 0;
+    M2C_FIELD(arg0, s32* , 0x48) = 0;
+    M2C_FIELD(arg0, s32* , 0x4C) = 0;
+    M2C_FIELD(arg0, s32* , 0x50) = 0;
+    M2C_FIELD(arg0, s32* , 0x54) = 0;
+    M2C_FIELD(arg0, s32* , 0x88) = temp_v0_3;
+    M2C_FIELD(arg0, s32* , 0x7C) = timerGetFieldCount__Fv_B8_497();
+    M2C_FIELD(arg0, s32* , 0x80) = timerGetFieldCount__Fv_B8_497();
+    temp_v0 = timerGetFieldCount__Fv_B8_497();
+    M2C_FIELD(arg0, s32* , 0x84) = temp_v0;
+    return temp_v0;
+}
+
+void terminateLoop__FPUi_A4_501(void*) __asm__("terminateLoop__FPUi");
+
+void stopLauncherSounds__13LauncherSound(s32 arg0) {
+    terminateLoop__FPUi_A4_501(arg0 + 0x14);
+    terminateLoop__FPUi_A4_501(arg0 + 0x18);
+    terminateLoop__FPUi_A4_501(arg0 + 0x1C);
+    terminateLoop__FPUi_A4_501(arg0 + 0x3C);
+    terminateLoop__FPUi_A4_501(arg0 + 0x40);
+    terminateLoop__FPUi_A4_501(arg0 + 0x2C);
+    terminateLoop__FPUi_A4_501(arg0 + 0x20);
+    terminateLoop__FPUi_A4_501(arg0 + 0x24);
+    terminateLoop__FPUi_A4_501(arg0 + 0x68);
+    terminateLoop__FPUi_A4_501(arg0 + 0x6C);
+    terminateLoop__FPUi_A4_501(arg0 + 0x70);
+    terminateLoop__FPUi_A4_501(arg0 + 0x74);
+    terminateLoop__FPUi_A4_501(arg0 + 0x60);
+    terminateLoop__FPUi_A4_501(arg0 + 0x64);
+    terminateLoop__FPUi_A4_501(arg0 + 0x30);
+    terminateLoop__FPUi_A4_501(arg0 + 0x34);
+    terminateLoop__FPUi_A4_501(arg0 + 0x38);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playRockSound__13LauncherSoundP8_fvector);
 
@@ -431,7 +776,12 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateTankerTo
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateTankCarTorchSound__13LauncherSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateChargerSpecialChargeUpSound__13LauncherSound);
+void terminateLoop__FPUi_2C_594(void*) __asm__("terminateLoop__FPUi");
+
+void terminateChargerSpecialChargeUpSound__13LauncherSound(s32 arg0) {
+    terminateLoop__FPUi_2C_594(arg0 + 0x20);
+    terminateLoop__FPUi_2C_594(arg0 + 0x24);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playOverchargeSound__13LauncherSoundP7Vehicle);
 
@@ -508,13 +858,104 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", unloadRTSoundBank
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", loadShellSoundBanks__12SoundManager);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", unloadShellSoundBanks__12SoundManager);
+M2C_UNK snd_ResolveBankXREFS_58_696() __asm__("snd_ResolveBankXREFS");
+M2C_UNK snd_SetReverbDepth_58_696() __asm__("snd_SetReverbDepth");
+M2C_UNK snd_UnloadBank_58_696() __asm__("snd_UnloadBank");
+extern u8 gShellCarsBank_58_696[4] __asm__("gShellCarsBank");
+extern u8 gShellMusicBank_58_696[4] __asm__("gShellMusicBank");
+extern u8 gShellSFXBank_58_696[4] __asm__("gShellSFXBank");
+
+void unloadShellSoundBanks__12SoundManager(s32* arg0) {
+    snd_UnloadBank_58_696((*(s32*)gShellSFXBank_58_696));
+    (*(s32*)gShellSFXBank_58_696) = 0;
+    snd_UnloadBank_58_696((*(s32*)gShellCarsBank_58_696));
+    (*(s32*)gShellCarsBank_58_696) = 0;
+    snd_UnloadBank_58_696((*(s32*)gShellMusicBank_58_696));
+    (*(s32*)gShellMusicBank_58_696) = 0;
+    snd_ResolveBankXREFS_58_696();
+    *arg0 = 0;
+    snd_SetReverbDepth_58_696(3, 0, 0);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", loadVehicleAndSpWeaponSoundBank__12SoundManageri);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", loadAISpWeaponSoundBank__12SoundManageri);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", __19AmbientSoundManager);
+s32 __19AmbientSoundManager(void* arg0) {
+    void* sp0;
+    void* sp4;
+    void* sp8;
+    void* spC;
+    void* sp10;
+    void* sp14;
+    void* sp18;
+    void* sp1C;
+    void* sp20;
+    void* sp24;
+    void* sp28;
+    void* sp2C;
+    void* sp30;
+    void* sp34;
+    void* sp38;
+    void* sp3C;
+    s32 var_s2;
+    s32 var_s3;
+    void* var_s0;
+    void* var_s0_2;
+
+    sp3C = arg0 + 0x6E0;
+    sp14 = arg0 + 0x740;
+    sp28 = arg0 + 0x820;
+    sp0 = arg0 + 0x880;
+    sp18 = arg0 + 0x8E0;
+    var_s3 = 0xE;
+    sp2C = arg0 + 0x940;
+    sp4 = arg0 + 0x9A0;
+    var_s0 = arg0 + 0x50;
+    sp1C = arg0 + 0xA00;
+    sp30 = arg0 + 0xA60;
+    sp8 = arg0 + 0xAC0;
+    sp20 = arg0 + 0xB20;
+    sp34 = arg0 + 0xB80;
+    spC = arg0 + 0xBE0;
+    sp24 = arg0 + 0xC40;
+    sp38 = arg0 + 0xCA0;
+    sp10 = arg0 + 0xD00;
+    do {
+        var_s3 -= 1;
+        __14StreamingSound(var_s0);
+        var_s0 += 0x50;
+    } while (var_s3 != -1);
+    var_s0_2 = arg0 + 0x500;
+    var_s2 = 1;
+    do {
+        var_s2 -= 1;
+        __14StreamingSound(var_s0_2);
+        var_s0_2 += 0x50;
+    } while (var_s2 != -1);
+    __14StreamingSound(arg0 + 0x5A0);
+    __14StreamingSound(arg0 + 0x5F0);
+    __14StreamingSound(arg0 + 0x640);
+    __14StreamingSound(arg0 + 0x690);
+    __17SFXStreamingSound(sp3C);
+    __17SFXStreamingSound(sp14);
+    __17SFXStreamingSound(sp28);
+    __17SFXStreamingSound(sp0);
+    __17SFXStreamingSound(sp18);
+    __17SFXStreamingSound(sp2C);
+    __17SFXStreamingSound(sp4);
+    __17SFXStreamingSound(sp1C);
+    __17SFXStreamingSound(sp30);
+    __17SFXStreamingSound(sp8);
+    __17SFXStreamingSound(sp20);
+    __17SFXStreamingSound(sp34);
+    __17SFXStreamingSound(spC);
+    __17SFXStreamingSound(sp24);
+    __17SFXStreamingSound(sp38);
+    __17SFXStreamingSound(sp10);
+    M2C_FIELD(arg0, s32* , 0x7C4) = 0;
+    return (s32) arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", setReverbDepth__19AmbientSoundManagerffii);
 
@@ -540,17 +981,33 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", requestScream__19
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initStreamingSoundSectorLocations__19AmbientSoundManager);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", __14StreamingSound);
+s32 __14StreamingSound(void* arg0) {
+    M2C_FIELD(arg0, s32* , 0x40) = 4;
+    M2C_FIELD(arg0, f32* , 0x24) = 1.0f;
+    return (s32) arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", _$_14StreamingSound);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateStreamingSound__14StreamingSound);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", __17SFXStreamingSound);
+s32 __17SFXStreamingSound(void* arg0) {
+    __14StreamingSound(arg0);
+    M2C_FIELD(arg0, f32* , 0x28) = 2.0f;
+    return (s32) arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initSFXStreamingSound__17SFXStreamingSoundPcfffiiiii);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", setState__14StreamingSound18_ambientSoundState);
+int timerGetFieldCount__Fv_50_745(void) __asm__("timerGetFieldCount__Fv");
+void setState__14StreamingSound18_ambientSoundState(void* arg0, s32 arg1) {
+    M2C_FIELD(arg0, s32* , 0x40) = arg1;
+    if (arg1 == 0) {
+        M2C_FIELD(arg0, s32* , 0xC) = timerGetFieldCount__Fv_50_745();
+    } else if (arg1 == 3) {
+        M2C_FIELD(arg0, s32* , 8) = timerGetFieldCount__Fv_50_745();
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", updateSFXStreamingSound__17SFXStreamingSound);
 
@@ -564,7 +1021,20 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playBlimpExplosio
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playPizzaManExplosion__14ExplosionSoundP8_fvector);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", __17ErrantLoopManager);
+s32 __17ErrantLoopManager(void* arg0) {
+    s32 var_v1;
+    s32* var_v0;
+
+    var_v1 = 0x31;
+    var_v0 = arg0 + 0xC4;
+    do {
+        *var_v0 = 0;
+        var_v1 -= 1;
+        var_v0 -=0x1;
+    } while (var_v1 >= 0);
+    M2C_FIELD(arg0, s32* , 0xC8) = 0;
+    return (s32) arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", _$_17ErrantLoopManager);
 
@@ -584,13 +1054,21 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playCityLampDestr
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playExpodyLightPoleSound__FP8_fvector);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initTimberDebrisSound__17TimberDebrisSound);
+s32 timerGetFieldCount__Fv_28_794(void) __asm__("timerGetFieldCount__Fv");
+
+void initTimberDebrisSound__17TimberDebrisSound(s32* arg0) {
+    *arg0 = timerGetFieldCount__Fv_28_794();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playLightPoleBounceSound__17TimberDebrisSoundP8_fvectorf);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playLevelSpecificSound__FP8_fvectoriii);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", initRigidDebrisSound__16RigidDebrisSound);
+s32 timerGetFieldCount__Fv_28_803(void) __asm__("timerGetFieldCount__Fv");
+
+void initRigidDebrisSound__16RigidDebrisSound(s32* arg0) {
+    *arg0 = timerGetFieldCount__Fv_28_803();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playRigidDebrisSoundBounce__16RigidDebrisSoundP8_fvectorif);
 
@@ -604,13 +1082,22 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", playFoundGodModeS
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", soundPlayPickupSound__FP7Vehiclei);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", soundUpdate__Fv);
+M2C_UNK snd_FlushSoundCommands_8_821() __asm__("snd_FlushSoundCommands");
+
+void soundUpdate__Fv(void) {
+    snd_FlushSoundCommands_8_821();
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", soundPlayVAGCB__FUiUl);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", soundPlayCB__FUiUl);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", soundStopSound__FPUi);
+M2C_UNK snd_StopSound_2C_828() __asm__("snd_StopSound");
+
+void soundStopSound__FPUi(s32* arg0) {
+    snd_StopSound_2C_828(*arg0);
+    *arg0 = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", terminateLoop__FPUi);
 
@@ -628,4 +1115,8 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", calculatePanAngle
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", _GLOBAL_$D$gShipHasDocked);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/sound", _GLOBAL_$I$gShipHasDocked);
+extern u8 gErrantLoopManager_C_857[] __asm__("gErrantLoopManager");
+
+void _GLOBAL_$I$gShipHasDocked(void) {
+    __17ErrantLoopManager(((u8*)gErrantLoopManager_C_857));
+}
