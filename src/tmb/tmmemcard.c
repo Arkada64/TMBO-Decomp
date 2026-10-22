@@ -1,8 +1,26 @@
 #include "common.h"
+#include "m2c_macros.h"
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tmmemcard", __17TwistedMemoryCard);
+s32 __17TwistedMemoryCard(void* arg0) {
+    __10MemoryCard(arg0);
+    M2C_FIELD(arg0, s32* , 0x6C) = 1;
+    M2C_FIELD(arg0, s32* , 0x70) = 0;
+    M2C_FIELD(arg0, s32* , 0x74) = 0;
+    return (s32) arg0;
+}
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tmmemcard", prep__17TwistedMemoryCard);
+void initialize__10MemoryCardPcT1T1_44_3(void*, void*, void*, void*) __asm__("initialize__10MemoryCardPcT1T1");
+extern u8 D_004EAE30_44_3[] __asm__("D_004EAE30");
+extern u8 D_004EAE40_44_3[] __asm__("D_004EAE40");
+extern u8 D_004EAE50_44_3[] __asm__("D_004EAE50");
+
+s32 prep__17TwistedMemoryCard(void* arg0) {
+    if (M2C_FIELD(arg0, s32* , 0x6C) != 0) {
+        M2C_FIELD(arg0, s32* , 0x6C) = 0;
+        initialize__10MemoryCardPcT1T1_44_3(arg0, ((u8*)D_004EAE30_44_3), ((u8*)D_004EAE40_44_3), ((u8*)D_004EAE50_44_3));
+    }
+    return 1;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/tmmemcard", doesTwistedDirectoryExist__17TwistedMemoryCardR9_MCStatus);
 
