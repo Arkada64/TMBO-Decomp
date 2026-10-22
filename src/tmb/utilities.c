@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/utilities", loadShellTextureFile__10BlitMasterPCc);
 
@@ -17,7 +18,11 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/utilities", WaitDMA__Fv);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/utilities", buildProgressBar__FUi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/utilities", getLoadbarPacket__Fv);
+extern u8 loadbarBuf_C_21[] __asm__("loadbarBuf");
+
+s32 getLoadbarPacket__Fv(void) {
+    return (s32) ((u8*)loadbarBuf_C_21);
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/utilities", initProgressBar__Fiiib);
 
