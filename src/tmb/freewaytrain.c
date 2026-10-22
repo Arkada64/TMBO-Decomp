@@ -63,7 +63,26 @@ s32 update__12FreewayTrain(void* arg0) {
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/freewaytrain", addNode__12FreewayTrainiP9_hierhead);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/freewaytrain", BlowUpCar__12FreewayTrainP9_hierheadifP8_fvector);
+void blowUpCar__15FreewayTrainCarP9_hierheadfP8_fvectori_78_12(void *, void *, float, void *, int) __asm__("blowUpCar__15FreewayTrainCarP9_hierheadfP8_fvectori");
+s32 BlowUpCar__12FreewayTrainP9_hierheadifP8_fvector(void *arg0, void *arg1, s32 arg2, f32 fparg0, void *arg3)
+{
+  s32 temp_a3;
+  s32 temp_v0;
+  s32 var_s0;
+  void *var_s1;
+  var_s1 = arg0;
+  var_s0 = 0;
+  do
+  {
+    blowUpCar__15FreewayTrainCarP9_hierheadfP8_fvectori_78_12(var_s1, *((void **) (((u8 *) arg1) + 0x14)), fparg0, arg3, var_s0);
+    ;
+    var_s0 += 1;
+    temp_v0 = var_s0 < 4;
+    var_s1 += 0x60;
+  }
+  while (temp_v0 != 0);
+  return temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/freewaytrain", update__15FreewayTrainCar);
 
