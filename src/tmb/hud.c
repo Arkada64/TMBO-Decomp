@@ -1,6 +1,10 @@
 #include "common.h"
+#include "m2c_macros.h"
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hud", __3Hud);
+s32 __3Hud(void* arg0) {
+    M2C_FIELD(arg0, s32* , 0x7FC) = 0;
+    return (s32) arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hud", ParseHudElements__FiiP9_hierhead);
 
@@ -14,7 +18,13 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hud", updateMachineGunOve
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hud", updateWeaponDisplay__3Hud);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hud", toggleWeaponDisplay__3Hud);
+void toggleWeaponDisplay__3Hud(void* arg0) {
+    if (M2C_FIELD(arg0, s32* , 0x7FC) == 0) {
+        M2C_FIELD(arg0, s32* , 0x7FC) = 1;
+        return;
+    }
+    M2C_FIELD(arg0, s32* , 0x7FC) = 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hud", updateHUDPosition__3Hud);
 
@@ -36,7 +46,16 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hud", BuildRadarStuff__3H
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hud", updateClosestEnemyInfo__3Hudi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hud", ResetDBElements__3Hud);
+s32 ResetDBElements__3Hud(void* arg0) {
+    void* temp_v0;
+
+    M2C_FIELD(M2C_FIELD(arg0, void** , 0x99C), s8* , 8) = 1;
+    M2C_FIELD(M2C_FIELD(arg0, void** , 0x9A0), s8* , 8) = 1;
+    temp_v0 = M2C_FIELD(arg0, void** , 0x9A4);
+    M2C_FIELD(temp_v0, s8* , 8) = 1;
+    M2C_FIELD(M2C_FIELD(arg0, void** , 0x9A8), s8* , 8) = 1;
+    return (s32) temp_v0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hud", AddRadarSignal__3HudiP8_fvector9_bliptypef);
 
