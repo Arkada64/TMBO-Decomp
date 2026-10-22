@@ -3,7 +3,32 @@
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hoserInfo", hoserInfoInit__FP9HoserInfo);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hoserInfo", hoserFindFreeBookmark__FP9HoserInfo);
+s32 hoserFindFreeBookmark__FP9HoserInfo(void *arg0)
+{
+  int new_var2;
+  s32 var_a1;
+  s32 var_a2;
+  s32 *var_v1;
+  void *new_var;
+  var_a2 = -1;
+  var_a1 = 0;
+  new_var = arg0 + 0x80;
+  new_var2 = -1;
+  var_v1 = new_var;
+  do
+  {
+    if ((*var_v1) == new_var2)
+    {
+      var_a2 = var_a1;
+      var_v1 = arg0 + 0x1340;
+      var_a1 = 0x32;
+    }
+    var_a1 += 1;
+    var_v1 += 0x18;
+  }
+  while (var_a1 < 0x32);
+  return var_a2;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/hoserInfo", hoserAddBookmark__FP9HoserInfoPA3_fP8_fvector);
 
