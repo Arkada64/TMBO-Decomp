@@ -25,7 +25,23 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/ai", aiTurn__7Vehicle);
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/ai", aiTurnCorner__7Vehicle);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/ai", aiInitTurnAndShoot__7Vehicleii);
+void aiInitTurnAndShoot__7Vehicleii(void *arg0, s32 arg1, s32 arg2)
+{
+  void *temp_a3;
+  void *temp_v0;
+  temp_a3 = *((void **) (((u8 *) arg0) + 0x2008));
+  if (((*((f32 *) (((u8 *) temp_a3) + 0x1A0))) == 0.0f) && ((*((s32 *) (((u8 *) arg0) + 0x20A8))) != 0x1E0))
+  {
+    temp_v0 = *((void **) (((u8 *) arg0) + 0x2004));
+    *((s32 *) (((u8 *) temp_v0) + 0x5CC)) = 1;
+    *((s32 *) (((u8 *) temp_v0) + 0x5D0)) = 0;
+    *((s32 *) (((u8 *) temp_a3) + 0x258)) = 1;
+    *((s32 *) (((u8 *) temp_v0) + 0x444)) = arg1;
+    *((s32 *) (((u8 *) temp_v0) + 0x448)) = arg2;
+    *((s32 *) (((u8 *) temp_v0) + 0x458)) = 0;
+    *((s32 *) (((u8 *) temp_a3) + 0x250)) = (*((s32 *) (((u8 *) temp_a3) + 0x254)) = 0);
+  }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/ai", aiTurnAndShoot__7Vehicle);
 
