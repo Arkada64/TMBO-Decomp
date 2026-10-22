@@ -25,7 +25,16 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputUseLgActuato
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputAnyKey__Fi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputIsCtlAvailable__Fib);
+extern u8 padReady_18_42[] __asm__("padReady");
+
+s32 inputIsCtlAvailable__Fib(s32 arg0, u8 arg1)
+{
+  u8 *new_var2;
+  s32 *new_var;
+  new_var2 = ((*(new_var = &arg0)) * 4) + ((u8 *) padReady_18_42);
+  new_var = new_var2;
+  return *new_var;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputGetPadButtons__Fi);
 
