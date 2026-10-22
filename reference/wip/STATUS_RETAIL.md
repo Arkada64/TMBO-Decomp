@@ -43,7 +43,7 @@
   the venv; m2c still fine). Smoke test: IsAscii__FPc solved in 30 s.
 
 - Permuter run 1 (`perm_run.py 8 180 120 4`, ~2.5 h): **53 solved of 120** (closest first).
-  Retail now has **483 functions in the build** (429 + 53 + IsAscii... see git log), plus upstream's 107.
+  Retail now has **482 functions in the build** (429 + 53), plus upstream's 107.
 
 ## Next
 1. More permuter runs: `perm_run.py 8 180 120 4` continues with the next 120 (done.txt).

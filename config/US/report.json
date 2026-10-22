@@ -1,9 +1,9 @@
 {
   "measures": {
-    "fuzzy_match_percent": 2.2088175,
-    "total_code": "1221468",
+    "fuzzy_match_percent": 2.208955,
+    "total_code": "1221392",
     "matched_code": "26980",
-    "matched_code_percent": 2.2088175,
+    "matched_code_percent": 2.208955,
     "matched_data_percent": 100.0,
     "total_functions": 3606,
     "matched_functions": 107,
@@ -1192,7 +1192,7 @@
     {
       "name": "tmb/attractped",
       "measures": {
-        "total_code": "12208",
+        "total_code": "12204",
         "matched_data_percent": 100.0,
         "total_functions": 52,
         "total_units": 1
@@ -1200,7 +1200,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "12208",
+          "size": "12204",
           "metadata": {
             "virtual_address": "1093920"
           }
@@ -1566,7 +1566,7 @@
         },
         {
           "name": "getDbId__10Pedestrian",
-          "size": "24",
+          "size": "20",
           "metadata": {
             "virtual_address": "1106104"
           }
@@ -3059,7 +3059,7 @@
     {
       "name": "tmb/drivein",
       "measures": {
-        "total_code": "1136",
+        "total_code": "1132",
         "matched_data_percent": 100.0,
         "total_functions": 5,
         "total_units": 1
@@ -3067,7 +3067,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "1136",
+          "size": "1132",
           "metadata": {
             "virtual_address": "1201992"
           }
@@ -3104,7 +3104,7 @@
         },
         {
           "name": "AddEpNode__7DriveIniP9_hierhead",
-          "size": "24",
+          "size": "20",
           "metadata": {
             "virtual_address": "1203104"
           }
@@ -5296,7 +5296,7 @@
     {
       "name": "tmb/highway",
       "measures": {
-        "total_code": "512",
+        "total_code": "508",
         "matched_data_percent": 100.0,
         "total_functions": 8,
         "total_units": 1
@@ -5304,7 +5304,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "512",
+          "size": "508",
           "metadata": {
             "virtual_address": "1283848"
           }
@@ -5362,7 +5362,7 @@
         },
         {
           "name": "isRoadblockSet__7Highwayi",
-          "size": "40",
+          "size": "36",
           "metadata": {
             "virtual_address": "1284320"
           }
@@ -5379,7 +5379,7 @@
     {
       "name": "tmb/highwaydriver",
       "measures": {
-        "total_code": "4528",
+        "total_code": "4524",
         "matched_data_percent": 100.0,
         "total_functions": 20,
         "total_units": 1
@@ -5387,7 +5387,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "4528",
+          "size": "4524",
           "metadata": {
             "virtual_address": "1284360"
           }
@@ -5529,7 +5529,7 @@
         },
         {
           "name": "getWaypointIndex__7HighwayPQ27Highway8Waypoint",
-          "size": "16",
+          "size": "12",
           "metadata": {
             "virtual_address": "1288872"
           }
@@ -5852,7 +5852,7 @@
     {
       "name": "tmb/hwyloop",
       "measures": {
-        "total_code": "48",
+        "total_code": "44",
         "matched_data_percent": 100.0,
         "total_functions": 4,
         "total_units": 1
@@ -5860,7 +5860,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "48",
+          "size": "44",
           "metadata": {
             "virtual_address": "1322200"
           }
@@ -5890,7 +5890,7 @@
         },
         {
           "name": "addNode__11HighwayLoopiP9_hierhead",
-          "size": "24",
+          "size": "20",
           "metadata": {
             "virtual_address": "1322224"
           }
@@ -6490,7 +6490,7 @@
     {
       "name": "tmb/ped",
       "measures": {
-        "total_code": "6096",
+        "total_code": "6092",
         "matched_data_percent": 100.0,
         "total_functions": 38,
         "total_units": 1
@@ -6498,7 +6498,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "6096",
+          "size": "6092",
           "metadata": {
             "virtual_address": "1385040"
           }
@@ -6766,7 +6766,7 @@
         },
         {
           "name": "__tfQ210Pedestrian8Strategy",
-          "size": "64",
+          "size": "60",
           "metadata": {
             "virtual_address": "1391072"
           }
@@ -7094,7 +7094,7 @@
     {
       "name": "tmb/prison",
       "measures": {
-        "total_code": "7912",
+        "total_code": "7908",
         "matched_data_percent": 100.0,
         "total_functions": 23,
         "total_units": 1
@@ -7102,7 +7102,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "7912",
+          "size": "7908",
           "metadata": {
             "virtual_address": "1407584"
           }
@@ -7265,7 +7265,7 @@
         },
         {
           "name": "cleanupOnShutdown__6Prison",
-          "size": "40",
+          "size": "36",
           "metadata": {
             "virtual_address": "1415456"
           }
@@ -7643,7 +7643,7 @@
     {
       "name": "tmb/reset",
       "measures": {
-        "total_code": "3296",
+        "total_code": "3292",
         "matched_data_percent": 100.0,
         "total_functions": 6,
         "total_units": 1
@@ -7651,7 +7651,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "3296",
+          "size": "3292",
           "metadata": {
             "virtual_address": "1424784"
           }
@@ -7695,7 +7695,7 @@
         },
         {
           "name": "__tf5reset",
-          "size": "80",
+          "size": "76",
           "metadata": {
             "virtual_address": "1428000"
           }
@@ -7822,7 +7822,7 @@
     {
       "name": "tmb/shell",
       "measures": {
-        "total_code": "20232",
+        "total_code": "20228",
         "matched_data_percent": 100.0,
         "total_functions": 50,
         "total_units": 1
@@ -7830,7 +7830,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "20232",
+          "size": "20228",
           "metadata": {
             "virtual_address": "1435128"
           }
@@ -8182,7 +8182,7 @@
         },
         {
           "name": "func_001634E0",
-          "size": "32",
+          "size": "28",
           "metadata": {
             "virtual_address": "1455328"
           }
@@ -8609,7 +8609,7 @@
     {
       "name": "tmb/sound",
       "measures": {
-        "total_code": "118880",
+        "total_code": "118876",
         "matched_data_percent": 100.0,
         "total_functions": 313,
         "total_units": 1
@@ -8617,7 +8617,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "118880",
+          "size": "118876",
           "metadata": {
             "virtual_address": "1482816"
           }
@@ -10810,7 +10810,7 @@
         },
         {
           "name": "_GLOBAL_$I$gShipHasDocked",
-          "size": "16",
+          "size": "12",
           "metadata": {
             "virtual_address": "1601680"
           }
@@ -12071,7 +12071,7 @@
     {
       "name": "tmb/uimemcard",
       "measures": {
-        "total_code": "22592",
+        "total_code": "22588",
         "matched_data_percent": 100.0,
         "total_functions": 39,
         "total_units": 1
@@ -12079,7 +12079,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "22592",
+          "size": "22588",
           "metadata": {
             "virtual_address": "1696600"
           }
@@ -12354,7 +12354,7 @@
         },
         {
           "name": "setButtonPrompt__9UiMemCardPCc",
-          "size": "48",
+          "size": "44",
           "metadata": {
             "virtual_address": "1719144"
           }
@@ -12797,7 +12797,7 @@
     {
       "name": "tmb/watow",
       "measures": {
-        "total_code": "1152",
+        "total_code": "1148",
         "matched_data_percent": 100.0,
         "total_functions": 5,
         "total_units": 1
@@ -12805,7 +12805,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "1152",
+          "size": "1148",
           "metadata": {
             "virtual_address": "1771744"
           }
@@ -12842,7 +12842,7 @@
         },
         {
           "name": "AddEpNode__10WaterToweriP9_hierhead",
-          "size": "24",
+          "size": "20",
           "metadata": {
             "virtual_address": "1772872"
           }
@@ -13285,7 +13285,7 @@
     {
       "name": "tmb/989snd",
       "measures": {
-        "total_code": "8744",
+        "total_code": "8740",
         "matched_data_percent": 100.0,
         "total_functions": 111,
         "total_units": 1
@@ -13293,7 +13293,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "8744",
+          "size": "8740",
           "metadata": {
             "virtual_address": "1813664"
           }
@@ -14072,7 +14072,7 @@
         },
         {
           "name": "snd_GetDopplerPitchMod",
-          "size": "40",
+          "size": "36",
           "metadata": {
             "virtual_address": "1822368"
           }
@@ -16423,7 +16423,7 @@
           }
         },
         {
-          "name": "vifWorking",
+          "name": "hierWaitForVif1__Fv",
           "size": "16",
           "metadata": {
             "virtual_address": "1918952"
@@ -16713,7 +16713,7 @@
     {
       "name": "tmb/hoserInfo",
       "measures": {
-        "total_code": "1440",
+        "total_code": "1436",
         "matched_data_percent": 100.0,
         "total_functions": 10,
         "total_units": 1
@@ -16721,7 +16721,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "1440",
+          "size": "1436",
           "metadata": {
             "virtual_address": "1924104"
           }
@@ -16793,7 +16793,7 @@
         },
         {
           "name": "hoserGetHoserInfo__Fv",
-          "size": "16",
+          "size": "12",
           "metadata": {
             "virtual_address": "1925528"
           }
@@ -19183,7 +19183,7 @@
     {
       "name": "tmb/plight",
       "measures": {
-        "total_code": "4760",
+        "total_code": "4756",
         "matched_data_percent": 100.0,
         "total_functions": 32,
         "total_units": 1
@@ -19191,7 +19191,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "4760",
+          "size": "4756",
           "metadata": {
             "virtual_address": "2011184"
           }
@@ -19417,7 +19417,7 @@
         },
         {
           "name": "plightGetPktPtr__Fv",
-          "size": "16",
+          "size": "12",
           "metadata": {
             "virtual_address": "2015928"
           }
@@ -19551,7 +19551,7 @@
     {
       "name": "tmb/resetcom",
       "measures": {
-        "total_code": "2136",
+        "total_code": "2132",
         "matched_data_percent": 100.0,
         "total_functions": 17,
         "total_units": 1
@@ -19559,7 +19559,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "2136",
+          "size": "2132",
           "metadata": {
             "virtual_address": "2017032"
           }
@@ -19680,7 +19680,7 @@
         },
         {
           "name": "__tf8resetcom",
-          "size": "64",
+          "size": "60",
           "metadata": {
             "virtual_address": "2019104"
           }
@@ -22196,7 +22196,7 @@
     {
       "name": "tmb/zip",
       "measures": {
-        "total_code": "7312",
+        "total_code": "7308",
         "matched_data_percent": 100.0,
         "total_functions": 13,
         "total_units": 1
@@ -22204,7 +22204,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "7312",
+          "size": "7308",
           "metadata": {
             "virtual_address": "2092920"
           }
@@ -22297,7 +22297,7 @@
         },
         {
           "name": "_GLOBAL_$I$whichHalfMeg",
-          "size": "16",
+          "size": "12",
           "metadata": {
             "virtual_address": "2100216"
           }
@@ -22314,7 +22314,7 @@
     {
       "name": "tmb/audiodec",
       "measures": {
-        "total_code": "1800",
+        "total_code": "1796",
         "matched_data_percent": 100.0,
         "total_functions": 13,
         "total_units": 1
@@ -22322,7 +22322,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "1800",
+          "size": "1796",
           "metadata": {
             "virtual_address": "2100232"
           }
@@ -22415,7 +22415,7 @@
         },
         {
           "name": "audioDecResume__FP8AudioDec",
-          "size": "32",
+          "size": "28",
           "metadata": {
             "virtual_address": "2102000"
           }
@@ -22556,7 +22556,7 @@
     {
       "name": "tmb/ctx",
       "measures": {
-        "total_code": "160",
+        "total_code": "156",
         "matched_data_percent": 100.0,
         "total_functions": 2,
         "total_units": 1
@@ -22564,7 +22564,7 @@
       "sections": [
         {
           "name": ".text",
-          "size": "160",
+          "size": "156",
           "metadata": {
             "virtual_address": "2104528"
           }
@@ -22580,7 +22580,7 @@
         },
         {
           "name": "ctxGetDefaultGSCtx__Fv",
-          "size": "16",
+          "size": "12",
           "metadata": {
             "virtual_address": "2104672"
           }
@@ -36532,10 +36532,10 @@
       "id": "tmb",
       "name": "tmb",
       "measures": {
-        "fuzzy_match_percent": 2.5417054,
-        "total_code": "1061492",
+        "fuzzy_match_percent": 2.5418875,
+        "total_code": "1061416",
         "matched_code": "26980",
-        "matched_code_percent": 2.5417054,
+        "matched_code_percent": 2.5418873,
         "matched_data_percent": 100.0,
         "total_functions": 2724,
         "matched_functions": 107,
