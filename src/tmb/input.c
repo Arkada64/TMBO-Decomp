@@ -1,4 +1,5 @@
 #include "common.h"
+#include "m2c_macros.h"
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputInit__Fv);
 
@@ -44,7 +45,23 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputGetPlayerPad
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputIsMtapConnected__Fv);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputGetAnyInput__Fi);
+int inputAnyKey__Fi_5C_75(int) __asm__("inputAnyKey__Fi");
+extern u8 keyWasAlreadyDown_5C_75[] __asm__("keyWasAlreadyDown");
+
+s32 inputGetAnyInput__Fi(s32 arg0) {
+    s32* temp_s0;
+
+    temp_s0 = (arg0 * 4) + ((u8*)keyWasAlreadyDown_5C_75);
+    if (*temp_s0 == 0) {
+        if (inputAnyKey__Fi_5C_75(arg0) != 0) {
+            *temp_s0 = 1;
+            return 1;
+        }
+        /* Duplicate return node #4. Try simplifying control flow for better match */
+        return 0;
+    }
+    return 0;
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputGetInput__Fii);
 
@@ -84,7 +101,22 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputStopLgCollis
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputSetLgSmallActuatorEffect__Fiii);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputStartLgSmallActuatorEffect__Fi);
+void inputStartLgEffect__FiPi_8C_133(int, void*) __asm__("inputStartLgEffect__FiPi");
+extern u8 smallActuatorEffectId_8C_133[] __asm__("smallActuatorEffectId");
+extern u8 smallActuatorStarted_8C_133[] __asm__("smallActuatorStarted");
+
+void inputStartLgSmallActuatorEffect__Fi(s32 arg0) {
+    s32 temp_s1;
+    s32* temp_v1;
+
+    temp_v1 = (arg0 * 4) + ((u8*)smallActuatorStarted_8C_133);
+    if (*temp_v1 == 0) {
+        temp_s1 = arg0 * 8;
+        *temp_v1 = 1;
+        inputStartLgEffect__FiPi_8C_133(arg0, temp_s1 + ((u8*)smallActuatorEffectId_8C_133));
+        inputStartLgEffect__FiPi_8C_133(arg0, temp_s1 + (((u8*)smallActuatorEffectId_8C_133) + 4));
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputStopLgSmallActuatorEffect__Fi);
 
@@ -96,7 +128,24 @@ INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputStopLgLargeA
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputStopLgEffect__FiPi);
 
-INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputStartLgEffect__FiPi);
+s32 lgDevStartForceEffect_78_151() __asm__("lgDevStartForceEffect");
+extern u8 usbDeviceId_78_151[] __asm__("usbDeviceId");
+
+void inputStartLgEffect__FiPi(s32 arg0, s32* arg1) {
+    s32 temp_a0;
+    s32 temp_a1;
+    s32* temp_s1;
+
+    temp_s1 = (arg0 * 4) + ((u8*)usbDeviceId_78_151);
+    temp_a0 = *temp_s1;
+    if (temp_a0 != -1) {
+        temp_a1 = *arg1;
+        if ((temp_a1 != -1) && (lgDevStartForceEffect_78_151(temp_a0, temp_a1) == 0x80000006)) {
+            *temp_s1 = -1;
+            *arg1 = -1;
+        }
+    }
+}
 
 INCLUDE_ASM("/home/ark/tmb_decomp/asm/nonmatchings/tmb/input", inputSetLgTurningFriction__Fif);
 
