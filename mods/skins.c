@@ -293,8 +293,55 @@ static void pakMounts(char* l, int i)
     pakMountLog[i] = 1;
 }
 
+/* Gold Tooth (Sweet Tooth with the Gold Tooth skin) has no robot form, so the special's missiles, launched
+ * from the robot's arms high above the truck, appeared out of thin air: weapons he creates during his launcher
+ * update from higher than GOLD_HIGH over the car are moved to the tip of his ice-cream-cone arm (Head-On
+ * mesh 0x3e0 at 1.15x: x 0.76..3.51, y -0.84..4.09, z 3.64..7.92) */
+static float GOLDSPOT[4] = { 3.0f, 3.9f, 7.6f, 4.5f };   /* cone tip x/y/z, GOLD_HIGH */
+static unsigned char goldBusy[200];
+static int isGold(char* v)
+{
+    int c, s;
+    if (*(int*)(v + 0x20F4) != 0xC0 || !D_004FA030) return 0;
+    for (c = 0; c < 8; c++) {
+        if (!skinOn(c, 0)) continue;
+        s = netSlotVehicle(netState, c);
+        if (s > 0 && s <= 8 && *(char**)(D_004FA030 + 0x9E670 + 4 * (s - 1)) == v) return 1;
+    }
+    return 0;
+}
+static void goldMoveLaunches(char* v)
+{
+    char* w0 = D_004FA030 + 0x6C310 + 0xB0;
+    float* pos = (float*)(v + 0x1D0);
+    float* m = (float*)(*(char**)(v + 0x2028) + 0x20);    /* car rows: world = x*m[0..2] + y*m[4..6] + z*m[8..10] */
+    float tip[3];
+    int i, k;
+    for (k = 0; k < 3; k++) tip[k] = pos[k] + GOLDSPOT[0] * m[k] + GOLDSPOT[1] * m[4 + k] + GOLDSPOT[2] * m[8 + k];
+    for (i = 0; i < 200; i++) {
+        char* w = w0 + i * 0x210;
+        float *p, d[3], h, *cp;
+        if (!*(int*)w || goldBusy[i] || *(char**)(w + 0x130) != v) continue;
+        p = (float*)(w + 0xA0);
+        for (k = 0; k < 3; k++) d[k] = p[k] - pos[k];
+        h = d[0] * m[8] + d[1] * m[9] + d[2] * m[10];      /* height over the car */
+        if (h <= GOLDSPOT[3]) continue;
+        if (!*(char**)(w + 0x150)) continue;
+        cp = (float*)(*(char**)(w + 0x150) + 0x10);
+        for (k = 0; k < 3; k++) { p[k] = tip[k]; cp[k] = tip[k]; }
+    }
+}
+
 void tmbr_LauncherUpdate(void* l, char* v)
 {
+    if (isGold(v)) {
+        char* w0 = D_004FA030 + 0x6C310 + 0xB0;
+        int i;
+        for (i = 0; i < 200; i++) goldBusy[i] = *(int*)(w0 + i * 0x210) != 0;
+        launcherUpdate(l, v);
+        goldMoveLaunches(v);
+        return;
+    }
     if (isPak(v)) {
         int i = vidx(v);
         if (i >= 0) pakMounts((char*)l, i);

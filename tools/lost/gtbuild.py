@@ -35,7 +35,8 @@ BLANK_TEX = {1, 2, 3, 6, 7, 8}
 CHARS = [0x25640, 0x2f500, 0x344c0, 0x36400, 0x38890, 0x3c370, 0x3e880, 0x3ffa0, 0x4ba20, 0x50960, 0x52eb0,
          0x91c20, 0x96e90, 0xa01a0, 0xa2a90]
 ARM_CHARS = {0x2f500, 0x344c0, 0x36400, 0x38890, 0x3c370, 0x3e880}
-V2 = os.environ.get('GT_V2', '1') == '1'          # v2: shine, turning head, red eyes, gold robot form
+V2 = os.environ.get('GT_V2', '1') == '1'
+NO_ROBOT = os.environ.get('GT_ROBOT', '0') != '1'   # no robot form: the special keeps the gold truck (the model pop looked bad)          # v2: shine, turning head, red eyes, gold robot form
 CLOWN_HEAD_SLOT = 0x508cc                         # char 0x50960 (the clown head, rotates about its bone) -> mesh 0x4bc10
 ROBOT_RANGE = (0x55680, 0x94200)
 GT_EXTRA_V2 = [0x3e0]                            # v2: only the arm stays static (head + eyes go into the clown head)
@@ -250,11 +251,11 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
             struct.pack_into('<f', car.n, rot + 0x40, x)
             struct.pack_into('<f', car.n, rot + 0x48, 0.3)
     # special form: both LOD children -> Gold Tooth state 0
-    if not V2:
+    if not V2 or NO_ROBOT:
         g0 = car.P(STP_STATES[0] + 0x20)
         for i in range(struct.unpack_from('<i', car.n, STP_ALT_LOD + 4)[0]):
             car.setp(STP_ALT_LOD + 0x28 + 0x10 * i, g0)
-    else:
+    if V2:
         # the clown head: Gold Tooth's head + red eyes as ONE mesh in the clown head character, so it turns with
         # Sweet Tooth's head animation (same place on both trucks; the bone pivots it about its base)
         hm = merge_meshes(hdr2pk[0x1230][1], red(hdr2pk[0x3bd0][1]))
@@ -274,7 +275,7 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     for nd in sorted({a - 0x50 - 2 * i for a, g in car.pairs for i in range(5) if (a - 0x50 - 2 * i) % 16 == 0}):
         if nd in deadset or nd in keep or nd >= len(car.n) or (u32(car.n, nd) & 0x3f) != 0:
             continue
-        if V2 and ROBOT_RANGE[0] <= nd < ROBOT_RANGE[1]:
+        if V2 and not NO_ROBOT and ROBOT_RANGE[0] <= nd < ROBOT_RANGE[1]:
             continue
         nt = struct.unpack_from('<H', car.n, nd + 0x5a)[0]
         ts = {struct.unpack_from('<H', car.n, nd + 0x50 + 2 * k)[0] for k in range(nt)}
