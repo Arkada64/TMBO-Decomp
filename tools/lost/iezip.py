@@ -9,6 +9,9 @@ loc = bytearray(b[:30 + nl + xl]); struct.pack_into('<III', loc, 14, crc, len(co
 csize_old = struct.unpack_from('<I', b, 18)[0]
 tail = bytearray(b[30 + nl + xl + csize_old:])
 cd = tail.find(b'PK\x01\x02'); struct.pack_into('<III', tail, cd + 16, crc, len(comp), len(data))
-eo = tail.find(b'PK\x05\x06'); struct.pack_into('<I', tail, eo + 16, len(loc) + len(comp))
-open(out, 'wb').write(bytes(loc) + comp + bytes(tail))
+# pad to the original file size (zeros between the data and the central directory): the game reloads the
+# shell with the original size, and a replaced file keeps its disc spot (in place) only if it is not bigger
+pad = max(0, len(b) - (len(loc) + len(comp) + len(tail)))
+eo = tail.find(b'PK\x05\x06'); struct.pack_into('<I', tail, eo + 16, len(loc) + len(comp) + pad)
+open(out, 'wb').write(bytes(loc) + comp + b'\0' * pad + bytes(tail))
 print(out, len(b), '->', len(loc) + len(comp) + len(tail))

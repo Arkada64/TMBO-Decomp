@@ -39,7 +39,8 @@ V2 = os.environ.get('GT_V2', '1') == '1'          # v2: shine, turning head, red
 CLOWN_HEAD_SLOT = 0x508cc                         # char 0x50960 (the clown head, rotates about its bone) -> mesh 0x4bc10
 ROBOT_RANGE = (0x55680, 0x94200)
 GT_EXTRA_V2 = [0x3e0]                            # v2: only the arm stays static (head + eyes go into the clown head)
-GOLD_CBPS = [49, 45, 9, 37]                      # CLUT blocks of sheets 1, 2, 3, 6                 # the special's robot (char 0x91c20 + switch 217 child 1): kept, gold sheets
+GOLD_CBPS = [49, 45, 9, 37]
+SHINE_MIN = int(os.environ.get('GT_SHINE_MIN', '60'))   # shine layer on gold meshes with at least this many verts                      # CLUT blocks of sheets 1, 2, 3, 6                 # the special's robot (char 0x91c20 + switch 217 child 1): kept, gold sheets
 STP_ALT_LOD = 0x941a0                            # switch 217 child 1 (the special's form): show Gold Tooth there too                    # Sweet Tooth's rear doors / bumper pieces (Gold Tooth has its own)
 
 
@@ -78,7 +79,7 @@ def gold_cluts(tb, cbps):
 
 def red(m):
     """eyes: glowing red (vertex colours; Head-On's eye mesh is prelit white)"""
-    m = dict(m, strips=[dict(st, col=[0x801010FF] * len(st['idx'])) for st in m['strips']])
+    m = dict(m, strips=[dict(st, noscale=True, col=[0x803030FF] * len(st['idx'])) for st in m['strips']])
     return m
 
 
@@ -177,8 +178,10 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
             ctx = ctx * 2      # env-mapped: TMB's env path reads a second texture slot (the reflection map)
         from meshconv import BAKE, TWOSIDED
         gold = m['texrefs'][:1] == [0x73ff0]
-        m = dict(m, bake=BAKE and gold and not V2,
-                 env=V2 and gold,                 # TMB's own reflective mesh path, gold map as the reflection
+        ov = bool(m.get('env_overlay'))
+        m = dict(m, bake=BAKE and gold and not ov,
+                 env=ov,                          # TMB's reflective path draws see-through (retail uses it as an
+                                                  # overlay on opaque parts): opaque baked gold + this shine layer
                  twosided=TWOSIDED and not (m.get('hflags', 0) & 0x800000))   # bit 23 clear = no culling in Head-On
         blob, slots, pairs, sph = hierobject(m, scale, ctx)
         return car.append(blob, slots, pairs), sph
@@ -204,6 +207,13 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
                 dead.append(mesh_extent(car.n, t))
         hs = meshes(GT_HI, gt_states[st]) + (GT_EXTRA_V2 if V2 else GT_EXTRA)
         kids = [node_for(h)[0] for h in hs]
+        if V2 and not os.environ.get('GT_NOSHINE'):      # shine layer over the big gold body panels
+            for h in hs:
+                m = hdr2pk[h][1]
+                if h not in GT_EXTRA and m['texrefs'] == [0x73ff0] and len(m['pos']) >= SHINE_MIN:
+                    if ('ov', h) not in built:
+                        built[('ov', h)] = build(dict(m, env_overlay=True))
+                    kids.append(built[('ov', h)][0])
         from winpatch import patch
         pm = patch([hdr2pk[h][1] for h in hs if h not in GT_EXTRA])   # close the open rear side window
         if pm and not os.environ.get('GT_NOWINDOW'):

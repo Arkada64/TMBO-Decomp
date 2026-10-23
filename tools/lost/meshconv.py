@@ -35,7 +35,7 @@ def strips_of(m, scale):
                 pi = s['idx'][i]
                 nx, ny, nz = m['nrm'][pi] if pi < len(m['nrm']) else (0, 0, 1)
                 col = s['col'][i] if i < len(s['col']) else 0xFFFF
-                rgba = c5(col) if col <= 0xFFFF else tuple(int(((col >> (8 * k)) & 255) * (COLOR_SCALE if k < 3 else 1)) for k in range(4))
+                rgba = c5(col) if col <= 0xFFFF else tuple(int(((col >> (8 * k)) & 255) * (COLOR_SCALE if k < 3 and not s.get('noscale') else 1)) for k in range(4))
                 uv = s['uv'][i] if i < len(s['uv']) else (0, 0)
                 if m.get('bake'):
                     # Head-On looks the body texture up by the view-space normal (a reflection map: city lights,
