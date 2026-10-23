@@ -21,6 +21,7 @@ typedef unsigned int u32;
 #define NAI(g) F(g, 0x9FEE4)
 
 extern char* D_004FA030;   /* game */
+extern int tmbr_levelIndex;  /* packs.c */
 extern char D_003156C0[];  /* net: 8 player slots x 0x220 from +0 */
 extern int D_002C07F8[];   /* radar name per character */
 extern int scePrintf(const char* fmt, ...);
@@ -513,6 +514,8 @@ static void unstick(char* g, char* v)
             stkCount[i] = 0;
             unstT[i] = UNSTICK_REV + UNSTICK_FWD;
             unstSide[i] ^= 1;
+            scePrintf("TMBR unstick: bot %d at %d %d %d, mode %d, level %d\n", i, (int)p[0], (int)p[1], (int)p[2],
+                F(v, 0x2018) ? F(F(v, 0x2018), 4) : -1, tmbr_levelIndex);
         }
     } else stkCount[i] = 0;
     stkPos[i][0] = p[0]; stkPos[i][1] = p[1]; stkPos[i][2] = p[2];
@@ -538,7 +541,8 @@ static int aiUpdate(char* v)
         /* respawn shield (shield.s: byte 0x497 >= 4, weapons locked): cruise until it drops, no fighting */
         int si = (int)(v - g) / 0x31B0 & 7;
         if (F(drv, 4) != 4) { driverSetMode(drv, 4); pickCruiseZone(g, v, 0); }
-        if (++shieldT[si] > 600) { shieldOff(v); shieldT[si] = 0; }    /* 10 s, like the players' shield */
+        if (shieldT[si] == 0) scePrintf("TMBR shield: bot %d on (20B4 %d 498 %d 464 %d)\n", si, F(v, 0x20B4), *(signed char*)(v + 0x498), F(v, 0x464));
+        if (++shieldT[si] > 600) { shieldOff(v); shieldT[si] = 0; scePrintf("TMBR shield: bot %d off\n", si); }    /* 10 s, like the players' shield */
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
         return r;
     }

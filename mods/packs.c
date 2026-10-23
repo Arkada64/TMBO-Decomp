@@ -269,11 +269,15 @@ void tmbr_LevelDbLoaded(int ngp, int vram, int slot)
  * entries become an inmate type, round robin. Called every frame from the camera hook (cheap when idle). */
 void tmbr_PedsRetype(void)
 {
+    static int k, tick, total;
     char* mgr;
-    int g, e, n = 0, k = 0, ng;
-    if (retypeSerial != tmbr_levelSerial || (retypeLevel != 15 && retypeLevel != 16)) return;   /* pack is -1 by now */
-    if (!D_004FA030) return;
-    retypeSerial = -1;
+    int g, e, n = 0, ng;
+    if (retypeLevel != 15 && retypeLevel != 16) return;
+    if (tmbr_levelIndex != retypeLevel) { retypeLevel = 0; return; }       /* another map now */
+    if (!D_004FA030 || ++tick < 30) return;
+    tick = 0;
+    /* every 0.5 s for the whole match: the ped groups fill in after load (only 1 group existed on the first
+     * frame), so every type-2 entry found becomes an inmate (types 9-11 in turn) */
     mgr = D_004FA030 + 0x89FA0;
     ng = *(unsigned char*)mgr;
     for (g = 0; g < ng; g++) {
@@ -281,9 +285,9 @@ void tmbr_PedsRetype(void)
         for (e = 0; e < grp[1] && e < 21; e++) {
             unsigned char* ent = grp + 0x630 + e * 3;
             if (ent[1] != 2) continue;
+            ent[1] = 9 + (k++ % 3);
             n++;
-            if ((k++ & 3) != 3) ent[1] = 9 + (k % 3);
         }
     }
-    scePrintf("TMBR peds: %d groups, %d type-2 entries, %d now inmates (types 9-11)\n", ng, n, n - n / 4);
+    if (n) { total += n; scePrintf("TMBR peds: %d groups, %d more inmates (types 9-11), %d total\n", ng, n, total); }
 }
