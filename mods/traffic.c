@@ -331,46 +331,42 @@ void tmbr_FodderTakeHit(char* v, void* pos, int a, int b)
 }
 
 extern void netVehicleDamage(void* net, char* victim, char* attacker, float dmg) __asm__("func_001740B0");
-/* damage reports (Twisted Metal: Head-On): "N Pts Damage" on the attacker's HUD each time he hurts another car
+/* damage reports (Twisted Metal: Head-On): "N Pts Damage" each time the local player hurts another car
  * (players, bots, traffic). Hits on the same victim within 1 s add up into one report, so machine-gun streams
- * read as a running total. Shown through the HUD's free-text message (0xE6, the kill feed's own buffer, same
- * typewriter font); a kill message on screen is never overwritten. */
-extern char* D_002C0410[];                             /* HUD message strings; [0xE6] is a writable buffer */
-extern void hudAddMsg(void* hud, int id, int a, int b) __asm__("AddMessage__3Hudiii");
+ * read as a running total. Drawn with the game font (yellow, like the reticle countdown) a bit below the kill
+ * feed for 1.5 s, so kill messages never hide it. */
+extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
+extern void fontPrint(int font, const char* s) __asm__("func_00203150");
+extern void fontSetColor(int font, int r, int g, int b) __asm__("fontSetColor__Fiiii");
 extern int sprintf(char* s, const char* f, ...);
-static char* dmgVictim[4];
-static float dmgSum[4];
-static int dmgTime[4], dmgMine[4], dmgClock;
+static char* dmgVictim;
+static float dmgSum;
+static int dmgTime, dmgClock, dmgLen;
+static char dmgText[32];
 static float DMG_K[2] = { 0.5f, 0.0f };
-void tmbr_DamageReportTick(void) { dmgClock++; }
+void tmbr_DamageReportTick(void)
+{
+    dmgClock++;
+    if (!dmgLen || dmgClock - dmgTime > 90) return;
+    fontSetColor(0, 0xBA, 0xB4, 0x02);
+    fontSetCursorAtSubPixel(0, (320 - dmgLen * 9) * 16, 0x700);   /* centred, under the kill feed */
+    fontPrint(0, dmgText);
+}
 static void damageReport(char* victim, char* attacker, float dmg)
 {
     char* g = D_004FA030;
-    char* hud;
-    int p, n;
+    int n;
     if (!g || !attacker || attacker == victim || !(dmg > DMG_K[1])) return;
     if (attacker < g || attacker >= g + 8 * VSIZE || *(int*)(attacker + 0x20B4) != 1) return;
-    p = *(int*)(attacker + 0x210C);
-    if (p < 0 || p > 3) return;
-    hud = g + 0x97B50 + p * 0xA20;
-    if (*(int*)(hud + 0x9EC) == 0xE6 && *(int*)(hud + 0x9F4) > 0 && !dmgMine[p]) return;   /* kill message up */
-    if (dmgVictim[p] == victim && dmgClock - dmgTime[p] < 60) dmgSum[p] += dmg;
-    else { dmgSum[p] = dmg; dmgVictim[p] = victim; }
-    dmgTime[p] = dmgClock;
-    n = (int)(dmgSum[p] + DMG_K[0]);
+    if (*(int*)(attacker + 0x210C) != 0) return;              /* first screen only */
+    if (dmgVictim == victim && dmgClock - dmgTime < 60) dmgSum += dmg;
+    else { dmgSum = dmg; dmgVictim = victim; }
+    dmgTime = dmgClock;
+    n = (int)(dmgSum + DMG_K[0]);
     if (n < 1) n = 1;
-    sprintf(D_002C0410[0xE6], "%d Pts Damage", n);
-    dmgMine[p] = 1;
-    hudAddMsg(hud, 0xE6, -1, 0);
+    dmgLen = sprintf(dmgText, "%d Pts Damage", n);
 }
-/* a kill message is about to replace the HUD text: returns 1 if a damage report was showing */
-int tmbr_KillFeedShown(int p)
-{
-    int was;
-    if (p < 0 || p >= 4) return 0;
-    was = dmgMine[p]; dmgMine[p] = 0;
-    return was;
-}
+int tmbr_KillFeedShown(int p) { (void)p; return 0; }
 
 void tmbr_NetVehicleDamage(void* net, char* victim, char* attacker, float dmg)
 {
