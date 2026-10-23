@@ -158,7 +158,23 @@ INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021EE78);
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021EFF0);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021F098);
+#include "m2c_macros.h"
+u32 func_00248028_21F098() __asm__("func_00248028");
+extern M2C_UNK D_004B3C60_21F098 __asm__("D_004B3C60");
+
+s32 func_0021F098(s32 arg0, s32 arg1)
+{
+  int new_var;
+  new_var = 1;
+  if (new_var)
+  {
+    if (arg0 < arg1)
+    {
+      return arg0 + (func_00248028_21F098(&D_004B3C60_21F098) % ((u32) ((arg1 - arg0) + new_var)));
+    }
+  }
+  return arg0;
+}
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/mathf", func_0021F100);
 
