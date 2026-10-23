@@ -1,13 +1,15 @@
 """Textured preview of meshes in a TMB car NGP using its TEX/RTX (validates the converted files)."""
 import sys, struct, re, numpy as np
-from texrec import recs
+from texfile import recs
 from tmbmesh import decode, triangles
 from hotex import clut_unswizzle
 from textconv import rtx_records
 from trender import render
 def load(d):
     n=open(d+'/STP.NGP','rb').read(); t=open(d+'/STP.TEX','rb').read(); r=open(d+'/STP.RTX','rb').read()
-    _,rs,_=recs(t); byid={x['id']:x for x in rs}
+    from textconv import records, tex_rec_size
+    byid={}
+    for o,b,gs,k in records(t,tex_rec_size): byid[gs&0xffff]=dict(off=o,bytes=b,gs=gs,tw=(gs>>40)&15,th=(gs>>44)&15)
     rr,_=rtx_records(r); clut={a:(o,sz,tw,th) for o,sz,a,tw,th in rr}
     return n,t,r,byid,clut
 def image(t,r,byid,clut,tid,cbp):

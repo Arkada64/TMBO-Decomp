@@ -12,7 +12,13 @@ from tmbcar import Car, mesh_extent, u32
 from textconv import TexBuilder
 from meshconv import hierobject
 
-SKIP_TEX = {0x8a480, 0xc1fa8, 0x84320}          # headlight flares, turbo / exhaust flames (Head-On effects)
+SKIP_TEX = {0x8a480, 0xc1fa8, 0x84320,          # headlight flares, turbo / exhaust flames (Head-On effects)
+            0x87f40, 0x8bba8, 0xa2888}          # far-LOD wheels / underside (Sweet Tooth's wheels are kept)
+# same truck art as Sweet Tooth's own sheets: reuse those palettes (car CLUT space is tight: STP uses 76 blocks)
+REUSE = {0xb0448: 45, 0xa91b8: 49, 0x8dc74: 45}
+if os.environ.get('GT_GOLD_PAL'):                # put the gold body texture on Sweet Tooth's body palette too
+    REUSE[0x73ff0] = int(os.environ['GT_GOLD_PAL'])
+HALF = [int(x, 16) for x in os.environ.get('GT_HALF', '').split(',') if x]   # e.g. b0448,a91b8
 GT_HI, GT_LO = 0x28ef0, 0x5980
 STP_STATES = [0xa940, 0x152b0, 0x1ede0]          # op31 id209 damage-state groups (3 meshes each)
 STP_LOD1 = 0x55650                               # far LOD body group
@@ -24,7 +30,7 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     car = Car(rd('NGP'), rd('PTR'), rd('TEX'), rd('RTX'))
     s = bdd(bddpath)
     n = s['ngp']
-    tb = TexBuilder(car.tex, car.rtx, s['tex'], car.max_tex_id() + 1)
+    tb = TexBuilder(car.tex, car.rtx, s['tex'], car.max_tex_id() + 1, REUSE, HALF)
     hdr2pk = {}
     for o in find_packets(n):
         m = decode(n, o)
@@ -88,6 +94,7 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     dropped = car.compact(sorted(set(dead)))
     print('ngp %d -> %d bytes (orig %d), %d dangling pointers cleared, %d slots, %d tex pairs, %d new textures' % (
         before, len(car.n), len(rd('NGP')), dropped, len(car.slots), len(car.pairs), len(tb.new_tex)))
+    print('CLUT blocks', tb.next_cbp, 'new CLUTs', len(tb.new_rtx))
     os.makedirs(outdir, exist_ok=True)
     w = lambda e, b: open(os.path.join(outdir, 'STP.' + e), 'wb').write(b)
     w('NGP', car.ngp_bytes())

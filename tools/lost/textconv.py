@@ -1,87 +1,134 @@
 """Head-On textures (CT32-swizzled upload data, CLUT records inside the TEX) -> TMB TEX records (linear PSMT8/PSMT4
-pixels) + RTX CLUT records, and the TMB TEX0 word for a mesh's gsTexCtx."""
+pixels) + RTX CLUT records, and the TMB TEX0 word for a mesh's gsTexCtx.
+
+Record lists (TEX and RTX, both games): the LAST record has sizew 0 and runs to the end of the file; texmRelocate
+processes it and then stops. So appending = give the old last record its real size, add ours, zero the size of the
+new last one. RTX CLUT block addresses are packed (256 colours = 4 blocks, 16 = 1)."""
 import struct, zlib
 import numpy as np
-from texrec import recs
-from hotex import textures as ho_textures
+from hotex import textures as ho_textures, clut_unswizzle
 
 TEX1 = struct.pack('<IIII', 0x120, 0xfb5, 0x14, 0)
 
 
-def rtx_records(rtx):
-    """[(off, sizew, addr, tw, th)] and the end offset (terminator)"""
-    o, out = 0, []
-    while o + 16 <= len(rtx):
-        sz = struct.unpack_from('<I', rtx, o)[0]
+def records(d, payload_size):
+    """[(off, bytes, gs)] including the final sizew-0 record (its size from payload_size(gs))"""
+    ncls = struct.unpack_from('<I', d, 0)[0] if payload_size is tex_rec_size else 0
+    o = struct.unpack_from('<I', d, 4)[0] * 16 if payload_size is tex_rec_size else 0
+    out = []
+    while o + 16 <= len(d):
+        sz, key, gs = struct.unpack_from('<IIQ', d, o)
         if sz == 0:
+            if gs:
+                out.append((o, payload_size(gs), gs, key))
             break
-        gs = struct.unpack_from('<Q', rtx, o + 8)[0]
-        out.append((o, sz, (gs >> 16) & 0xffff, (gs >> 40) & 15, (gs >> 44) & 15))
+        out.append((o, sz * 4, gs, key))
         o += sz * 4
-    return out, o
+    return out
+
+
+def tex_rec_size(gs):
+    psm, tw, th = (gs >> 32) & 0x3f, (gs >> 40) & 15, (gs >> 44) & 15
+    n = (1 << tw) * (1 << th)
+    return 0x80 + (n // 2 if psm == 0x14 else n)
+
+
+def rtx_rec_size(gs):
+    tw, th = (gs >> 40) & 15, (gs >> 44) & 15
+    return 16 + 4 * (1 << tw) * (1 << th)
+
+
+def rtx_records(rtx):
+    """compat: [(off, sizew, addr, tw, th)], end"""
+    rs = records(rtx, rtx_rec_size)
+    out = [(o, b // 4, (gs >> 16) & 0xffff, (gs >> 40) & 15, (gs >> 44) & 15) for o, b, gs, k in rs]
+    return out, (rs[-1][0] + rs[-1][1]) if rs else 0
 
 
 def clut_blocks(tw, th):
-    n = (1 << tw) * (1 << th)          # entries (CT32)
-    return max(1, n * 4 // 256)        # GS blocks of 256 bytes
+    return max(1, (1 << tw) * (1 << th) * 4 // 256)
 
 
-def tex0(tid_psm, w, h, cbp):
-    psm = tid_psm
+def tex0(psm, w, h, cbp):
     tw, th = w.bit_length() - 1, h.bit_length() - 1
     tbw = max(1, w // 64)
-    q = (tbw << 14) | (psm << 20) | (tw << 26) | (th << 30) | (1 << 34) | (cbp << 37) | (1 << 61)
-    return q
+    return (tbw << 14) | (psm << 20) | (tw << 26) | (th << 30) | (1 << 34) | (cbp << 37) | (1 << 61)
+
+
+def join(recs_bytes):
+    """concatenate full-size records; the last one gets sizew 0"""
+    out = bytearray(b''.join(recs_bytes))
+    last = len(out) - len(recs_bytes[-1])
+    struct.pack_into('<I', out, last, 0)
+    return out
 
 
 class TexBuilder:
-    def __init__(self, tmb_tex, tmb_rtx, ho_tex, first_id):
-        self.tex = bytearray(tmb_tex)
-        self.rtx = bytearray(tmb_rtx)
-        self.classes = [struct.unpack_from('<II', tmb_tex, 8 + 8 * i) for i in range(struct.unpack_from('<I', tmb_tex, 0)[0])]
-        _, self.trecs, self.tend = recs(bytes(self.tex))
-        self.rrecs, self.rend = rtx_records(bytes(self.rtx))
-        last = max(self.rrecs, key=lambda r: r[2])
-        self.next_cbp = last[2] + clut_blocks(last[3], last[4])
+    def __init__(self, tmb_tex, tmb_rtx, ho_tex, first_id, reuse=None, half=()):
+        """reuse: {ho key: existing RTX CLUT address} - quantize to that palette instead of adding a CLUT"""
+        self.tex, self.rtx = bytes(tmb_tex), bytes(tmb_rtx)
+        ncls, recq = struct.unpack_from('<II', self.tex, 0)
+        self.classes = [struct.unpack_from('<II', self.tex, 8 + 8 * i) for i in range(ncls)]
+        self.recq = recq
+        self.trecs = records(self.tex, tex_rec_size)
+        self.rrecs = records(self.rtx, rtx_rec_size)
+        self.pal = {}
+        nxt = 0
+        for o, b, gs, k in self.rrecs:
+            a, tw, th = (gs >> 16) & 0xffff, (gs >> 40) & 15, (gs >> 44) & 15
+            nxt = max(nxt, a + clut_blocks(tw, th))
+            ne = (1 << tw) * (1 << th)
+            p = [tuple(x) for x in np.frombuffer(self.rtx[o + 16:o + 16 + 4 * ne], np.uint8).reshape(ne, 4)]
+            self.pal[a] = np.array(clut_unswizzle(p) if ne == 256 else p, float)
+        self.next_cbp = nxt
         self.next_id = first_id
         self.ho = ho_textures(ho_tex)
-        self.map = {}      # ho key -> (id, psm, w, h, cbp)
+        self.reuse = reuse or {}
+        self.half = set(half)               # keys stored at half size (reuse path only; UVs are normalized)
+        self.map = {}
         self.new_tex, self.new_rtx = [], []
 
     def add(self, key):
         if key in self.map:
             return self.map[key]
         t = self.ho[key]
-        img_idx = t['idx']
         h, w = t['img'].shape[:2]
-        bpp = t['bpp']
-        if bpp == 8:
-            payload = img_idx.astype(np.uint8).tobytes()
-            psm = 0x13
+        if key in self.reuse:                       # requantize onto an existing palette
+            cbp = self.reuse[key]
+            P = self.pal[cbp]
+            im = t['img']
+            if key in self.half:
+                im = im.reshape(h // 2, 2, w // 2, 2, 4).mean((1, 3))
+                h, w = h // 2, w // 2
+            img = im.reshape(-1, 4).astype(float)
+            img[:, 3] = np.minimum(255, img[:, 3])
+            idx = ((img[:, None, :3] - P[None, :, :3]) ** 2).sum(2).argmin(1).astype(np.uint8)
+            bpp = 8 if len(P) == 256 else 4
         else:
-            a = img_idx.astype(np.uint8)
-            payload = (a[0::2] | (a[1::2] << 4)).astype(np.uint8).tobytes()
-            psm = 0x14
+            idx, bpp, cbp = t['idx'].astype(np.uint8), t['bpp'], None
+        if bpp == 8:
+            payload, psm = idx.tobytes(), 0x13
+        else:
+            payload, psm = (idx[0::2] | (idx[1::2] << 4)).astype(np.uint8).tobytes(), 0x14
         nbytes = len(payload)
         cls = next(i for i, (cnt, bs) in enumerate(self.classes) if bs >= nbytes)
         tid = self.next_id
         self.next_id += 1
         tw, th = w.bit_length() - 1, h.bit_length() - 1
-        k = 4 if psm == 0x13 else 8
-        gs = tid | (psm << 32) | (tw << 40) | (th << 44) | (k << 51) | (cls << 59)
+        gs = tid | (psm << 32) | (tw << 40) | (th << 44) | ((4 if psm == 0x13 else 8) << 51) | (cls << 59)
         q = nbytes // 16
-        hdr = struct.pack('<IIQ', (0x80 + nbytes) // 4, zlib.crc32(payload + t['clutraw']) or 1, gs)
+        hdr = struct.pack('<IIQ', (0x80 + nbytes) // 4, zlib.crc32(payload + bytes([key & 255])) or 1, gs)
         hdr += struct.pack('<IIII', 0x60000000 | (q + 6), 0, 0, 0x50000000 | (q + 6)) + b'\0' * 0x60
         self.new_tex.append(hdr + payload)
-        # CLUT -> RTX (TMB alpha range is 0..0xFF, Head-On 0..0x80)
-        c = bytearray(t['clutraw'])
-        for i in range(3, len(c), 4):
-            c[i] = min(255, c[i] * 2)
-        ctw, cth = t['clut']['tw'], t['clut']['th']
-        cbp = self.next_cbp
-        self.next_cbp += clut_blocks(ctw, cth)
-        rgs = (cbp << 16) | (ctw << 40) | (cth << 44) | (0x08 << 48) | (0x01 << 56)
-        self.new_rtx.append(struct.pack('<IIQ', (16 + len(c)) // 4, 0, rgs) + bytes(c))
+        if cbp is None:                             # new CLUT (TMB alpha 0..0xFF, Head-On 0..0x80)
+            c = bytearray(t['clutraw'])
+            for i in range(3, len(c), 4):
+                c[i] = min(255, c[i] * 2)
+            ctw, cth = t['clut']['tw'], t['clut']['th']
+            cbp = self.next_cbp
+            self.next_cbp += clut_blocks(ctw, cth)
+            rgs = (cbp << 16) | (ctw << 40) | (cth << 44) | (0x08 << 48) | (0x01 << 56)
+            self.new_rtx.append(struct.pack('<IIQ', (16 + len(c)) // 4, 0, rgs) + bytes(c))
         self.map[key] = (tid, psm, w, h, cbp)
         return self.map[key]
 
@@ -90,20 +137,27 @@ class TexBuilder:
         return tid, struct.pack('<Q', tex0(psm, w, h, cbp)) + struct.pack('<II', 6, 0) + TEX1 + b'\0' * 16
 
     def tex_bytes(self):
-        body = bytes(self.tex[:self.tend]) + b''.join(self.new_tex)
+        old = []
+        for o, b, gs, k in self.trecs:
+            r = bytearray(self.tex[o:o + b])
+            struct.pack_into('<I', r, 0, b // 4)
+            old.append(bytes(r))
+        allr = old + self.new_tex
         counts = {}
-        for i in range(len(self.classes)):
-            counts[i] = 0
-        _, rs, _ = recs(body + b'\0' * 16)
-        for r in rs:
-            counts[r['gs'] >> 59] = counts.get(r['gs'] >> 59, 0) + 1
-        out = bytearray(body)
+        for r in allr:
+            c = struct.unpack_from('<Q', r, 8)[0] >> 59
+            counts[c] = counts.get(c, 0) + 1
+        head = bytearray(self.tex[:self.recq * 16])
         for i, (cnt, bs) in enumerate(self.classes):
-            struct.pack_into('<II', out, 8 + 8 * i, max(cnt, counts.get(i, 0)), bs)
-        out += b'\0' * 16
-        out += b'\0' * (-len(out) % 2048)
-        return bytes(out)
+            struct.pack_into('<II', head, 8 + 8 * i, max(cnt, counts.get(i, 0)), bs)
+        out = head + join(allr)
+        return bytes(out + b'\0' * (-len(out) % 2048))
 
     def rtx_bytes(self):
-        out = bytes(self.rtx[:self.rend]) + b''.join(self.new_rtx) + b'\0' * 16
-        return out + b'\0' * (-len(out) % 2048)
+        old = []
+        for o, b, gs, k in self.rrecs:
+            r = bytearray(self.rtx[o:o + b])
+            struct.pack_into('<I', r, 0, b // 4)
+            old.append(bytes(r))
+        out = join(old + self.new_rtx)
+        return bytes(out + b'\0' * (-len(out) % 2048))

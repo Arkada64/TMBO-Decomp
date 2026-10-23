@@ -73,6 +73,13 @@ effect meshes skipped), adds 7 textures + CLUTs, drops the old meshes and rebuil
 built TMB files, round-trip check). Test disc: `TMBO_GOLDTOOTH_TEST.iso` = peds test disc + the four STP files
 (cloud/goldtooth/mkdisc_gt.sh, mkswap.py appends files and repoints their directory records).
 
+- First in-game run (2026-10-23): black-screen softlock, loading screen corrupted, VIF DMA error. Cause: TEX/RTX
+  record lists end with a record whose sizew is 0 (it runs to the end of the file and stops texmRelocate); the
+  first build cut that record off (STP texture 21 + its CLUT at block 72) and put a new CLUT on block 72. Fixed
+  (textconv.records/join). Car CLUT space: retail cars use 57-74 blocks (STP 76 incl. that last CLUT), car TEX
+  up to 299,520 bytes, so the build reuses Sweet Tooth's palettes for the truck-art textures (GT_HALF, GT_GOLD_PAL
+  shrink further: TMBO_GOLDTOOTH_SAFE.iso = no new CLUTs, TEX 282,624).
+
 ## Next
 1. In-game check of the skin (pick Sweet Tooth). Then: Gold Tooth's own wheels (Head-On wheel meshes / tire
    texture 0x87F40), damage states, Lost's mount points.
