@@ -2,9 +2,10 @@
 # One test build for everything: TMB Decomp/test/TMBR_TEST.ELF (all mods: traffic on, bots, peds, cameras,
 # Gold Tooth toggle) + TMBR_TEST.iso (online disc + content packs + Gold Tooth \PCAR\ZZP.*) + Run TMBR_TEST.bat.
 #   bash "/mnt/c/Users/Ark/Desktop/TMB Decomp/mktest.sh"          (CLEAN=1 also removes the old test files)
-set -e
+set -e -o pipefail
 W="/mnt/c/Users/Ark/Desktop/TMB Decomp"
 cd "$W"
+rm -f test/TRAFFIC_TEST.ELF
 bash mods_copy_build.sh | tail -4
 cp test/TRAFFIC_TEST.ELF test/TMBR_TEST.ELF
 B="ZFP0.BIN ZFP1.BIN ZRP0.BIN ZRP1.BIN ZRP2.BIN ZAP0.BIN ZAP1.BIN ZSP0.BIN ZSP1.BIN ZSF0.BIN ZSF1.BIN ZSF2.BIN ZYP.NGP ZYP.PTR ZYP.RTX ZYP.TEX ZZP.NGP ZZP.PTR ZZP.RTX ZZP.TEX ACAR/ZYA.NGP ACAR/ZYA.PTR ACAR/ZYA.RTX ACAR/ZYA.TEX ACAR/ZZA.NGP ACAR/ZZA.PTR ACAR/ZZA.RTX ACAR/ZZA.TEX PTS/ZZASYLUM.PED PTS/ZZSHIP.PED SHELL/SHELL1.TEX"

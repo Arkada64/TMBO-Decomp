@@ -175,8 +175,18 @@ extern void weaponUsed(void* w, char* v, int slot) __asm__("func_001F1AE0");
 #define L_SLOT(l)    (*(int*)((char*)(l) + 0x0))
 #define L_S5TYPE(l)  (*(int*)((char*)(l) + 0x110))
 #define L_ARMED(l)   (*(int*)((char*)(l) + 0x218))
+extern void tmbr_DamageReportTick(void);
 static int pakRet[8], pakMountLog[8], pakCool[8], pakFrames;
 #define PAK_COOLDOWN (10 * 60)                   /* Lost: 10 s between 12 Pak specials */
+/* TMB's reticle missile: damage 7, life 7 s, turn 0.1 (D_004FAB98/9C/A4). Lost's reticle weapons: type 4 (taken as
+ * 12 Pak's special) vs type 51 (the pickup): damage 13.5 / 21 (x0.64), life 7 / 12 s (x0.58), homing 0.08 / 0.15
+ * (x0.53), charge 2.5 / 1.5 (x1.67 slower). 12 Pak gets TMB's values times those ratios. */
+#define PAK_DAMAGE 5
+#define PAK_LIFE   4
+static float PAK_TURN_V[1] = { 0.053f };    /* static, not a literal: mod code has no .lit4 */
+#define PAK_TURN   PAK_TURN_V[0]
+extern int D_004FAB98, D_004FAB9C;
+extern float D_004FABA4;
 static char* pakGame;
 
 static int vidx(char* v)
@@ -194,7 +204,12 @@ void tmbr_FireSpecial(void* l, char* v)
     slot = L_SLOT(l); type = L_S5TYPE(l);
     L_SLOT(l) = 5; L_S5TYPE(l) = 0xB;
     pakRet[i] = 1;
-    fireCurrentWeapon(l, v);                             /* arm, or release when armed */
+    {   /* his missiles: the pickup reticle's (weapon 0xB, func_001EE038) scaled by Lost's special/pickup ratios */
+        int d = D_004FAB98, life = D_004FAB9C; float turn = D_004FABA4;
+        D_004FAB98 = PAK_DAMAGE; D_004FAB9C = PAK_LIFE; D_004FABA4 = PAK_TURN;
+        fireCurrentWeapon(l, v);                         /* arm, or release when armed */
+        D_004FAB98 = d; D_004FAB9C = life; D_004FABA4 = turn;
+    }
     L_SLOT(l) = slot; L_S5TYPE(l) = type;
     if (!L_ARMED(l)) pakRet[i] = 0;
 }
@@ -213,6 +228,7 @@ void tmbr_SkinsFrame(void)
     int i;
     if (!D_004FA030) return;
     pakFrames++;
+    tmbr_DamageReportTick();
     if (pakGame == D_004FA030) return;
     pakGame = D_004FA030;
     for (i = 0; i < 8; i++) pakRet[i] = pakMountLog[i] = pakCool[i] = 0;
@@ -223,15 +239,15 @@ extern void launcherUpdate(void* l, char* v) __asm__("func_001549A0");
 /* weapon mounts: the launcher's per-weapon launch offsets (launcher+0x630, 16 bytes each, x/y/z in the car's
  * frame, +y forward, +z up; filled per car type by func_001518A0, Roadkill's for 12 Pak). Forward-firing ones
  * are moved to 12 Pak's hood gun (centre of the hood, measured from his model); rear drops stay. */
-static float PAKGUN[3] = { 0.0f, 5.2f, 1.1f };
+static float PAKGUN[5] = { 0.0f, 5.2f, 1.1f, 0.5f, 0.25f };   /* gun x/y/z, min forward y, x squeeze */
 static void pakMounts(char* l, int i)
 {
     int k;
     for (k = 0; k < 20; k++) {
         float* e = (float*)(l + 0x630 + 16 * k);
-        if (e[1] <= 0.5f) continue;                        /* empty, or a rear / under-car launch point */
+        if (e[1] <= PAKGUN[3]) continue;                        /* empty, or a rear / under-car launch point */
         if (!pakMountLog[i]) scePrintf("TMBR 12pak mount %d: %d %d %d (x100)\n", k, (int)(e[0] * 100), (int)(e[1] * 100), (int)(e[2] * 100));
-        e[0] = PAKGUN[0] + e[0] * 0.25f; e[1] = PAKGUN[1]; e[2] = PAKGUN[2];
+        e[0] = PAKGUN[0] + e[0] * PAKGUN[4]; e[1] = PAKGUN[1]; e[2] = PAKGUN[2];
     }
     pakMountLog[i] = 1;
 }
@@ -251,13 +267,20 @@ void tmbr_LauncherUpdate(void* l, char* v)
 
 /* kill feed (0x1E278C): only for kills of the 8 real cars (traffic kills showed "UNKNOWN KILLED BY ...") */
 extern void hudKillMessage(void* hud, int victim, int killer) __asm__("func_0014E708");
+extern int tmbr_KillFeedShown(int p);
+
 void tmbr_KillMessage(void* hud, int victim, int killer)
 {
     int i;
     for (i = 0; i < 8; i++) {
         char* v = D_004FA030 + i * 0x31B0;
         int o = *(int*)(v + 0x20B4);
-        if (o >= 1 && o <= 5 && *(int*)(v + 0x20FC) == victim) { hudKillMessage(hud, victim, killer); return; }
+        if (o >= 1 && o <= 5 && *(int*)(v + 0x20FC) == victim) {
+            if (tmbr_KillFeedShown((int)((char*)hud - (D_004FA030 + 0x97B50)) / 0xA20))
+                *(int*)((char*)hud + 0x9F4) = 0;                  /* clear the report so the kill message shows */
+            hudKillMessage(hud, victim, killer);
+            return;
+        }
     }
 }
 

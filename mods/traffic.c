@@ -331,9 +331,51 @@ void tmbr_FodderTakeHit(char* v, void* pos, int a, int b)
 }
 
 extern void netVehicleDamage(void* net, char* victim, char* attacker, float dmg) __asm__("func_001740B0");
+/* damage reports (Twisted Metal: Head-On): "N Pts Damage" on the attacker's HUD each time he hurts another car
+ * (players, bots, traffic). Hits on the same victim within 1 s add up into one report, so machine-gun streams
+ * read as a running total. Shown through the HUD's free-text message (0xE6, the kill feed's own buffer, same
+ * typewriter font); a kill message on screen is never overwritten. */
+extern char* D_002C0410[];                             /* HUD message strings; [0xE6] is a writable buffer */
+extern void hudAddMsg(void* hud, int id, int a, int b) __asm__("AddMessage__3Hudiii");
+extern int sprintf(char* s, const char* f, ...);
+static char* dmgVictim[4];
+static float dmgSum[4];
+static int dmgTime[4], dmgMine[4], dmgClock;
+static float DMG_K[2] = { 0.5f, 0.0f };
+void tmbr_DamageReportTick(void) { dmgClock++; }
+static void damageReport(char* victim, char* attacker, float dmg)
+{
+    char* g = D_004FA030;
+    char* hud;
+    int p, n;
+    if (!g || !attacker || attacker == victim || !(dmg > DMG_K[1])) return;
+    if (attacker < g || attacker >= g + 8 * VSIZE || *(int*)(attacker + 0x20B4) != 1) return;
+    p = *(int*)(attacker + 0x210C);
+    if (p < 0 || p > 3) return;
+    hud = g + 0x97B50 + p * 0xA20;
+    if (*(int*)(hud + 0x9EC) == 0xE6 && *(int*)(hud + 0x9F4) > 0 && !dmgMine[p]) return;   /* kill message up */
+    if (dmgVictim[p] == victim && dmgClock - dmgTime[p] < 60) dmgSum[p] += dmg;
+    else { dmgSum[p] = dmg; dmgVictim[p] = victim; }
+    dmgTime[p] = dmgClock;
+    n = (int)(dmgSum[p] + DMG_K[0]);
+    if (n < 1) n = 1;
+    sprintf(D_002C0410[0xE6], "%d Pts Damage", n);
+    dmgMine[p] = 1;
+    hudAddMsg(hud, 0xE6, -1, 0);
+}
+/* a kill message is about to replace the HUD text: returns 1 if a damage report was showing */
+int tmbr_KillFeedShown(int p)
+{
+    int was;
+    if (p < 0 || p >= 4) return 0;
+    was = dmgMine[p]; dmgMine[p] = 0;
+    return was;
+}
+
 void tmbr_NetVehicleDamage(void* net, char* victim, char* attacker, float dmg)
 {
     char* g = D_004FA030;
+    damageReport(victim, attacker, dmg);
     if (victim < g || victim >= g + 8 * VSIZE) return;
     netVehicleDamage(net, victim, attacker, dmg);
 }
@@ -349,7 +391,8 @@ static void respawn(char* v)
     *(float*)(v + 0x404) = *(float*)(v + 0x400);
     for (q = 0; q < 4; q++) if (F(v, sws[q])) hierSetSwitchT((void*)F(v, sws[q]), 0);
     F(v, 0x590) = 3;
-    if (F(v, 0x2020)) fodderInit(v, D_004FA030);
+    /* no fodderInit here: it re-runs the full vehicle init (func_001D6F78) on a live car and froze the game
+     * right after a respawn; the car keeps its driver and street state, only health / looks are reset */
     if (F(v, 0x202C)) hierSetCsDrawMe((void*)F(v, 0x202C), 1);
     hierSetCsDrawMe((void*)F(v, 0x2028), 1);
 }
