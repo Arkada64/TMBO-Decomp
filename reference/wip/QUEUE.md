@@ -88,3 +88,17 @@ Already baked in: DNS, Bugfixes, Skip Intros, No-Interlacing, 16:9, the 3 Balanc
   node addresses + free-memory ranges per level, computed offline before the packs existed.
 - Peds: ASYLUM and SHIP already have retail's type-2 peds (3016-3018, same as retail). Retail PRISON's inmates
   (types 9-11) are packed for them: ZAP (ASYLUM, level 16) / ZSP (SHIP, level 15) in TMBO_PEDS_TEST.iso.
+
+## Status 2026-10-22 night (account 2)
+- Traffic: works on FREEWAY / MINIBURB / CITY (street lanes fixed: FodderDriver::init is static). SUBURB: ZSF pack
+  (18 cars) + fod_suburb, untested. Cars in the RAM gap except SUBURB. Open: collisions with players
+  (func_0013CEE0 pairs only 8 slots), damage / destruction, net sync (each machine runs its own traffic).
+- Rear fire L1+Down: flag is set like the d-pad combo; the launcher drops it on a 21-frame tick. Held 1 s now,
+  debug log TMBR rf on (freecam.c TMBR_RFDBG) - still failing in Ark's test before the hold.
+- Peds SHIP / ASYLUM: ZSP / ZAP inmates load into the pool (3 -> 18); packs.c tmbr_PedsRetype retypes 3/4 of the
+  type-2 group entries (PedWorldManager game+0x89FA0) to 9-11. Untested.
+- Packs: blob 0 scratch moved to the RAM gap (FREEWAY loading screen). FREEWAY player-car / headlight texture
+  corruption still unexplained (LOOP bridge corruption seen with traffic in its NGP tail).
+- Bots: respawn shield for bots (cruise while 0x497 >= 4), turbo (pad[7]). Perf: bots < 1 ms/frame total.
+- Audio cut-outs with many bots: probably SPU voice limits (989snd); not looked at yet.
+- Head-On ETE disc: reference/wip/HEADON_ETE.md (Harbor City cars/levels; no Gold Tooth / 12 Pak).
