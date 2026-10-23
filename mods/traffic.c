@@ -175,8 +175,13 @@ static void setup(void)
             F(v, 0x201C) = 0;
             F(v, 0x2020) = (int)(drv + j * 0x70);
             fodderDriverInit(drv + j * 0x70, game + 0x34890);
-            if (TRAFFIC_DBG) scePrintf("TMBR traffic: car %d init\n", j);
             fodderInit(v, game);
+            if (TRAFFIC_DBG) {
+                char *d = drv + j * 0x70, *c = (char*)F(v, 0x2028);
+                scePrintf("TMBR traffic: car %d init: cs %08x %08x %08x  v1D0 %08x %08x  drv20 %08x %08x  pts %x %x %x\n", j,
+                    F(c, 0x10), F(c, 0x14), F(c, 0x18), F(v, 0x1D0), F(v, 0x1D4), F(d, 0x20), F(d, 0x24),
+                    F(d, 0xC), F(d, 0x10), F(d, 0x14));
+            }
         }
         if (F(v, 0x202C)) hierSetCsDrawMe((void*)F(v, 0x202C), 1);
         active++;
@@ -205,7 +210,7 @@ void tmbr_TrafficUpdate(void)
         char* v = cars + j * VSIZE;
         if (!F(v, 0x590)) continue;
         vehicleUpdate(v);
-        if (!F(v, 0x2158)) {
+        if (!F(v, 0x2158) && (F(v, 0x1D0) || F(v, 0x1D4))) {
             /* physics: without this a car only moved in cheap (off-screen) mode and froze on screen */
             phys1(v); phys2(v); phys3(v); phys4(v); phys5(v); phys6(v);
             if (F(v, 0x1A78)) { vehicleSetCsMat(v); phys7(v); }
@@ -230,10 +235,11 @@ void tmbr_TrafficUpdate(void)
     if (TRAFFIC_DBG && ncars && ++dbgTick % 120 == 0)
         for (j = 0; j < ncars && j < 4; j++) {
             char *v = cars + j * VSIZE, *cs = (char*)F(v, 0x2028);
-            scePrintf("TMBR trafdbg %d: kind %d hidden %d b485 %d b488 %d t2150 %d own %d hw %x st %x cs %x [%d %d %d] pos %08x %08x spd %08x pad %d%d%d\n",
+            scePrintf("TMBR trafdbg %d: kind %d hidden %d b485 %d b488 %d t2150 %d own %d hw %x st %x cs %x [%d %d %d] pos %08x %08x v1D0 %08x %08x drv20 %08x %08x spd %08x pad %d%d%d\n",
                 j, F(v, 0x590), F(v, 0x2158), *(unsigned char*)(v + 0x485), *(unsigned char*)(v + 0x488), F(v, 0x2150),
                 F(v, 0x20B4), F(v, 0x201C), F(v, 0x2020), (u32)cs, cs ? cs[0xC] : -1, cs ? cs[0xD] : -1, cs ? cs[0xE] : -1,
-                cs ? fb(*(float*)(cs + 0x10)) : 0, cs ? fb(*(float*)(cs + 0x14)) : 0, fb(*(float*)(v + 0x2D4)),
+                cs ? fb(*(float*)(cs + 0x10)) : 0, cs ? fb(*(float*)(cs + 0x14)) : 0, F(v, 0x1D0), F(v, 0x1D4),
+                F(v, 0x2020) ? F(F(v, 0x2020), 0x20) : 0, F(v, 0x2020) ? F(F(v, 0x2020), 0x24) : 0, fb(*(float*)(v + 0x2D4)),
                 *(unsigned char*)(v + 0x598), *(unsigned char*)(v + 0x59A), *(unsigned char*)(v + 0x59D));
         }
 }
