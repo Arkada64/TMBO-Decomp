@@ -31,6 +31,16 @@ The ngp section uses the TMB node format (HierHead words, op1 roots, vehicle id 
 - TMB car files (/PCAR/<code>.NGP, e.g. STP) are stored for their RAM slot (STP entry points 0xA25200...) with
   3 entry points; Lost cars have 2. The BDD ptr section should list the pointer slots to relocate.
 
+## Full walk (headon_cmp.py, TMB dbsTraverse port)
+- TMB STP (Sweet Tooth): 3 entry points (op1 car root id 192, op15, op7), 589 nodes, ops 0,1,2,3,4,5,6,7,9,10,
+  15,17,25,31; callbacks: car parts 192-223, weapon mounts 4001-4006, 4100; PTR = 1643 pointer slots + 335
+  texture pairs.
+- Lost HC_CHROM: 2 entry points (op1 root id 134, op6); the walk stops after 7 nodes at **ops 20, 26, 27**,
+  which the TMB traverse doesn't know: the Head-On engine has new node types (PSP-era geometry). Its ptr
+  section is another format (starts 0xFFFFFFFF, then pairs of u16).
+- So Lost cars are not drop-in: an import means decoding the Head-On geometry/texture nodes and re-authoring a
+  TMB car (op17 meshes, op4/op6 parts, 4001+ weapon mounts, TEX/RTX), i.e. a model converter.
+
 ## Next steps for imports
 1. Diff the ngp node set of a Head-On car vs the same TMB car (e.g. SWEET vs TMB Sweet Tooth): ops, ids,
    attachment ids, weapon mounts.
