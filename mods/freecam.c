@@ -54,6 +54,7 @@ extern void tmbr_BotsThink(void);
 extern unsigned int tmbr_Cycles(void);              /* perf.c */
 extern void tmbr_PerfAdd(int slot, unsigned int start);
 extern void tmbr_PerfFrame(void);
+extern int scePrintf(const char* fmt, ...);
 
 #ifndef TMBR_TRAFFIC_ON
 #define TMBR_TRAFFIC_ON 0   /* traffic (traffic.c) per-frame update; the TRAFFIC_DIAG build sets 1 */
@@ -70,6 +71,28 @@ void tmbr_CameraUpdate(char *cam)
 #ifndef TMBR_PNACH
     { unsigned int t0 = tmbr_Cycles(); tmbr_BotsThink(); tmbr_PerfAdd(0, t0); } /* bots.c: free-for-all targets (not in the pnach build) */
     tmbr_PerfFrame();     /* perf.c: per-frame cost log every 5 s */
+    {   /* debug (rear fire via L1+Down does nothing, the d-pad combo works): when a human's combo state is 3
+         * (rear fire) log the fields func_001E4690 / the launcher check, for 20 frames */
+        extern char* D_004FA030;
+        static int rfFrames;
+        char* g = D_004FA030;
+        int k;
+        if (g)
+            for (k = 0; k < 8; k++) {
+                char* v = g + k * 0x31B0;
+                char* c = *(char**)(v + 0x2010);
+                if (*(int*)(v + 0x590) != 1 || !c) continue;
+                if (*(int*)c == 3) rfFrames = 20;
+                if (rfFrames > 0) {
+                    rfFrames--;
+                    scePrintf("TMBR rf: st %d w %d t2244 %d need %d flag21B4 %d 225C %d A8 %d CC %d 214 %d 27C %d 258 %d pad %d%d%d%d\n",
+                        *(int*)c, *(int*)(v + 0x21B0), *(int*)(v + 0x2244), *(int*)(v + 0x21B8 + 4 * *(int*)(v + 0x21B0)),
+                        *(int*)(v + 0x21B4), *(int*)(v + 0x225C), *(int*)(v + 0x21B0 + 0xA8), *(int*)(v + 0x21B0 + 0xCC),
+                        *(int*)(v + 0x21B0 + 0x214), *(int*)(v + 0x21B0 + 0x27C), *(int*)(v + 0x21B0 + 0x258),
+                        v[0x594 + 0xD], v[0x594 + 0xE], v[0x594 + 0xF], v[0x5A1]);
+                }
+            }
+    }
 #endif
     cameraUpdate(cam);
 
