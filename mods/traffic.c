@@ -38,6 +38,17 @@ extern void vehicleUpdate(char* v) __asm__("func_001DC760");
 extern void suspUpdate(char* v) __asm__("func_001AA3B8");
 extern void vehicleSetCsMat(char* v) __asm__("func_001E0230");
 extern void vehicleAfterNewPos(char* v) __asm__("func_001DCD48");
+/* the game's per-vehicle physics step (func_0013CEE0 runs these over the 8 slots, in this order) */
+extern void phys1(char* v) __asm__("func_001DF840");
+extern void phys2(char* v) __asm__("func_001E03C0");
+extern void phys3(char* v) __asm__("func_0011DBE0");
+extern void phys4(char* v) __asm__("func_0011E5C0");
+extern void phys5(char* v) __asm__("func_00121AC0");
+extern void phys6(char* v) __asm__("func_001212E8");
+extern void phys7(char* v) __asm__("func_0011E0E8");
+/* free RAM gap after the 8 car NGP slots (point-file read buffer after it); PRISON / SHIP / ASYLUM packs use it */
+#define GAP 0x1B93480
+#define GAP_END 0x1BE0000
 
 #define VSIZE 0x31B0
 #define MAXCARS 32       /* retail allows 33; traffic.s has a 32-entry cs pool (LOOP has 32 cars) */
@@ -84,6 +95,9 @@ static void setup(void)
             mem = tmbr_fodderLevels[i].mem; memEnd = tmbr_fodderLevels[i].memEnd;
         }
     if (!nodes) return;
+    /* the offline free ranges (traffic_nodes.c) predate the packs and CITY's sits in its TEX slot tail (hang
+     * on load); the gap is free on every traffic level */
+    mem = GAP; memEnd = GAP_END;
     type = F(game, 0x9FCA0);
     points = F(game, 0x34890 + 0x248);
     /* group the nodes like retail FodderParse: a car per base node (sub 0), attachments follow it */
@@ -111,6 +125,10 @@ static void setup(void)
     nhw = k;
     for (i = 0; i < ngroups; i++) if (!(type == 2 && gName[i] < 0x8F0)) order[k++] = i;
     if (ngroups > MAXCARS) ngroups = MAXCARS;
+    {   /* what fits in [mem, memEnd): vehicles (aligned to game) + MAXCARS fodder (0x70) and highway (0x30) drivers */
+        int fit = (int)((memEnd - mem) - VSIZE - MAXCARS * (0x70 + 0x30)) / VSIZE;
+        if (ngroups > fit) ngroups = fit;
+    }
     if (nhw > ngroups) nhw = ngroups;
     /* memory: vehicles a whole number of VSIZE from game, then the drivers */
     r = (mem - (u32)game) % VSIZE;
@@ -184,9 +202,25 @@ void tmbr_TrafficUpdate(void)
         if (!F(v, 0x590)) continue;
         vehicleUpdate(v);
         if (!F(v, 0x2158)) {
+            /* physics: without this a car only moved in cheap (off-screen) mode and froze on screen */
+            phys1(v); phys2(v); phys3(v); phys4(v); phys5(v); phys6(v);
+            if (F(v, 0x1A78)) { vehicleSetCsMat(v); phys7(v); }
+            if (!F(v, 0x1A68)) {
+                int* s4 = (int*)(F(v, 0x790) + 0x10);
+                int* cs = (int*)(F(v, 0x2028) + 0x10);
+                int q;
+                for (q = 0; q < 4; q++) ((int*)(v + 0x280))[q] = s4[q];
+                for (q = 0; q < 16; q++) ((int*)(v + 0x90))[q] = s4[4 + q];
+                for (q = 0; q < 4; q++) ((int*)(v + 0x270))[q] = cs[q];
+                for (q = 0; q < 16; q++) ((int*)(v + 0x50))[q] = cs[4 + q];
+            }
             suspUpdate(v);
             vehicleSetCsMat(v);
             vehicleAfterNewPos(v);
+        } else {
+            /* cheap mode (off screen): the drivers move the vehicle, not its cs. MINIBURB's street cars stayed
+             * at the origin (cs never set), so never on screen, so never out of cheap mode. */
+            vehicleSetCsMat(v);
         }
     }
     if (TRAFFIC_DBG && ncars && ++dbgTick % 120 == 0)
