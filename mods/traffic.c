@@ -96,9 +96,9 @@ static void setup(void)
             mem = tmbr_fodderLevels[i].mem; memEnd = tmbr_fodderLevels[i].memEnd;
         }
     if (!nodes) return;
-    /* the offline free ranges (traffic_nodes.c, NGP slot tails) work on FREEWAY / MINIBURB; CITY's is its
-     * TEX slot tail (hung on load). The gap after the car NGP slots hung MINIBURB (used on ped levels?). */
-    if (tmbr_levelIndex == 5) { mem = GAP; memEnd = GAP_END; }   /* CITY: NGP tail too small, TEX tail hung */
+    /* the gap after the car NGP slots, except where a pack lives there (SUBURB's ZSF2): the NGP slot tails held
+     * runtime data on some maps (LOOP's bridge textures broke with the cars at the top of its NGP tail) */
+    if (tmbr_levelIndex != 0) { mem = GAP; memEnd = GAP_END; }
     scePrintf("TMBR traffic: setup level %d, %d nodes, memory %x..%x, street points at %x (%d)\n", tmbr_levelIndex, n, mem, memEnd,
         F(game, 0x34890), F(game, 0x34890 + 0x248));
     type = F(game, 0x9FCA0);
