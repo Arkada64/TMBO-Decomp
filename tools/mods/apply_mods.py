@@ -148,6 +148,9 @@ PATCHES = [
     (A("nonmatchings/tmb/game/func_001399A8.s"), "00139AA4", "jal", "jal        tmbr_BotsSpawn"),
     (A("nonmatchings/tmb/game/func_001399A8.s"), "00139AB0", "beqz", "b          .L00139AC0"),
     # ... joins/leaves and bot removal for any number of bots
+    # ... bot weapons pass (bots.c): heavy-weapon cooldowns, weighted pick
+    (A("nonmatchings/tmb/ai/aiUpdateAttack__7Vehicle.s"), "00105BA0", "jal", "jal        tmbr_AiKeepWeapon"),
+    (A("nonmatchings/tmb/ai/aiUpdateAttack__7Vehicle.s"), "00105BB0", "jal", "jal        tmbr_AiPickWeapon"),
     # ... team play (teams.c): team colours for every car incl. bots on markers / radar, lock-on skips teammates
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCE2C", "addiu", "jal        tmbr_TeamColorS"),
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCE30", "bne", "daddu      $4, $17, $0"),

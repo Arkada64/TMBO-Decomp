@@ -388,6 +388,7 @@ void tmbr_BotsThink(void)
             if (tmbr_Opt(OPT_TEAMS) && tmbr_TeamOf(v) == tmbr_TeamOf(b)) continue;   /* teammate */
             d = (int)manhat(POS(b), POS(v));
             others = hunted[k] - (k == ci);              /* other bots already on it */
+            if (F(v, 0x590) == 1 && others > 0) d += others * 300;  /* a human already fought by a bot: look elsewhere */
             if (rl == R_CRUISER) sc = d;
             else if (rl == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
             else if (rl == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
@@ -480,6 +481,8 @@ static void shieldOff(char* v)
 #define SN_MAX 0x440C0000    /* 560.0 */
 #define SN_BEHIND 0x40200000 /* 2.5 rad */
 #define DF_SWING 30
+#define STANDOFF 0x43160000       /* 150.0 */
+#define STANDOFF_BRAKE 0x42B40000 /* 90.0 */
 static signed char ph[8];
 static short phT[8];
 static signed char hbTimer[8];
@@ -510,6 +513,12 @@ static void aggressiveTurn(char* g, char* v, char* t)
     if (F(v, 0x444) >= 60) { dbgWhy[idx] = 3; return; }        /* stuck: the AI's own reverse/turn */
     if (d < 0 || d > CS_DIST) { dbgWhy[idx] = 5; ph[idx] = 0; return; }
     pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* in a fight: stay on the gas */
+    /* standoff: nose-on and close, a bot coasts (< 150) or brakes (< 90) instead of driving into its target;
+     * the original and the old pass rammed and fired point blank */
+    if (ROLE(v) != R_SNIPER && a < CS_HB && ph[idx] == 0) {
+        if (d < STANDOFF_BRAKE) { pad[4] = 0; pad[6] = 1; dbgWhy[idx] = 40; }
+        else if (d < STANDOFF) { pad[4] = 0; dbgWhy[idx] = 41; }
+    }
     if (ph[idx] == 1 || ph[idx] == 4 || (a < CS_AIM && d > TURBO_FAR)) pad[7] = 1;   /* turbo: extend, run, close in */
     if (ROLE(v) == R_SNIPER) {
         /* sniper: rushed (< SN_MIN) -> run (target behind us) until SN_FAR, then swing round; in the band,
@@ -683,6 +692,62 @@ int tmbr_AiGoodWeapon(char* v, int w)
 {
     if (tmbr_botCount >= 0 && w == 1 && mathfRand(0, 99) >= SPECIAL_CHANCE) return 0;
     return aiGoodWeapon(v, w);
+}
+
+/* ---- weapons pass (bots, chosen count) ----
+ * The attack state (aiUpdateAttack) keeps the current weapon while aiIsGoodWeaponChoice says it is in range and
+ * angle (0x105BA0), else asks aiPickBestWeaponToFireNow (0x105BB0), which takes the first good one in a fixed
+ * order: special, power missile (6), ricochet (7), homing (3), napalm (4), fire missile (2), pickup slot (5),
+ * and tops the AI's ammo (car +0x2338[w]) back up to 1 so it never runs out. So bots fired their heaviest
+ * weapons back to back. Now: heavy weapons (special, power, ricochet, napalm, pickup) have a cooldown per bot,
+ * the pick is a weighted draw that favours fire / homing missiles, and a heavy weapon is only held briefly. */
+extern int aiGoodChoice(char* v, int w) __asm__("aiIsGoodWeaponChoice__7Vehiclei");
+extern void aiPickBest(char* v) __asm__("aiPickBestWeaponToFireNow__7Vehicle");
+extern int mathfRandW(int lo, int hi) __asm__("mathfRand__Fii");
+static int wpnClock;               /* = thinkTick */
+static int wpnReady[8][8];         /* per car, per AI weapon: frame it can be picked again */
+static int wpnPicked[8];           /* frame the current weapon was picked */
+static int heavyW(int w) { return w == 1 || w >= 4; }
+static int cooldown(int w)
+{
+    static const int heavy[3] = { 900, 600, 420 }, light[3] = { 150, 100, 70 };   /* frames: easy, medium, hard */
+    int d = tmbr_botDiff < 0 ? 0 : tmbr_botDiff > 2 ? 2 : tmbr_botDiff;
+    if (w == 1) return heavy[d] * 3 / 2;
+    return heavyW(w) ? heavy[d] : light[d];
+}
+int tmbr_AiKeepWeapon(char* v, int w)
+{
+    int k = (int)(v - D_004FA030) / 0x31B0 & 7;
+    if (tmbr_botCount < 0) return aiGoodChoice(v, w);
+    wpnClock = thinkTick;
+    if (heavyW(w) && wpnClock - wpnPicked[k] > 90) return 0;   /* heavy: held 1.5 s at most, then pick again */
+    return aiGoodChoice(v, w);
+}
+void tmbr_AiPickWeapon(char* v)
+{
+    static const int weight[8] = { 0, 1, 6, 6, 2, 1, 2, 2 };
+    char* br = (char*)F(v, 0x2014);
+    int k = (int)(v - D_004FA030) / 0x31B0 & 7, w, total = 0, r, ok[8];
+    wpnClock = thinkTick;                     /* frames (tmbr_BotsThink counts every frame) */
+    if (tmbr_botCount < 0 || !br) { aiPickBest(v); return; }
+    for (w = 1; w < 8; w++) {
+        ok[w] = wpnClock >= wpnReady[k][w] && aiGoodChoice(v, w);
+        if (ok[w] && w == 1 && mathfRandW(0, 99) >= SPECIAL_CHANCE) ok[w] = 0;
+        if (ok[w]) total += weight[w];
+    }
+    F(br, 0x47C) = 0;
+    if (!total) return;
+    r = mathfRandW(0, total - 1);
+    for (w = 1; w < 8; w++) {
+        if (!ok[w]) continue;
+        if ((r -= weight[w]) < 0) break;
+    }
+    if (w >= 8) return;
+    F(br, 0x47C) = w;
+    wpnPicked[k] = wpnClock;
+    wpnReady[k][w] = wpnClock + cooldown(w) + mathfRandW(0, cooldown(w) / 3);
+    if (w == 5) F(v, 0x22C0) = mathfRandW(11, 13);            /* as the original: pickup slot type */
+    if (F(v, 0x2338 + w * 4) <= 0) F(v, 0x2338 + w * 4) = 1;  /* as the original: AI ammo topped up */
 }
 
 /* Fairness gate (aiLineUpShot, func_00106D50, func_00107048): a bot only fires a normal weapon when its target
