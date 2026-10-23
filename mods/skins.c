@@ -195,26 +195,42 @@ static int vidx(char* v)
     return (i >= 0 && i < 8 && D_004FA030 + i * 0x31B0 == v) ? i : -1;
 }
 
-void tmbr_FireSpecial(void* l, char* v)
+#define L_AMMO(l, s) (*(int*)((char*)(l) + 0x188 + 4 * (s)))
+static int pakHold[8], pakOldCnt[8], pakOldType[8], pakOldSlot[8], pakSaved[3], pakSwapped;
+
+/* while any 12 Pak reticle is up, the reticle missile globals hold his values (the release can come from the
+ * fire button too, through the game's own slot-5 path) */
+static void pakMissileValues(int on)
 {
-    int i = vidx(v), slot, type;
-    if (i < 0 || !isPak(v)) { fireSpecial(l, v); return; }
-    if (L_ARMED(l) && !pakRet[i]) return;               /* a pickup reticle is up: leave it alone */
-    if (!pakRet[i] && pakFrames < pakCool[i]) return;   /* cooling down */
-    slot = L_SLOT(l); type = L_S5TYPE(l);
-    L_SLOT(l) = 5; L_S5TYPE(l) = 0xB;
-    pakRet[i] = 1;
-    {   /* his missiles: the pickup reticle's (weapon 0xB, func_001EE038) scaled by Lost's special/pickup ratios */
-        int d = D_004FAB98, life = D_004FAB9C; float turn = D_004FABA4;
-        D_004FAB98 = PAK_DAMAGE; D_004FAB9C = PAK_LIFE; D_004FABA4 = PAK_TURN;
-        fireCurrentWeapon(l, v);                         /* arm, or release when armed */
-        D_004FAB98 = d; D_004FAB9C = life; D_004FABA4 = turn;
+    if (on && !pakSwapped) {
+        pakSaved[0] = D_004FAB98; pakSaved[1] = D_004FAB9C; *(float*)&pakSaved[2] = D_004FABA4;
+        D_004FAB98 = PAK_DAMAGE; D_004FAB9C = PAK_LIFE; D_004FABA4 = PAK_TURN; pakSwapped = 1;
+    } else if (!on && pakSwapped) {
+        D_004FAB98 = pakSaved[0]; D_004FAB9C = pakSaved[1]; D_004FABA4 = *(float*)&pakSaved[2]; pakSwapped = 0;
     }
-    L_SLOT(l) = slot; L_S5TYPE(l) = type;
-    if (!L_ARMED(l)) pakRet[i] = 0;
 }
 
-/* the reticle code's ammo calls (slot 5): a special while 12 Pak's own reticle is up */
+/* special press: lend the game's reticle (slot 5, type 0xB, one round) and select it, so the HUD shows the
+ * reticle overlay and countdown (hud.s 0x14E19C: slot 5, type 0xB, ammo > 0) and the game arms / releases /
+ * times it out itself. The round it uses is charged to his special instead (tmbr_ReticleUsed); afterwards his
+ * own slot-5 pickup and his previous weapon come back (tmbr_SkinsFrame). */
+void tmbr_FireSpecial(void* l, char* v)
+{
+    int i = vidx(v);
+    if (i < 0 || !isPak(v)) { fireSpecial(l, v); return; }
+    if (L_ARMED(l) && !pakRet[i]) return;               /* a pickup reticle is up: leave it alone */
+    if (!pakRet[i]) {
+        if (pakFrames < pakCool[i]) return;              /* cooling down */
+        pakOldCnt[i] = L_AMMO(l, 5); pakOldType[i] = L_S5TYPE(l); pakOldSlot[i] = L_SLOT(l);
+        L_AMMO(l, 5) = 1; L_S5TYPE(l) = 0xB;
+        pakRet[i] = 1; pakHold[i] = 1;
+    }
+    L_SLOT(l) = 5;
+    pakMissileValues(1);
+    fireCurrentWeapon(l, v);                             /* arm, or release when armed */
+}
+
+/* the reticle code's ammo calls (slot 5): his special pays while his own reticle is up */
 void tmbr_ReticleUsed(void* w, char* v, int slot)
 {
     int i = vidx(v);
@@ -222,16 +238,28 @@ void tmbr_ReticleUsed(void* w, char* v, int slot)
     weaponUsed(w, v, slot);
 }
 
-/* every game frame (freecam.c's camera hook): forget reticle state from a previous game */
+/* every game frame (freecam.c's camera hook) */
 void tmbr_SkinsFrame(void)
 {
-    int i;
+    int i, any = 0;
     if (!D_004FA030) return;
     pakFrames++;
     tmbr_DamageReportTick();
-    if (pakGame == D_004FA030) return;
-    pakGame = D_004FA030;
-    for (i = 0; i < 8; i++) pakRet[i] = pakMountLog[i] = pakCool[i] = 0;
+    if (pakGame != D_004FA030) {
+        pakGame = D_004FA030;
+        for (i = 0; i < 8; i++) pakRet[i] = pakHold[i] = pakMountLog[i] = pakCool[i] = 0;
+    }
+    for (i = 0; i < 8; i++) {
+        void* l;
+        if (!pakHold[i]) continue;
+        l = D_004FA030 + i * 0x31B0 + 0x21B0;
+        if (pakRet[i] && (L_ARMED(l) || L_SLOT(l) == 5)) { any = 1; continue; }
+        if (pakRet[i]) { pakRet[i] = 0; pakCool[i] = pakFrames + PAK_COOLDOWN; weaponUsed(D_004FA030 + 0x6C310, D_004FA030 + i * 0x31B0, 1); }
+        L_AMMO(l, 5) = pakOldCnt[i]; L_S5TYPE(l) = pakOldType[i];
+        if (L_SLOT(l) == 5) L_SLOT(l) = pakOldSlot[i] == 5 ? 1 : pakOldSlot[i];
+        pakHold[i] = 0;
+    }
+    pakMissileValues(any);
 }
 
 /* vehicle update's launcher update call (0x1DCD90): 12 Pak runs it under PAK_ID (see above) */
