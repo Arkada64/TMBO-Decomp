@@ -41,8 +41,40 @@ The ngp section uses the TMB node format (HierHead words, op1 roots, vehicle id 
 - So Lost cars are not drop-in: an import means decoding the Head-On geometry/texture nodes and re-authoring a
   TMB car (op17 meshes, op4/op6 parts, 4001+ weapon mounts, TEX/RTX), i.e. a model converter.
 
-## Next steps for imports
-1. Diff the ngp node set of a Head-On car vs the same TMB car (e.g. SWEET vs TMB Sweet Tooth): ops, ids,
-   attachment ids, weapon mounts.
-2. Head-On tex vs TMB TEX+RTX: record layout, PSMs, CLUT placement.
-3. A converter (mkpack-like) to a TMB car slot: NGP + PTR + TEX + RTX, then a car-select entry.
+## Head-On formats, decoded (2026-10-23, tools/lost/)
+- **Nodes**: same HierHead word as TMB (op = word & 0x3F) and the same layouts for op0 object, op1 group, op2 LOD,
+  op3 translate, op4 rotate, op6 switch. New / changed in Head-On: op5 = child list (count byte +0xB, kids +0xC),
+  op13 = joint (bind matrix + inverse, kids at +0xA0; a short 0x30 form has kids at +0x20 and an inline op0),
+  op19 = health switch (count byte +8, entries of 0xC from +0x10: child, extra, u16 threshold of 0xFFFF),
+  op20 = reference (child +8), op8 = empty placeholder, op17/26/27 = car-level data (skeleton, mounts).
+  Gold Tooth: high LOD = 0x28EF0 (LOD node 0x28F20), far LOD = 0x5980; op5 at 0x350 lists 14 mount points (id 62).
+- **op0 (Head-On)**: {0, flags, 0, pow2 scale}, texture keys (u32, up to 4), bounding sphere, 3 qwords, one GS
+  qword per texture, optional 2 skin qwords (bone indices), then a DMA `ret` packet. VIF: STROW + STMOD 1 +
+  UNPACK V3-16 positions ((row + s16) * scale), V3-8 normals, then per strip: GIF tag (4th word = texture select
+  1+3k, same as TMB), S-8 pool indices, V4-5 (or V4-8) colors, V2-16 UVs (same 4096 scale as TMB), masked S-8
+  writes = strip restart pairs, MSCNT. Positions are in car space, same axes as TMB (x right, y forward, z up);
+  the Lost truck is the TMB Sweet Tooth model at ~1/1.15 scale.
+- **op0 (TMB)**: hier.h HierObject (0x70 + 0x30 per texture: TEX0 + TEX1 as A+D) then the packet: UNPACK S-32
+  @0xB4 count, V3-32 float pool, MSCAL 0, STCYCL 1/3, strips of {GIF tag, V4-8 (normal xyz, pool index),
+  V4-8 RGBA, V2-16 UV}, MSCNT; new batch = STCYCL 4/4, FLUSH, count, pool. numVerts (flags >> 16) = strip
+  vertices. tools/lost/tmbenc.py re-encodes 33 of STP's 36 meshes byte-identically (the other 3 are sprites).
+- **Textures**: Head-On TEX records = TMB TEX records, but pixels are stored as the PSMCT32 upload (GS-swizzled;
+  gsmem.py unswizzles T8/T4), gs holds the upload rect, the key is the texture reference, and each CLUT is the
+  next record (alpha 0..0x80). TMB stores linear PSMT8/PSMT4 pixels, gs = id | psm<<32 | tw<<40 | th<<44 |
+  (4 for T8, 8 for T4)<<51 | class<<59, CLUTs live in the RTX (alpha 0..0xFF, CBP = RTX block address).
+  For a non-first texture file (cars) texmRelocate only matches class block sizes to the level's bins.
+
+## Gold Tooth as a Sweet Tooth skin (tools/lost/gtbuild.py)
+`python3 gtbuild.py DIR_WITH_STP.* HC_CHROM.BDD OUTDIR [scale=1.15]` replaces the meshes of Sweet Tooth's three
+body damage states (op31 id 209 groups) and its far LOD body with Gold Tooth's (high LOD, Head-On flare / flame
+effect meshes skipped), adds 7 textures + CLUTs, drops the old meshes and rebuilds the PTR. NGP 756,640 bytes
+(original 757,888). Wheels, weapon mounts, special, shadow and collision stay Sweet Tooth's.
+`GT_STATES=0,1,2` uses Gold Tooth's own damage states (+25 KB). Previews: hoprev.py (Head-On), tmbprev.py (the
+built TMB files, round-trip check). Test disc: `TMBO_GOLDTOOTH_TEST.iso` = peds test disc + the four STP files
+(cloud/goldtooth/mkdisc_gt.sh, mkswap.py appends files and repoints their directory records).
+
+## Next
+1. In-game check of the skin (pick Sweet Tooth). Then: Gold Tooth's own wheels (Head-On wheel meshes / tire
+   texture 0x87F40), damage states, Lost's mount points.
+2. 12-Pak (HC_STOCK.BDD) as a new character: needs a free car slot / car-select entry, its own collision and
+   weapon mounts (Head-On op5 mount list), and a full NGP instead of a skin.
