@@ -191,6 +191,7 @@ static int thinkTick;
 #define CRUISE_SEE 350
 #define ROLE(v) (role[((int)((char*)(v) - D_004FA030) / 0x31B0) & 7])
 static int hunted[8], crowd[8];
+static short shieldT[8];         /* frames a bot has been under its respawn shield */
 static signed char role[8];          /* by vehicle index */
 static short roleT[8], rushT[8];
 static short fightT[8], leaveT[8];  /* think ticks (0.5 s) in a fight / left of a breakaway */
@@ -251,6 +252,7 @@ void tmbr_BotsThink(void)
         char *b = LIST(g)[i], *drv, *cur, *best = 0;
         int d, sc, bestS = 0x7FFFFFF, curS = -1, rl, ci = -1;   /* ints: float literals would need .lit4 (gp) */
         if (!b || !live(b) || !(drv = (char*)F(b, 0x2018))) continue;
+        if (*(signed char*)(b + 0x497) >= 4) continue;   /* respawn shield: cruising (tmbr_AiUpdate) */
         cur = (char*)F(drv, 0xB4);
         {
             int k2 = (int)(b - g) / 0x31B0 & 7;
@@ -346,6 +348,7 @@ extern int aiFrame(char* v) __asm__("func_00101F88");
 #define HB_HOLD 24
 #define HB_REST 20
 #define STALL 240
+#define TURBO_FAR 0x43C80000  /* 400.0: lined up and this far away -> turbo in */
 #define FIRE_ANG 0x3F19999A   /* 0.6 rad, ~34 deg */
 #define FIRE_DIST 0x43FA0000  /* 500.0 */
 #define CS_PIVOT 0x3F800000  /* 1.0 rad, ~57 deg */
@@ -390,6 +393,7 @@ static void aggressiveTurn(char* g, char* v, char* t)
     if (F(v, 0x444) >= 60) { dbgWhy[idx] = 3; return; }        /* stuck: the AI's own reverse/turn */
     if (d < 0 || d > CS_DIST) { dbgWhy[idx] = 5; ph[idx] = 0; return; }
     pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* in a fight: stay on the gas */
+    if (ph[idx] == 1 || ph[idx] == 4 || (a < CS_AIM && d > TURBO_FAR)) pad[7] = 1;   /* turbo: extend, run, close in */
     if (ROLE(v) == R_SNIPER) {
         /* sniper: rushed (< SN_MIN) -> run (target behind us) until SN_FAR, then swing round; in the band,
          * coast so it lingers and shoots; beyond the band, the attack logic below closes in */
@@ -458,6 +462,15 @@ int tmbr_AiUpdate(char* v)
     int k, save = 0, swap, r;
     unsigned int t0;
     dbgCalls[(int)(v - g) / 0x31B0 & 7]++;
+    if (tmbr_botCount >= 0 && F(v, 0x2014) && *(signed char*)(v + 0x497) >= 4 && drv) {
+        /* respawn shield (shield.s: byte 0x497 >= 4, weapons locked): cruise until it drops, no fighting */
+        int si = (int)(v - g) / 0x31B0 & 7;
+        if (F(drv, 4) != 4) { driverSetMode(drv, 4); pickCruiseZone(g, v, 0); }
+        if (++shieldT[si] > 1200) { *(signed char*)(v + 0x497) = 0; shieldT[si] = 0; }   /* safety: 20 s max */
+        t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
+        return r;
+    }
+    shieldT[(int)(v - g) / 0x31B0 & 7] = 0;
     if (tmbr_botCount >= 0 && F(v, 0x2014)) {
         /* No fleeing: hunt mode (func_00108618) switches to flee (mode 3, then cruise) when healthScore <
          * fleeHealth; online there is no health pickup to flee to, and our think tick forced hunt back every
