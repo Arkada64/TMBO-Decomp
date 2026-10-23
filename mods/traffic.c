@@ -213,6 +213,25 @@ static void setup(void)
 static int dbgTick;
 static int fb(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 
+/* Car-to-car collisions with traffic. collisCsToCsCollision (collis.s, 0x121B9C) asks IsInteractiveAVehicle
+ * which vehicle owns the cs it hit; that only scans the 8 slots, so cars drove through traffic. This version
+ * (hooked at that one call; the game's other 56 callers keep the 8-slot answer, since their per-player arrays
+ * can't take a traffic index) also finds traffic cars, as an index from game (cars sit a whole number of
+ * vehicles away from it). */
+int tmbr_IsVehicleOrTraffic(char* g, int ia, int* out)
+{
+    int i;
+    for (i = 0; i < 8; i++) {
+        char* v = g + i * VSIZE;
+        if (F(v, 0x590) && F(v, 0x20FC) == ia) { *out = i; return 1; }
+    }
+    for (i = 0; i < ncars; i++) {
+        char* v = cars + i * VSIZE;
+        if (F(v, 0x590) && F(v, 0x20FC) == ia) { *out = (int)(v - g) / VSIZE; return 1; }
+    }
+    return 0;
+}
+
 void tmbr_TrafficUpdate(void)
 {
     int j;
