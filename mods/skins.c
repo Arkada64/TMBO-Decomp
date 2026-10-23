@@ -1,8 +1,13 @@
-/* Alternate skins for two cars, picked on the car select screen and synced to every player.
- *   Sweet Tooth -> Gold Tooth (Twisted Metal: Lost), files \PCAR\ZZP.* / \ACAR\ZZA.*
- *   Roadkill    -> 12 Pak     (Twisted Metal: Lost), files \PCAR\ZYP.* / \ACAR\ZYA.*   (Roadkill's stats)
+/* Gold Tooth and 12 Pak (Twisted Metal: Lost), synced to every player.
+ *   Gold Tooth: Sweet Tooth skin, files \PCAR\ZZP.* / \ACAR\ZZA.*; on car select, while Sweet Tooth is highlighted
+ *               a line shows it and L1 + SQUARE toggles.
+ *   12 Pak:     his own (16th) spot on car select, after Minion. In game he is a Roadkill (type 1: Roadkill's stats,
+ *               sounds, HUD; files \PCAR\ZYP.* / \ACAR\ZYA.*) with his own special: Roadkill's charge-and-release
+ *               special (FireSpecial: up to 6 shots by charge time) fires homing missiles (weapon 3) instead of saw
+ *               blades (0x11) - Lost's 12 Pak charges a reticle and releases a missile volley.
  * Car select (func_001CB4C8, every frame; hooked at its playShellCarsEngineSound call, which gets the highlighted
- * car's value = type << 5): while Sweet Tooth or Roadkill is highlighted a line shows the skin, L1 + SQUARE toggles.
+ * car's value = type << 5; position D_004FA7D8, list of values shell+0x1A2F0, 15 entries 0..14): the wrap
+ * constants are 15 instead of 14, entry 15 is Roadkill's value, the preview model switch shows Roadkill there.
  * Sync: the choice goes out as a chat message "\x01SK<type><on>" (func_00171C08 sends chat to every client) on every
  * change and every 5 s in the waiting room; the chat handler (netMsgChatHandler, re-registered as tmbr_ChatHandler)
  * swallows those and records skin[sender]. Unmodded clients would see the message as a chat line.
@@ -37,7 +42,14 @@ static const char skinCode[NSKIN][2] = { { 'z', 'z' }, { 'z', 'y' } };
 static const char* const skinName[NSKIN] = { "GOLD TOOTH", "12 PAK" };
 static const char* const baseName[NSKIN] = { "SWEET TOOTH", "ROADKILL" };
 
-int tmbr_skin[NSKIN];                  /* this console's choices */
+int tmbr_skin[NSKIN];                  /* this console's choices (12 Pak = car select position 15) */
+#define PAK_POS 15
+extern int carSelPos __asm__("D_004FA7D8");
+extern char* shellPtr __asm__("D_004FA03C");
+extern void hierSetSwitch(void* sw, int i) __asm__("hierSetSwitch__FP11_hierswitchi");
+extern char* D_004FA030;
+extern int netSlotVehicle(void* net, int client) __asm__("func_00174268");
+extern void createWeapon(void* w, int type, char* v, void* t, void* tp) __asm__("func_001ED8D0");
 static unsigned char remote[8][NSKIN]; /* per client, from their chat messages */
 static int prevPad, resendTick;
 
@@ -104,12 +116,25 @@ void tmbr_LoadCar0F0(void* s, int c) { setCodes(c); loadCar0F0(s, c); setCodes(-
 /* car select frame: highlighted car value (type << 5) */
 void tmbr_CarSelectSound(void* snd, int car)
 {
-    int pad, pressed, k = skinOfType(car >> 5);
+    int pad, pressed, k = -1, pak;
     char line[64];
     playCarSound(snd, car);
+    if (shellPtr) *(int*)(shellPtr + 0x1A2F0 + PAK_POS * 4) = 0x20;      /* 16th spot = a Roadkill */
+    pak = carSelPos == PAK_POS;
+    if (pak != tmbr_skin[1]) {
+        tmbr_skin[1] = pak;
+        scePrintf("TMBR skins: 12 PAK %s\n", pak ? "on" : "off");
+        sendSkins();
+    }
     pad = inputGetPadButtons(0) & (PAD_L1 | PAD_SQUARE);
     pressed = pad & ~prevPad;
     prevPad = pad;
+    if (pak) {
+        fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 11 * 0x100);
+        fontPrint(0, "12 PAK   (TWISTED METAL: LOST)");
+        return;
+    }
+    if ((car >> 5) == skinType[0]) k = 0;
     if (k < 0) return;
     if ((pad & PAD_L1) && (pressed & PAD_SQUARE)) {
         tmbr_skin[k] = !tmbr_skin[k];
@@ -127,6 +152,32 @@ void tmbr_CarSelectSound(void* snd, int car)
     }
     fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 11 * 0x100);
     fontPrint(0, line);
+}
+
+/* car select preview model (shell+0xC3C switch, one child per position): the 16th spot shows Roadkill's */
+void tmbr_PreviewSwitch(void* sw, int i)
+{
+    hierSetSwitch(sw, i == PAK_POS ? 0 : i);
+}
+
+/* is this vehicle a player's 12 Pak? (Roadkill driven by a client with the 12 Pak choice) */
+static int isPak(char* v)
+{
+    int c, s;
+    if (*(int*)(v + 0x20F4) != 0x20 || !D_004FA030) return 0;
+    for (c = 0; c < 8; c++) {
+        if (!skinOn(c, 1)) continue;
+        s = netSlotVehicle(netState, c);
+        if (s > 0 && s <= 8 && *(char**)(D_004FA030 + 0x9E670 + 4 * (s - 1)) == v) return 1;
+    }
+    return 0;
+}
+
+/* Roadkill's special, one shot (FireSpecial's loop, func_001ED8D0(weapons, 0x11 saw blade, v, target, ..)) */
+void tmbr_RkSpecialShot(void* w, int type, char* v, void* t, void* tp)
+{
+    if (type == 0x11 && isPak(v)) type = 3;      /* homing missile */
+    createWeapon(w, type, v, t, tp);
 }
 
 /* waiting room (from tmbr_LobbyFrame): repeat the choice every 5 s for players who joined later */

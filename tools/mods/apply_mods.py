@@ -231,6 +231,14 @@ PATCHES = [
     (A("nonmatchings/online/net/func_001742B0.s"), "001744F8", "jal", "jal        tmbr_LoadCar0F0"),
     # traffic: weapon hits on traffic cars logged (destruction work)
     (A("nonmatchings/tmb/interact/func_0014F108.s"), "0014F1A0", "jal", "jal        tmbr_FodderTakeHit"),
+    # 12 Pak: 16th car select spot (wrap 14 -> 15), preview shows Roadkill there, his special fires homing missiles
+    (A("tmb/ui.s"), "001CB784", "addiu", "addiu      $v0, $zero, 0xF"),
+    (A("tmb/ui.s"), "001CB7B0", "addiu", "addiu      $v0, $zero, 0xF"),
+    (A("tmb/ui.s"), "001CB59C", "jal", "jal        tmbr_PreviewSwitch"),
+    (A("tmb/ui.s"), "001CB65C", "jal", "jal        tmbr_PreviewSwitch"),
+    (A("tmb/ui.s"), "001CB694", "jal", "jal        tmbr_PreviewSwitch"),
+    (A("tmb/ui.s"), "001CB8AC", "jal", "jal        tmbr_PreviewSwitch"),
+    (A("nonmatchings/tmb/launch/FireSpecial__8LauncherP7Vehicle.s"), "00158130", "jal", "jal        tmbr_RkSpecialShot"),
 ]
 # (file, address, label) - global label placed right before that instruction (return points)
 LABELS = [
