@@ -72,6 +72,8 @@ static int wanted(int mid)
     return n < 0 ? 0 : n;
 }
 
+int tmbr_BotsPlanned(void) { return F(D_003156C0, 0x3148) ? wanted(0) : 0; }
+
 /* AI index of every bot = its list position: vehicle, sort list, brain, net objects, radar */
 static void reindex(char* g)
 {
@@ -107,6 +109,7 @@ static int addBot(void)
     veh = gameMakeAI(g, v, F(D_003156C0 + s * 0x220, 0xB4), v, -1, 1);
     if (!veh) return 0;
     netBotObjects(D_003156C0, veh);
+    tmbr_TeamsBotJoined(s, (int)(veh - g) / 0x31B0);
     return 1;
 }
 
@@ -135,6 +138,7 @@ char* tmbr_BotRemove(char* g, char* v)
         if (g + i * 0x31B0 == v) vehFlag(0, i + 1);
     if (F(v, 0x20D0)) *(char*)(F(v, 0x20D0) + 0x2E) = 0;
     F(v, 0x590) = 0;
+    tmbr_TeamsBotLeft(v);
     vehNetDrop(v);
     vehicleDisable(v);
     F(g, 0x9FD04) = 0;
@@ -271,32 +275,17 @@ static void optSync(int flip)
     if (want != has) F(gi, 0) ^= 0x1000;   /* the mode presets clear it: put it back */
     if (flip || want != has) netSendGameInfo(D_003156C0, -1);
 }
-static int teamOf(char* g, char* v)
-{
-    int s = F(v, 0x20C0);
-    if (s >= 0 && s < 8) return s & 1;
-    return ((int)(v - g) / 0x31B0) & 1;
-}
-static int teamLogSerial = -1;
-static void teamsFrame(char* g)
-{
-    int s, k;
-    if (!tmbr_Opt(OPT_TEAMS)) return;
-    for (s = 0; s < 8; s++) F(D_003156C0 + s * 0x220, 0x14) = s & 1;
-    if (teamLogSerial != tmbr_levelSerial) {
-        teamLogSerial = tmbr_levelSerial;
-        for (k = 0; k < 8; k++) {
-            char* v = g + k * 0x31B0;
-            if (F(v, 0x590)) scePrintf("TMBR teams: car %d kind %d slot %d team %d\n", k, F(v, 0x590), F(v, 0x20C0), teamOf(g, v));
-        }
-    }
-}
+extern int tmbr_TeamOf(char* v);         /* teams.c */
+extern void tmbr_TeamsFrame(void);
+extern void tmbr_TeamsLobby(void);
+extern void tmbr_TeamsBotJoined(int slot, int car);
+extern void tmbr_TeamsBotLeft(char* v);
 
 void tmbr_BotsThink(void)
 {
     char* g = D_004FA030;
     int i, k;
-    if (g) teamsFrame(g);
+    if (g) tmbr_TeamsFrame();
     if (tmbr_botCount < 0 || !g || NAI(g) <= 0 || !netIsHost(D_003156C0)) return;
 #if TMBR_NAV
     tmbr_NavFrame();
@@ -363,7 +352,7 @@ void tmbr_BotsThink(void)
             char* v = g + k * 0x31B0;
             int others;
             if (v == b || !live(v)) continue;
-            if (tmbr_Opt(OPT_TEAMS) && teamOf(g, v) == teamOf(g, b)) continue;   /* teammate */
+            if (tmbr_Opt(OPT_TEAMS) && tmbr_TeamOf(v) == tmbr_TeamOf(b)) continue;   /* teammate */
             d = (int)manhat(POS(b), POS(v));
             others = hunted[k] - (k == ci);              /* other bots already on it */
             if (rl == R_CRUISER) sc = d;
@@ -693,6 +682,7 @@ void tmbr_LobbyFrame(void)
         tmbr_Opt(OPT_TEAMS) ? "ON" : "OFF");
     fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 11 * 0x100);
     fontPrint(0, buf);
+    tmbr_TeamsLobby();
     if (!netIsHost(D_003156C0)) return;
     /* raw pad, active high: R3 0x4, Up 0x10, Down 0x40, L2 0x100, R2 0x200, L1 0x400, R1 0x800 */
     pad = inputGetPadButtons(0) & 0xF54;

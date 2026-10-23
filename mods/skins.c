@@ -71,10 +71,16 @@ static void sendSkins(void)
 
 /* chat: our skin messages are recorded, not shown */
 extern void tmbr_TrafficSyncRecv(int client, const char* data);   /* traffic.c */
+extern void tmbr_TeamsRecv(int client, const char* msg);           /* teams.c */
+extern void tmbr_TeamsKill(int victim, int killer);
 int tmbr_ChatHandler(int a0, int a1, int client, char* msg)
 {
     if (msg && msg[0] == 1 && msg[1] == 'T' && msg[2] == 'R') {
         tmbr_TrafficSyncRecv(client, msg + 3);
+        return 0x44;
+    }
+    if (msg && msg[0] == 1 && msg[1] == 'T' && (msg[2] == 'T' || msg[2] == 'Q')) {
+        tmbr_TeamsRecv(client, msg + 1);
         return 0x44;
     }
     if (msg && msg[0] == 1 && msg[1] == 'S' && msg[2] == 'K') {
@@ -311,6 +317,7 @@ void tmbr_KillMessage(void* hud, int victim, int killer)
             if (tmbr_KillFeedShown((int)((char*)hud - (D_004FA030 + 0x97B50)) / 0xA20))
                 *(int*)((char*)hud + 0x9F4) = 0;                  /* clear the report so the kill message shows */
             hudKillMessage(hud, victim, killer);
+            if ((char*)hud == D_004FA030 + 0x97B50) tmbr_TeamsKill(victim, killer);   /* team score, once */
             return;
         }
     }

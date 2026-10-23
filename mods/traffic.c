@@ -346,9 +346,11 @@ static float dmgSum;
 static int dmgTime, dmgClock, dmgLen;
 static char dmgText[32];
 static float DMG_K[2] = { 0.5f, 0.0f };
+extern void tmbr_TeamsHud(void);   /* teams.c */
 void tmbr_DamageReportTick(void)
 {
     dmgClock++;
+    tmbr_TeamsHud();
     if (!dmgLen || dmgClock - dmgTime > 90) return;
     {   /* same font and centring as the kill feed (hud.s 0x14EC90: y 7), one line under it */
         int wh[2];
