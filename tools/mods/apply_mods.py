@@ -148,6 +148,8 @@ PATCHES = [
     (A("nonmatchings/tmb/game/func_001399A8.s"), "00139AA4", "jal", "jal        tmbr_BotsSpawn"),
     (A("nonmatchings/tmb/game/func_001399A8.s"), "00139AB0", "beqz", "b          .L00139AC0"),
     # ... joins/leaves and bot removal for any number of bots
+    # ... synchronous entry: the host's "everyone loaded -> go" (net state 0xA -> 0xB) waits for the bots
+    (A("nonmatchings/tmb/game/func_00138C90.s"), "00138FD8", "jal", "jal        tmbr_SyncGo"),
     (A("nonmatchings/online/net/func_00176EA0.s"), "00176EA0", "addiu", "j          tmbr_BotsRebalance"),
     (A("nonmatchings/online/net/func_00176EA0.s"), "00176EA4", "lui", "nop"),
     (A("nonmatchings/online/after_game_19/func_0013EED0.s"), "0013EED0", "addiu", "j          tmbr_BotRemove"),

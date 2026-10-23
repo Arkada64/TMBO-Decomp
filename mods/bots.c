@@ -159,21 +159,42 @@ static void balance(int mid)
 }
 
 /* game start (func_001399A8, host only; replaces the two func_00175588 calls) */
-/* Synchronous entry (game info bit 5; the net state goes to 0xA instead of 0xB): every player loads the level at
- * the same time, so bots made at the host's game start went out before the clients were in. There the host
- * waits SYNC_DELAY frames into the match and adds them like players joining mid-match (balance(1)). */
-#define SYNC_DELAY 240
-static int spawnWait;
+/* Synchronous entry (game info bit 5): everyone loads the level at the same time and waits on the scoreboard
+ * screen (net state 0xA) until every player has loaded (client +0x214 == 0xA); then the host sets game info
+ * bit 0 and goes to state 0xB (func_00138C90 0x138FD8). Bots made at the host's game start went out while the
+ * others were still loading. So in that mode the host makes them at the go instead (tmbr_SyncGo, hooked over
+ * that state change): everyone is loaded and still held. It keeps the hold SYNC_HOLD more frames so the bots
+ * reach every machine, then lets the match start. Bots are frozen while held (tmbr_AiUpdate). */
+#define SYNC_HOLD 90
+static int syncPending, syncHold;
 static int syncEntry(void) { return F(D_003156C0, 0x3148) && (*(u32*)F(D_003156C0, 0x3148) >> 5 & 1); }
+extern void netSetState(void* net, int state) __asm__("func_00173570");
+void tmbr_SyncGo(void* net, int state)
+{
+    char* gi = (char*)F(D_003156C0, 0x3148);
+    if (syncPending) {
+        syncPending = 0;
+        balance(0);
+        syncHold = NAI(D_004FA030) > 0 ? SYNC_HOLD : 0;
+        scePrintf("TMBR bots: everyone loaded, %d humans, %d bots, hold %d\n", humans(), NAI(D_004FA030), syncHold);
+    }
+    if (syncHold > 0) {
+        syncHold--;
+        if (gi) F(gi, 0) &= ~1;            /* not started yet (set just before this call) */
+        return;
+    }
+    netSetState(net, state);
+}
 int tmbr_BotsSpawn(void* net, int slot)
 {
     if (tmbr_botCount >= 0) F(D_004FA030, 0x9A3D4) = tmbr_botDiff;
+    syncHold = 0;
     if (syncEntry()) {
-        spawnWait = SYNC_DELAY;
-        scePrintf("TMBR bots: synchronous entry, bots in %d frames\n", SYNC_DELAY);
+        syncPending = 1;
+        scePrintf("TMBR bots: synchronous entry, bots when everyone has loaded\n");
         return 1;
     }
-    spawnWait = 0;
+    syncPending = 0;
     balance(0);
     scePrintf("TMBR bots: start, %d humans, %d bots (setting %d)\n", humans(), NAI(D_004FA030), tmbr_botCount);
     return 1;
@@ -182,7 +203,7 @@ int tmbr_BotsSpawn(void* net, int slot)
 /* players joined/left (replaces func_00176EA0) */
 void tmbr_BotsRebalance(void* net)
 {
-    if (!netIsHost(D_003156C0) || (F(D_003156C0, 0x1BB4) != 0xB && F(D_003156C0, 0x1BB4) != 0xA) || spawnWait > 0) return;
+    if (!netIsHost(D_003156C0) || (F(D_003156C0, 0x1BB4) != 0xB && F(D_003156C0, 0x1BB4) != 0xA) || syncPending || syncHold > 0) return;
     balance(1);
     scePrintf("TMBR bots: rebalance, %d humans, %d bots\n", humans(), NAI(D_004FA030));
 }
@@ -298,10 +319,6 @@ void tmbr_BotsThink(void)
     char* g = D_004FA030;
     int i, k;
     if (g) tmbr_TeamsFrame();
-    if (spawnWait > 0 && g && netIsHost(D_003156C0) && --spawnWait == 0) {   /* synchronous entry: bots now */
-        balance(0);
-        scePrintf("TMBR bots: sync spawn, %d humans, %d bots\n", humans(), NAI(g));
-    }
     if (tmbr_botCount < 0 || !g || NAI(g) <= 0 || !netIsHost(D_003156C0)) return;
 #if TMBR_NAV
     tmbr_NavFrame();
@@ -603,9 +620,12 @@ static void unstick(char* g, char* v)
 }
 
 static int aiUpdate(char* v);
+extern void padClear(char* v) __asm__("vehicleSaveAndClearPadFlags__7Vehicle");
 int tmbr_AiUpdate(char* v)
 {
-    int r = aiUpdate(v);
+    int r;
+    if (F(D_003156C0, 0x1BB4) == 0xA && F(v, 0x2014)) { padClear(v); return 0; }   /* sync hold: bots frozen */
+    r = aiUpdate(v);
     if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030) unstick(D_004FA030, v);
     return r;
 }
