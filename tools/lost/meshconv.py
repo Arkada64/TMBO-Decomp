@@ -5,7 +5,9 @@ from tmbenc import vif_packet
 POOL_MAX = 180
 COLOR_SCALE = 0.32
 import os
-ENV_MAP = os.environ.get('GT_ENV', '1') == '1'
+ENV_MAP = os.environ.get('GT_ENV', '0') == '1'
+BAKE = os.environ.get('GT_BAKE', '1') == '1'     # bake the reflection-map lookup into the UVs (static shine)
+TWOSIDED = os.environ.get('GT_TWOSIDED', '1') == '1'
 STRIP_MAX = 36          # longest strip seen in TMB car data
 TEMPLATE_20 = bytes.fromhex('00000000000000000000803f0000803f'
                             'ffffffffffffffffffffffffffff0000'
@@ -35,18 +37,31 @@ def strips_of(m, scale):
                 col = s['col'][i] if i < len(s['col']) else 0xFFFF
                 rgba = c5(col) if col <= 0xFFFF else tuple(int(((col >> (8 * k)) & 255) * (COLOR_SCALE if k < 3 else 1)) for k in range(4))
                 uv = s['uv'][i] if i < len(s['uv']) else (0, 0)
+                if m.get('bake'):
+                    # Head-On looks the body texture up by the view-space normal (a reflection map: city lights,
+                    # dark sky at the top). Bake that lookup for a chase camera, kept in the bright lower band.
+                    u = 0.5 + 0.45 * (0.85 * nx + 0.15 * ny)
+                    v = 0.66 - 0.30 * nz + 0.05 * ny
+                    uv = (int(-u * 4096), int(-v * 4096))
                 vs.append((pi, (nx, ny, nz), rgba, uv))
             tag = list(s['tag'])
             if not first:
                 tag[3] = 0
             first = False
-            # split long strips; pieces start on even offsets so the winding is kept
-            i = 0
-            while i < len(vs) - 2:
-                piece = vs[i:i + STRIP_MAX]
-                out.append((tuple(tag), piece))
-                tag[3] = 0
-                i += STRIP_MAX - 2
+            segs = [vs]
+            if m.get('twosided'):
+                # Head-On draws this object without backface culling: add the back faces (reversed strip;
+                # an even-length strip gets a leading duplicate so the winding really flips)
+                rv = vs[::-1]
+                segs.append(rv if len(rv) % 2 else [rv[0]] + rv)
+            for seg in segs:
+                # split long strips; pieces start on even offsets so the winding is kept
+                i = 0
+                while i < len(seg) - 2:
+                    piece = seg[i:i + STRIP_MAX]
+                    out.append((tuple(tag), piece))
+                    tag[3] = 0
+                    i += STRIP_MAX - 2
     return out
 
 

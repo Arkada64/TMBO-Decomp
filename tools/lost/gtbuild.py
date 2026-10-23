@@ -28,6 +28,13 @@ STP_HIDE = [0x296f0, 0x2a640]
 # Most of Sweet Tooth's body is character parts (op25: rear box + doors, clown head, cab pieces, the special's
 # robot), drawn over Gold Tooth: every remaining mesh textured only from these sheets gets an empty packet.
 BLANK_TEX = {1, 2, 3, 6, 7, 8}
+# Sweet Tooth's animated parts (op25 character instances; a character's meshes precede its instance node).
+# The fender and side-compartment characters carry the mechanical arms the weapons sit on: keep their
+# metal (sheet 2) pieces, blank only their body panels. The rest (clown head, driver, rear box, debris,
+# special / far-LOD bodies) is blanked whole.
+CHARS = [0x25640, 0x2f500, 0x344c0, 0x36400, 0x38890, 0x3c370, 0x3e880, 0x3ffa0, 0x4ba20, 0x50960, 0x52eb0,
+         0x91c20, 0x96e90, 0xa01a0, 0xa2a90]
+ARM_CHARS = {0x2f500, 0x344c0, 0x36400, 0x38890, 0x3c370, 0x3e880}
 STP_ALT_LOD = 0x941a0                            # switch 217 child 1 (the special's form): show Gold Tooth there too                    # Sweet Tooth's rear doors / bumper pieces (Gold Tooth has its own)
 
 
@@ -94,8 +101,11 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
             return built[h]
         o, m = hdr2pk[h]
         ctx = [tb.gs_ctx(k) for k in m['texrefs']]
-        if m.get('hflags', 0) & 0x0E and os.environ.get('GT_ENV', '1') == '1' and len(ctx) == 1:
+        if m.get('hflags', 0) & 0x0E and os.environ.get('GT_ENV', '0') == '1' and len(ctx) == 1:
             ctx = ctx * 2      # env-mapped: TMB's env path reads a second texture slot (the reflection map)
+        from meshconv import BAKE, TWOSIDED
+        m = dict(m, bake=BAKE and m['texrefs'] == [0x73ff0],
+                 twosided=TWOSIDED and not (m.get('hflags', 0) & 0x800000))   # bit 23 clear = no culling in Head-On
         blob, slots, pairs, sph = hierobject(m, scale, ctx)
         built[h] = (car.append(blob, slots, pairs), sph)
         return built[h]
@@ -149,7 +159,7 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     # Sweet Tooth's side weapon mounts (missiles shown resting on the car) sit in the air beside Gold Tooth's
     # narrower cab: move them in against the cab side
     for rot, x in ((0x4ba90, -3.6), (0x4bb10, 3.6)):
-        if (u32(car.n, rot) & 0x3f) == 4:
+        if os.environ.get('GT_MOVEMOUNTS') and (u32(car.n, rot) & 0x3f) == 4:
             struct.pack_into('<f', car.n, rot + 0x40, x)
             struct.pack_into('<f', car.n, rot + 0x48, 0.3)
     # special form: both LOD children -> Gold Tooth state 0
@@ -162,12 +172,18 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     keep = mount_meshes(car)
     print('weapon mount meshes kept', len(keep))
     nb = 0
+    global BL
+    BL = []
     for nd in sorted({a - 0x50 - 2 * i for a, g in car.pairs for i in range(5) if (a - 0x50 - 2 * i) % 16 == 0}):
         if nd in deadset or nd in keep or nd >= len(car.n) or (u32(car.n, nd) & 0x3f) != 0:
             continue
         nt = struct.unpack_from('<H', car.n, nd + 0x5a)[0]
         ts = {struct.unpack_from('<H', car.n, nd + 0x50 + 2 * k)[0] for k in range(nt)}
         if not ts or not ts <= BLANK_TEX or u32(car.n, nd + 4) - 0x980000 != nd + 0x70 + 0x30 * nt:
+            continue
+        import bisect
+        ch = CHARS[bisect.bisect_left(CHARS, nd)] if nd < CHARS[-1] else None
+        if ch in ARM_CHARS and 2 in ts and not os.environ.get('GT_NOARMS'):
             continue
         cx, cy = struct.unpack_from('<2f', car.n, nd + 0x10)
         if os.environ.get('GT_KEEPGUNS') and abs(cx) >= 4.0 and cy >= 4.5:   # Sweet Tooth's fender guns (stick out of Gold Tooth)
@@ -177,7 +193,9 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
         car.setp(nd + 4, nopk)
         struct.pack_into('<I', car.n, nd + 0xc, u32(car.n, nd + 0xc) & 0xFFFF)
         nb += 1
+        BL.append(nd)
     print('blanked', nb, 'Sweet Tooth meshes')
+    if os.environ.get('GT_DUMPBLANK'): open(os.environ['GT_DUMPBLANK'],'w').write(' '.join('%x'%x for x in BL))
     before = len(car.n)
     dropped = car.compact(sorted(set(dead)))
     print('ngp %d -> %d bytes (orig %d), %d dangling pointers cleared, %d slots, %d tex pairs, %d new textures' % (
