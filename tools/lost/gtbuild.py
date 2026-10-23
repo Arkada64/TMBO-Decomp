@@ -85,6 +85,9 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
         if m['hdr'] is not None:
             hdr2pk[m['hdr']] = (o, m)
     built = {}
+    for h in GT_EXTRA:                 # head / eyes / arm: no env map (their shine came out black in places)
+        if h in hdr2pk:
+            hdr2pk[h][1]['hflags'] &= ~0x0E
 
     def node_for(h):
         if h in built:

@@ -435,7 +435,7 @@ static void aggressiveTurn(char* g, char* v, char* t)
                 return;
             }
         } else if (d < SN_MIN && ph[idx] == 0) { ph[idx] = 4; return; }
-        else if (d < SN_MAX && a < CS_HB) pad[4] = 0;          /* in the band, roughly facing: coast */
+        else if (d < SN_MAX && a < CS_HB && (thinkTick & 3) == 0) pad[4] = 0;  /* in the band, roughly facing: ease off (gas 3 of 4 frames; full coasting crawled) */
     }
     if (a < CS_AIM && ph[idx] != 1 && ph[idx] != 4) { dbgWhy[idx] = 6; ph[idx] = 0; return; }               /* nearly lined up: the AI aims */
     /* ---- dogfight: like PvP, keep speed and fight for the angle ----
@@ -490,7 +490,7 @@ static void aggressiveTurn(char* g, char* v, char* t)
 #define UNSTICK_REV 45
 #define UNSTICK_FWD 25
 static float stkPos[8][4];
-static int stkTick[8], stkCount[8], unstT[8], unstSide[8];
+static int stkTick[8], stkCount[8], unstT[8], unstSide[8], crawl[8];
 static void unstick(char* g, char* v)
 {
     int i = (int)(v - g) / 0x31B0 & 7;
@@ -517,7 +517,16 @@ static void unstick(char* g, char* v)
             scePrintf("TMBR unstick: bot %d at %d %d %d, mode %d, level %d\n", i, (int)p[0], (int)p[1], (int)p[2],
                 F(v, 0x2018) ? F(F(v, 0x2018), 4) : -1, tmbr_levelIndex);
         }
-    } else stkCount[i] = 0;
+    } else {
+        stkCount[i] = 0;
+        /* crawling (driving, 3..12 units per 0.5 s) for 3 s: log what the bot is doing */
+        if (pad[4] && fbits(manhat(p, stkPos[i])) < 0x41400000) {
+            if (++crawl[i] == 6)
+                scePrintf("TMBR crawl: bot %d at %d %d %d, mode %d, role %d, hp %d, atk %d, pad %d%d%d%d\n", i, (int)p[0], (int)p[1], (int)p[2],
+                    F(v, 0x2018) ? F(F(v, 0x2018), 4) : -1, ROLE(v), hpPct(v), F(v, 0x2014) ? F(F(v, 0x2014), 0x414) : -1,
+                    pad[2], pad[4], pad[6], pad[8]);
+        } else crawl[i] = 0;
+    }
     stkPos[i][0] = p[0]; stkPos[i][1] = p[1]; stkPos[i][2] = p[2];
 }
 
