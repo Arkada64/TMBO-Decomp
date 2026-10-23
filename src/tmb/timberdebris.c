@@ -49,4 +49,27 @@ void* func_001ACA28(void* arg0) {
 
 INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/timberdebris", Init__12TimberDebrisP12Destructible);
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/timberdebris", Deactivate__12TimberDebris);
+#include "m2c_macros.h"
+f32 hdHatTest__FP8_fvectorT0P14ColorUnionType_Debris() __asm__("hdHatTest__FP8_fvectorT0P14ColorUnionType");
+f32 terrainGetQuickHAT__FP8_fvector_Debris() __asm__("terrainGetQuickHAT__FP8_fvector");
+
+f32 Deactivate__12TimberDebris(void *arg0, M2C_UNK arg1, void *arg2)
+{
+  s32 temp_v1;
+  temp_v1 = (((u32) (*(*((u32 **) (((u8 *) arg0) + 4))))) >> 7) & 0x7FF;
+  switch (temp_v1)
+  {
+    case 0:
+      *((s32 *) (((u8 *) arg2) + 0)) = 0;
+      *((f32 *) (((u8 *) arg2) + 8)) = 1.0f;
+ do { *((s32 *) (((u8 *) arg2) + 4)) = 0; return terrainGetQuickHAT__FP8_fvector_Debris(arg1, arg2); } while (0);
+
+    case 1:
+      return hdHatTest__FP8_fvectorT0P14ColorUnionType_Debris(arg1, arg2, 0);
+
+    default:
+      return 0.0f;
+
+  }
+
+}
