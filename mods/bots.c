@@ -199,7 +199,8 @@ static int hpPct(char* v)
     if (h < 0) h = 0;
     return h * 100 / m;
 }
-static short shieldT[8];         /* frames a bot has been under its respawn shield */
+static short shieldT[8];
+static signed char retreated[8];  /* already retreated this life */         /* frames a bot has been under its respawn shield */
 static signed char role[8];          /* by vehicle index */
 static short roleT[8], rushT[8];
 static short fightT[8], leaveT[8];  /* think ticks (0.5 s) in a fight / left of a breakaway */
@@ -283,7 +284,10 @@ void tmbr_BotsThink(void)
             }
             if (cur && (int)manhat(POS(b), POS(cur)) < 600) fightT[k2]++; else fightT[k2] = 0;
             /* retreat: hurt (< 35 %) and two or more cars on it -> break away (25 % per check) */
-            retreat = hpPct(b) < 35 && hunted[k2] >= 2 && mathfRandI(0, 99) < 25;
+            /* online has no health to recover, so a retreat is short (8-15 s) and once per life */
+            if (hpPct(b) >= 90) retreated[k2] = 0;
+            retreat = !retreated[k2] && hpPct(b) < 35 && hunted[k2] >= 2 && mathfRandI(0, 99) < 25;
+            if (retreat) retreated[k2] = 1;
             if (retreat || (fightT[k2] > 40 && mathfRandI(0, 99) < 10) || (pile && fightT[k2] > 10 && mathfRandI(0, 99) < 6)) {
                 leaveT[k2] = 16 + mathfRandI(0, 14);
                 fightT[k2] = 0;

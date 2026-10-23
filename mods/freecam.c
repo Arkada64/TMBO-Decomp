@@ -3,7 +3,7 @@
  * func_00138C90) goes to tmbr_CameraUpdate, which runs it and then, while free cam is on, replaces viewport
  * 0's camera with ours.
  * On while spectating (tmbr_spectating, set by tmbr_SpecMark in camera_pnach.s when the game switches a dead
- * player to the spectator camera; cleared at match start). Select toggles it off/on while spectating.
+ * player to the spectator camera; cleared at match start) or the spectator POV (5). R3 turns it on/off while spectating.
  * TMBR_FREECAM_ANYTIME (test builds only): Select + L3 toggles it any time, so it can be tested alone.
  * Controls: left stick move, right stick look, L2/R2 down/up, hold R1 = faster.
  * Camera data: Camera at game+0x27780; viewport i's camera state cs = *(cam + 0x42A0 + 4i):
@@ -19,7 +19,7 @@ extern void mathfRotMatrixRPH(float *m, fvec *angles) __asm__("mathfRotMatrixRPH
 extern void cameraUpdate(char *cam) __asm__("func_001166B8");
 
 int tmbr_spectating;
-static int fc_off;          /* spectator turned it off with Select */
+static int fc_on;          /* spectator turned it on with R3 */
 static int fc_init;
 static int fc_anytime;
 static int prev_buttons;
@@ -38,6 +38,7 @@ static float K[12] = { 1.0f / 128.0f, 0.2f, 0.04f, 0.03f, 1.5f, 2.0f, 0.5f, 1.0f
 
 #define IN_SELECT 0x0001
 #define IN_L3 0x0002
+#define IN_R3 0x0004
 #define IN_L2 0x0100
 #define IN_R2 0x0200
 #define IN_R1 0x0800
@@ -107,16 +108,26 @@ void tmbr_CameraUpdate(char *cam)
     cameraUpdate(cam);
 
     pad = inputGetPadButtons(0);
-    b = pad & (IN_SELECT | IN_L3);
+    b = pad & (IN_SELECT | IN_L3 | IN_R3);
     pressed = b & ~prev_buttons;
     prev_buttons = b;
 #ifdef TMBR_FREECAM_ANYTIME
     if ((b & IN_L3) && (pressed & IN_SELECT)) { fc_anytime = !fc_anytime; pressed = 0; }
 #endif
-    if (!tmbr_spectating) fc_off = 0;
-    else if (pressed & IN_SELECT) fc_off = !fc_off;
-
-    if (!((tmbr_spectating && !fc_off) || fc_anytime)) { fc_init = 0; return; }
+    /* Spectating: the dead-player hook (tmbr_spectating) or viewport 0's camera POV = 5 (spectator; cam+0 holds
+     * the POV per viewport). Free cam starts OFF; R3 turns it on/off. Select stays the game's (it already does
+     * something in the spectator view, so the old Select toggle never got through). */
+    {
+        int spec = tmbr_spectating || *(int*)cam == 5;
+        static int lastSpec = -1, lastPov = -1;
+        if (spec != lastSpec || *(int*)cam != lastPov) {
+            scePrintf("TMBR freecam: spectating %d (hook %d, pov %d)\n", spec, tmbr_spectating, *(int*)cam);
+            lastSpec = spec; lastPov = *(int*)cam;
+        }
+        if (!spec) fc_on = 0;
+        else if (pressed & IN_R3) fc_on = !fc_on;
+        if (!((spec && fc_on) || fc_anytime)) { fc_init = 0; return; }
+    }
     cs = *(char **)(cam + 0x42A0);
     if (cs == 0) return;
     m = (float *)(cs + 0x20);

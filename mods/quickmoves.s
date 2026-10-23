@@ -96,7 +96,16 @@ tmbr_ComboUpdate:
     ori     $7, $0, 0x8                 # cloak
 
     # fire it: set the state, then clear the combo buffers like Combo::ClearCombo (inlined in the game)
-8:  sw      $7, 0x0($16)
+8:  ori     $9, $0, 0x3                 # rear fire: fire it too, next frame (tmbr_ShoulderTap), like the
+    bne     $7, $9, 81f                 #  old pnach did (the game's rear-fire flag then waits for a fire press)
+    lw      $9, 0x4($16)
+    andi    $9, $9, 0x7
+    lui     $10, %hi(tmbr_rfFire)
+    addiu   $10, $10, %lo(tmbr_rfFire)
+    addu    $10, $10, $9
+    ori     $11, $0, 0x2
+    sb      $11, 0x0($10)
+81: sw      $7, 0x0($16)
     sw      $0, 0x8($16)
     sw      $0, 0xC($16)
     sw      $0, 0x10($16)
@@ -193,7 +202,20 @@ tmbr_ShoulderTap:
     sb      $11, 0x5A1($16)
     srl     $11, $15, 1
     sb      $11, 0x5A2($16)
-    beqz    $3, 1f                      # displaced `beqz $3, .L0017C060` ($3 = L2, loaded just before the hook;
+    lui     $9, %hi(tmbr_rfFire)        # quick rear fire: one frame of fire (0x5A3 = the fire action, $3 its copy)
+    addiu   $9, $9, %lo(tmbr_rfFire)    #  the frame after L1+Down, if the game took the rear-fire request
+    addu    $9, $9, $8
+    lbu     $10, 0x0($9)
+    beqz    $10, 6f
+    addiu   $10, $10, -1
+    sb      $10, 0x0($9)
+    bnez    $10, 6f
+    lw      $11, 0x21B4($16)            # launcher rear flag (set by func_001E4690 for combo state 3)
+    beqz    $11, 6f
+    nop
+    ori     $3, $0, 0x1
+    sb      $3, 0x5A3($16)
+6:  beqz    $3, 1f                      # displaced `beqz $3, .L0017C060` ($3 = L2, loaded just before the hook;
     nop                                 #  its delay slot `sb $2, 0x5A4` ran in the hook's delay slot)
     j       tmbr_ret_17BF80
     nop
@@ -205,3 +227,4 @@ tmbr_prevDpad: .space 8
 tmbr_qmUsed: .space 8
 tmbr_shPrev: .space 8
 tmbr_shTime: .space 16
+tmbr_rfFire: .space 8
