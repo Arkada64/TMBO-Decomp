@@ -162,7 +162,7 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
         if not ts or not ts <= BLANK_TEX or u32(car.n, nd + 4) - 0x980000 != nd + 0x70 + 0x30 * nt:
             continue
         cx, cy = struct.unpack_from('<2f', car.n, nd + 0x10)
-        if abs(cx) >= 4.0 and cy >= 4.5:      # front fender machine-gun barrels / missile tips: keep
+        if os.environ.get('GT_KEEPGUNS') and abs(cx) >= 4.0 and cy >= 4.5:   # Sweet Tooth's fender guns (stick out of Gold Tooth)
             continue
         a, b = mesh_extent(car.n, nd)
         dead.append((nd + 0x70 + 0x30 * nt, b))

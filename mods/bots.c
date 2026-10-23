@@ -209,6 +209,16 @@ static short fightT[8], leaveT[8];  /* think ticks (0.5 s) in a fight / left of 
 /* Roles change during the match: every 15..40 s a bot rolls a new one (brawler 45 %, sniper 30 %, roamer
  * 25 %, re-rolled once if every other bot already has it), and a sniper that keeps getting caught up close
  * (target < 150 for 3 s) turns brawler on the spot. */
+/* Cruise to an empty part of the map: gamePickCruiseZone picks the nearest candidate zone, or the farthest when
+ * the driver is in flee mode (3); so pick with the mode set to 3 for that one call, then cruise (4). */
+static void cruiseFar(char* g, char* b, char* drv)
+{
+    if (F(drv, 4) != 4) driverSetMode(drv, 4);
+    F(drv, 4) = 3;
+    pickCruiseZone(g, b, 0);
+    F(drv, 4) = 4;
+}
+
 static void rollRole(char* g, int k)
 {
     int r = mathfRandI(0, 99), n = r < 35 ? R_BRAWLER : r < 55 ? R_SNIPER : r < 75 ? R_ROAMER : R_CRUISER, i, same = 0, bots = 0;
@@ -280,7 +290,7 @@ void tmbr_BotsThink(void)
             int k2 = (int)(b - g) / 0x31B0 & 7, pile = crowd[k2] >= 3, retreat;
             if (leaveT[k2] > 0) {
                 leaveT[k2]--;
-                if (F(drv, 4) != 4) { driverSetMode(drv, 4); pickCruiseZone(g, b, 0); }
+                if (F(drv, 4) != 4) cruiseFar(g, b, drv);
                 continue;
             }
             if (cur && (int)manhat(POS(b), POS(cur)) < 600) fightT[k2]++; else fightT[k2] = 0;
@@ -289,10 +299,10 @@ void tmbr_BotsThink(void)
             if (hpPct(b) >= 90) retreated[k2] = 0;
             retreat = !retreated[k2] && hpPct(b) < 35 && hunted[k2] >= 2 && mathfRandI(0, 99) < 25;
             if (retreat) retreated[k2] = 1;
-            if (retreat || (fightT[k2] > 40 && mathfRandI(0, 99) < 10) || (pile && fightT[k2] > 10 && mathfRandI(0, 99) < 6)) {
+            if (retreat || (fightT[k2] > 40 && mathfRandI(0, 99) < 10) || (pile && fightT[k2] > 6 && mathfRandI(0, 99) < 15)) {
                 leaveT[k2] = 16 + mathfRandI(0, 14);
                 fightT[k2] = 0;
-                driverSetMode(drv, 4); pickCruiseZone(g, b, 0);
+                cruiseFar(g, b, drv);       /* to the far side of the map: spreads the bots out */
                 if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d breaks away (%s)\n", k2, pile ? "pile-up" : "long fight");
                 continue;
             }
@@ -307,7 +317,7 @@ void tmbr_BotsThink(void)
             if (rl == R_CRUISER) sc = d;
             else if (rl == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
             else if (rl == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
-            else sc = d + others * 200;                                                   /* brawler */
+            else sc = d + others * 200 + crowd[k] * 150;                                  /* brawler (avoids pile-ups) */
             sc -= (100 - hpPct(v)) * (rl == R_CRUISER ? 1 : 3);   /* finish off damaged cars (up to -300) */
             if (v == cur) curS = sc;
             if (sc < bestS) { bestS = sc; best = v; }
@@ -318,7 +328,7 @@ void tmbr_BotsThink(void)
             /* cruise the map until someone is close, then fight it (hunt) until it gets away */
             int bd = (int)manhat(POS(b), POS(best));
             if (bd > CRUISE_SEE * 2 || (F(drv, 4) == 4 && bd > CRUISE_SEE)) {
-                if (F(drv, 4) != 4) { driverSetMode(drv, 4); pickCruiseZone(g, b, 0); }
+                if (F(drv, 4) != 4) cruiseFar(g, b, drv);
                 continue;
             }
         }

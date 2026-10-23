@@ -4,7 +4,7 @@ pixels) + RTX CLUT records, and the TMB TEX0 word for a mesh's gsTexCtx.
 Record lists (TEX and RTX, both games): the LAST record has sizew 0 and runs to the end of the file; texmRelocate
 processes it and then stops. So appending = give the old last record its real size, add ours, zero the size of the
 new last one. RTX CLUT block addresses are packed (256 colours = 4 blocks, 16 = 1)."""
-import struct, zlib
+import struct, zlib, os
 import numpy as np
 from hotex import textures as ho_textures, clut_unswizzle
 
@@ -110,6 +110,8 @@ class TexBuilder:
             q = Image.fromarray(t['img'][:, :, :3]).quantize(16, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
             idx = np.asarray(q, np.uint8).reshape(-1)
             pal = np.array(q.getpalette()[:48], np.uint8).reshape(16, 3)
+            if os.environ.get('GT_ENVLIFT', '1') == '1':   # used as a reflection map: no near-black entries
+                pal = (pal.astype(float) * 0.6 + np.array([230, 190, 90]) * 0.4).clip(0, 255).astype(np.uint8)
             pal16 = np.concatenate([pal, np.full((16, 1), 0x80, np.uint8)], 1)   # Head-On alpha range (x2 below)
             t = dict(t, clutraw=pal16.tobytes(), clut=dict(tw=3, th=1))
             bpp, cbp = 4, None
