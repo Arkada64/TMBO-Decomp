@@ -30,7 +30,7 @@ extern void attachAdd(char* v, int sub, void* h) __asm__("attachAdd__7VehicleiP9
 extern void hierCsPtLightMe(void* cs, int on) __asm__("hierCsPtLightMe__FP3_csi");
 extern void hierSetCsDrawMe(void* cs, int on) __asm__("hierSetCsDrawMe__FP3_csUc");
 extern void* tmbr_FodderCs(void* h);  /* traffic.s: cs for a fodder model (own pool) */
-extern void fodderDriverInit(void* drv, void* points) __asm__("init__12FodderDriverP15AttractorPoints");
+extern void fodderDriverInit(void* points) __asm__("init__12FodderDriverP15AttractorPoints");  /* static: sets the lanes (D_004F9764) */
 extern void fodderInit(char* v, char* game) __asm__("func_001343D8");
 extern void highwayFodderInit(char* v, char* game) __asm__("func_00133EF0");
 extern void trafficDirectorInit(void* td, void* hw, void* first, int n) __asm__("func_001B0688");
@@ -168,6 +168,10 @@ static void setup(void)
     ncars = ngroups;
     scePrintf("TMBR traffic: models attached\n");
     /* InitializeFodderCars + SetFodderCar */
+    /* FodderDriver::init is static: it only stores the street points every fodder driver reads its lanes from.
+     * It used to get (driver, points), so the lanes pointed at driver memory: MINIBURB / CITY cars placed from
+     * garbage (stacked in the air on CITY, nowhere on MINIBURB). */
+    fodderDriverInit(game + 0x34890);
     savedCount = F(game, 0x9FCB8);
     F(game, 0x9FCB8) = ncars;                   /* fodderInit spreads the start points over this */
     active = 0;
@@ -185,7 +189,6 @@ static void setup(void)
         } else {
             F(v, 0x201C) = 0;
             F(v, 0x2020) = (int)(drv + j * 0x70);
-            fodderDriverInit(drv + j * 0x70, game + 0x34890);
             fodderInit(v, game);
             if (TRAFFIC_DBG) {
                 char *d = drv + j * 0x70, *c = (char*)F(v, 0x2028);
