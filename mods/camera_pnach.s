@@ -22,6 +22,9 @@ tmbr_InitPOV:
     daddu   $4, $16, $0
     jal     func_00117B90
     daddu   $5, $17, $0
+    ori     $2, $0, 10                  # weapon list default in 10 frames (freecam.c)
+    lui     $1, %hi(tmbr_hudStart)
+    sw      $2, %lo(tmbr_hudStart)($1)
     lq      $31, 0x20($29)
     lq      $17, 0x10($29)
     lq      $16, 0x0($29)

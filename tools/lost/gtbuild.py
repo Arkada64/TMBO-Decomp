@@ -15,7 +15,8 @@ from meshconv import hierobject
 SKIP_TEX = {0x8a480, 0xc1fa8, 0x84320,          # headlight flares, turbo / exhaust flames (Head-On effects)
             0x87f40, 0x8bba8, 0xa2888}          # far-LOD wheels / underside (Sweet Tooth's wheels are kept)
 # same truck art as Sweet Tooth's own sheets: reuse those palettes (car CLUT space is tight: STP uses 76 blocks)
-REUSE = {0xb0448: 45, 0xa91b8: 49, 0x8dc74: 45}
+REUSE = {0xb0448: 45, 0xa91b8: 49, 0x8dc74: 45, 0x9e768: 5}
+GT_EXTRA = [0x1230, 0x3bd0, 0x3e0]              # Gold Tooth's head, eyes, arm with the cone (under the op17 root)
 if os.environ.get('GT_GOLD_PAL'):                # put the gold body texture on Sweet Tooth's body palette too
     REUSE[0x73ff0] = int(os.environ['GT_GOLD_PAL'])
 HALF = [int(x, 16) for x in os.environ.get('GT_HALF', '').split(',') if x]   # e.g. b0448,a91b8
@@ -37,6 +38,38 @@ def hide_meshes(car, root, empty, dead):
         if (u32(car.n, tgt) & 0x3f) == 0:
             dead.append(mesh_extent(car.n, tgt))
             car.setp(slot, empty)
+
+
+def mount_meshes(car):
+    """op0 nodes reachable from the weapon mount nodes (ids 4001-4006, 4100): node = a pointer target, its child
+    pointers = the relocated slots between it and the next target"""
+    import bisect
+    starts = sorted({car.P(sl) for sl in car.slots if car.P(sl) is not None} |
+                    {u32(car.n, 4 + 4 * i) - 0x980000 for i in range(u32(car.n, 0))})
+    slots = sorted(car.slots)
+    def kids(o):
+        i = bisect.bisect_right(starts, o)
+        end = starts[i] if i < len(starts) else len(car.n)
+        a = bisect.bisect_left(slots, o)
+        out = []
+        while a < len(slots) and slots[a] < end:
+            t = car.P(slots[a])
+            if t is not None:
+                out.append(t)
+            a += 1
+        return out
+    roots = [o for o in starts if o < len(car.n) and (u32(car.n, o) >> 18) in (4001, 4002, 4003, 4004, 4005, 4006, 4100)]
+    seen, st, mesh = set(), list(roots), set()
+    while st:
+        o = st.pop()
+        if o in seen:
+            continue
+        seen.add(o)
+        if (u32(car.n, o) & 0x3f) == 0:
+            mesh.add(o)
+            continue
+        st += kids(o)
+    return mesh
 
 
 def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
@@ -81,7 +114,7 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
             t = car.P(g + 0x20 + 4 * i)
             if t is not None and (u32(car.n, t) & 0x3f) == 0:
                 dead.append(mesh_extent(car.n, t))
-        hs = meshes(GT_HI, gt_states[st])
+        hs = meshes(GT_HI, gt_states[st]) + GT_EXTRA
         kids = [node_for(h)[0] for h in hs]
         sph = struct.unpack_from('<3ff', car.n, g + 0x10)
         newg = car.group(kids, sphere=sph)
@@ -115,13 +148,18 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     # blank the remaining Sweet Tooth body meshes
     nopk = car.append(struct.pack('<4I', 0x60000001, 0, 0, 0) + struct.pack('<4I', 0x01000404, 0, 0, 0))
     deadset = {a for a, b in dead}
+    keep = mount_meshes(car)
+    print('weapon mount meshes kept', len(keep))
     nb = 0
     for nd in sorted({a - 0x50 - 2 * i for a, g in car.pairs for i in range(5) if (a - 0x50 - 2 * i) % 16 == 0}):
-        if nd in deadset or nd >= len(car.n) or (u32(car.n, nd) & 0x3f) != 0:
+        if nd in deadset or nd in keep or nd >= len(car.n) or (u32(car.n, nd) & 0x3f) != 0:
             continue
         nt = struct.unpack_from('<H', car.n, nd + 0x5a)[0]
         ts = {struct.unpack_from('<H', car.n, nd + 0x50 + 2 * k)[0] for k in range(nt)}
         if not ts or not ts <= BLANK_TEX or u32(car.n, nd + 4) - 0x980000 != nd + 0x70 + 0x30 * nt:
+            continue
+        cx, cy = struct.unpack_from('<2f', car.n, nd + 0x10)
+        if abs(cx) >= 4.0 and cy >= 4.5:      # front fender machine-gun barrels / missile tips: keep
             continue
         a, b = mesh_extent(car.n, nd)
         dead.append((nd + 0x70 + 0x30 * nt, b))

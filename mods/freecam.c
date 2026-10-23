@@ -19,6 +19,7 @@ extern void mathfRotMatrixRPH(float *m, fvec *angles) __asm__("mathfRotMatrixRPH
 extern void cameraUpdate(char *cam) __asm__("func_001166B8");
 
 int tmbr_spectating;
+int tmbr_hudStart;  /* set by tmbr_InitPOV (camera_pnach.s) at match start: frames until the weapon list default */
 static int fc_on;          /* spectator turned it on with R3 */
 static int fc_init;
 static int fc_anytime;
@@ -75,6 +76,17 @@ void tmbr_CameraUpdate(char *cam)
     { unsigned int t0 = tmbr_Cycles(); tmbr_BotsThink(); tmbr_PerfAdd(0, t0); } /* bots.c: free-for-all targets (not in the pnach build) */
     tmbr_PerfFrame();     /* perf.c: per-frame cost log every 5 s */
     tmbr_PedsRetype();    /* packs.c: inmates into SHIP / ASYLUM ped groups after load */
+    /* Weapon bay: start in the list view (what Select+Right = func_00145818 cycles to from the default: HUD
+     * (game + 0x97B50 + viewport * 0xA20) +0x7F4, 0 -> 1). Set a few frames after match start, after the HUD
+     * init; only from the default, so a player's own choice stays. */
+    if (tmbr_hudStart > 0 && --tmbr_hudStart == 0) {
+        extern char* D_004FA030;
+        char* gg = D_004FA030;
+        int vp;
+        if (gg)
+            for (vp = 0; vp < 4; vp++)
+                if (*(int*)(gg + 0x97B50 + vp * 0xA20 + 0x7F4) == 0) *(int*)(gg + 0x97B50 + vp * 0xA20 + 0x7F4) = 1;
+    }
     {   /* debug (rear fire via L1+Down does nothing, the d-pad combo works): when a human's combo state is 3
          * (rear fire) log the fields func_001E4690 / the launcher check, for 20 frames */
         extern char* D_004FA030;
