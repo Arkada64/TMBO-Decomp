@@ -618,6 +618,7 @@ int tmbr_AiMayShoot(char* v)
 
 extern void lobbyFrame(void) __asm__("func_001C5768");
 extern void tmbr_GoldToothLobby(void);   /* goldtooth.c */
+extern void tmbr_PedNamesInit(void);     /* packs.c */
 extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
 extern void fontPrint(int font, const char* s) __asm__("func_00203150");
 extern int sprintf(char* d, const char* f, ...);
@@ -630,6 +631,7 @@ void tmbr_LobbyFrame(void)
     char buf[48];
     lobbyFrame();
     tmbr_GoldToothLobby();
+    tmbr_PedNamesInit();
     if (!netIsHost(D_003156C0)) return;
     pad = inputGetPadButtons(0) & 0xF04;  /* raw pad, active high: R3 0x4, L2 0x100, R2 0x200, L1 0x400, R1 0x800 */
     pressed = pad & ~prevPad;

@@ -291,3 +291,20 @@ void tmbr_PedsRetype(void)
     }
     if (n) { total += n; scePrintf("TMBR peds: %d groups, %d more inmates (types 9-11), %d total\n", ng, n, total); }
 }
+
+/* SHIP (15) and ASYLUM (16) have no ped spawn file: their entries in the .PED name table (32 bytes per level,
+ * read by func_00178850 at level load into PedWorldManager) are empty, so they get one empty group. The test
+ * disc carries \PTS\ZZSHIP.PED and \PTS\ZZASYLUM.PED (tools/peds/mkped.py: 20 small walking rings at
+ * well spread pickup spots, inmate types 9-11 + type 2). Called from the waiting-room frame. */
+extern char pedNames[] __asm__("D_00330100");
+void tmbr_PedNamesInit(void)
+{
+    static const char ship[] = "\\PTS\\ZZSHIP.PED;1", asy[] = "\\PTS\\ZZASYLUM.PED;1";   /* Z..: sort last in \\PTS */
+    int i;
+    if (pedNames[15 * 32] && pedNames[16 * 32]) return;
+    for (i = 0; ship[i]; i++) pedNames[15 * 32 + i] = ship[i];
+    pedNames[15 * 32 + i] = 0;
+    for (i = 0; asy[i]; i++) pedNames[16 * 32 + i] = asy[i];
+    pedNames[16 * 32 + i] = 0;
+    scePrintf("TMBR peds: spawn files for SHIP / ASYLUM set\n");
+}
