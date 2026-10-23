@@ -108,6 +108,31 @@ def main(rkdir, bddpath, outdir, scale=1.0):
                     if sl + 4 > len(car.n): continue
                     t = car.P(sl)
                     if t is not None: wheels.add(t)
+        # brake / tail lights: Roadkill's switch id 42 (attach type 10 -> vehicle+0x2050: 0 off, 1 braking, 2 ...)
+        # stays, its four lamp quads moved onto 12 Pak's four round rear lamps
+        from tmbtree_walk import subtree_slots
+        brake = set()
+        for o in range(0, limit, 16):
+            h = u32(car.n, o)
+            if (h & 0x3f) == 6 and (h >> 18) == 42 and car.n[o + 0xb] == 3:
+                for i in range(3):
+                    c = car.P(o + 0xc + 4 * i)
+                    if c is None: continue
+                    if (u32(car.n, c) & 0x3f) == 0: brake.add(c)
+                    brake |= {t for sl, t in subtree_slots(car, c) if (u32(car.n, t) & 0x3f) == 0}
+        RK_C = [-2.6, -1.68, 1.77, 2.65]; PK_C = [-1.86, -1.31, 1.40, 1.97]
+        from tmbmesh import parse, BASE
+        for nd in brake:
+            pk = u32(car.n, nd + 4) - BASE; qwc = u32(car.n, pk) & 0xffff
+            for r in parse(car.n, pk + 8, pk + 16 + qwc * 16):
+                if r[1] == 0x68:
+                    for k in range(r[2]):
+                        x, y, z = struct.unpack_from('<3f', car.n, r[4] + 12 * k)
+                        j = min(range(4), key=lambda q: abs(x - RK_C[q]))
+                        struct.pack_into('<3f', car.n, r[4] + 12 * k, PK_C[j] + (x - RK_C[j]) * 0.5,
+                                         -8.05 + (y + 8.3) * 0.5, -0.24 + (z - 0.13) * 0.5)
+        print('brake light meshes kept and moved:', len(brake))
+        wheels |= brake
         deadset = {a for a, b in dead}
         nopk = car.append(struct.pack('<4I', 0x60000001, 0, 0, 0) + struct.pack('<4I', 0x01000404, 0, 0, 0))
         nb = 0

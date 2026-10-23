@@ -164,17 +164,20 @@ static int isPak(char* v)
     return 0;
 }
 
-/* 12 Pak's special = the game's reticle weapon (weapon 0xB; FireCurrentWeapon's reticle pickup case): first press
- * arms it, the longer it stays armed the more missiles (1..10 over 4 s, like the pickup's 0x224*10/0x228), second
- * press (or 5 s) releases them at the lock-on target. Hooked at FireCurrentWeapon's FireSpecial call; everyone
- * else's special is untouched. Ammo: one special (func_001F1AE0 slot 1, as Roadkill's special uses). */
+/* 12 Pak's special = the game's own reticle pickup (weapon slot 5, pickup type 0xB at launcher+0x110). Pressing
+ * special lends him one reticle in slot 5, selects slot 5 and fires it through FireCurrentWeapon (func_00156E08),
+ * so the game arms it (launcher+0x218), shows/sounds it, and releases it on the next fire press or its timeout,
+ * using up the lent reticle. One special is spent per use. When the reticle is done (0x218 back to 0) his old
+ * slot-5 pickup and his special selection come back. */
 extern void fireSpecial(void* l, char* v) __asm__("FireSpecial__8LauncherP7Vehicle");
-extern int getLockOn(void* l, char* v, void* t, void* tp, float r) __asm__("func_0015A650");
+extern void fireCurrentWeapon(void* l, char* v) __asm__("func_00156E08");
 extern void weaponUsed(void* w, char* v, int slot) __asm__("func_001F1AE0");
-extern void hudAddMessage(void* hud, int id, int a, int b) __asm__("AddMessage__3Hudiii");
-static float PK[2] = { 17.5f, 0.0f };     /* lock-on range used by the reticle pickup (D_004F9BC4) */
-static int pakArm[8], pakT0[8], pakFrame;
-static void* pakL[8];
+#define L_SLOT(l)    (*(int*)((char*)(l) + 0x0))
+#define L_AMMO(l, s) (*(int*)((char*)(l) + 0x188 + 4 * (s)))
+#define L_S5TYPE(l)  (*(int*)((char*)(l) + 0x110))
+#define L_ARMED(l)   (*(int*)((char*)(l) + 0x218))
+static int pakOn[8], pakOldCnt[8], pakOldType[8], pakWait[8];
+static char* pakGame;
 
 static int vidx(char* v)
 {
@@ -182,46 +185,41 @@ static int vidx(char* v)
     return (i >= 0 && i < 8 && D_004FA030 + i * 0x31B0 == v) ? i : -1;
 }
 
-static void pakHud(char* v, int id)
+static void pakDone(int i)
 {
-    if (*(int*)(v + 0x20B4) == 1)
-        hudAddMessage(D_004FA030 + 0x97B50 + *(int*)(v + 0x210C) * 0xA20, id, 1, 1);
-}
-
-static void pakRelease(int i)
-{
-    char* v = D_004FA030 + i * 0x31B0;
-    void *t = 0, *tp = 0;
-    int k, n = (pakFrame - pakT0[i]) * 10 / 240;
-    if (n < 1) n = 1;
-    if (n > 10) n = 10;
-    pakArm[i] = 0;
-    getLockOn(pakL[i], v, &t, &tp, PK[0]);
-    for (k = 0; k < n; k++) createWeapon(D_004FA030 + 0x6C310, 0xB, v, t, tp);
-    weaponUsed(D_004FA030 + 0x6C310, v, 1);
-    scePrintf("TMBR 12pak: special released, %d missiles\n", n);
+    void* l = D_004FA030 + i * 0x31B0 + 0x21B0;
+    L_AMMO(l, 5) = pakOldCnt[i];
+    L_S5TYPE(l) = pakOldType[i];
+    if (L_SLOT(l) == 5) L_SLOT(l) = 1;
+    pakOn[i] = 0;
 }
 
 void tmbr_FireSpecial(void* l, char* v)
 {
     int i = vidx(v);
     if (i < 0 || !isPak(v)) { fireSpecial(l, v); return; }
-    if (!pakArm[i]) {
-        pakArm[i] = 1; pakT0[i] = pakFrame; pakL[i] = l;
-        pakHud(v, 0x80);
-        return;
-    }
-    pakRelease(i);
+    if (pakOn[i]) return;
+    pakOn[i] = 1; pakWait[i] = 0;
+    pakOldCnt[i] = L_AMMO(l, 5); pakOldType[i] = L_S5TYPE(l);
+    L_AMMO(l, 5) = 1; L_S5TYPE(l) = 0xB; L_SLOT(l) = 5;
+    weaponUsed(D_004FA030 + 0x6C310, v, 1);              /* one special spent */
+    fireCurrentWeapon(l, v);                             /* arms the reticle */
+    scePrintf("TMBR 12pak: reticle armed (%d)\n", L_ARMED(l));
 }
 
-/* every game frame (freecam.c's camera hook): armed reticles release by themselves after 5 s */
+/* every game frame (freecam.c's camera hook): give back the lent slot once the reticle has fired or timed out */
 void tmbr_SkinsFrame(void)
 {
     int i;
     if (!D_004FA030) return;
-    pakFrame++;
-    for (i = 0; i < 8; i++)
-        if (pakArm[i] && pakFrame - pakT0[i] > 300) pakRelease(i);
+    if (pakGame != D_004FA030) { pakGame = D_004FA030; for (i = 0; i < 8; i++) pakOn[i] = 0; }
+    for (i = 0; i < 8; i++) {
+        void* l;
+        if (!pakOn[i]) continue;
+        l = D_004FA030 + i * 0x31B0 + 0x21B0;
+        if (L_ARMED(l) && ++pakWait[i] < 60 * 30) continue;
+        pakDone(i);
+    }
 }
 
 /* vehicle update's launcher update call (0x1DCD90): 12 Pak runs it under PAK_ID (see above) */
