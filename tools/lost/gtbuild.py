@@ -35,7 +35,60 @@ BLANK_TEX = {1, 2, 3, 6, 7, 8}
 CHARS = [0x25640, 0x2f500, 0x344c0, 0x36400, 0x38890, 0x3c370, 0x3e880, 0x3ffa0, 0x4ba20, 0x50960, 0x52eb0,
          0x91c20, 0x96e90, 0xa01a0, 0xa2a90]
 ARM_CHARS = {0x2f500, 0x344c0, 0x36400, 0x38890, 0x3c370, 0x3e880}
+V2 = os.environ.get('GT_V2', '1') == '1'          # v2: shine, turning head, red eyes, gold robot form
+CLOWN_HEAD_SLOT = 0x508cc                         # char 0x50960 (the clown head, rotates about its bone) -> mesh 0x4bc10
+ROBOT_RANGE = (0x55680, 0x94200)
+GT_EXTRA_V2 = [0x3e0]                            # v2: only the arm stays static (head + eyes go into the clown head)
+GOLD_CBPS = [49, 45, 9, 37]                      # CLUT blocks of sheets 1, 2, 3, 6                 # the special's robot (char 0x91c20 + switch 217 child 1): kept, gold sheets
 STP_ALT_LOD = 0x941a0                            # switch 217 child 1 (the special's form): show Gold Tooth there too                    # Sweet Tooth's rear doors / bumper pieces (Gold Tooth has its own)
+
+
+def gold_cluts(tb, cbps):
+    """recolour whole CLUTs onto a gold ramp by brightness (keeps every texel of the art, only the colours move)"""
+    import numpy as np
+    from textconv import records, rtx_rec_size
+    r = bytearray(tb.rtx)
+    for o, b, gs, k in records(bytes(r), rtx_rec_size):
+        if ((gs >> 16) & 0xffff) not in cbps:
+            continue
+        ne = (1 << ((gs >> 40) & 15)) * (1 << ((gs >> 44) & 15))
+        a = np.frombuffer(bytes(r[o + 16:o + 16 + 4 * ne]), np.uint8).reshape(ne, 4).astype(np.float32)
+        L = (0.3 * a[:, 0] + 0.59 * a[:, 1] + 0.11 * a[:, 2]) / 255
+        L = np.clip((L - 0.5) * 1.35 + 0.55, 0, 1)
+        stops = np.array([[0, 0, 0], [60, 35, 8], [150, 100, 25], [220, 175, 60], [250, 225, 140], [255, 250, 215]], np.float32)
+        xs = [0, 0.2, 0.45, 0.7, 0.88, 1.0]
+        for c in range(3):
+            a[:, c] = np.interp(L, xs, stops[:, c])
+        r[o + 16:o + 16 + 4 * ne] = a.astype(np.uint8).tobytes()
+    tb.rtx = bytes(r)
+
+
+def red(m):
+    """eyes: glowing red (vertex colours; Head-On's eye mesh is prelit white)"""
+    m = dict(m, strips=[dict(st, col=[0x801010FF] * len(st['idx'])) for st in m['strips']])
+    return m
+
+
+def merge_meshes(a, b):
+    """one Head-On mesh dict from two (vertex pools joined, b's texture selects moved past a's textures)"""
+    off, nt = len(a['pos']), len(a['texrefs'])
+    sb = []
+    for i, st in enumerate(b['strips']):
+        t = list(st['tag'])
+        if t[3]:
+            t[3] += 3 * nt
+        elif i == 0:
+            t[3] = 1 + 3 * nt
+        sb.append(dict(st, tag=tuple(t), idx=[x + off for x in st['idx']]))
+    sa = []
+    for i, st in enumerate(a['strips']):
+        t = list(st['tag'])
+        if i == 0 and not t[3]:
+            t[3] = 1
+        sa.append(dict(st, tag=tuple(t)))
+    nrm = list(a['nrm']) + [(0, 0, 1)] * (off - len(a['nrm'])) + list(b['nrm'])
+    return dict(a, pos=list(a['pos']) + list(b['pos']), nrm=nrm, strips=sa + sb,
+                texrefs=list(a['texrefs']) + list(b['texrefs']), hflags=a.get('hflags', 0))
 
 
 def hide_meshes(car, root, empty, dead):
@@ -92,9 +145,12 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
         if m['hdr'] is not None:
             hdr2pk[m['hdr']] = (o, m)
     built = {}
-    for h in GT_EXTRA:                 # head / eyes / arm: no env map (their shine came out black in places)
-        if h in hdr2pk:
-            hdr2pk[h][1]['hflags'] &= ~0x0E
+    if not V2:
+        for h in GT_EXTRA:             # head / eyes / arm: no env map (their shine came out black in places)
+            if h in hdr2pk:
+                hdr2pk[h][1]['hflags'] &= ~0x0E
+    if V2:                             # Sweet Tooth's art palettes (sheets 1/2/3/6, also lent to Gold Tooth's own
+        gold_cluts(tb, GOLD_CBPS)      # truck-art textures) -> gold, so the robot form and arms are gold too
 
     def node_for(h):
         if h in built:
@@ -107,7 +163,9 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
         if m.get('hflags', 0) & 0x0E and os.environ.get('GT_ENV', '0') == '1' and len(ctx) == 1:
             ctx = ctx * 2      # env-mapped: TMB's env path reads a second texture slot (the reflection map)
         from meshconv import BAKE, TWOSIDED
-        m = dict(m, bake=BAKE and m['texrefs'] == [0x73ff0],
+        gold = m['texrefs'][:1] == [0x73ff0]
+        m = dict(m, bake=BAKE and gold and not V2,
+                 env=V2 and gold,                 # TMB's own reflective mesh path, gold map as the reflection
                  twosided=TWOSIDED and not (m.get('hflags', 0) & 0x800000))   # bit 23 clear = no culling in Head-On
         blob, slots, pairs, sph = hierobject(m, scale, ctx)
         return car.append(blob, slots, pairs), sph
@@ -131,7 +189,7 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
             t = car.P(g + 0x20 + 4 * i)
             if t is not None and (u32(car.n, t) & 0x3f) == 0:
                 dead.append(mesh_extent(car.n, t))
-        hs = meshes(GT_HI, gt_states[st]) + GT_EXTRA
+        hs = meshes(GT_HI, gt_states[st]) + (GT_EXTRA_V2 if V2 else GT_EXTRA)
         kids = [node_for(h)[0] for h in hs]
         from winpatch import patch
         pm = patch([hdr2pk[h][1] for h in hs if h not in GT_EXTRA])   # close the open rear side window
@@ -169,9 +227,19 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
             struct.pack_into('<f', car.n, rot + 0x40, x)
             struct.pack_into('<f', car.n, rot + 0x48, 0.3)
     # special form: both LOD children -> Gold Tooth state 0
-    g0 = car.P(STP_STATES[0] + 0x20)
-    for i in range(struct.unpack_from('<i', car.n, STP_ALT_LOD + 4)[0]):
-        car.setp(STP_ALT_LOD + 0x28 + 0x10 * i, g0)
+    if not V2:
+        g0 = car.P(STP_STATES[0] + 0x20)
+        for i in range(struct.unpack_from('<i', car.n, STP_ALT_LOD + 4)[0]):
+            car.setp(STP_ALT_LOD + 0x28 + 0x10 * i, g0)
+    else:
+        # the clown head: Gold Tooth's head + red eyes as ONE mesh in the clown head character, so it turns with
+        # Sweet Tooth's head animation (same place on both trucks; the bone pivots it about its base)
+        hm = merge_meshes(hdr2pk[0x1230][1], red(hdr2pk[0x3bd0][1]))
+        hn, _ = build(hm)
+        old = car.P(CLOWN_HEAD_SLOT)
+        dead.append(mesh_extent(car.n, old))
+        car.setp(CLOWN_HEAD_SLOT, hn)
+        print('clown head', hex(old), '->', hex(hn))
     # blank the remaining Sweet Tooth body meshes
     nopk = car.append(struct.pack('<4I', 0x60000001, 0, 0, 0) + struct.pack('<4I', 0x01000404, 0, 0, 0))
     deadset = {a for a, b in dead}
@@ -182,6 +250,8 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     BL = []
     for nd in sorted({a - 0x50 - 2 * i for a, g in car.pairs for i in range(5) if (a - 0x50 - 2 * i) % 16 == 0}):
         if nd in deadset or nd in keep or nd >= len(car.n) or (u32(car.n, nd) & 0x3f) != 0:
+            continue
+        if V2 and ROBOT_RANGE[0] <= nd < ROBOT_RANGE[1]:
             continue
         nt = struct.unpack_from('<H', car.n, nd + 0x5a)[0]
         ts = {struct.unpack_from('<H', car.n, nd + 0x50 + 2 * k)[0] for k in range(nt)}

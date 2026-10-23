@@ -1,7 +1,9 @@
 """Encode a mesh into a TMB HierObject (op0) VIF packet.
 mesh: {'batches': [ {'pool': [(x,y,z)...], 'strips': [ {'tag': (nloop?,prim,regs,texsel), 'v': [(nx,ny,nz,idx),(r,g,b,a),(u,v)]...} ]} ]}"""
 import struct
-def vif_packet(batches):
+def vif_packet(batches, env=False):
+    """env: TMB's env-mapped mesh prelude (retail RKP/STP reflective meshes): after MSCAL 0, one UNPACK V4-32 @TOPS
+    of (0, 1.0, 0.9, 0.1) + MSCNT, then the strips as usual"""
     w=[]  # words after the DMA tag's first 2 words
     for bi,b in enumerate(batches):
         if bi>0: w+=[0x01000404,0x11000000]
@@ -9,7 +11,9 @@ def vif_packet(batches):
         if bi==0: first_two=w[:2]; w=[]
         w.append(0x680040b5|(len(b['pool'])&0xff)<<16)
         for p in b['pool']: w+=list(struct.unpack('<3I',struct.pack('<3f',*p)))
-        w+=[0x14000000,0x00000000,0x01000103]
+        w+=[0x14000000,0x00000000]
+        if env: w+=[0x6c018000,0,0x3f800000,0x3f666666,0x3dcccccd,0x17000000]
+        w+=[0x01000103]
         for s in b['strips']:
             n=len(s['v'])
             prim,regs,texsel=s['tag'][1],s['tag'][2],s['tag'][3]
