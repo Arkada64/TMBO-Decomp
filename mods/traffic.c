@@ -99,7 +99,8 @@ static void setup(void)
     /* the offline free ranges (traffic_nodes.c, NGP slot tails) work on FREEWAY / MINIBURB; CITY's is its
      * TEX slot tail (hung on load). The gap after the car NGP slots hung MINIBURB (used on ped levels?). */
     if (tmbr_levelIndex == 5) { mem = GAP; memEnd = GAP_END; }   /* CITY: NGP tail too small, TEX tail hung */
-    scePrintf("TMBR traffic: setup level %d, %d nodes, memory %x..%x\n", tmbr_levelIndex, n, mem, memEnd);
+    scePrintf("TMBR traffic: setup level %d, %d nodes, memory %x..%x, street points at %x (%d)\n", tmbr_levelIndex, n, mem, memEnd,
+        F(game, 0x34890), F(game, 0x34890 + 0x248));
     type = F(game, 0x9FCA0);
     points = F(game, 0x34890 + 0x248);
     /* group the nodes like retail FodderParse: a car per base node (sub 0), attachments follow it */
@@ -133,8 +134,18 @@ static void setup(void)
     }
     if (nhw > ngroups) nhw = ngroups;
     /* memory: vehicles a whole number of VSIZE from game, then the drivers */
-    r = (mem - (u32)game) % VSIZE;
-    cars = (char*)(mem + (VSIZE - r) % VSIZE);
+    /* from the TOP of the free range: the street attractor points (game+0x34890, the cars' lanes) are loaded
+     * right after the level NGP, i.e. at the bottom of the NGP tail - MINIBURB's traffic memset wiped them and
+     * every street car was placed from garbage */
+    {
+        u32 need = ngroups * VSIZE + MAXCARS * (0x70 + 0x30), top = memEnd - need;
+        r = (top - (u32)game) % VSIZE;
+        cars = (char*)(top - r);
+    }
+    if (F(game, 0x34890) >= (int)(u32)cars && F(game, 0x34890) < (int)memEnd) {
+        scePrintf("TMBR traffic: street points %x inside the traffic memory, no traffic\n", F(game, 0x34890));
+        return;
+    }
     drv = cars + ngroups * VSIZE;
     hwdrv = drv + MAXCARS * 0x70;
     if ((u32)(hwdrv + MAXCARS * 0x30) > memEnd) {
