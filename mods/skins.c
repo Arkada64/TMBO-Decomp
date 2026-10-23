@@ -164,19 +164,18 @@ static int isPak(char* v)
     return 0;
 }
 
-/* 12 Pak's special = the game's own reticle pickup (weapon slot 5, pickup type 0xB at launcher+0x110). Pressing
- * special lends him one reticle in slot 5, selects slot 5 and fires it through FireCurrentWeapon (func_00156E08),
- * so the game arms it (launcher+0x218), shows/sounds it, and releases it on the next fire press or its timeout,
- * using up the lent reticle. One special is spent per use. When the reticle is done (0x218 back to 0) his old
- * slot-5 pickup and his special selection come back. */
+/* 12 Pak's special IS the game's reticle (slot-5 pickup type 0xB at launcher+0x110), run from his special slot:
+ * FireCurrentWeapon is re-entered with the slot temporarily reading 5 / type 0xB, so the game's own reticle code
+ * arms it (launcher+0x218), releases it on the next special press, or times it out / cancels it on a weapon
+ * switch. Its ammo calls for slot 5 (release, timeout, cancel: tmbr_ReticleUsed) take a special instead while
+ * his reticle is up. Pickup reticles he collects still use slot 5 as usual. */
 extern void fireSpecial(void* l, char* v) __asm__("FireSpecial__8LauncherP7Vehicle");
 extern void fireCurrentWeapon(void* l, char* v) __asm__("func_00156E08");
 extern void weaponUsed(void* w, char* v, int slot) __asm__("func_001F1AE0");
 #define L_SLOT(l)    (*(int*)((char*)(l) + 0x0))
-#define L_AMMO(l, s) (*(int*)((char*)(l) + 0x188 + 4 * (s)))
 #define L_S5TYPE(l)  (*(int*)((char*)(l) + 0x110))
 #define L_ARMED(l)   (*(int*)((char*)(l) + 0x218))
-static int pakOn[8], pakOldCnt[8], pakOldType[8], pakWait[8];
+static int pakRet[8], pakMountLog[8];
 static char* pakGame;
 
 static int vidx(char* v)
@@ -185,48 +184,59 @@ static int vidx(char* v)
     return (i >= 0 && i < 8 && D_004FA030 + i * 0x31B0 == v) ? i : -1;
 }
 
-static void pakDone(int i)
-{
-    void* l = D_004FA030 + i * 0x31B0 + 0x21B0;
-    L_AMMO(l, 5) = pakOldCnt[i];
-    L_S5TYPE(l) = pakOldType[i];
-    if (L_SLOT(l) == 5) L_SLOT(l) = 1;
-    pakOn[i] = 0;
-}
-
 void tmbr_FireSpecial(void* l, char* v)
 {
-    int i = vidx(v);
+    int i = vidx(v), slot, type;
     if (i < 0 || !isPak(v)) { fireSpecial(l, v); return; }
-    if (pakOn[i]) return;
-    pakOn[i] = 1; pakWait[i] = 0;
-    pakOldCnt[i] = L_AMMO(l, 5); pakOldType[i] = L_S5TYPE(l);
-    L_AMMO(l, 5) = 1; L_S5TYPE(l) = 0xB; L_SLOT(l) = 5;
-    weaponUsed(D_004FA030 + 0x6C310, v, 1);              /* one special spent */
-    fireCurrentWeapon(l, v);                             /* arms the reticle */
-    scePrintf("TMBR 12pak: reticle armed (%d)\n", L_ARMED(l));
+    if (L_ARMED(l) && !pakRet[i]) return;               /* a pickup reticle is up: leave it alone */
+    slot = L_SLOT(l); type = L_S5TYPE(l);
+    L_SLOT(l) = 5; L_S5TYPE(l) = 0xB;
+    pakRet[i] = 1;
+    fireCurrentWeapon(l, v);                             /* arm, or release when armed */
+    L_SLOT(l) = slot; L_S5TYPE(l) = type;
+    if (!L_ARMED(l)) pakRet[i] = 0;
 }
 
-/* every game frame (freecam.c's camera hook): give back the lent slot once the reticle has fired or timed out */
+/* the reticle code's ammo calls (slot 5): a special while 12 Pak's own reticle is up */
+void tmbr_ReticleUsed(void* w, char* v, int slot)
+{
+    int i = vidx(v);
+    if (slot == 5 && i >= 0 && pakRet[i]) { pakRet[i] = 0; slot = 1; }
+    weaponUsed(w, v, slot);
+}
+
+/* every game frame (freecam.c's camera hook): forget reticle state from a previous game */
 void tmbr_SkinsFrame(void)
 {
     int i;
-    if (!D_004FA030) return;
-    if (pakGame != D_004FA030) { pakGame = D_004FA030; for (i = 0; i < 8; i++) pakOn[i] = 0; }
-    for (i = 0; i < 8; i++) {
-        void* l;
-        if (!pakOn[i]) continue;
-        l = D_004FA030 + i * 0x31B0 + 0x21B0;
-        if (L_ARMED(l) && ++pakWait[i] < 60 * 30) continue;
-        pakDone(i);
-    }
+    if (!D_004FA030 || pakGame == D_004FA030) return;
+    pakGame = D_004FA030;
+    for (i = 0; i < 8; i++) pakRet[i] = pakMountLog[i] = 0;
 }
 
 /* vehicle update's launcher update call (0x1DCD90): 12 Pak runs it under PAK_ID (see above) */
 extern void launcherUpdate(void* l, char* v) __asm__("func_001549A0");
+/* weapon mounts: the launcher's per-weapon launch offsets (launcher+0x630, 16 bytes each, x/y/z in the car's
+ * frame, +y forward, +z up; filled per car type by func_001518A0, Roadkill's for 12 Pak). Forward-firing ones
+ * are moved to 12 Pak's hood gun (centre of the hood, measured from his model); rear drops stay. */
+static float PAKGUN[3] = { 0.0f, 5.2f, 1.1f };
+static void pakMounts(char* l, int i)
+{
+    int k;
+    for (k = 0; k < 20; k++) {
+        float* e = (float*)(l + 0x630 + 16 * k);
+        if (e[1] <= 0.5f) continue;                        /* empty, or a rear / under-car launch point */
+        if (!pakMountLog[i]) scePrintf("TMBR 12pak mount %d: %d %d %d (x100)\n", k, (int)(e[0] * 100), (int)(e[1] * 100), (int)(e[2] * 100));
+        e[0] = PAKGUN[0] + e[0] * 0.25f; e[1] = PAKGUN[1]; e[2] = PAKGUN[2];
+    }
+    pakMountLog[i] = 1;
+}
+
 void tmbr_LauncherUpdate(void* l, char* v)
 {
     if (isPak(v)) {
+        int i = vidx(v);
+        if (i >= 0) pakMounts((char*)l, i);
         *(int*)(v + 0x20F4) = PAK_ID;
         launcherUpdate(l, v);
         *(int*)(v + 0x20F4) = 0x20;

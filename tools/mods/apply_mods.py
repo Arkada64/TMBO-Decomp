@@ -241,6 +241,12 @@ PATCHES = [
     (A("nonmatchings/tmb/launch/func_00156E08.s"), "00157D10", "jal", "jal        tmbr_FireSpecial"),
     # traffic: weapon damage on traffic is not reported to the network as player damage
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E24C0", "jal", "jal        tmbr_NetVehicleDamage"),
+    # 12 Pak's reticle special: the reticle's slot-5 ammo calls
+    (A("nonmatchings/tmb/launch/func_001549A0.s"), "00155240", "jal", "jal        tmbr_ReticleUsed"),
+    (A("nonmatchings/tmb/launch/func_00156118.s"), "00156268", "jal", "jal        tmbr_ReticleUsed"),
+    (A("nonmatchings/tmb/launch/func_00156118.s"), "00156698", "jal", "jal        tmbr_ReticleUsed"),
+    (A("nonmatchings/tmb/launch/func_00156118.s"), "00156A88", "jal", "jal        tmbr_ReticleUsed"),
+    (A("nonmatchings/tmb/launch/func_00156E08.s"), "00157BDC", "jal", "jal        tmbr_ReticleUsed"),
     # traffic kills: no kill feed line
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E278C", "jal", "jal        tmbr_KillMessage"),
     # 12 Pak: launcher update without Roadkill's charge special
