@@ -35,6 +35,7 @@ extern void dbLevelCallback(void) __asm__("func_00127650");
 extern void animInit(void* anim, void* chr, int i) __asm__("func_001FDE28");
 extern int scePrintf(const char* fmt, ...);
 extern int D_004FAE38;    /* online fixed slot layout */
+extern char* D_004FA030;  /* game */
 extern int D_004F9714;    /* db index being walked */
 extern u32 D_0048AC10[];  /* file table: [0..13] TEX file addresses */
 extern u32 D_00465E68[];  /* global animation table per db (op7 nodes) */
@@ -66,6 +67,7 @@ static int pack = -1;       /* PACKS index of the level being loaded */
 int tmbr_levelSerial;       /* bumped on every level load (traffic.c sets up on the next game frame) */
 int tmbr_levelIndex = -1;   /* shell level index of the level being loaded */
 static u32 clutStart;       /* GS block of the pack's first CLUT */
+static int retypeSerial;    /* level serial whose ped groups still need the inmate types (tmbr_PedsRetype) */
 
 static Manifest* readBlob0(int p, u32 at)
 {
@@ -225,4 +227,31 @@ void tmbr_LevelDbLoaded(int ngp, int vram, int slot)
     D_004F9714 = saveDb;
     scePrintf("TMBR pack: %d blobs, %d entry points, tex ids %d.., clut %d.. (%d), anims %d+%d, peds in pool %d -> %d\n",
         m->nblobs, hdr[0], texBase + 1, clutStart, m->clutBlocks, n, m->nanims, before, D_004FB748);
+    retypeSerial = tmbr_levelSerial;   /* inmate packs: retype the ped groups on the first game frame */
+}
+
+/* Peds spawn from the level's ped groups (PedWorldManager at game+0x89FA0: u8 count, groups of 0x670 from
+ * +0x10; group+1 = entry count, entries of 3 bytes {point, ped type, behavior} at group+0x630; a group fills
+ * its entries with allocPedType(type) when a player comes near, func_00110338). SHIP / ASYLUM only list type 2,
+ * so the packed inmates (types 9-11) sat in the pool. On the first frame after such a pack loaded, 3 of every 4
+ * entries become an inmate type, round robin. Called every frame from the camera hook (cheap when idle). */
+void tmbr_PedsRetype(void)
+{
+    char* mgr;
+    int g, e, n = 0, k = 0, ng;
+    if (retypeSerial != tmbr_levelSerial || pack < 0 || (PACKS[pack].level != 15 && PACKS[pack].level != 16)) return;
+    if (!D_004FA030) return;
+    retypeSerial = -1;
+    mgr = D_004FA030 + 0x89FA0;
+    ng = *(unsigned char*)mgr;
+    for (g = 0; g < ng; g++) {
+        unsigned char* grp = (unsigned char*)mgr + 0x10 + g * 0x670;
+        for (e = 0; e < grp[1] && e < 21; e++) {
+            unsigned char* ent = grp + 0x630 + e * 3;
+            if (ent[1] != 2) continue;
+            n++;
+            if ((k++ & 3) != 3) ent[1] = 9 + (k % 3);
+        }
+    }
+    scePrintf("TMBR peds: %d groups, %d type-2 entries, %d now inmates (types 9-11)\n", ng, n, n - n / 4);
 }

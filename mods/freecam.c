@@ -54,6 +54,7 @@ extern void tmbr_BotsThink(void);
 extern unsigned int tmbr_Cycles(void);              /* perf.c */
 extern void tmbr_PerfAdd(int slot, unsigned int start);
 extern void tmbr_PerfFrame(void);
+extern void tmbr_PedsRetype(void);           /* packs.c */
 extern int scePrintf(const char* fmt, ...);
 
 #define TMBR_RFDBG 1   /* rear-fire debug log */
@@ -72,6 +73,7 @@ void tmbr_CameraUpdate(char *cam)
 #ifndef TMBR_PNACH
     { unsigned int t0 = tmbr_Cycles(); tmbr_BotsThink(); tmbr_PerfAdd(0, t0); } /* bots.c: free-for-all targets (not in the pnach build) */
     tmbr_PerfFrame();     /* perf.c: per-frame cost log every 5 s */
+    tmbr_PedsRetype();    /* packs.c: inmates into SHIP / ASYLUM ped groups after load */
     {   /* debug (rear fire via L1+Down does nothing, the d-pad combo works): when a human's combo state is 3
          * (rear fire) log the fields func_001E4690 / the launcher check, for 20 frames */
         extern char* D_004FA030;
