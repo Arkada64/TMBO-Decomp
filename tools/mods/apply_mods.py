@@ -160,6 +160,8 @@ PATCHES = [
     (A("nonmatchings/tmb/ai/func_00106440.s"), "001064E8", "jal", "jal        tmbr_AiGoodWeapon"),
     # ... traffic cars collide: collisCsToCsCollision's owner lookup also finds them (traffic.c)
     (A("tmb/collis.s"), "00121B9C", "jal", "jal        tmbr_IsVehicleOrTraffic"),
+    (A("tmb/collis.s"), "00121F14", "jal", "jal        tmbr_CollideHit"),
+    (A("tmb/collis.s"), "00121F28", "jal", "jal        tmbr_CollideHit"),
     # ... bots 0..5 in net messages as -2..-7 (was -2 / -3 for everything else): mods/botnet.s
     (A("nonmatchings/online/net/func_00171818.s"), "0017187C", "lui", "jal        tmbr_BotCode"),
     (A("nonmatchings/online/net/func_00171818.s"), "00171880", "ori", "daddu      $4, $5, $0"),

@@ -232,6 +232,24 @@ int tmbr_IsVehicleOrTraffic(char* g, int ia, int* out)
     return 0;
 }
 
+/* vehicle-vehicle hit (func_00121D10 calls func_00122AF0(v, side, other, info) once per car): hits on or by a
+ * traffic car keep their push but do no damage. func_00122AF0 only damages when one of the two is a human
+ * (+0x590 == 1), so both kinds are hidden for the call. */
+extern void collideHit(char* v, int side, char* other, void* info) __asm__("func_00122AF0");
+void tmbr_CollideHit(char* v, int side, char* other, void* info)
+{
+    char* g = D_004FA030;
+    int ka, kb;
+    if ((v >= g && v < g + 8 * VSIZE) && (other >= g && other < g + 8 * VSIZE)) {
+        collideHit(v, side, other, info);
+        return;
+    }
+    ka = F(v, 0x590); kb = F(other, 0x590);
+    F(v, 0x590) = 3; F(other, 0x590) = 3;
+    collideHit(v, side, other, info);
+    F(v, 0x590) = ka; F(other, 0x590) = kb;
+}
+
 void tmbr_TrafficUpdate(void)
 {
     int j;

@@ -115,7 +115,8 @@ void tmbr_LevelRtxInit(int vram, char* rtx, int slot, char* shell)
 {
     int level = *(int*)(shell + 0x18000 + 0x23AC), i;
     char *r, *q;
-    u32 maxAddr = 0, end = 0, px;
+    u32 maxAddr = 0, end = 0, px, resMax = 0, resEnd = 0;
+    char *last, *lvlLast = 0;
     Manifest* m;
     pack = -1;
     if (D_004FAE38 && slot == 0)
@@ -124,25 +125,47 @@ void tmbr_LevelRtxInit(int vram, char* rtx, int slot, char* shell)
     /* blob 0 goes to a scratch spot (RTX_SCRATCH), not to its home: FREEWAY's is the TEX slot tail, which still
      * holds loading-screen data at this point */
     if (pack >= 0 && (m = readBlob0(pack, RTX_SCRATCH)) != 0) {
-        /* where the game will put the next CLUT: after the record with the highest address (as func_0023EC80
-         * computes D_006F268C), then the terminator (size 0), which our records replace */
+        /* Record lists end with a record whose size word is 0: the game processes it, then stops. The level's
+         * last RTX record is a real one (a res texture on every pack level), so it gets its true size and stays,
+         * ours follow it and our last one gets size 0. (Overwriting it, and ending with an all-zero record that
+         * the game also processes, broke a level res texture and CLUT block 0: the car corruption on packs maps.)
+         * CLUT addresses continue after the highest level CLUT (as func_0023EC80 computes D_006F268C), res
+         * addresses after the highest res texture. */
         r = rtx + *(u32*)(rtx + 4) * 16;
-        while (RSIZE(r)) {
-            u32 psm = (u32)(*(u64*)(r + 8) >> 32) & 0x3F;
-            if (psm != 0x1B && psm != 0x24 && psm != 0x2C && RADDR(r) > maxAddr) {  /* CLUTs only, not res */
-                maxAddr = RADDR(r);
-                px = (u32)(1 << RLOG2(r, 40)) << RLOG2(r, 44);
-                if ((px & 0xFFFF) < 0x40) px = 0x40;
-                end = maxAddr + ((px & 0xFFFF) >> 6);
+        for (;;) {
+            u32 psm = (u32)(*(u64*)(r + 8) >> 32) & 0x3F, sz = RSIZE(r);
+            px = (u32)(1 << RLOG2(r, 40)) << RLOG2(r, 44);
+            if (psm != 0x1B && psm != 0x24 && psm != 0x2C) {
+                if (RADDR(r) >= maxAddr) {
+                    u32 p2 = px & 0xFFFF;
+                    if (p2 < 0x40) p2 = 0x40;
+                    maxAddr = RADDR(r);
+                    end = maxAddr + (p2 >> 6);
+                }
+            } else if (RADDR(r) >= resMax) {
+                u32 w = 1u << RLOG2(r, 40);
+                if (w < 0x40) w = 0x40;
+                resMax = RADDR(r);
+                resEnd = resMax + ((w << RLOG2(r, 44)) >> 6);
             }
-            r += RSIZE(r);
+            if (sz == 0) {
+                sz = psm == 0x1B ? 0x80 + px : (psm == 0x24 || psm == 0x2C) ? 0x80 + px / 2 : 16 + 4 * px;
+                *(u32*)r = sz / 4;
+                lvlLast = r;
+                r += sz;
+                break;
+            }
+            r += sz;
         }
+        last = 0;
         for (q = (char*)m + (m->rtx - PACKS[pack].addr); RSIZE(q); q += RSIZE(q)) {
+            u32 psm = (u32)(*(u64*)(q + 8) >> 32) & 0x3F;
             for (i = 0; i < (int)RSIZE(q); i++) r[i] = q[i];
-            RADDR(r) += end;
+            RADDR(r) += (psm == 0x1B || psm == 0x24 || psm == 0x2C) ? resEnd : end;
+            last = r;
             r += RSIZE(r);
         }
-        for (i = 0; i < 16; i++) r[i] = 0;
+        if (last) *(u32*)last = 0; else *(u32*)lvlLast = 0;
         clutStart = (vram >> 6) + end;
     } else {
         pack = -1;
@@ -186,6 +209,11 @@ void tmbr_LevelDbLoaded(int ngp, int vram, int slot)
         scePrintf("TMBR pack: no texture ids left (%d + %d)\n", texBase, m->ntex);
         dbInitSlot(ngp, vram, slot);
         return;
+    }
+    {   /* pack TEX: the record before the all-zero terminator becomes the size-0 last record */
+        char *t = (char*)m->tex, *r = t + *(u32*)(t + 4) * 16, *prev = 0;
+        while (RSIZE(r)) { prev = r; r += RSIZE(r); }
+        if (prev) *(u32*)prev = 0;
     }
     D_0048AC10[PACK_SLOT] = m->tex;
     setTexIdBase(PACK_SLOT, texBase);
