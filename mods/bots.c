@@ -28,6 +28,8 @@ extern int mathfRandI(int lo, int hi) __asm__("mathfRand__Fii");
 extern void pickCruiseZone(char* g, char* v, int i) __asm__("gamePickCruiseZone__7TheGameP7Vehiclei");
 extern int tmbr_NavDrive(char* g, char* v, char* t);   /* nav.c */
 extern void tmbr_NavFrame(void);
+extern unsigned int tmbr_Cycles(void);              /* perf.c */
+extern void tmbr_PerfAdd(int slot, unsigned int start);
 extern int inputGetPadButtons(int pad) __asm__("inputGetPadButtons__Fi");
 extern int netIsHost(void* net) __asm__("func_001734B8");
 extern int netSlotVehicle(void* net, int slot) __asm__("func_00174268");
@@ -454,6 +456,7 @@ int tmbr_AiUpdate(char* v)
     char* drv = (char*)F(v, 0x2018);
     char* t = drv ? (char*)F(drv, 0xB4) : 0;
     int k, save = 0, swap, r;
+    unsigned int t0;
     dbgCalls[(int)(v - g) / 0x31B0 & 7]++;
     if (tmbr_botCount >= 0 && F(v, 0x2014)) {
         /* No fleeing: hunt mode (func_00108618) switches to flee (mode 3, then cruise) when healthScore <
@@ -462,19 +465,23 @@ int tmbr_AiUpdate(char* v)
         F(F(v, 0x2014), 0x48) = 0;
         if (drv && t && F(drv, 4) >= 2 && F(drv, 4) <= 4 && !(F(drv, 4) == 4 && (ROLE(v) == R_CRUISER || leaveT[(int)(v - g) / 0x31B0 & 7] > 0))) { driverSetMode(drv, 5); driverSetTarget(drv, t); }
     }
-    if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) return aiFrame(v);
+    if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) { t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0); return r; }
     swap = F(t, 0x590) == 2;
     k = F(t, 0x2100) & 7;
     if (swap) {
         save = F(g, 0x9FD40 + k * 4);
         F(g, 0x9FD40 + k * 4) = attractGroupAt(g + 0x30970, POS(t));
     }
+    t0 = tmbr_Cycles();
     r = aiFrame(v);
+    tmbr_PerfAdd(1, t0);
     if (swap) F(g, 0x9FD40 + k * 4) = save;
+    t0 = tmbr_Cycles();
 #if TMBR_NAV
-    if (tmbr_NavDrive(g, v, t)) return r;
+    if (tmbr_NavDrive(g, v, t)) { tmbr_PerfAdd(2, t0); return r; }
 #endif
     aggressiveTurn(g, v, t);
+    tmbr_PerfAdd(2, t0);
     return r;
 }
 

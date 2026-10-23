@@ -51,6 +51,9 @@ static float stick(int axis)
 
 extern void tmbr_TrafficUpdate(void);
 extern void tmbr_BotsThink(void);
+extern unsigned int tmbr_Cycles(void);              /* perf.c */
+extern void tmbr_PerfAdd(int slot, unsigned int start);
+extern void tmbr_PerfFrame(void);
 
 #ifndef TMBR_TRAFFIC_ON
 #define TMBR_TRAFFIC_ON 0   /* traffic (traffic.c) per-frame update; the TRAFFIC_DIAG build sets 1 */
@@ -62,10 +65,11 @@ void tmbr_CameraUpdate(char *cam)
     char *cs;
 
 #if TMBR_TRAFFIC_ON
-    tmbr_TrafficUpdate(); /* traffic.c: per-frame traffic cars (after the game's vehicle loops); off in stable */
+    { unsigned int t0 = tmbr_Cycles(); tmbr_TrafficUpdate(); tmbr_PerfAdd(3, t0); } /* traffic.c: per-frame traffic cars (after the game's vehicle loops); off in stable */
 #endif
 #ifndef TMBR_PNACH
-    tmbr_BotsThink();     /* bots.c: free-for-all targets (not in the pnach build) */
+    { unsigned int t0 = tmbr_Cycles(); tmbr_BotsThink(); tmbr_PerfAdd(0, t0); } /* bots.c: free-for-all targets (not in the pnach build) */
+    tmbr_PerfFrame();     /* perf.c: per-frame cost log every 5 s */
 #endif
     cameraUpdate(cam);
 
