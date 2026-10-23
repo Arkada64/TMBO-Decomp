@@ -117,6 +117,9 @@ class TexBuilder:
             bpp, cbp = 4, None
         else:
             idx, bpp, cbp = t['idx'].astype(np.uint8), t['bpp'], None
+            if key in self.half:                    # half size: every other texel (indices, same CLUT)
+                idx = idx.reshape(h, w)[::2, ::2].reshape(-1)
+                h, w = h // 2, w // 2
         if bpp == 8:
             payload, psm = idx.tobytes(), 0x13
         else:

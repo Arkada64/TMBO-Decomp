@@ -217,6 +217,20 @@ PATCHES = [
     (A("nonmatchings/tmb/ai/func_00107048.s"), "001071A4", "jal", "jal        tmbr_AiMayShoot"),
     (A("nonmatchings/tmb/ai/aiLineUpShot__7Vehicle.s"), "00106C40", "jal", "jal        tmbr_AiMayShoot"),
     (A("nonmatchings/tmb/ai/func_00106D50.s"), "00106F0C", "jal", "jal        tmbr_AiMayShoot"),
+    # skins (mods/skins.c): Gold Tooth / 12 Pak picked on the car select screen, synced over chat, loaded per client
+    (A("tmb/ui.s"), "001CB50C", "jal", "jal        tmbr_CarSelectSound"),
+    (A("nonmatchings/online/net/netInitDme.s"), "0016E680", "lui", "lui        $5, %hi(tmbr_ChatHandler)"),
+    (A("nonmatchings/online/net/netInitDme.s"), "0016E68C", "addiu", "addiu      $5, $5, %lo(tmbr_ChatHandler)"),
+    (A("tmb/shell.s"), "001884BC", "jal", "jal        tmbr_LoadOwnCar"),
+    (A("tmb/shell.s"), "00189048", "jal", "jal        tmbr_LoadCar268"),
+    (A("tmb/shell.s"), "00189070", "jal", "jal        tmbr_LoadCar478"),
+    (A("tmb/shell.s"), "00189098", "jal", "jal        tmbr_LoadCar680"),
+    (A("tmb/shell.s"), "0018AB18", "jal", "jal        tmbr_LoadCar268"),
+    (A("tmb/shell.s"), "0018AB2C", "jal", "jal        tmbr_LoadCar478"),
+    (A("tmb/shell.s"), "0018AB40", "jal", "jal        tmbr_LoadCar680"),
+    (A("nonmatchings/online/net/func_001742B0.s"), "001744F8", "jal", "jal        tmbr_LoadCar0F0"),
+    # traffic: weapon hits on traffic cars logged (destruction work)
+    (A("nonmatchings/tmb/interact/func_0014F108.s"), "0014F1A0", "jal", "jal        tmbr_FodderTakeHit"),
 ]
 # (file, address, label) - global label placed right before that instruction (return points)
 LABELS = [
