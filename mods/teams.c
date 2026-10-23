@@ -42,16 +42,22 @@ int tmbr_team[8] = { 0, 1, 0, 1, 0, 1, 0, 1 };
 int tmbr_botTeamMode;                    /* 0 balanced, 1 vs players */
 static char botSlot[8];                  /* host: slot taken by a bot this match */
 static int sendTick, prevPad, dirty;
-static int score[2], scoreSerial = -1, overShown;
+static int score[2], scoreSerial = -1, overShown, winner = -1, winShown = -1, lastType;
+static signed char rcvVeh[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };   /* clients: car teams from the host */
 
+int tmbr_TeamOf(char* v);
 static void sendTable(void)
 {
-    char m[16];
+    char m[24];
     int s;
     m[0] = 1; m[1] = 'T'; m[2] = 'T';
     for (s = 0; s < 8; s++) m[3 + s] = '0' + (tmbr_team[s] & 1);
     m[11] = '0' + tmbr_botTeamMode;
-    m[12] = 0;
+    for (s = 0; s < 8; s++) {                 /* per car (bots have no player slot on the clients) */
+        char* v = D_004FA030 ? D_004FA030 + s * VSIZE : 0;
+        m[12 + s] = v && (F(v, 0x590) == 1 || F(v, 0x590) == 2) ? '0' + (tmbr_TeamOf(v) & 1) : '-';
+    }
+    m[20] = 0;
     netChatSend(D_003156C0, m);
 }
 
@@ -71,6 +77,7 @@ void tmbr_TeamsRecv(int client, const char* msg)
         if (netIsHost(D_003156C0)) return;
         for (s = 0; s < 8 && msg[2 + s]; s++) tmbr_team[s] = msg[2 + s] == '1';
         if (msg[10]) tmbr_botTeamMode = msg[10] == '1';
+        if (msg[10]) for (s = 0; s < 8 && msg[11 + s]; s++) rcvVeh[s] = msg[11 + s] == '-' ? -1 : msg[11 + s] - '0';
     } else if (msg[1] == 'Q') {                            /* TQ: a player asks for a team */
         if (!netIsHost(D_003156C0) || tmbr_botTeamMode) return;
         setTeam(client, msg[2] == '1');
@@ -86,8 +93,35 @@ int tmbr_TeamOf(char* v)
     int s = F(v, 0x20C0), k = (int)(v - D_004FA030) / VSIZE;
     if (k >= 0 && k < 8 && vehSlot[k] >= 0) return tmbr_team[(int)vehSlot[k]];
     if (s >= 0 && s < 8) return tmbr_team[s];
+    if (k >= 0 && k < 8 && rcvVeh[k] >= 0) return rcvVeh[k];
     return k & 1;
 }
+
+/* Hooks over the game's own team code (it reads client +0x14 through the car's player slot +0x20C0, which is
+ * -1 for bots, and only for humans):
+ *  - car markers (func_001DCD48 0x1DCE2C) and radar blips (hud func_00149D08 0x14A91C): tmbr_TeamColorS(car)
+ *    returns the colour code: 0 = red, 1 = blue (the game's team colours, func_0014C4D8), -1 = the car's own;
+ *  - lock-on (func_0015A650 0x15A738): tmbr_SameTeam(shooter, target) = 1 skips that target. */
+int tmbr_MarkerTeam(char* v)
+{
+    if (!tmbr_Opt(OPT_TEAMS) || !v || (F(v, 0x590) != 1 && F(v, 0x590) != 2)) return -1;
+    return tmbr_TeamOf(v) & 1;
+}
+int tmbr_SameTeam(char* a, char* b)
+{
+    return tmbr_MarkerTeam(a) >= 0 && tmbr_MarkerTeam(a) == tmbr_MarkerTeam(b);
+}
+/* the callers keep values in argument / temp registers across this point: save them all */
+__asm__(".section .text\n.set push\n.set noreorder\n.globl tmbr_TeamColorS\ntmbr_TeamColorS:\n"
+        "    addiu $29, $29, -0xC0\n"
+        "    sq $31, 0x00($29)\n    sq $5, 0x10($29)\n    sq $6, 0x20($29)\n    sq $7, 0x30($29)\n"
+        "    sq $8, 0x40($29)\n    sq $9, 0x50($29)\n    sq $10, 0x60($29)\n    sq $11, 0x70($29)\n"
+        "    sq $12, 0x80($29)\n    sq $13, 0x90($29)\n    sq $14, 0xA0($29)\n    sq $15, 0xB0($29)\n"
+        "    jal tmbr_MarkerTeam\n    nop\n"
+        "    lq $31, 0x00($29)\n    lq $5, 0x10($29)\n    lq $6, 0x20($29)\n    lq $7, 0x30($29)\n"
+        "    lq $8, 0x40($29)\n    lq $9, 0x50($29)\n    lq $10, 0x60($29)\n    lq $11, 0x70($29)\n"
+        "    lq $12, 0x80($29)\n    lq $13, 0x90($29)\n    lq $14, 0xA0($29)\n    lq $15, 0xB0($29)\n"
+        "    jr $31\n    addiu $29, $29, 0xC0\n.set pop\n.previous\n");
 
 /* bots.c addBot: a bot (car index k) took slot s (host) */
 void tmbr_TeamsBotJoined(int s, int k)
@@ -112,21 +146,65 @@ void tmbr_TeamsBotLeft(char* v)
     vehSlot[k] = -1;
 }
 
-/* kill feed (skins.c tmbr_KillMessage, first viewport only): victim / killer are car ids (+0x20FC) */
-void tmbr_TeamsKill(int victim, int killer)
+/* kill feed (skins.c tmbr_KillMessage): team score now comes from the game's own stats (teamStats) */
+void tmbr_TeamsKill(int victim, int killer) { (void)victim; (void)killer; }
+
+/* Team totals from the game's per-car stats (net D_003156C0: kills +0x2F28 [car], score +0x2F88 [car], deaths
+ * +0x2F48 [car +0x2104]; limits: kills u16 +0x3098, score +0x308C, lives = game info byte +5; func_001761E8). */
+typedef struct { int kills[2], pts[2], members[2], alive[2]; } TeamStats;
+static void teamStats(TeamStats* ts)
 {
-    char *g = D_004FA030, *vv = 0, *kv = 0;
-    int i;
-    if (!tmbr_Opt(OPT_TEAMS) || !g) return;
-    for (i = 0; i < 8; i++) {
-        char* v = g + i * VSIZE;
-        if (!F(v, 0x590)) continue;
-        if (F(v, 0x20FC) == victim) vv = v;
-        if (F(v, 0x20FC) == killer) kv = v;
+    char *g = D_004FA030, *gi = *(char**)(D_003156C0 + 0x3148);
+    int k, lives = gi ? ((unsigned char*)gi)[5] : 0;
+    for (k = 0; k < 2; k++) ts->kills[k] = ts->pts[k] = ts->members[k] = ts->alive[k] = 0;
+    if (!g) return;
+    for (k = 0; k < 8; k++) {
+        char* v = g + k * VSIZE;
+        int t, d, slot;
+        if (!F(v, 0x20D8) || (F(v, 0x590) != 1 && F(v, 0x590) != 2)) continue;
+        t = tmbr_TeamOf(v) & 1;
+        ts->kills[t] += F(D_003156C0, 0x2F28 + 4 * k);
+        ts->pts[t] += F(D_003156C0, 0x2F88 + 4 * k);
+        ts->members[t]++;
+        slot = F(v, 0x2104);
+        d = slot >= 0 && slot < 8 ? F(D_003156C0, 0x2F48 + 4 * slot) : 0;
+        if (!lives || d < lives) ts->alive[t]++;
     }
-    if (!vv || !kv || vv == kv) return;
-    if (tmbr_TeamOf(kv) != tmbr_TeamOf(vv)) score[tmbr_TeamOf(kv) & 1]++;
-    else if (score[tmbr_TeamOf(kv) & 1] > 0) score[tmbr_TeamOf(kv) & 1]--;   /* team kill */
+}
+static int gameType(void)
+{
+    char* gi = *(char**)(D_003156C0 + 0x3148);
+    return gi ? (F(gi, 0) >> 1) & 0xF : 0;
+}
+/* the leading team: Last Man Standing = the team still alive, else score (Fox Hunt / Collector) or kills */
+static int leader(TeamStats* ts, int type)
+{
+    int a = ts->kills[0], b = ts->kills[1];
+    if (type == 3 && ts->alive[0] != ts->alive[1] && (!ts->alive[0] || !ts->alive[1])) return ts->alive[1] > 0;
+    if (type == 4 || type == 5) { a = ts->pts[0]; b = ts->pts[1]; }
+    return a == b ? -1 : b > a;
+}
+extern void netEndMatch(void* net, int reason, int x) __asm__("func_00174D78");
+/* host: team versions of the limits (a team reaches the kill / score limit together; Last Man Standing ends
+ * when one team has nobody left). The game's own player checks still run after ours. */
+static void teamLimits(void)
+{
+    char* gi = *(char**)(D_003156C0 + 0x3148);
+    TeamStats ts;
+    int type, kl, sl, t;
+    if (!gi || !(F(gi, 0) & 1) || (type = gameType()) == 1) return;      /* not started / over */
+    teamStats(&ts);
+    kl = *(unsigned short*)(D_003156C0 + 0x3098);
+    sl = F(D_003156C0, 0x308C);
+    for (t = 0; t < 2; t++) {
+        if (kl > 0 && ts.kills[t] >= kl) { winner = t; netEndMatch(D_003156C0, 2, 0); break; }
+        if (sl > 0 && ts.pts[t] >= sl) { winner = t; netEndMatch(D_003156C0, 4, 0); break; }
+    }
+    if (winner < 0 && type == 3 && ((unsigned char*)gi)[5] && ts.members[0] && ts.members[1] && (!ts.alive[0] || !ts.alive[1])) {
+        winner = ts.alive[1] > 0;
+        netEndMatch(D_003156C0, 3, 0);
+    }
+    if (winner >= 0) scePrintf("TMBR teams: %s team reached the limit, match over\n", winner ? "blue" : "red");
 }
 
 /* every frame of a match (bots.c tmbr_BotsThink, all machines) */
@@ -139,6 +217,8 @@ void tmbr_TeamsFrame(void)
         scoreSerial = tmbr_levelSerial;
         score[0] = score[1] = 0;
         overShown = 0;
+        winner = -1;
+        for (k = 0; k < 8; k++) rcvVeh[k] = -1;
         for (k = 0; k < 8; k++) {
             char* v = g + k * VSIZE;
             if (F(v, 0x590)) scePrintf("TMBR teams: car %d kind %d slot %d team %s\n", k, F(v, 0x590), F(v, 0x20C0), tmbr_TeamOf(v) ? "blue" : "red");
@@ -148,6 +228,8 @@ void tmbr_TeamsFrame(void)
         for (s = 0; s < 8; s++) if (HUMAN(s) && !botSlot[s]) tmbr_team[s] = 0;
     for (s = 0; s < 8; s++) F(CLIENT(s), 0x14) = tmbr_team[s];
     if (netIsHost(D_003156C0) && (dirty || ++sendTick >= 120)) { dirty = 0; sendTick = 0; sendTable(); }
+    if (gameType() > 1) lastType = gameType();
+    if (netIsHost(D_003156C0) && winner < 0) teamLimits();
 }
 
 /* team 0 = RED, 1 = BLUE (text colours, 0x80 = full) */
@@ -167,25 +249,23 @@ int tmbr_MyTeam(void)
 void tmbr_TeamsHud(void)
 {
     char buf[48];
-    int wh[2], over;
-    char* gi = *(char**)(D_003156C0 + 0x3148);
-    if (!tmbr_Opt(OPT_TEAMS) || !D_004FA030 || !gi) return;
-    over = ((F(gi, 0) >> 1) & 0xF) == 1;
-    viewGetSize(viewGetCurView(), &wh[0], &wh[1]);
-    if (over) {
-        if (score[0] == score[1]) sprintf(buf, "TEAMS TIED  %d - %d", score[0], score[1]);
-        else sprintf(buf, "%s TEAM WINS  %d - %d", score[0] > score[1] ? "RED" : "BLUE", score[0], score[1]);
-        if (!overShown) { overShown = 1; scePrintf("TMBR teams: %s\n", buf); }
-        if (score[0] == score[1]) fontSetColor(0, 0x80, 0x80, 0x80);
-        else tmbr_TeamColor(score[0] > score[1] ? 0 : 1);
-        fontSpritePrintCenteredXY(0, wh[0] / 2, wh[1] / 2 - 40, buf);
-    } else {
-        /* "YOU: RED  3 - 1" in your team's colour: your score first */
-        int me = tmbr_MyTeam();
-        sprintf(buf, "YOU: %s  %d - %d", me ? "BLUE" : "RED", score[me], score[me ^ 1]);
-        tmbr_TeamColor(me);
-        fontSpritePrintCenteredXY(0, wh[0] / 2, 47, buf);
+    int wh[2], w;
+    TeamStats ts;
+    if (!tmbr_Opt(OPT_TEAMS) || !D_004FA030 || gameType() != 1) { overShown = 0; return; }
+    /* match over: the winning team in its colour (nothing during the match) */
+    if (!overShown) {
+        overShown = 1;
+        teamStats(&ts);
+        score[0] = ts.kills[0]; score[1] = ts.kills[1];
+        w = winner >= 0 ? winner : leader(&ts, lastType);
+        winShown = w;
+        scePrintf("TMBR teams: over, kills red %d blue %d, score red %d blue %d, alive red %d blue %d, winner %s\n",
+            ts.kills[0], ts.kills[1], ts.pts[0], ts.pts[1], ts.alive[0], ts.alive[1], w < 0 ? "tie" : w ? "blue" : "red");
     }
+    viewGetSize(viewGetCurView(), &wh[0], &wh[1]);
+    if (winShown < 0) { sprintf(buf, "TEAMS TIED"); fontSetColor(0, 0x80, 0x80, 0x80); }
+    else { sprintf(buf, "%s TEAM WINS", winShown ? "BLUE" : "RED"); tmbr_TeamColor(winShown); }
+    fontSpritePrintCenteredXY(0, wh[0] / 2, wh[1] / 2 - 40, buf);
     fontSpriteEnd(0);
 }
 

@@ -106,8 +106,8 @@ static int skinOn(int client, int k)
  * client struct is in $s2 there; the stub passes it on, and a player with 12 Pak on shows "12 PAK". */
 extern char* D_0041BF00[];          /* waiting-room car names by car code >> 5 (1 = "ROADKILL") */
 extern int sprintf(char* d, const char* f, ...);
-__asm__(".pushsection .text\n.set push\n.set noreorder\n.globl tmbr_LobbyCarNameS\ntmbr_LobbyCarNameS:\n"
-        "    j       tmbr_LobbyCarName\n    move    $7, $18\n.set pop\n.popsection\n");
+__asm__(".section .text\n.set push\n.set noreorder\n.globl tmbr_LobbyCarNameS\ntmbr_LobbyCarNameS:\n"
+        "    j       tmbr_LobbyCarName\n    move    $7, $18\n.set pop\n.previous\n");
 int tmbr_LobbyCarName(char* buf, const char* fmt, const char* name, char* row)
 {
     int i = (int)(row - netState) / 0x220;
