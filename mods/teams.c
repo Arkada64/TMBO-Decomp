@@ -173,13 +173,15 @@ void tmbr_TeamsHud(void)
     fontSpriteEnd(0);
 }
 
-/* waiting room (bots.c tmbr_LobbyFrame, every machine): roster and team pick.
+/* waiting room (bots.c tmbr_LobbyFrame, every machine): team pick and the two roster lines (28 chars max).
  * R3 + Left / Right: my team A / B. Host: R3 + Select: bot mode. */
-void tmbr_TeamsLobby(void)
+void tmbr_TeamsLobby(char* la, char* lb)
 {
-    char line[2][96];
-    int len[2] = { 0, 0 }, s, me = netGetMyClientIndex(D_003156C0), host = netIsHost(D_003156C0);
+    char* line[2];
+    int len[2], s, me = netGetMyClientIndex(D_003156C0), host = netIsHost(D_003156C0);
     int pad, pressed, bots, b, n[2] = { 0, 0 };
+    line[0] = la; line[1] = lb;
+    la[0] = lb[0] = 0;
     if (!tmbr_Opt(OPT_TEAMS)) return;
     pad = inputGetPadButtons(0) & 0xA5;      /* R3 0x4, Select 0x1, Right 0x20, Left 0x80 */
     pressed = pad & ~prevPad;
@@ -187,10 +189,10 @@ void tmbr_TeamsLobby(void)
     if ((pad & 0x4) && (pressed & 0xA1)) {
         if (pressed & 0x1) {
             if (host) { tmbr_botTeamMode ^= 1; dirty = 1; }
-        } else {
+        } else if (!tmbr_botTeamMode) {
             int t = (pressed & 0x20) != 0;
-            if (host) { if (!tmbr_botTeamMode) setTeam(me, t); }
-            else if (!tmbr_botTeamMode) {
+            if (host) setTeam(me, t);
+            else {
                 char m[5];
                 m[0] = 1; m[1] = 'T'; m[2] = 'Q'; m[3] = '0' + t; m[4] = 0;
                 netChatSend(D_003156C0, m);
@@ -199,25 +201,19 @@ void tmbr_TeamsLobby(void)
         }
     }
     if (host && (dirty || ++sendTick >= 120)) { dirty = 0; sendTick = 0; sendTable(); }
-    for (s = 0; s < 2; s++) len[s] = sprintf(line[s], "TEAM %c :", 'A' + s);
+    for (s = 0; s < 2; s++) len[s] = sprintf(line[s], "%c%s:", 'A' + s, tmbr_botTeamMode ? (s ? " BOTS" : " YOU") : "");
     for (s = 0; s < 8; s++) {
         int t;
         if (!HUMAN(s)) continue;
         t = tmbr_botTeamMode ? 0 : tmbr_team[s] & 1;
         n[t]++;
-        if (len[t] < 70) len[t] += sprintf(line[t] + len[t], " %.10s", CLIENT(s) + 0x18);
+        if (len[t] < 18) len[t] += sprintf(line[t] + len[t], " %.8s", CLIENT(s) + 0x18);
+        else if (len[t] < 26) len[t] += sprintf(line[t] + len[t], " +");
     }
     bots = tmbr_BotsPlanned();
     for (b = 0; b < bots; b++) {                   /* the bots that will spawn, as they will be placed */
         int t = tmbr_botTeamMode ? 1 : n[1] < n[0];
         n[t]++;
-        if (len[t] < 80) len[t] += sprintf(line[t] + len[t], " BOT");
+        if (len[t] < 24) len[t] += sprintf(line[t] + len[t], " BOT");
     }
-    for (s = 0; s < 2; s++) {
-        fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + (12 + s) * 0x100);
-        fontPrint(0, line[s]);
-    }
-    fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 14 * 0x100);
-    fontPrint(0, tmbr_botTeamMode ? "BOTS VS PLAYERS  (R3 + LEFT/RIGHT, HOST R3 + SELECT)"
-                                  : "BALANCED BOTS  (R3 + LEFT/RIGHT, HOST R3 + SELECT)");
 }

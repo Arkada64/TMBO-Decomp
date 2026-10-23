@@ -463,7 +463,7 @@ void tmbr_TrafficUpdate(void)
     int j;
     if (doneSerial != tmbr_levelSerial) {
         doneSerial = tmbr_levelSerial;
-        if (tmbr_Opt(1)) { ncars = 0; scePrintf("TMBR traffic: off (lobby option)\n"); }   /* bots.c lobby option */
+        if (!tmbr_Opt(1)) { ncars = 0; scePrintf("TMBR traffic: off (lobby option, default)\n"); }   /* bots.c lobby option */
         else setup();
     }
     if (ncars && netIsHost(D_003156C0) && ++syncTick >= SYNC_EVERY) { syncTick = 0; syncSend(); }

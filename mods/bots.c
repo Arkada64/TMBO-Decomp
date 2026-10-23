@@ -282,13 +282,13 @@ static int dbgBits(float f) { union { float f; int i; } u; u.f = f; return u.i; 
 static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v, 0x2028); }
 
 /* ---- lobby options, shared through the game info (the net object the host sends to every machine, 0xC8 bytes,
- * func_00174988). Byte +0xC6 is unused by the game: TMBR flags, bit 0 traffic off, bit 1 teams. Word 0 bit 12 is
+ * func_00174988). Byte +0xC6 is unused by the game: TMBR flags, bit 0 traffic on, bit 1 teams. Word 0 bit 12 is
  * the game's own (cut) "teams on" switch: with it lock-on skips teammates (func_0015A650), radar blips and car
  * markers use team colours, teammate damage is not credited. Team of a player = client struct +0x14
  * (D_003156C0 + slot*0x220), never set or sent by the game: every machine sets slot & 1 for all 8 slots, so no
  * sync is needed. Bots: same rule by their vehicle's slot (+0x20C0), logged at match start. */
 #define GINFO() (*(char**)(D_003156C0 + 0x3148))
-#define OPT_NOTRAFFIC 1
+#define OPT_TRAFFIC 1      /* traffic ON (off by default) */
 #define OPT_TEAMS 2
 extern void netSendGameInfo(void* net, int to) __asm__("func_00174988");
 extern int tmbr_levelSerial;
@@ -310,7 +310,7 @@ static void optSync(int flip)
 }
 extern int tmbr_TeamOf(char* v);         /* teams.c */
 extern void tmbr_TeamsFrame(void);
-extern void tmbr_TeamsLobby(void);
+extern void tmbr_TeamsLobby(char* lineA, char* lineB);
 extern void tmbr_TeamsBotJoined(int slot, int car);
 extern void tmbr_TeamsBotLeft(char* v);
 
@@ -707,26 +707,49 @@ extern int sprintf(char* d, const char* f, ...);
 
 /* waiting room (func_001B2B68 -> func_001C5768 every frame): host hotkeys R3 + R1/L1 and a "BOTS" line.
  * Count steps AUTO (original rule) -> 0 .. MAXBOTS. */
+/* Two lines fit under the settings box (rows 10 and 11, about 28 characters each). Normal view: BOTS, then
+ * TRAFFIC / TEAMS; with teams on it alternates every 3 s with the two team rosters. Holding R3 shows the
+ * controls instead (two pages, 2 s each, when teams are on). */
+static int lobbyTick;
+static void lobbyLines(const char* a, const char* b)
+{
+    fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 10 * 0x100);
+    fontPrint(0, a);
+    fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 11 * 0x100);
+    fontPrint(0, b);
+}
 void tmbr_LobbyFrame(void)
 {
-    int pad = 0, pressed;
-    char buf[48];
+    int pad = 0, pressed, host, teams;
+    char buf[48], buf2[48], ra[40], rb[40];
     lobbyFrame();
     tmbr_SkinsLobby();
     tmbr_PedNamesInit();
-    sprintf(buf, "TRAFFIC : %s  (R3 + UP)    TEAMS : %s  (R3 + DOWN)", tmbr_Opt(OPT_NOTRAFFIC) ? "OFF" : "ON",
-        tmbr_Opt(OPT_TEAMS) ? "ON" : "OFF");
-    fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 11 * 0x100);
-    fontPrint(0, buf);
-    tmbr_TeamsLobby();
-    if (!netIsHost(D_003156C0)) return;
+    host = netIsHost(D_003156C0);
+    teams = tmbr_Opt(OPT_TEAMS);
+    tmbr_TeamsLobby(ra, rb);                 /* teams.c: team pick input + rosters */
+    lobbyTick++;
     /* raw pad, active high: R3 0x4, Up 0x10, Down 0x40, L2 0x100, R2 0x200, L1 0x400, R1 0x800 */
-    pad = inputGetPadButtons(0) & 0xF54;
+    pad = inputGetPadButtons(0) & 0xF55;
     pressed = pad & ~prevPad;
     prevPad = pad;
+    if (pad & 0x4) {
+        if (teams && (lobbyTick / 120) & 1)
+            lobbyLines("LEFT/RIGHT : MY TEAM", host ? "SELECT : BOT TEAMS" : "(HOLD R3)");
+        else if (host) lobbyLines("L1/R1 BOTS  L2/R2 SKILL", "UP TRAFFIC  DOWN TEAMS");
+        else lobbyLines("HOST SETS BOTS, TRAFFIC", "AND TEAMS");
+    } else if (teams && (lobbyTick / 180) & 1) {
+        lobbyLines(ra, rb);
+    } else {
+        if (tmbr_botCount < 0) sprintf(buf, "BOTS : AUTO");
+        else sprintf(buf, "BOTS : %d  %s", tmbr_botCount, tmbr_botDiff == 0 ? "EASY" : tmbr_botDiff == 1 ? "MEDIUM" : "HARD");
+        sprintf(buf2, "TRAFFIC %s  TEAMS %s", tmbr_Opt(OPT_TRAFFIC) ? "ON" : "OFF", teams ? "ON" : "OFF");
+        lobbyLines(buf, buf2);
+    }
+    if (!host) return;
     if ((pad & 0x4) && (pressed & 0x50)) {
-        optSync(((pressed & 0x10) ? OPT_NOTRAFFIC : 0) | ((pressed & 0x40) ? OPT_TEAMS : 0));
-        scePrintf("TMBR lobby: traffic %s, teams %s\n", tmbr_Opt(OPT_NOTRAFFIC) ? "off" : "on", tmbr_Opt(OPT_TEAMS) ? "on" : "off");
+        optSync(((pressed & 0x10) ? OPT_TRAFFIC : 0) | ((pressed & 0x40) ? OPT_TEAMS : 0));
+        scePrintf("TMBR lobby: traffic %s, teams %s\n", tmbr_Opt(OPT_TRAFFIC) ? "on" : "off", tmbr_Opt(OPT_TEAMS) ? "on" : "off");
     } else optSync(0);
     if ((pad & 0x4) && (pressed & 0xF00)) {
         if (pressed & 0x800) tmbr_botCount++;
@@ -739,9 +762,4 @@ void tmbr_LobbyFrame(void)
         if (tmbr_botDiff > 2) tmbr_botDiff = 2;
         scePrintf("TMBR bots: lobby setting %d, difficulty %d\n", tmbr_botCount, tmbr_botDiff);
     }
-    if (tmbr_botCount < 0) sprintf(buf, "BOTS : AUTO  (R3 + L1/R1)");
-    else sprintf(buf, "BOTS : %d  %s  (R3 + L1/R1, L2/R2)", tmbr_botCount,
-        tmbr_botDiff == 0 ? "EASY" : tmbr_botDiff == 1 ? "MEDIUM" : "HARD");
-    fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 10 * 0x100);
-    fontPrint(0, buf);
 }
