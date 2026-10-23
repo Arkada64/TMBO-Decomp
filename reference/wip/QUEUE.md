@@ -102,3 +102,7 @@ Already baked in: DNS, Bugfixes, Skip Intros, No-Interlacing, 16:9, the 3 Balanc
 - Bots: respawn shield for bots (cruise while 0x497 >= 4), turbo (pad[7]). Perf: bots < 1 ms/frame total.
 - Audio cut-outs with many bots: probably SPU voice limits (989snd); not looked at yet.
 - Head-On ETE disc: reference/wip/HEADON_ETE.md (Harbor City cars/levels; no Gold Tooth / 12 Pak).
+- 2026-10-23 morning: bot respawn shield 10 s; traffic collisions (collisCsToCsCollision owner lookup also finds
+  traffic, tmbr_IsVehicleOrTraffic; weapons still use the 8-slot lookup - traffic not destructible yet);
+  bots prefer damaged targets and retreat when < 35 % with 2+ bots on them. Lost: Gold Tooth = HC_CHROM,
+  12-Pak = HC_STOCK (HEADON_ETE.md). Still open: traffic damage/destruction, traffic net sync, audio.
