@@ -301,6 +301,30 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     print('ngp %d -> %d bytes (orig %d), %d dangling pointers cleared, %d slots, %d tex pairs, %d new textures' % (
         before, len(car.n), len(rd('NGP')), dropped, len(car.slots), len(car.pairs), len(tb.new_tex)))
     print('CLUT blocks', tb.next_cbp, 'new CLUTs', len(tb.new_rtx), {hex(k): v[4] for k, v in tb.map.items()})
+    if V2 and not os.environ.get('GT_KEEPTEX'):
+        # Sweet Tooth textures / palettes no mesh of the finished car uses any more (rear box, doors, cab parts,
+        # robot): not shipped. Tiny ones stay (cheap; in case the game's own code looks one up by number).
+        from textconv import records, tex_rec_size, rtx_rec_size
+        used_t, used_c = set(), set()
+        empty_pk = nopk                                   # blanked meshes point at this empty packet
+        for a, g in car.pairs:                            # every texture slot of every mesh still drawn
+            for i in range(5):
+                nd = a - 0x50 - 2 * i
+                if nd % 16 or nd < 0 or nd + 0x70 > len(car.n) or (u32(car.n, nd) & 0x3f) != 0:
+                    continue
+                if g != nd + 0x70 + 0x30 * i:
+                    continue
+                pk = u32(car.n, nd + 4) - 0x980000
+                if 0 <= pk < len(car.n) - 16 and u32(car.n, pk) == 0x60000001 and u32(car.n, pk + 16) == 0x01000404:
+                    break                                 # blanked (empty packet)
+                used_t.add(struct.unpack_from('<H', car.n, a)[0])
+                used_c.add((struct.unpack_from('<Q', car.n, g)[0] >> 37) & 0x3fff)
+                break
+        tb.drop_tids = {gs & 0xffff for o, b, gs, k in records(tb.tex, tex_rec_size)
+                        if (gs & 0xffff) not in used_t and b >= 4000}
+        tb.drop_cbps = {(gs >> 16) & 0xffff for o, b, gs, k in records(tb.rtx, rtx_rec_size)
+                        if ((gs >> 16) & 0xffff) not in used_c and b >= 1000}
+        print('unused textures dropped', sorted(tb.drop_tids), 'palettes dropped', sorted(tb.drop_cbps))
     os.makedirs(outdir, exist_ok=True)
     w = lambda e, b: open(os.path.join(outdir, 'STP.' + e), 'wb').write(b)
     w('NGP', car.ngp_bytes())

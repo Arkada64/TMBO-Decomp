@@ -156,6 +156,8 @@ class TexBuilder:
             r = bytearray(self.tex[o:o + b])
             struct.pack_into('<I', r, 0, b // 4)
             old.append(bytes(r))
+        drop = getattr(self, 'drop_tids', set())
+        old = [r for r in old if (struct.unpack_from('<Q', r, 8)[0] & 0xffff) not in drop]
         allr = old + self.new_tex
         counts = {}
         for r in allr:
@@ -173,5 +175,7 @@ class TexBuilder:
             r = bytearray(self.rtx[o:o + b])
             struct.pack_into('<I', r, 0, b // 4)
             old.append(bytes(r))
+        dropc = getattr(self, 'drop_cbps', set())
+        old = [r for r in old if ((struct.unpack_from('<Q', r, 8)[0] >> 16) & 0xffff) not in dropc]
         out = join(old + self.new_rtx)
         return bytes(out + b'\0' * (-len(out) % 2048))
