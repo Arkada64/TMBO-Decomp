@@ -113,11 +113,15 @@ void tmbr_LoadCar680(void* s, int c, int ai) { setCodes(ai ? -1 : c); loadCar680
 void tmbr_LoadCar0F0(void* s, int c) { setCodes(c); loadCar0F0(s, c); setCodes(-1); }
 
 /* car select frame: highlighted car value (type << 5) */
+extern int D_004EFBF0[];                         /* static car select value list (rodata) */
 void tmbr_CarSelectSound(void* snd, int car)
 {
     int pad, pressed, pak;
-    playCarSound(snd, car);
     if (shellPtr) *(int*)(shellPtr + 0x1A2F0 + PAK_POS * 4) = 0x20;      /* 16th spot = a Roadkill */
+    D_004EFBF0[PAK_POS] = 0x20;                       /* the static list the shell copies its list from (was 0) */
+    if (carSelPos == PAK_POS || car <= 0) car = 0x20;  /* first frame back from a match: the 16th slot still read 0
+                                                         * (no car) -> engine-sound stream index -1, read past the disc */
+    playCarSound(snd, car);
     pak = carSelPos == PAK_POS;
     if (pak != tmbr_skin[1]) {
         tmbr_skin[1] = pak;
