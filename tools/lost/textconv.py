@@ -64,7 +64,7 @@ def join(recs_bytes):
 
 
 class TexBuilder:
-    def __init__(self, tmb_tex, tmb_rtx, ho_tex, first_id, reuse=None, half=()):
+    def __init__(self, tmb_tex, tmb_rtx, ho_tex, first_id, reuse=None, half=(), own16=()):
         """reuse: {ho key: existing RTX CLUT address} - quantize to that palette instead of adding a CLUT"""
         self.tex, self.rtx = bytes(tmb_tex), bytes(tmb_rtx)
         ncls, recq = struct.unpack_from('<II', self.tex, 0)
@@ -84,6 +84,7 @@ class TexBuilder:
         self.next_id = first_id
         self.ho = ho_textures(ho_tex)
         self.reuse = reuse or {}
+        self.own16 = set(own16)
         self.half = set(half)               # keys stored at half size (reuse path only; UVs are normalized)
         self.map = {}
         self.new_tex, self.new_rtx = [], []
@@ -104,6 +105,14 @@ class TexBuilder:
             img[:, 3] = np.minimum(255, img[:, 3])
             idx = ((img[:, None, :3] - P[None, :, :3]) ** 2).sum(2).argmin(1).astype(np.uint8)
             bpp = 8 if len(P) == 256 else 4
+        elif key in self.own16:                     # own 16-colour palette: 1 CLUT block instead of 4
+            from PIL import Image
+            q = Image.fromarray(t['img'][:, :, :3]).quantize(16, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+            idx = np.asarray(q, np.uint8).reshape(-1)
+            pal = np.array(q.getpalette()[:48], np.uint8).reshape(16, 3)
+            pal16 = np.concatenate([pal, np.full((16, 1), 0x80, np.uint8)], 1)   # Head-On alpha range (x2 below)
+            t = dict(t, clutraw=pal16.tobytes(), clut=dict(tw=3, th=1))
+            bpp, cbp = 4, None
         else:
             idx, bpp, cbp = t['idx'].astype(np.uint8), t['bpp'], None
         if bpp == 8:

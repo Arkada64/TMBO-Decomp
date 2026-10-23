@@ -13,8 +13,7 @@ from textconv import TexBuilder
 from meshconv import hierobject
 
 SKIP_TEX = {0x8a480, 0xc1fa8, 0x84320,          # headlight flares, turbo / exhaust flames (Head-On effects)
-            0x87f40, 0x8bba8, 0xa2888,          # far-LOD wheels / underside (Sweet Tooth's wheels are kept)
-            0xa91b8, 0x8dc74}                   # two small details: keeps the NGP under 727,680 (car slots 2-8)
+            0x87f40, 0x8bba8, 0xa2888}          # far-LOD wheels / underside (Sweet Tooth's wheels are kept)
 # same truck art as Sweet Tooth's own sheets: reuse those palettes (car CLUT space is tight: STP uses 76 blocks)
 REUSE = {0xb0448: 45, 0xa91b8: 49, 0x8dc74: 45}
 if os.environ.get('GT_GOLD_PAL'):                # put the gold body texture on Sweet Tooth's body palette too
@@ -24,7 +23,11 @@ GT_HI, GT_LO = 0x28ef0, 0x5980
 STP_STATES = [0xa940, 0x152b0, 0x1ede0]          # op31 id209 damage-state groups (3 meshes each)
 STP_LOD1 = 0x55650                               # far LOD body group
 STP_LOD1_KEEP = [0x54b60, 0x55620]               # its non-body kids (light, shadow)
-STP_HIDE = [0x296f0, 0x2a640]                    # Sweet Tooth's rear doors / bumper pieces (Gold Tooth has its own)
+STP_HIDE = [0x296f0, 0x2a640]
+# Most of Sweet Tooth's body is character parts (op25: rear box + doors, clown head, cab pieces, the special's
+# robot), drawn over Gold Tooth: every remaining mesh textured only from these sheets gets an empty packet.
+BLANK_TEX = {1, 2, 3, 6, 7, 8}
+STP_ALT_LOD = 0x941a0                            # switch 217 child 1 (the special's form): show Gold Tooth there too                    # Sweet Tooth's rear doors / bumper pieces (Gold Tooth has its own)
 
 
 def hide_meshes(car, root, empty, dead):
@@ -41,7 +44,8 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     car = Car(rd('NGP'), rd('PTR'), rd('TEX'), rd('RTX'))
     s = bdd(bddpath)
     n = s['ngp']
-    tb = TexBuilder(car.tex, car.rtx, s['tex'], car.max_tex_id() + 1, REUSE, HALF)
+    tb = TexBuilder(car.tex, car.rtx, s['tex'], car.max_tex_id() + 1, REUSE, HALF,
+                    [] if os.environ.get('GT_GOLD_PAL') else [0x73ff0])
     hdr2pk = {}
     for o in find_packets(n):
         m = decode(n, o)
@@ -104,11 +108,32 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     empty = car.group([])
     for r in STP_HIDE:
         hide_meshes(car, r, empty, dead)
+    # special form: both LOD children -> Gold Tooth state 0
+    g0 = car.P(STP_STATES[0] + 0x20)
+    for i in range(struct.unpack_from('<i', car.n, STP_ALT_LOD + 4)[0]):
+        car.setp(STP_ALT_LOD + 0x28 + 0x10 * i, g0)
+    # blank the remaining Sweet Tooth body meshes
+    nopk = car.append(struct.pack('<4I', 0x60000001, 0, 0, 0) + struct.pack('<4I', 0x01000404, 0, 0, 0))
+    deadset = {a for a, b in dead}
+    nb = 0
+    for nd in sorted({a - 0x50 - 2 * i for a, g in car.pairs for i in range(5) if (a - 0x50 - 2 * i) % 16 == 0}):
+        if nd in deadset or nd >= len(car.n) or (u32(car.n, nd) & 0x3f) != 0:
+            continue
+        nt = struct.unpack_from('<H', car.n, nd + 0x5a)[0]
+        ts = {struct.unpack_from('<H', car.n, nd + 0x50 + 2 * k)[0] for k in range(nt)}
+        if not ts or not ts <= BLANK_TEX or u32(car.n, nd + 4) - 0x980000 != nd + 0x70 + 0x30 * nt:
+            continue
+        a, b = mesh_extent(car.n, nd)
+        dead.append((nd + 0x70 + 0x30 * nt, b))
+        car.setp(nd + 4, nopk)
+        struct.pack_into('<I', car.n, nd + 0xc, u32(car.n, nd + 0xc) & 0xFFFF)
+        nb += 1
+    print('blanked', nb, 'Sweet Tooth meshes')
     before = len(car.n)
     dropped = car.compact(sorted(set(dead)))
     print('ngp %d -> %d bytes (orig %d), %d dangling pointers cleared, %d slots, %d tex pairs, %d new textures' % (
         before, len(car.n), len(rd('NGP')), dropped, len(car.slots), len(car.pairs), len(tb.new_tex)))
-    print('CLUT blocks', tb.next_cbp, 'new CLUTs', len(tb.new_rtx))
+    print('CLUT blocks', tb.next_cbp, 'new CLUTs', len(tb.new_rtx), {hex(k): v[4] for k, v in tb.map.items()})
     os.makedirs(outdir, exist_ok=True)
     w = lambda e, b: open(os.path.join(outdir, 'STP.' + e), 'wb').write(b)
     w('NGP', car.ngp_bytes())
@@ -119,4 +144,4 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
 
 if __name__ == '__main__':
     main(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[4]) if len(sys.argv) > 4 else 1.15,
-         tuple(int(x) for x in os.environ.get('GT_STATES', '0,0,0').split(',')))
+         tuple(int(x) for x in os.environ.get('GT_STATES', '0,1,2').split(',')))
