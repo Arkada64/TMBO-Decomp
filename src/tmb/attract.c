@@ -72,7 +72,14 @@ void func_0010BD88(void* arg0) {
     }
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/tmb/attract", func_0010BDC0);
+#include "m2c_macros.h"
+void func_0010BDC0(void *arg0, s32 arg1)
+{
+  s32 var_a2;
+  void *temp_v1;
+  var_a2 = 0;
+ do { if ((*((s32 *) (((u8 *) arg0) + 0x24C))) > 0) { loop_2: temp_v1 = (var_a2 * 4) + (*((s32 *) (((u8 *) arg0) + 4))); if ((*((s16 *) (((u8 *) temp_v1) - -0))) == arg1) { *((s16 *) (((u8 *) temp_v1) + 2)) = 0; } var_a2 += 1; if (var_a2 < (*((s32 *) (((u8 *) arg0) + 0x24C)))) { goto loop_2; } } } while (0);
+}
 
 #include "m2c_macros.h"
 s32 func_0010BE08(void* arg0, s32 arg1) {
