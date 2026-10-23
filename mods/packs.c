@@ -70,7 +70,7 @@ static int pack = -1;       /* PACKS index of the level being loaded */
 int tmbr_levelSerial;       /* bumped on every level load (traffic.c sets up on the next game frame) */
 int tmbr_levelIndex = -1;   /* shell level index of the level being loaded */
 static u32 clutStart;       /* GS block of the pack's first CLUT */
-static int retypeSerial;    /* level serial whose ped groups still need the inmate types (tmbr_PedsRetype) */
+static int retypeSerial, retypeLevel;    /* level serial whose ped groups still need the inmate types (tmbr_PedsRetype) */
 
 static Manifest* readBlob0(int p, u32 at)
 {
@@ -258,7 +258,8 @@ void tmbr_LevelDbLoaded(int ngp, int vram, int slot)
     D_004F9714 = saveDb;
     scePrintf("TMBR pack: %d blobs, %d entry points, tex ids %d.., clut %d.. (%d), anims %d+%d, peds in pool %d -> %d\n",
         m->nblobs, hdr[0], texBase + 1, clutStart, m->clutBlocks, n, m->nanims, before, D_004FB748);
-    retypeSerial = tmbr_levelSerial;   /* inmate packs: retype the ped groups on the first game frame */
+    retypeSerial = tmbr_levelSerial;
+    retypeLevel = PACKS[p0].level;   /* inmate packs: retype the ped groups on the first game frame */
 }
 
 /* Peds spawn from the level's ped groups (PedWorldManager at game+0x89FA0: u8 count, groups of 0x670 from
@@ -270,7 +271,7 @@ void tmbr_PedsRetype(void)
 {
     char* mgr;
     int g, e, n = 0, k = 0, ng;
-    if (retypeSerial != tmbr_levelSerial || pack < 0 || (PACKS[pack].level != 15 && PACKS[pack].level != 16)) return;
+    if (retypeSerial != tmbr_levelSerial || (retypeLevel != 15 && retypeLevel != 16)) return;   /* pack is -1 by now */
     if (!D_004FA030) return;
     retypeSerial = -1;
     mgr = D_004FA030 + 0x89FA0;

@@ -345,6 +345,18 @@ void tmbr_BotsThink(void)
  * game+0x9FD40[target AI/human index] (aiOkToHuntUsingLOS, func_0012E798, ...), which only holds humans'
  * groups: for a bot target put its own group there for the duration of the frame. */
 extern int aiFrame(char* v) __asm__("func_00101F88");
+extern void hierSetSwitch(void* sw, int i) __asm__("hierSetSwitch__FP11_hierswitchi");
+extern void shieldSoundStop(void* snd) __asm__("func_001957E0");
+/* end the shield the way func_001DD0C8 does (that only ends it for humans by timer, bots by byte 0x498):
+ * clearing byte 0x497 alone left the shield effect on the car forever */
+static void shieldOff(char* v)
+{
+    F(v, 0x464) = 0;
+    *(signed char*)(v + 0x497) = 0;
+    hierSetSwitch((void*)F(v, 0x2068), 0);
+    hierSetSwitch((void*)F(v, 0x206C), 0);
+    shieldSoundStop(v + 0x2F50);
+}
 
 /* Combat steering. The log (Ark, 2026-10-22) showed bots parked in attack state 6 (aiLineUpShot) for 20+ s
  * at 20-300 units from their target, braking with no steer: state 6 waits for brain->aimed (target within
@@ -481,7 +493,7 @@ int tmbr_AiUpdate(char* v)
         /* respawn shield (shield.s: byte 0x497 >= 4, weapons locked): cruise until it drops, no fighting */
         int si = (int)(v - g) / 0x31B0 & 7;
         if (F(drv, 4) != 4) { driverSetMode(drv, 4); pickCruiseZone(g, v, 0); }
-        if (++shieldT[si] > 600) { *(signed char*)(v + 0x497) = 0; shieldT[si] = 0; }    /* 10 s, like the players' shield */
+        if (++shieldT[si] > 600) { shieldOff(v); shieldT[si] = 0; }    /* 10 s, like the players' shield */
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
         return r;
     }
