@@ -4,6 +4,8 @@ from tmbenc import vif_packet
 
 POOL_MAX = 180
 COLOR_SCALE = 0.32
+import os
+ENV_MAP = os.environ.get('GT_ENV', '1') == '1'
 STRIP_MAX = 36          # longest strip seen in TMB car data
 TEMPLATE_20 = bytes.fromhex('00000000000000000000803f0000803f'
                             'ffffffffffffffffffffffffffff0000'
@@ -80,6 +82,8 @@ def hierobject(m, scale, gsctx):
     nsv = sum(len(s['v']) for b in bs for s in b['strips'])
     alpha = any(s['tag'][1] & 0x200000 for b in bs for s in b['strips'])   # ABE bit (prim bit 6)
     flags = (min(nsv, 0xFFFF) << 16) | 0x0100 | (0x8000 if alpha else 0)
+    if ENV_MAP:   # envMapSize (bits 1-3): same bitfield in Head-On's object flags; TMB's VU1 code has an env-map path
+        flags |= m.get('hflags', 0) & 0x0E
     nt = len(gsctx)
     hsize = 0x70 + 0x30 * nt
     h = bytearray(hsize)

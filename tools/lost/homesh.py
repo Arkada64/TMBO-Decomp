@@ -50,7 +50,7 @@ def decode(n,o):
             for j in range(num): cur['brk'].add(k+j)
         elif cmd==0x17:
             if cur: strips.append(cur); cur=None
-    return {'hdr':h,'texrefs':texrefs,'gsreg':gs,'skin':skin,'scale':scale,'pos':pos,'nrm':nrm,'strips':strips,'tex':u32(n,o-0x60),'flags':u32(n,o-0x6c)}
+    return {'hdr':h,'texrefs':texrefs,'gsreg':gs,'skin':skin,'scale':scale,'pos':pos,'nrm':nrm,'strips':strips,'tex':u32(n,o-0x60),'flags':u32(n,o-0x6c),'hflags':u32(n,h+4) if h is not None else 0}
 def triangles(m):
     """-> list of ((i0,uv0),(i1,uv1),(i2,uv2)) with consistent winding"""
     tris=[]
