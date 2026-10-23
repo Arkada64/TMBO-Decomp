@@ -13,7 +13,8 @@ from textconv import TexBuilder
 from meshconv import hierobject
 
 SKIP_TEX = {0x8a480, 0xc1fa8, 0x84320,          # headlight flares, turbo / exhaust flames (Head-On effects)
-            0x87f40, 0x8bba8, 0xa2888}          # far-LOD wheels / underside (Sweet Tooth's wheels are kept)
+            0x87f40, 0x8bba8, 0xa2888,          # far-LOD wheels / underside (Sweet Tooth's wheels are kept)
+            0xa91b8, 0x8dc74}                   # two small details: keeps the NGP under 727,680 (car slots 2-8)
 # same truck art as Sweet Tooth's own sheets: reuse those palettes (car CLUT space is tight: STP uses 76 blocks)
 REUSE = {0xb0448: 45, 0xa91b8: 49, 0x8dc74: 45}
 if os.environ.get('GT_GOLD_PAL'):                # put the gold body texture on Sweet Tooth's body palette too
