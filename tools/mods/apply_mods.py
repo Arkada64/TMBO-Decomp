@@ -241,6 +241,10 @@ PATCHES = [
     (A("nonmatchings/tmb/launch/func_00156E08.s"), "00157D10", "jal", "jal        tmbr_FireSpecial"),
     # traffic: weapon damage on traffic is not reported to the network as player damage
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E24C0", "jal", "jal        tmbr_NetVehicleDamage"),
+    # traffic kills: no kill feed line
+    (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E278C", "jal", "jal        tmbr_KillMessage"),
+    # 12 Pak: launcher update without Roadkill's charge special
+    (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCD90", "jal", "jal        tmbr_LauncherUpdate"),
 ]
 # (file, address, label) - global label placed right before that instruction (return points)
 LABELS = [

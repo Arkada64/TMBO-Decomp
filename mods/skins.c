@@ -127,11 +127,7 @@ void tmbr_CarSelectSound(void* snd, int car)
     pad = inputGetPadButtons(0) & (PAD_L1 | PAD_SQUARE);
     pressed = pad & ~prevPad;
     prevPad = pad;
-    if (pak) {                                        /* the 16th spot still shows another car's name plate */
-        fontSetCursorAtSubPixel(0, 0x1500, 0xFA0 + 11 * 0x100);
-        fontPrint(0, "12 PAK");
-        return;
-    }
+    if (pak) return;                                  /* name plate: child 15 ('Black Razer', repainted '12 Pak') */
     if ((car >> 5) != skinType[0]) return;
     if ((pad & PAD_L1) && (pressed & PAD_SQUARE)) {
         tmbr_skin[0] = !tmbr_skin[0];
@@ -142,17 +138,24 @@ void tmbr_CarSelectSound(void* snd, int car)
     fontPrint(0, tmbr_skin[0] ? "GOLD TOOTH  L1+SQ" : "L1+SQ: GOLD TOOTH");
 }
 
-/* car select preview model (shell+0xC3C switch, one child per position): the 16th spot shows Roadkill's */
+/* car select name plate (shell+0xC3C switch, one child per position; SHELL1 ids 9033). Child 15 was the cut
+ * 'Black Razer' plate; the test disc's SHELL1.TEX repaints it '12 Pak' (tools/lost/plate12pak.py), so the 16th
+ * spot uses it as is. */
 void tmbr_PreviewSwitch(void* sw, int i)
 {
-    hierSetSwitch(sw, i == PAK_POS ? 0 : i);
+    hierSetSwitch(sw, i);
 }
+
+/* while 12 Pak's launcher updates, his vehicle id is swapped from Roadkill's (0x20) to this unused id, so
+ * Roadkill's hold-to-charge special logic (keyed on id 0x20: charge sound, saw blades) never runs for him */
+#define PAK_ID 0x7E0
 
 /* is this vehicle a player's 12 Pak? (Roadkill driven by a client with the 12 Pak choice) */
 static int isPak(char* v)
 {
     int c, s;
-    if (*(int*)(v + 0x20F4) != 0x20 || !D_004FA030) return 0;
+    int id = *(int*)(v + 0x20F4);
+    if ((id != 0x20 && id != PAK_ID) || !D_004FA030) return 0;
     for (c = 0; c < 8; c++) {
         if (!skinOn(c, 1)) continue;
         s = netSlotVehicle(netState, c);
@@ -168,10 +171,9 @@ static int isPak(char* v)
 extern void fireSpecial(void* l, char* v) __asm__("FireSpecial__8LauncherP7Vehicle");
 extern int getLockOn(void* l, char* v, void* t, void* tp, float r) __asm__("func_0015A650");
 extern void weaponUsed(void* w, char* v, int slot) __asm__("func_001F1AE0");
-extern int timerGetFieldCount(void) __asm__("timerGetFieldCount__Fv");
 extern void hudAddMessage(void* hud, int id, int a, int b) __asm__("AddMessage__3Hudiii");
 static float PK[2] = { 17.5f, 0.0f };     /* lock-on range used by the reticle pickup (D_004F9BC4) */
-static int pakArm[8], pakT0[8];
+static int pakArm[8], pakT0[8], pakFrame;
 static void* pakL[8];
 
 static int vidx(char* v)
@@ -190,7 +192,7 @@ static void pakRelease(int i)
 {
     char* v = D_004FA030 + i * 0x31B0;
     void *t = 0, *tp = 0;
-    int k, n = (timerGetFieldCount() - pakT0[i]) * 10 / 240;
+    int k, n = (pakFrame - pakT0[i]) * 10 / 240;
     if (n < 1) n = 1;
     if (n > 10) n = 10;
     pakArm[i] = 0;
@@ -205,7 +207,7 @@ void tmbr_FireSpecial(void* l, char* v)
     int i = vidx(v);
     if (i < 0 || !isPak(v)) { fireSpecial(l, v); return; }
     if (!pakArm[i]) {
-        pakArm[i] = 1; pakT0[i] = timerGetFieldCount(); pakL[i] = l;
+        pakArm[i] = 1; pakT0[i] = pakFrame; pakL[i] = l;
         pakHud(v, 0x80);
         return;
     }
@@ -217,8 +219,34 @@ void tmbr_SkinsFrame(void)
 {
     int i;
     if (!D_004FA030) return;
+    pakFrame++;
     for (i = 0; i < 8; i++)
-        if (pakArm[i] && timerGetFieldCount() - pakT0[i] > 300) pakRelease(i);
+        if (pakArm[i] && pakFrame - pakT0[i] > 300) pakRelease(i);
+}
+
+/* vehicle update's launcher update call (0x1DCD90): 12 Pak runs it under PAK_ID (see above) */
+extern void launcherUpdate(void* l, char* v) __asm__("func_001549A0");
+void tmbr_LauncherUpdate(void* l, char* v)
+{
+    if (isPak(v)) {
+        *(int*)(v + 0x20F4) = PAK_ID;
+        launcherUpdate(l, v);
+        *(int*)(v + 0x20F4) = 0x20;
+        return;
+    }
+    launcherUpdate(l, v);
+}
+
+/* kill feed (0x1E278C): only for kills of the 8 real cars (traffic kills showed "UNKNOWN KILLED BY ...") */
+extern void hudKillMessage(void* hud, int victim, int killer) __asm__("func_0014E708");
+void tmbr_KillMessage(void* hud, int victim, int killer)
+{
+    int i;
+    for (i = 0; i < 8; i++) {
+        char* v = D_004FA030 + i * 0x31B0;
+        int o = *(int*)(v + 0x20B4);
+        if (o >= 1 && o <= 5 && *(int*)(v + 0x20FC) == victim) { hudKillMessage(hud, victim, killer); return; }
+    }
 }
 
 /* waiting room (from tmbr_LobbyFrame): repeat the choice every 5 s for players who joined later */
