@@ -466,7 +466,7 @@ int tmbr_AiUpdate(char* v)
         /* respawn shield (shield.s: byte 0x497 >= 4, weapons locked): cruise until it drops, no fighting */
         int si = (int)(v - g) / 0x31B0 & 7;
         if (F(drv, 4) != 4) { driverSetMode(drv, 4); pickCruiseZone(g, v, 0); }
-        if (++shieldT[si] > 1200) { *(signed char*)(v + 0x497) = 0; shieldT[si] = 0; }   /* safety: 20 s max */
+        if (++shieldT[si] > 600) { *(signed char*)(v + 0x497) = 0; shieldT[si] = 0; }    /* 10 s, like the players' shield */
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
         return r;
     }
