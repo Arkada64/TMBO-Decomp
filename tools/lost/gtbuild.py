@@ -23,6 +23,16 @@ GT_HI, GT_LO = 0x28ef0, 0x5980
 STP_STATES = [0xa940, 0x152b0, 0x1ede0]          # op31 id209 damage-state groups (3 meshes each)
 STP_LOD1 = 0x55650                               # far LOD body group
 STP_LOD1_KEEP = [0x54b60, 0x55620]               # its non-body kids (light, shadow)
+STP_HIDE = [0x296f0, 0x2a640]                    # Sweet Tooth's rear doors / bumper pieces (Gold Tooth has its own)
+
+
+def hide_meshes(car, root, empty, dead):
+    """repoint every op0 under root (through any relocated slot inside the subtree's nodes) to an empty group"""
+    from tmbtree_walk import subtree_slots
+    for slot, tgt in subtree_slots(car, root):
+        if (u32(car.n, tgt) & 0x3f) == 0:
+            dead.append(mesh_extent(car.n, tgt))
+            car.setp(slot, empty)
 
 
 def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
@@ -90,6 +100,9 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     struct.pack_into('<H', car.n, STP_LOD1 + 8, 1)
     car.setp(STP_LOD1 + 0x20, newg)
     print('lod1', len(lo), 'meshes')
+    empty = car.group([])
+    for r in STP_HIDE:
+        hide_meshes(car, r, empty, dead)
     before = len(car.n)
     dropped = car.compact(sorted(set(dead)))
     print('ngp %d -> %d bytes (orig %d), %d dangling pointers cleared, %d slots, %d tex pairs, %d new textures' % (

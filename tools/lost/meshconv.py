@@ -3,6 +3,7 @@ import struct, math
 from tmbenc import vif_packet
 
 POOL_MAX = 180
+COLOR_SCALE = 0.32
 STRIP_MAX = 36          # longest strip seen in TMB car data
 TEMPLATE_20 = bytes.fromhex('00000000000000000000803f0000803f'
                             'ffffffffffffffffffffffffffff0000'
@@ -11,7 +12,8 @@ TEMPLATE_20 = bytes.fromhex('00000000000000000000803f0000803f'
 
 def c5(v):
     r, g, b, a = v & 31, (v >> 5) & 31, (v >> 10) & 31, (v >> 15) & 1
-    return (r << 3, g << 3, b << 3, 0x80 if a else 0)
+    k = COLOR_SCALE    # Head-On prelit colours are ~3x TMB's (Gold Tooth body 80, Sweet Tooth body avg 25)
+    return (int((r << 3) * k), int((g << 3) * k), int((b << 3) * k), 0x80 if a else 0)
 
 
 def strips_of(m, scale):
@@ -29,7 +31,7 @@ def strips_of(m, scale):
                 pi = s['idx'][i]
                 nx, ny, nz = m['nrm'][pi] if pi < len(m['nrm']) else (0, 0, 1)
                 col = s['col'][i] if i < len(s['col']) else 0xFFFF
-                rgba = c5(col) if col <= 0xFFFF else tuple((col >> (8 * k)) & 255 for k in range(4))
+                rgba = c5(col) if col <= 0xFFFF else tuple(int(((col >> (8 * k)) & 255) * (COLOR_SCALE if k < 3 else 1)) for k in range(4))
                 uv = s['uv'][i] if i < len(s['uv']) else (0, 0)
                 vs.append((pi, (nx, ny, nz), rgba, uv))
             tag = list(s['tag'])
