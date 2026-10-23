@@ -455,12 +455,14 @@ void tmbr_CollideHit(char* v, int side, char* other, void* info)
     F(v, 0x590) = ka; F(other, 0x590) = kb;
 }
 
+extern int tmbr_Opt(int bit);   /* bots.c: lobby options in the game info */
 void tmbr_TrafficUpdate(void)
 {
     int j;
     if (doneSerial != tmbr_levelSerial) {
         doneSerial = tmbr_levelSerial;
-        setup();
+        if (tmbr_Opt(1)) { ncars = 0; scePrintf("TMBR traffic: off (lobby option)\n"); }   /* bots.c lobby option */
+        else setup();
     }
     if (ncars && netIsHost(D_003156C0) && ++syncTick >= SYNC_EVERY) { syncTick = 0; syncSend(); }
     for (j = 0; j < ncars; j++) destructionStep(j);

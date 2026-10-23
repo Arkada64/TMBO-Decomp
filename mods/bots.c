@@ -244,10 +244,59 @@ static int dbgBits(float f) { union { float f; int i; } u; u.f = f; return u.i; 
 #define POS(v) ((void*)(F(v, 0x2028) + 0x10))
 static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v, 0x2028); }
 
+/* ---- lobby options, shared through the game info (the net object the host sends to every machine, 0xC8 bytes,
+ * func_00174988). Byte +0xC6 is unused by the game: TMBR flags, bit 0 traffic off, bit 1 teams. Word 0 bit 12 is
+ * the game's own (cut) "teams on" switch: with it lock-on skips teammates (func_0015A650), radar blips and car
+ * markers use team colours, teammate damage is not credited. Team of a player = client struct +0x14
+ * (D_003156C0 + slot*0x220), never set or sent by the game: every machine sets slot & 1 for all 8 slots, so no
+ * sync is needed. Bots: same rule by their vehicle's slot (+0x20C0), logged at match start. */
+#define GINFO() (*(char**)(D_003156C0 + 0x3148))
+#define OPT_NOTRAFFIC 1
+#define OPT_TEAMS 2
+extern void netSendGameInfo(void* net, int to) __asm__("func_00174988");
+extern int tmbr_levelSerial;
+int tmbr_Opt(int bit)
+{
+    char* gi = GINFO();
+    return gi && (gi[0xC6] & bit);
+}
+static void optSync(int flip)
+{
+    char* gi = GINFO();
+    int want, has;
+    if (!gi) return;
+    gi[0xC6] ^= flip;
+    want = (gi[0xC6] & OPT_TEAMS) != 0;
+    has = (F(gi, 0) >> 12) & 1;
+    if (want != has) F(gi, 0) ^= 0x1000;   /* the mode presets clear it: put it back */
+    if (flip || want != has) netSendGameInfo(D_003156C0, -1);
+}
+static int teamOf(char* g, char* v)
+{
+    int s = F(v, 0x20C0);
+    if (s >= 0 && s < 8) return s & 1;
+    return ((int)(v - g) / 0x31B0) & 1;
+}
+static int teamLogSerial = -1;
+static void teamsFrame(char* g)
+{
+    int s, k;
+    if (!tmbr_Opt(OPT_TEAMS)) return;
+    for (s = 0; s < 8; s++) F(D_003156C0 + s * 0x220, 0x14) = s & 1;
+    if (teamLogSerial != tmbr_levelSerial) {
+        teamLogSerial = tmbr_levelSerial;
+        for (k = 0; k < 8; k++) {
+            char* v = g + k * 0x31B0;
+            if (F(v, 0x590)) scePrintf("TMBR teams: car %d kind %d slot %d team %d\n", k, F(v, 0x590), F(v, 0x20C0), teamOf(g, v));
+        }
+    }
+}
+
 void tmbr_BotsThink(void)
 {
     char* g = D_004FA030;
     int i, k;
+    if (g) teamsFrame(g);
     if (tmbr_botCount < 0 || !g || NAI(g) <= 0 || !netIsHost(D_003156C0)) return;
 #if TMBR_NAV
     tmbr_NavFrame();
@@ -314,6 +363,7 @@ void tmbr_BotsThink(void)
             char* v = g + k * 0x31B0;
             int others;
             if (v == b || !live(v)) continue;
+            if (tmbr_Opt(OPT_TEAMS) && teamOf(g, v) == teamOf(g, b)) continue;   /* teammate */
             d = (int)manhat(POS(b), POS(v));
             others = hunted[k] - (k == ci);              /* other bots already on it */
             if (rl == R_CRUISER) sc = d;
@@ -639,10 +689,19 @@ void tmbr_LobbyFrame(void)
     lobbyFrame();
     tmbr_SkinsLobby();
     tmbr_PedNamesInit();
+    sprintf(buf, "TRAFFIC : %s  (R3 + UP)    TEAMS : %s  (R3 + DOWN)", tmbr_Opt(OPT_NOTRAFFIC) ? "OFF" : "ON",
+        tmbr_Opt(OPT_TEAMS) ? "ON" : "OFF");
+    fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 11 * 0x100);
+    fontPrint(0, buf);
     if (!netIsHost(D_003156C0)) return;
-    pad = inputGetPadButtons(0) & 0xF04;  /* raw pad, active high: R3 0x4, L2 0x100, R2 0x200, L1 0x400, R1 0x800 */
+    /* raw pad, active high: R3 0x4, Up 0x10, Down 0x40, L2 0x100, R2 0x200, L1 0x400, R1 0x800 */
+    pad = inputGetPadButtons(0) & 0xF54;
     pressed = pad & ~prevPad;
     prevPad = pad;
+    if ((pad & 0x4) && (pressed & 0x50)) {
+        optSync(((pressed & 0x10) ? OPT_NOTRAFFIC : 0) | ((pressed & 0x40) ? OPT_TEAMS : 0));
+        scePrintf("TMBR lobby: traffic %s, teams %s\n", tmbr_Opt(OPT_NOTRAFFIC) ? "off" : "on", tmbr_Opt(OPT_TEAMS) ? "on" : "off");
+    } else optSync(0);
     if ((pad & 0x4) && (pressed & 0xF00)) {
         if (pressed & 0x800) tmbr_botCount++;
         if (pressed & 0x400) tmbr_botCount--;
