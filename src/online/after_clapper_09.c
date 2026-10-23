@@ -14,7 +14,24 @@ s32 func_001192E8(s32 arg0) {
     return arg0;
 }
 
-INCLUDE_ASM("/home/ark/tmbo_decomp/asm/nonmatchings/online/after_clapper_09", func_00119318);
+#include "m2c_macros.h"
+void func_00119318(void *arg0)
+{
+  u8 *new_var;
+  *((s32 *) (((u8 *) arg0) + 0x6C)) = 0;
+  *((f32 *) (((u8 *) arg0) + 0x2C)) = 1.0f;
+  *((s32 *) (((u8 *) arg0) + 0x78)) = -1;
+  *((s32 *) (((u8 *) arg0) + 0)) = 0;
+  *((s32 *) (((u8 *) arg0) + 4)) = 0;
+  *((s32 *) (((u8 *) arg0) + 8)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0xC)) = -1;
+  *((s32 *) (((u8 *) arg0) + 0x10)) = -1;
+  *((s32 *) (((u8 *) arg0) + 0x14)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x18)) = 0;
+  *((s32 *) (((u8 *) arg0) + 0x1C)) = 0;
+ do { *((s32 *) ((new_var = (u8 *) arg0) + 0x20)) = -1; *((s32 *) (new_var + 0x24)) = 0; *((s32 *) (new_var + 0x30)) = 0; *((s32 *) (new_var + 0x5C)) = 0; *((s32 *) (new_var + 0x60)) = 0; *((s32 *) (new_var + 0x68)) = 0; } while (0);
+  *((s32 *) (new_var + 0x64)) = 0;
+}
 
 #include "m2c_macros.h"
 s32 mathfRand__Fii_119370() __asm__("mathfRand__Fii");
