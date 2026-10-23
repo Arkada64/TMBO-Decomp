@@ -175,7 +175,8 @@ extern void weaponUsed(void* w, char* v, int slot) __asm__("func_001F1AE0");
 #define L_SLOT(l)    (*(int*)((char*)(l) + 0x0))
 #define L_S5TYPE(l)  (*(int*)((char*)(l) + 0x110))
 #define L_ARMED(l)   (*(int*)((char*)(l) + 0x218))
-static int pakRet[8], pakMountLog[8];
+static int pakRet[8], pakMountLog[8], pakCool[8], pakFrames;
+#define PAK_COOLDOWN (10 * 60)                   /* Lost: 10 s between 12 Pak specials */
 static char* pakGame;
 
 static int vidx(char* v)
@@ -189,6 +190,7 @@ void tmbr_FireSpecial(void* l, char* v)
     int i = vidx(v), slot, type;
     if (i < 0 || !isPak(v)) { fireSpecial(l, v); return; }
     if (L_ARMED(l) && !pakRet[i]) return;               /* a pickup reticle is up: leave it alone */
+    if (!pakRet[i] && pakFrames < pakCool[i]) return;   /* cooling down */
     slot = L_SLOT(l); type = L_S5TYPE(l);
     L_SLOT(l) = 5; L_S5TYPE(l) = 0xB;
     pakRet[i] = 1;
@@ -201,7 +203,7 @@ void tmbr_FireSpecial(void* l, char* v)
 void tmbr_ReticleUsed(void* w, char* v, int slot)
 {
     int i = vidx(v);
-    if (slot == 5 && i >= 0 && pakRet[i]) { pakRet[i] = 0; slot = 1; }
+    if (slot == 5 && i >= 0 && pakRet[i]) { pakRet[i] = 0; slot = 1; pakCool[i] = pakFrames + PAK_COOLDOWN; }
     weaponUsed(w, v, slot);
 }
 
@@ -209,9 +211,11 @@ void tmbr_ReticleUsed(void* w, char* v, int slot)
 void tmbr_SkinsFrame(void)
 {
     int i;
-    if (!D_004FA030 || pakGame == D_004FA030) return;
+    if (!D_004FA030) return;
+    pakFrames++;
+    if (pakGame == D_004FA030) return;
     pakGame = D_004FA030;
-    for (i = 0; i < 8; i++) pakRet[i] = pakMountLog[i] = 0;
+    for (i = 0; i < 8; i++) pakRet[i] = pakMountLog[i] = pakCool[i] = 0;
 }
 
 /* vehicle update's launcher update call (0x1DCD90): 12 Pak runs it under PAK_ID (see above) */
