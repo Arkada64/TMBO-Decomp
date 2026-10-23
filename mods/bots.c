@@ -159,9 +159,21 @@ static void balance(int mid)
 }
 
 /* game start (func_001399A8, host only; replaces the two func_00175588 calls) */
+/* Synchronous entry (game info bit 5; the net state goes to 0xA instead of 0xB): every player loads the level at
+ * the same time, so bots made at the host's game start went out before the clients were in. There the host
+ * waits SYNC_DELAY frames into the match and adds them like players joining mid-match (balance(1)). */
+#define SYNC_DELAY 240
+static int spawnWait;
+static int syncEntry(void) { return F(D_003156C0, 0x3148) && (*(u32*)F(D_003156C0, 0x3148) >> 5 & 1); }
 int tmbr_BotsSpawn(void* net, int slot)
 {
     if (tmbr_botCount >= 0) F(D_004FA030, 0x9A3D4) = tmbr_botDiff;
+    if (syncEntry()) {
+        spawnWait = SYNC_DELAY;
+        scePrintf("TMBR bots: synchronous entry, bots in %d frames\n", SYNC_DELAY);
+        return 1;
+    }
+    spawnWait = 0;
     balance(0);
     scePrintf("TMBR bots: start, %d humans, %d bots (setting %d)\n", humans(), NAI(D_004FA030), tmbr_botCount);
     return 1;
@@ -170,7 +182,7 @@ int tmbr_BotsSpawn(void* net, int slot)
 /* players joined/left (replaces func_00176EA0) */
 void tmbr_BotsRebalance(void* net)
 {
-    if (!netIsHost(D_003156C0) || F(D_003156C0, 0x1BB4) != 0xB) return;
+    if (!netIsHost(D_003156C0) || (F(D_003156C0, 0x1BB4) != 0xB && F(D_003156C0, 0x1BB4) != 0xA) || spawnWait > 0) return;
     balance(1);
     scePrintf("TMBR bots: rebalance, %d humans, %d bots\n", humans(), NAI(D_004FA030));
 }
@@ -286,6 +298,10 @@ void tmbr_BotsThink(void)
     char* g = D_004FA030;
     int i, k;
     if (g) tmbr_TeamsFrame();
+    if (spawnWait > 0 && g && netIsHost(D_003156C0) && --spawnWait == 0) {   /* synchronous entry: bots now */
+        balance(0);
+        scePrintf("TMBR bots: sync spawn, %d humans, %d bots\n", humans(), NAI(g));
+    }
     if (tmbr_botCount < 0 || !g || NAI(g) <= 0 || !netIsHost(D_003156C0)) return;
 #if TMBR_NAV
     tmbr_NavFrame();
