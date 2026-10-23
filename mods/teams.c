@@ -313,3 +313,15 @@ void tmbr_TeamsLobby(char* la, char* lb)
         if (len[t] < 24) len[t] += sprintf(line[t] + len[t], " BOT");
     }
 }
+
+/* Names over the cars (hud func_00149D08 0x14B098: func_0014C4D8(hud, car +0x20F4, &r, &g, &b) picks the text
+ * colour from the car's own colour code): with teams on, a player's / bot's name takes its team colour too.
+ * The stub passes the car ($s3) on as the 6th argument. Other codes (the fox in Man Hunt) stay as they are. */
+extern void hudColorOf(char* hud, int code, unsigned char* r, unsigned char* g, unsigned char* b) __asm__("func_0014C4D8");
+void tmbr_NameColor(char* hud, int code, unsigned char* r, unsigned char* g, unsigned char* b, char* v)
+{
+    int t = v && code == F(v, 0x20F4) ? tmbr_MarkerTeam(v) : -1;
+    hudColorOf(hud, t >= 0 ? t : code, r, g, b);
+}
+__asm__(".section .text\n.set push\n.set noreorder\n.globl tmbr_NameColorS\ntmbr_NameColorS:\n"
+        "    j       tmbr_NameColor\n    move    $9, $19\n.set pop\n.previous\n");

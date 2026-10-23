@@ -167,6 +167,7 @@ PATCHES = [
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCE60", "addu", "nop"),
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCE64", "lw", "nop"),
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCE68", "bne", "nop"),
+    (A("tmb/hud.s"), "0014B098", "jal", "jal        tmbr_NameColorS"),
     (A("tmb/hud.s"), "0014A914", "bne", "nop"),
     (A("tmb/hud.s"), "0014A91C", "lui", "jal        tmbr_TeamColorS"),
     (A("tmb/hud.s"), "0014A920", "addiu", "daddu      $a0, $s3, $zero"),
