@@ -15,7 +15,8 @@ ROOT_HI, ROOT_LO = 0x469d0, 0x3a0
 SKIP_TEX = {0xb1a44, 0xcaf58,          # 12 Pak's wheels (Roadkill's are kept)
             0x88de8,                   # its shadow
             0xc1fa8, 0x11d370, 0x8fed0}  # headlight / exhaust effects
-SKIP_MESH = {0x1db0}                   # light cone
+SKIP_MESH = {0x1db0,                  # light cone
+             0x41480, 0x41670, 0x41820, 0x41f60, 0x42150, 0x42300, 0x42530}   # cab poles + caps poking through the roof
 STATES = [0x12db0, 0x208c0, 0x2ca80]   # Roadkill RKP: op31 0x32270 body damage-state groups
 LOD1 = 0x5e830                         # far LOD group: body 0x5cf20 + shadow 0x5e310
 LOD1_BODY = 0x5cf20

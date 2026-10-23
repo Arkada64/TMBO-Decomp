@@ -268,6 +268,10 @@ extern void launcherUpdate(void* l, char* v) __asm__("func_001549A0");
  * frame, +y forward, +z up; filled per car type by func_001518A0, Roadkill's for 12 Pak). Forward-firing ones
  * are moved to 12 Pak's hood gun (centre of the hood, measured from his model); rear drops stay. */
 static float PAKGUN[5] = { 0.0f, 5.2f, 1.1f, 0.5f, 0.25f };   /* gun x/y/z, min forward y, x squeeze */
+/* machine guns: the two alternating muzzles are separate vectors at launcher+0x610 / +0x620 (Roadkill's:
+ * x 0.92 / 1.57, y 6.94, z 1.73). 12 Pak's machine gun is the barrel along his right side (Head-On mesh 0x40710:
+ * x 2.87..3.32, y 1.5..6.32, z 0.48..0.87): both muzzles at its front end */
+static float PAKMG[3] = { 3.1f, 6.4f, 0.68f };
 static void pakMounts(char* l, int i)
 {
     int k;
@@ -276,6 +280,11 @@ static void pakMounts(char* l, int i)
         if (e[1] <= PAKGUN[3]) continue;                        /* empty, or a rear / under-car launch point */
         if (!pakMountLog[i]) scePrintf("TMBR 12pak mount %d: %d %d %d (x100)\n", k, (int)(e[0] * 100), (int)(e[1] * 100), (int)(e[2] * 100));
         e[0] = PAKGUN[0] + e[0] * PAKGUN[4]; e[1] = PAKGUN[1]; e[2] = PAKGUN[2];
+    }
+    for (k = 0; k < 2; k++) {
+        float* e = (float*)(l + 0x610 + 16 * k);
+        if (!pakMountLog[i]) scePrintf("TMBR 12pak mg %d: %d %d %d (x100)\n", k, (int)(e[0] * 100), (int)(e[1] * 100), (int)(e[2] * 100));
+        e[0] = PAKMG[0]; e[1] = PAKMG[1]; e[2] = PAKMG[2];
     }
     pakMountLog[i] = 1;
 }

@@ -43,6 +43,19 @@ GOLD_CBPS = [49, 45, 9, 37]                      # CLUT blocks of sheets 1, 2, 3
 STP_ALT_LOD = 0x941a0                            # switch 217 child 1 (the special's form): show Gold Tooth there too                    # Sweet Tooth's rear doors / bumper pieces (Gold Tooth has its own)
 
 
+if os.environ.get('GT_ACAR'):      # Sweet Tooth STA (other players' copy): same tree, other offsets / palettes
+    REUSE = {0xb0448: 53, 0xa91b8: 57, 0x8dc74: 53, 0x9e768: 5}
+    STP_LOD1, STP_LOD1_KEEP = 0x53d10, [0x53220, 0x53ce0]
+    STP_HIDE = [0x27ee0, 0x28e00]
+    CHARS = [0x25640, 0x2dcc0, 0x32c80, 0x34bc0, 0x37050, 0x3ab30, 0x3d040, 0x3e760, 0x4a1e0, 0x4f120, 0x51640,
+             0x8a210, 0x8f480, 0x98790, 0x9b080]
+    ARM_CHARS = {0x2dcc0, 0x32c80, 0x34bc0, 0x37050, 0x3ab30, 0x3d040}
+    STP_ALT_LOD = 0x8c790
+    CLOWN_HEAD_SLOT = 0x4f08c
+    ROBOT_RANGE = (0x53d40, 0x8c7e0)
+    GOLD_CBPS = [57, 53, 9, 37]
+
+
 def gold_cluts(tb, cbps):
     """recolour whole CLUTs onto a gold ramp by brightness (keeps every texel of the art, only the colours move)"""
     import numpy as np
