@@ -93,6 +93,40 @@ def main(rkdir, bddpath, outdir, scale=1.0):
         if car.P(LOD1 + 0x20 + 4 * i) == LOD1_BODY:
             dead.append(mesh_extent(car.n, LOD1_BODY))
             car.setp(LOD1 + 0x20 + 4 * i, node(ROOT_LO))
+    # Roadkill's own parts (driver + roof guns, door / hood / side panels, gas cap, rear rack: characters 0..9 of
+    # the op7 list, and the meshes laid out before them) get an empty packet; wheels stay
+    if os.environ.get('PAK_KEEP_RK') != '1':
+        from tmbtree_walk import kid_slots
+        op7 = next(u32(car.n, 4 + 4 * i) - 0x980000 for i in range(u32(car.n, 0)) if (u32(car.n, u32(car.n, 4 + 4 * i) - 0x980000) & 0x3f) == 7)
+        chars = [u32(car.n, op7 + 8 + 4 * i) - 0x980000 for i in range(u32(car.n, op7 + 4))]
+        limit = chars[9]
+        wheels = set()
+        for o in range(0, limit, 16):
+            h = u32(car.n, o)
+            if (h & 0x3f) == 4 and 33 <= (h >> 18) <= 36:
+                for sl in kid_slots(car.n, o)[:4]:
+                    if sl + 4 > len(car.n): continue
+                    t = car.P(sl)
+                    if t is not None: wheels.add(t)
+        deadset = {a for a, b in dead}
+        nopk = car.append(struct.pack('<4I', 0x60000001, 0, 0, 0) + struct.pack('<4I', 0x01000404, 0, 0, 0))
+        nb = 0
+        for a, g in list(car.pairs):
+            for i in range(5):
+                nd = a - 0x50 - 2 * i
+                if nd % 16 or nd >= limit or nd in deadset or nd in wheels or (u32(car.n, nd) & 0x3f) != 0:
+                    continue
+                if g != nd + 0x70 + 0x30 * i or u32(car.n, nd + 4) - 0x980000 >= len(car.n):
+                    continue
+                nt = struct.unpack_from('<H', car.n, nd + 0x5a)[0]
+                if u32(car.n, nd + 4) - 0x980000 != nd + 0x70 + 0x30 * nt:
+                    continue
+                a2, b2 = mesh_extent(car.n, nd)
+                dead.append((nd + 0x70 + 0x30 * nt, b2)); deadset.add(nd)
+                car.setp(nd + 4, nopk)
+                struct.pack_into('<I', car.n, nd + 0xc, u32(car.n, nd + 0xc) & 0xFFFF)
+                nb += 1
+        print('Roadkill parts hidden:', nb, 'meshes (wheels kept:', len(wheels), ')')
     before = len(car.n)
     dropped = car.compact(sorted(set(dead)))
     print('ngp %d -> %d (orig %d), dropped %d, new textures %d, CLUT blocks %d' % (

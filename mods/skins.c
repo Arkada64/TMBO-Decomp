@@ -115,8 +115,7 @@ void tmbr_LoadCar0F0(void* s, int c) { setCodes(c); loadCar0F0(s, c); setCodes(-
 /* car select frame: highlighted car value (type << 5) */
 void tmbr_CarSelectSound(void* snd, int car)
 {
-    int pad, pressed, k = -1, pak;
-    char line[64];
+    int pad, pressed, pak;
     playCarSound(snd, car);
     if (shellPtr) *(int*)(shellPtr + 0x1A2F0 + PAK_POS * 4) = 0x20;      /* 16th spot = a Roadkill */
     pak = carSelPos == PAK_POS;
@@ -128,29 +127,19 @@ void tmbr_CarSelectSound(void* snd, int car)
     pad = inputGetPadButtons(0) & (PAD_L1 | PAD_SQUARE);
     pressed = pad & ~prevPad;
     prevPad = pad;
-    if (pak) {
-        fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 11 * 0x100);
-        fontPrint(0, "12 PAK   (TWISTED METAL: LOST)");
+    if (pak) {                                        /* the 16th spot still shows another car's name plate */
+        fontSetCursorAtSubPixel(0, 0x1500, 0xFA0 + 11 * 0x100);
+        fontPrint(0, "12 PAK");
         return;
     }
-    if ((car >> 5) == skinType[0]) k = 0;
-    if (k < 0) return;
+    if ((car >> 5) != skinType[0]) return;
     if ((pad & PAD_L1) && (pressed & PAD_SQUARE)) {
-        tmbr_skin[k] = !tmbr_skin[k];
-        scePrintf("TMBR skins: %s %s\n", skinName[k], tmbr_skin[k] ? "on" : "off");
+        tmbr_skin[0] = !tmbr_skin[0];
+        scePrintf("TMBR skins: %s %s\n", skinName[0], tmbr_skin[0] ? "on" : "off");
         sendSkins();
     }
-    {
-        const char* a = tmbr_skin[k] ? skinName[k] : baseName[k];
-        const char* b = tmbr_skin[k] ? baseName[k] : skinName[k];
-        int i = 0, j;
-        for (j = 0; a[j]; j++) line[i++] = a[j];
-        for (j = 0; "   (L1 + SQUARE: "[j]; j++) line[i++] = "   (L1 + SQUARE: "[j];
-        for (j = 0; b[j]; j++) line[i++] = b[j];
-        line[i++] = ')'; line[i] = 0;
-    }
-    fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 11 * 0x100);
-    fontPrint(0, line);
+    fontSetCursorAtSubPixel(0, 0x1500, 0xFA0 + 11 * 0x100);
+    fontPrint(0, tmbr_skin[0] ? "GOLD TOOTH  L1+SQ" : "L1+SQ: GOLD TOOTH");
 }
 
 /* car select preview model (shell+0xC3C switch, one child per position): the 16th spot shows Roadkill's */
