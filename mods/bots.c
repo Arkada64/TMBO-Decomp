@@ -191,6 +191,14 @@ static int thinkTick;
 #define CRUISE_SEE 350
 #define ROLE(v) (role[((int)((char*)(v) - D_004FA030) / 0x31B0) & 7])
 static int hunted[8], crowd[8];
+/* health in percent (vehicle+0x404 health, +0x3F0 max; floats, converted without float literals) */
+static int hpPct(char* v)
+{
+    int h = (int)*(float*)(v + 0x404), m = (int)*(float*)(v + 0x3F0);
+    if (m <= 0) return 100;
+    if (h < 0) h = 0;
+    return h * 100 / m;
+}
 static short shieldT[8];         /* frames a bot has been under its respawn shield */
 static signed char role[8];          /* by vehicle index */
 static short roleT[8], rushT[8];
@@ -267,14 +275,16 @@ void tmbr_BotsThink(void)
             /* Breakaway: like players leaving a brawl, a bot that has been fighting for a while, or is in a
              * pile-up (3+ other cars within 400), may drive off for 8-15 s (game cruise mode, ignores targets)
              * and come back fresh. Checked every 0.5 s: after 20 s of fighting 10 %, in a pile-up 6 %. */
-            int k2 = (int)(b - g) / 0x31B0 & 7, pile = crowd[k2] >= 3;
+            int k2 = (int)(b - g) / 0x31B0 & 7, pile = crowd[k2] >= 3, retreat;
             if (leaveT[k2] > 0) {
                 leaveT[k2]--;
                 if (F(drv, 4) != 4) { driverSetMode(drv, 4); pickCruiseZone(g, b, 0); }
                 continue;
             }
             if (cur && (int)manhat(POS(b), POS(cur)) < 600) fightT[k2]++; else fightT[k2] = 0;
-            if ((fightT[k2] > 40 && mathfRandI(0, 99) < 10) || (pile && fightT[k2] > 10 && mathfRandI(0, 99) < 6)) {
+            /* retreat: hurt (< 35 %) and two or more cars on it -> break away (25 % per check) */
+            retreat = hpPct(b) < 35 && hunted[k2] >= 2 && mathfRandI(0, 99) < 25;
+            if (retreat || (fightT[k2] > 40 && mathfRandI(0, 99) < 10) || (pile && fightT[k2] > 10 && mathfRandI(0, 99) < 6)) {
                 leaveT[k2] = 16 + mathfRandI(0, 14);
                 fightT[k2] = 0;
                 driverSetMode(drv, 4); pickCruiseZone(g, b, 0);
@@ -293,6 +303,7 @@ void tmbr_BotsThink(void)
             else if (rl == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
             else if (rl == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
             else sc = d + others * 200;                                                   /* brawler */
+            sc -= (100 - hpPct(v)) * (rl == R_CRUISER ? 1 : 3);   /* finish off damaged cars (up to -300) */
             if (v == cur) curS = sc;
             if (sc < bestS) { bestS = sc; best = v; }
         }
