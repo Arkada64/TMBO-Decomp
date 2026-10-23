@@ -141,7 +141,7 @@ def main(rkdir, bddpath, outdir, scale=1.0):
         KEEP = [(0x13a0, 0x2760), (0x39b80, 0x3d630), (0x41070, 0x4c180)]
         if os.environ.get('PAK_ACAR'):
             KEEP = [(0x10, 0x800), (0x29090, 0x2cb80), (0x305c0, 0x3b6d0)]   # RKA: same parts, its offsets
-        if os.environ.get('PAK_NOARMS') != '1':
+        if os.environ.get('PAK_ARMS') == '1':    # Roadkill's weapon hardware: dropped (looked wrong), kept for reference
             kept = {o for a, b in KEEP for o in range(a, b, 16) if (u32(car.n, o) & 0x3f) == 0}
             wheels |= kept
             print('Roadkill weapon parts kept:', len(kept))
