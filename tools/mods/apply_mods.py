@@ -236,6 +236,9 @@ PATCHES = [
     # 12 Pak: 16th car select spot (wrap 14 -> 15), preview shows Roadkill there, his special is the reticle weapon
     (A("tmb/ui.s"), "001CB784", "addiu", "addiu      $v0, $zero, 0xF"),
     (A("tmb/ui.s"), "001CB7B0", "addiu", "addiu      $v0, $zero, 0xF"),
+    # ... waiting room player list: "12 PAK" instead of "ROADKILL" for players with 12 Pak on
+    (A("tmb/ui.s"), "001C5E94", "jal", "jal        tmbr_LobbyCarNameS"),
+    (A("tmb/ui.s"), "001C5ED4", "jal", "jal        tmbr_LobbyCarNameS"),
     (A("tmb/ui.s"), "001CB59C", "jal", "jal        tmbr_PreviewSwitch"),
     (A("tmb/ui.s"), "001CB65C", "jal", "jal        tmbr_PreviewSwitch"),
     (A("tmb/ui.s"), "001CB694", "jal", "jal        tmbr_PreviewSwitch"),

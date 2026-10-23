@@ -35,7 +35,7 @@ G = [glyph(t55, 213, 248, 214, 230, 242, S, 1, 300), glyph(t55, 213, 248, 229, 2
 R0, R1, C0, C1 = 203, 251, 4, 255           # Black Razer box (upright)
 H, W = R1 - R0, C1 - C0
 can = np.zeros((H, W, 4), np.float32)
-x, base = 10, 34                           # same left edge/baseline as the other plates
+x, base = 67, 34                           # baseline as the other plates; text centred on the Black Razer plate (its centre x 128)
 for g in G:
     if g is None: x += 10; continue
     p, b = g; top = int(round(base - b)); h, w = p.shape[:2]

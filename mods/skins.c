@@ -102,6 +102,19 @@ static int skinOn(int client, int k)
     return client >= 0 && client < 8 && remote[client][k];
 }
 
+/* waiting room player list (func_001C5768 0x1C5E94 / 0x1C5ED4: sprintf(buf, "%s", carName[car >> 5])): the row's
+ * client struct is in $s2 there; the stub passes it on, and a player with 12 Pak on shows "12 PAK". */
+extern char* D_0041BF00[];          /* waiting-room car names by car code >> 5 (1 = "ROADKILL") */
+extern int sprintf(char* d, const char* f, ...);
+__asm__(".pushsection .text\n.set push\n.set noreorder\n.globl tmbr_LobbyCarNameS\ntmbr_LobbyCarNameS:\n"
+        "    j       tmbr_LobbyCarName\n    move    $7, $18\n.set pop\n.popsection\n");
+int tmbr_LobbyCarName(char* buf, const char* fmt, const char* name, char* row)
+{
+    int i = (int)(row - netState) / 0x220;
+    if (name == D_0041BF00[1] && i >= 0 && i < 8 && skinOn(i, 1)) name = "12 PAK";
+    return sprintf(buf, fmt, name);
+}
+
 static void setCodes(int client)
 {
     int k;
