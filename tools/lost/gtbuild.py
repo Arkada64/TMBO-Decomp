@@ -94,6 +94,8 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
             return built[h]
         o, m = hdr2pk[h]
         ctx = [tb.gs_ctx(k) for k in m['texrefs']]
+        if m.get('hflags', 0) & 0x0E and os.environ.get('GT_ENV', '1') == '1' and len(ctx) == 1:
+            ctx = ctx * 2      # env-mapped: TMB's env path reads a second texture slot (the reflection map)
         blob, slots, pairs, sph = hierobject(m, scale, ctx)
         built[h] = (car.append(blob, slots, pairs), sph)
         return built[h]
@@ -144,6 +146,12 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     empty = car.group([])
     for r in STP_HIDE:
         hide_meshes(car, r, empty, dead)
+    # Sweet Tooth's side weapon mounts (missiles shown resting on the car) sit in the air beside Gold Tooth's
+    # narrower cab: move them in against the cab side
+    for rot, x in ((0x4ba90, -3.6), (0x4bb10, 3.6)):
+        if (u32(car.n, rot) & 0x3f) == 4:
+            struct.pack_into('<f', car.n, rot + 0x40, x)
+            struct.pack_into('<f', car.n, rot + 0x48, 0.3)
     # special form: both LOD children -> Gold Tooth state 0
     g0 = car.P(STP_STATES[0] + 0x20)
     for i in range(struct.unpack_from('<i', car.n, STP_ALT_LOD + 4)[0]):
