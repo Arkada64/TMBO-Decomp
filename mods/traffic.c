@@ -51,6 +51,7 @@ extern void phys7(char* v) __asm__("func_0011E0E8");
 #define GAP_END 0x1BE0000
 
 #define VSIZE 0x31B0
+#define TRAFFIC_DBG 1   /* setup progress + car state every 2 s (first 4 cars) */
 #define MAXCARS 32       /* retail allows 33; traffic.s has a 32-entry cs pool (LOOP has 32 cars) */
 #define F(v, off) (*(int*)((v) + (off)))
 static int doneSerial = -1;
@@ -95,9 +96,10 @@ static void setup(void)
             mem = tmbr_fodderLevels[i].mem; memEnd = tmbr_fodderLevels[i].memEnd;
         }
     if (!nodes) return;
-    /* the offline free ranges (traffic_nodes.c) predate the packs and CITY's sits in its TEX slot tail (hang
-     * on load); the gap is free on every traffic level */
-    mem = GAP; memEnd = GAP_END;
+    /* the offline free ranges (traffic_nodes.c, NGP slot tails) work on FREEWAY / MINIBURB; CITY's is its
+     * TEX slot tail (hung on load). The gap after the car NGP slots hung MINIBURB (used on ped levels?). */
+    if (tmbr_levelIndex == 5) { mem = GAP; memEnd = GAP_END; }   /* CITY: NGP tail too small, TEX tail hung */
+    scePrintf("TMBR traffic: setup level %d, %d nodes, memory %x..%x\n", tmbr_levelIndex, n, mem, memEnd);
     type = F(game, 0x9FCA0);
     points = F(game, 0x34890 + 0x248);
     /* group the nodes like retail FodderParse: a car per base node (sub 0), attachments follow it */
@@ -140,6 +142,7 @@ static void setup(void)
         return;
     }
     memset(cars, 0, (u32)(hwdrv + MAXCARS * 0x30) - (u32)cars);
+    scePrintf("TMBR traffic: %d groups, %d highway, cars %x..%x\n", ngroups, nhw, (u32)cars, (u32)(hwdrv + MAXCARS * 0x30));
     for (j = 0; j < ngroups; j++) {
         int g = order[j], same = 0;
         char* v = cars + j * VSIZE;
@@ -152,6 +155,7 @@ static void setup(void)
         }
     }
     ncars = ngroups;
+    scePrintf("TMBR traffic: models attached\n");
     /* InitializeFodderCars + SetFodderCar */
     savedCount = F(game, 0x9FCB8);
     F(game, 0x9FCB8) = ncars;                   /* fodderInit spreads the start points over this */
@@ -171,6 +175,7 @@ static void setup(void)
             F(v, 0x201C) = 0;
             F(v, 0x2020) = (int)(drv + j * 0x70);
             fodderDriverInit(drv + j * 0x70, game + 0x34890);
+            if (TRAFFIC_DBG) scePrintf("TMBR traffic: car %d init\n", j);
             fodderInit(v, game);
         }
         if (F(v, 0x202C)) hierSetCsDrawMe((void*)F(v, 0x202C), 1);
@@ -186,7 +191,6 @@ static void setup(void)
         tmbr_levelIndex, type, ncars, nhw, active, points, F(game, 0x9FCAC), cars);
 }
 
-#define TRAFFIC_DBG 1   /* car state every 2 s (first 4 cars) */
 static int dbgTick;
 static int fb(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 
