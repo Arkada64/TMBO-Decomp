@@ -60,7 +60,7 @@ static void setTeam(int s, int t)
     if (s < 0 || s > 7 || tmbr_team[s] == t) return;
     tmbr_team[s] = t;
     dirty = 1;
-    scePrintf("TMBR teams: slot %d -> team %c\n", s, 'A' + t);
+    scePrintf("TMBR teams: slot %d -> team %s\n", s, t ? "blue" : "red");
 }
 
 /* chat (skins.c tmbr_ChatHandler): msg points after the \x01 */
@@ -141,13 +141,26 @@ void tmbr_TeamsFrame(void)
         overShown = 0;
         for (k = 0; k < 8; k++) {
             char* v = g + k * VSIZE;
-            if (F(v, 0x590)) scePrintf("TMBR teams: car %d kind %d slot %d team %c\n", k, F(v, 0x590), F(v, 0x20C0), 'A' + tmbr_TeamOf(v));
+            if (F(v, 0x590)) scePrintf("TMBR teams: car %d kind %d slot %d team %s\n", k, F(v, 0x590), F(v, 0x20C0), tmbr_TeamOf(v) ? "blue" : "red");
         }
     }
     if (tmbr_botTeamMode)                                  /* vs players: every human on A */
         for (s = 0; s < 8; s++) if (HUMAN(s) && !botSlot[s]) tmbr_team[s] = 0;
     for (s = 0; s < 8; s++) F(CLIENT(s), 0x14) = tmbr_team[s];
     if (netIsHost(D_003156C0) && (dirty || ++sendTick >= 120)) { dirty = 0; sendTick = 0; sendTable(); }
+}
+
+/* team 0 = RED, 1 = BLUE (text colours, 0x80 = full) */
+void tmbr_TeamColor(int t)
+{
+    if (t) fontSetColor(0, 0x30, 0x58, 0x80);
+    else fontSetColor(0, 0x80, 0x28, 0x20);
+}
+int tmbr_MyTeam(void)
+{
+    int me = netGetMyClientIndex(D_003156C0);
+    if (tmbr_botTeamMode) return 0;
+    return me >= 0 && me < 8 ? tmbr_team[me] & 1 : 0;
 }
 
 /* HUD (traffic.c tmbr_DamageReportTick, every frame): team score under the damage report */
@@ -161,13 +174,16 @@ void tmbr_TeamsHud(void)
     viewGetSize(viewGetCurView(), &wh[0], &wh[1]);
     if (over) {
         if (score[0] == score[1]) sprintf(buf, "TEAMS TIED  %d - %d", score[0], score[1]);
-        else sprintf(buf, "TEAM %c WINS  %d - %d", score[0] > score[1] ? 'A' : 'B', score[0], score[1]);
+        else sprintf(buf, "%s TEAM WINS  %d - %d", score[0] > score[1] ? "RED" : "BLUE", score[0], score[1]);
         if (!overShown) { overShown = 1; scePrintf("TMBR teams: %s\n", buf); }
-        fontSetColor(0, 0x80, 0x80, 0x80);
+        if (score[0] == score[1]) fontSetColor(0, 0x80, 0x80, 0x80);
+        else tmbr_TeamColor(score[0] > score[1] ? 0 : 1);
         fontSpritePrintCenteredXY(0, wh[0] / 2, wh[1] / 2 - 40, buf);
     } else {
-        sprintf(buf, "TEAM A %d  -  %d TEAM B", score[0], score[1]);
-        fontSetColor(0, 0x70, 0x70, 0x70);
+        /* "YOU: RED  3 - 1" in your team's colour: your score first */
+        int me = tmbr_MyTeam();
+        sprintf(buf, "YOU: %s  %d - %d", me ? "BLUE" : "RED", score[me], score[me ^ 1]);
+        tmbr_TeamColor(me);
         fontSpritePrintCenteredXY(0, wh[0] / 2, 47, buf);
     }
     fontSpriteEnd(0);
@@ -201,7 +217,7 @@ void tmbr_TeamsLobby(char* la, char* lb)
         }
     }
     if (host && (dirty || ++sendTick >= 120)) { dirty = 0; sendTick = 0; sendTable(); }
-    for (s = 0; s < 2; s++) len[s] = sprintf(line[s], "%c%s:", 'A' + s, tmbr_botTeamMode ? (s ? " BOTS" : " YOU") : "");
+    for (s = 0; s < 2; s++) len[s] = sprintf(line[s], "%s%s:", s ? "BLUE" : "RED", tmbr_botTeamMode ? (s ? " BOTS" : " HUMANS") : "");
     for (s = 0; s < 8; s++) {
         int t;
         if (!HUMAN(s)) continue;

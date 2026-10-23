@@ -707,16 +707,19 @@ extern int sprintf(char* d, const char* f, ...);
 
 /* waiting room (func_001B2B68 -> func_001C5768 every frame): host hotkeys R3 + R1/L1 and a "BOTS" line.
  * Count steps AUTO (original rule) -> 0 .. MAXBOTS. */
-/* Two lines fit under the settings box (rows 10 and 11, about 28 characters each). Normal view: BOTS, then
- * TRAFFIC / TEAMS; with teams on it alternates every 3 s with the two team rosters. Holding R3 shows the
- * controls instead (two pages, 2 s each, when teams are on). */
-static int lobbyTick;
-static void lobbyLines(const char* a, const char* b)
+/* Two lines fit under the settings box (rows 10 and 11, about 28 characters each), nothing alternates:
+ *   BOTS : 3 MEDIUM  TRAFFIC OFF
+ *   YOU: RED TEAM (SELECT: LIST)      <- in your team's colour; "TEAMS OFF (HOLD R3: HELP)" without teams
+ * Holding Select shows the two rosters (red / blue), holding R3 the controls. */
+extern void tmbr_TeamColor(int t);       /* teams.c */
+extern int tmbr_MyTeam(void);
+extern void fontSetColor(int font, int r, int g, int b) __asm__("fontSetColor__Fiiii");
+static void lobbyLine(int row, int color, const char* t)   /* color: -1 = the game's tan, 0 red, 1 blue */
 {
-    fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 10 * 0x100);
-    fontPrint(0, a);
-    fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + 11 * 0x100);
-    fontPrint(0, b);
+    if (color < 0) fontSetColor(0, 0x50, 0x44, 0x2C);
+    else tmbr_TeamColor(color);
+    fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + row * 0x100);
+    fontPrint(0, t);
 }
 void tmbr_LobbyFrame(void)
 {
@@ -727,25 +730,36 @@ void tmbr_LobbyFrame(void)
     tmbr_PedNamesInit();
     host = netIsHost(D_003156C0);
     teams = tmbr_Opt(OPT_TEAMS);
-    tmbr_TeamsLobby(ra, rb);                 /* teams.c: team pick input + rosters */
-    lobbyTick++;
-    /* raw pad, active high: R3 0x4, Up 0x10, Down 0x40, L2 0x100, R2 0x200, L1 0x400, R1 0x800 */
+    tmbr_TeamsLobby(ra, rb);                 /* teams.c: team pick input (R3 + Left/Right, R3 + Select) + rosters */
+    /* raw pad, active high: Select 0x1, R3 0x4, Up 0x10, Down 0x40, L2 0x100, R2 0x200, L1 0x400, R1 0x800 */
     pad = inputGetPadButtons(0) & 0xF55;
     pressed = pad & ~prevPad;
     prevPad = pad;
     if (pad & 0x4) {
-        if (teams && (lobbyTick / 120) & 1)
-            lobbyLines("LEFT/RIGHT : MY TEAM", host ? "SELECT : BOT TEAMS" : "(HOLD R3)");
-        else if (host) lobbyLines("L1/R1 BOTS  L2/R2 SKILL", "UP TRAFFIC  DOWN TEAMS");
-        else lobbyLines("HOST SETS BOTS, TRAFFIC", "AND TEAMS");
-    } else if (teams && (lobbyTick / 180) & 1) {
-        lobbyLines(ra, rb);
+        if (!host) {
+            lobbyLine(10, -1, teams ? "LEFT/RIGHT : PICK TEAM" : "THE HOST SETS BOTS,");
+            lobbyLine(11, -1, teams ? "SELECT : SHOW TEAMS" : "TRAFFIC AND TEAMS");
+        } else {
+            lobbyLine(10, -1, teams ? "L1/R1 BOTS  LEFT/RIGHT TEAM" : "L1/R1 BOTS  L2/R2 SKILL");
+            lobbyLine(11, -1, teams ? "UP TRAF DOWN TEAMS SEL BOTS" : "UP TRAFFIC  DOWN TEAMS");
+        }
+    } else if (teams && (pad & 0x1)) {
+        lobbyLine(10, 0, ra);
+        lobbyLine(11, 1, rb);
     } else {
-        if (tmbr_botCount < 0) sprintf(buf, "BOTS : AUTO");
-        else sprintf(buf, "BOTS : %d  %s", tmbr_botCount, tmbr_botDiff == 0 ? "EASY" : tmbr_botDiff == 1 ? "MEDIUM" : "HARD");
-        sprintf(buf2, "TRAFFIC %s  TEAMS %s", tmbr_Opt(OPT_TRAFFIC) ? "ON" : "OFF", teams ? "ON" : "OFF");
-        lobbyLines(buf, buf2);
+        if (tmbr_botCount < 0) sprintf(buf, "BOTS : AUTO  TRAFFIC %s", tmbr_Opt(OPT_TRAFFIC) ? "ON" : "OFF");
+        else sprintf(buf, "BOTS : %d %s  TRAFFIC %s", tmbr_botCount, tmbr_botDiff == 0 ? "EASY" : tmbr_botDiff == 1 ? "MED" : "HARD",
+            tmbr_Opt(OPT_TRAFFIC) ? "ON" : "OFF");
+        lobbyLine(10, -1, buf);
+        if (!teams) lobbyLine(11, -1, "TEAMS OFF  (HOLD R3: HELP)");
+        else {
+            extern int tmbr_botTeamMode;
+            if (tmbr_botTeamMode) sprintf(buf2, "HUMANS VS BOTS (SELECT)");
+            else sprintf(buf2, "YOU: %s TEAM (SELECT)", tmbr_MyTeam() ? "BLUE" : "RED");
+            lobbyLine(11, tmbr_MyTeam(), buf2);
+        }
     }
+    fontSetColor(0, 0x50, 0x44, 0x2C);
     if (!host) return;
     if ((pad & 0x4) && (pressed & 0x50)) {
         optSync(((pressed & 0x10) ? OPT_TRAFFIC : 0) | ((pressed & 0x40) ? OPT_TEAMS : 0));
