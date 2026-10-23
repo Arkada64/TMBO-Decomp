@@ -481,7 +481,52 @@ static void aggressiveTurn(char* g, char* v, char* t)
     } else if (hbTimer[idx] > 0) hbTimer[idx] = -HB_REST;
 }
 
+/* Wall unstick (all bot modes, after every other steering): every 30 frames compare the bot's position with
+ * the last sample; two samples in a row with < 3 units of travel while it wants to drive = pinned (against a wall,
+ * on a ledge: the game's own stuck counter (0x444) misses a car that keeps sliding along a wall). Then reverse
+ * with the wheel turned for 0.75 s and drive out with it turned the other way for 0.4 s; the side alternates
+ * each time. The nav planner gets a fresh path afterwards (it replans when its timer runs out / target moves). */
+#define UNSTICK_REV 45
+#define UNSTICK_FWD 25
+static float stkPos[8][4];
+static int stkTick[8], stkCount[8], unstT[8], unstSide[8];
+static void unstick(char* g, char* v)
+{
+    int i = (int)(v - g) / 0x31B0 & 7;
+    unsigned char* pad = PAD(v);
+    float* p;
+    if (!F(v, 0x2028)) return;
+    p = (float*)POS(v);
+    if (unstT[i] > 0) {
+        unstT[i]--;
+        pad[2] = 0; pad[7] = 0; pad[8] = 0;
+        if (unstT[i] >= UNSTICK_FWD) { pad[4] = 0; pad[6] = 1; }
+        else { pad[4] = 1; pad[6] = 0; }
+        pad[9] = 0; pad[0xA] = 0;
+        if ((unstT[i] >= UNSTICK_FWD) == (unstSide[i] != 0)) pad[9] = 1; else pad[0xA] = 1;
+        return;
+    }
+    if (++stkTick[i] < 30) return;
+    stkTick[i] = 0;
+    if ((pad[4] || pad[6]) && fbits(manhat(p, stkPos[i])) < 0x40400000) {        /* < 3.0 */
+        if (++stkCount[i] >= 2) {
+            stkCount[i] = 0;
+            unstT[i] = UNSTICK_REV + UNSTICK_FWD;
+            unstSide[i] ^= 1;
+        }
+    } else stkCount[i] = 0;
+    stkPos[i][0] = p[0]; stkPos[i][1] = p[1]; stkPos[i][2] = p[2];
+}
+
+static int aiUpdate(char* v);
 int tmbr_AiUpdate(char* v)
+{
+    int r = aiUpdate(v);
+    if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030) unstick(D_004FA030, v);
+    return r;
+}
+
+static int aiUpdate(char* v)
 {
     char* g = D_004FA030;
     char* drv = (char*)F(v, 0x2018);
