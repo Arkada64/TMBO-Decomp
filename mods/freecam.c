@@ -56,7 +56,7 @@ extern void tmbr_PerfAdd(int slot, unsigned int start);
 extern void tmbr_PerfFrame(void);
 extern int scePrintf(const char* fmt, ...);
 
-#define TMBR_RFDBG 0   /* rear-fire debug log */
+#define TMBR_RFDBG 1   /* rear-fire debug log */
 #ifndef TMBR_TRAFFIC_ON
 #define TMBR_TRAFFIC_ON 0   /* traffic (traffic.c) per-frame update; the TRAFFIC_DIAG build sets 1 */
 #endif
@@ -83,7 +83,7 @@ void tmbr_CameraUpdate(char *cam)
                 char* v = g + k * 0x31B0;
                 char* c = *(char**)(v + 0x2010);
                 if (*(int*)(v + 0x590) != 1 || !c) continue;
-                if (*(int*)c == 3) { rfFrames = 20; rfHold[k] = *(int*)(v + 0x21B4) == 1 ? 60 : 0; rfShot[k] = *(int*)(v + 0x2244); }  /* only when the game accepted it (weapon ready) */
+                if (*(int*)c == 3) { rfFrames = 90; rfHold[k] = *(int*)(v + 0x21B4) == 1 ? 60 : 0; rfShot[k] = *(int*)(v + 0x2244); }  /* only when the game accepted it (weapon ready) */
                 /* Rear fire: state 3 sets the launcher's rear flag (v+0x21B4), which the launcher clears on its own
                  * 21-frame tick, so the fire press has 0..1/3 s to arrive: fine right after the d-pad combo, too
                  * short after L1+Down (let go of L1, then fire). Keep the flag up for 1 s or until a shot. */
@@ -93,11 +93,11 @@ void tmbr_CameraUpdate(char *cam)
                 }
                 if (TMBR_RFDBG && rfFrames > 0) {
                     rfFrames--;
-                    scePrintf("TMBR rf: st %d w %d t2244 %d need %d flag21B4 %d 225C %d A8 %d CC %d 214 %d 27C %d 258 %d pad %d%d%d%d\n",
+                    scePrintf("TMBR rf: st %d w %d t2244 %d need %d flag21B4 %d 225C %d A8 %d CC %d 214 %d 27C %d 258 %d pad %d%d%d%d raw %x hold %d\n",
                         *(int*)c, *(int*)(v + 0x21B0), *(int*)(v + 0x2244), *(int*)(v + 0x21B8 + 4 * *(int*)(v + 0x21B0)),
                         *(int*)(v + 0x21B4), *(int*)(v + 0x225C), *(int*)(v + 0x21B0 + 0xA8), *(int*)(v + 0x21B0 + 0xCC),
                         *(int*)(v + 0x21B0 + 0x214), *(int*)(v + 0x21B0 + 0x27C), *(int*)(v + 0x21B0 + 0x258),
-                        v[0x594 + 0xD], v[0x594 + 0xE], v[0x594 + 0xF], v[0x5A1]);
+                        v[0x594 + 0xD], v[0x594 + 0xE], v[0x594 + 0xF], v[0x5A1], inputGetPadButtons(0), rfHold[k]);
                 }
             }
     }
