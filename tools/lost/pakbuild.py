@@ -135,6 +135,16 @@ def main(rkdir, bddpath, outdir, scale=1.0):
                                          -8.05 + (y + 8.3) * 0.5, -0.24 + (z - 0.13) * 0.5)
         print('brake light meshes kept and moved:', len(brake))
         wheels |= brake
+        # Roadkill's weapon hardware stays (the weapon mounts are still Roadkill's): the roof gun turret and
+        # its barrels (character 0, not the driver), the rear launcher / missile parts and the rocket rack.
+        # His body panels, doors, hood, trunk lid, gas cap and driver stay hidden.
+        KEEP = [(0x13a0, 0x2760), (0x39b80, 0x3d630), (0x41070, 0x4c180)]
+        if os.environ.get('PAK_ACAR'):
+            KEEP = [(0x10, 0x800), (0x29090, 0x2cb80), (0x305c0, 0x3b6d0)]   # RKA: same parts, its offsets
+        if os.environ.get('PAK_NOARMS') != '1':
+            kept = {o for a, b in KEEP for o in range(a, b, 16) if (u32(car.n, o) & 0x3f) == 0}
+            wheels |= kept
+            print('Roadkill weapon parts kept:', len(kept))
         deadset = {a for a, b in dead}
         nopk = car.append(struct.pack('<4I', 0x60000001, 0, 0, 0) + struct.pack('<4I', 0x01000404, 0, 0, 0))
         nb = 0
