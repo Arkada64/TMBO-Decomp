@@ -13,7 +13,9 @@ from hotex import clut_unswizzle, textures
 from bdd import bdd
 
 SHEETS = [1, 2, 6, 3]          # body art 1/2, mechanical 6/3
-DETAIL = float(os.environ.get('GT_DETAIL', '0.2'))
+DETAIL = float(os.environ.get('GT_DETAIL', '0'))
+# the clown head's two face slots (sheet 2 texels; front-facing triangles of head mesh 0x4bc10): Gold Tooth's red eyes
+EYES = {2: [(33, 131, 56, 149), (81, 131, 104, 149)]}
 
 
 def env_uv(nx, ny, nz):
@@ -112,10 +114,21 @@ def main(stpdir, bddpath, outdir):
         new[cov] = T['acc'][cov] / T['cnt'][cov][:, None]
         mean = new[cov].mean(0) if cov.any() else np.array([200, 160, 70.])
         new[~cov] = mean
+        # smooth the bake inside the covered area (normalized blur): fewer blotches where faces meet
+        def blur(a, r=1.5):                                # separable gaussian, wraps (textures tile)
+            k = np.exp(-0.5 * (np.arange(-4, 5) / r) ** 2); k /= k.sum()
+            out = sum(w * np.roll(a, d, 0) for d, w in zip(range(-4, 5), k))
+            return sum(w * np.roll(out, d, 1) for d, w in zip(range(-4, 5), k))
+        wsum = blur(cov.astype(float))
+        new = np.stack([blur(new[..., c] * cov) for c in range(3)], -1) / np.maximum(wsum, 1e-3)[..., None]
+        new[~cov] = mean
         # faint fine detail from the original (seams, grilles): high-pass of its brightness
         L = T['img'][:, :, :3].astype(float) @ [0.3, 0.55, 0.15]
         Lb = np.asarray(Image.fromarray(L.astype(np.uint8)).filter(ImageFilter.GaussianBlur(2)), float)
         new = new * (1 + DETAIL * np.clip((L - Lb) / 64.0, -1, 0.5))[..., None]
+        for x0, y0, x1, y1 in EYES.get(tid, []):
+            Lr = L[y0:y1, x0:x1][..., None] / 255.0
+            new[y0:y1, x0:x1] = np.array([255, 40, 12]) * (1.0 - 0.55 * Lr) + np.array([0, 0, 0]) * Lr
         new = new.clip(0, 255).astype(np.uint8)
         cut = T['img'][:, :, 3] == 0
         ncol = T['ne'] - 1

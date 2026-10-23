@@ -61,7 +61,7 @@ extern int scePrintf(const char* fmt, ...);
 
 #define TMBR_RFDBG 1   /* rear-fire debug log */
 #ifndef TMBR_TRAFFIC_ON
-#define TMBR_TRAFFIC_ON 0   /* traffic (traffic.c) per-frame update; the TRAFFIC_DIAG build sets 1 */
+#define TMBR_TRAFFIC_ON 1   /* traffic (traffic.c) per-frame update (on since the 2026-10-23 test round) */
 #endif
 void tmbr_CameraUpdate(char *cam)
 {
