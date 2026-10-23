@@ -2,9 +2,8 @@
  *   Gold Tooth: Sweet Tooth skin, files \PCAR\ZZP.* / \ACAR\ZZA.*; on car select, while Sweet Tooth is highlighted
  *               a line shows it and L1 + SQUARE toggles.
  *   12 Pak:     his own (16th) spot on car select, after Minion. In game he is a Roadkill (type 1: Roadkill's stats,
- *               sounds, HUD; files \PCAR\ZYP.* / \ACAR\ZYA.*) with his own special: Roadkill's charge-and-release
- *               special (FireSpecial: up to 6 shots by charge time) fires homing missiles (weapon 3) instead of saw
- *               blades (0x11) - Lost's 12 Pak charges a reticle and releases a missile volley.
+ *               sounds, HUD; files \PCAR\ZYP.* / \ACAR\ZYA.*) with his own special: the reticle weapon (see
+ *               tmbr_FireSpecial).
  * Car select (func_001CB4C8, every frame; hooked at its playShellCarsEngineSound call, which gets the highlighted
  * car's value = type << 5; position D_004FA7D8, list of values shell+0x1A2F0, 15 entries 0..14): the wrap
  * constants are 15 instead of 14, entry 15 is Roadkill's value, the preview model switch shows Roadkill there.
@@ -173,11 +172,64 @@ static int isPak(char* v)
     return 0;
 }
 
-/* Roadkill's special, one shot (FireSpecial's loop, func_001ED8D0(weapons, 0x11 saw blade, v, target, ..)) */
-void tmbr_RkSpecialShot(void* w, int type, char* v, void* t, void* tp)
+/* 12 Pak's special = the game's reticle weapon (weapon 0xB; FireCurrentWeapon's reticle pickup case): first press
+ * arms it, the longer it stays armed the more missiles (1..10 over 4 s, like the pickup's 0x224*10/0x228), second
+ * press (or 5 s) releases them at the lock-on target. Hooked at FireCurrentWeapon's FireSpecial call; everyone
+ * else's special is untouched. Ammo: one special (func_001F1AE0 slot 1, as Roadkill's special uses). */
+extern void fireSpecial(void* l, char* v) __asm__("FireSpecial__8LauncherP7Vehicle");
+extern int getLockOn(void* l, char* v, void* t, void* tp, float r) __asm__("func_0015A650");
+extern void weaponUsed(void* w, char* v, int slot) __asm__("func_001F1AE0");
+extern int timerGetFieldCount(void) __asm__("timerGetFieldCount__Fv");
+extern void hudAddMessage(void* hud, int id, int a, int b) __asm__("AddMessage__3Hudiii");
+static float PK[2] = { 17.5f, 0.0f };     /* lock-on range used by the reticle pickup (D_004F9BC4) */
+static int pakArm[8], pakT0[8];
+static void* pakL[8];
+
+static int vidx(char* v)
 {
-    if (type == 0x11 && isPak(v)) type = 3;      /* homing missile */
-    createWeapon(w, type, v, t, tp);
+    int i = (int)(v - D_004FA030) / 0x31B0;
+    return (i >= 0 && i < 8 && D_004FA030 + i * 0x31B0 == v) ? i : -1;
+}
+
+static void pakHud(char* v, int id)
+{
+    if (*(int*)(v + 0x20B4) == 1)
+        hudAddMessage(D_004FA030 + 0x97B50 + *(int*)(v + 0x210C) * 0xA20, id, 1, 1);
+}
+
+static void pakRelease(int i)
+{
+    char* v = D_004FA030 + i * 0x31B0;
+    void *t = 0, *tp = 0;
+    int k, n = (timerGetFieldCount() - pakT0[i]) * 10 / 240;
+    if (n < 1) n = 1;
+    if (n > 10) n = 10;
+    pakArm[i] = 0;
+    getLockOn(pakL[i], v, &t, &tp, PK[0]);
+    for (k = 0; k < n; k++) createWeapon(D_004FA030 + 0x6C310, 0xB, v, t, tp);
+    weaponUsed(D_004FA030 + 0x6C310, v, 1);
+    scePrintf("TMBR 12pak: special released, %d missiles\n", n);
+}
+
+void tmbr_FireSpecial(void* l, char* v)
+{
+    int i = vidx(v);
+    if (i < 0 || !isPak(v)) { fireSpecial(l, v); return; }
+    if (!pakArm[i]) {
+        pakArm[i] = 1; pakT0[i] = timerGetFieldCount(); pakL[i] = l;
+        pakHud(v, 0x80);
+        return;
+    }
+    pakRelease(i);
+}
+
+/* every game frame (freecam.c's camera hook): armed reticles release by themselves after 5 s */
+void tmbr_SkinsFrame(void)
+{
+    int i;
+    if (!D_004FA030) return;
+    for (i = 0; i < 8; i++)
+        if (pakArm[i] && timerGetFieldCount() - pakT0[i] > 300) pakRelease(i);
 }
 
 /* waiting room (from tmbr_LobbyFrame): repeat the choice every 5 s for players who joined later */

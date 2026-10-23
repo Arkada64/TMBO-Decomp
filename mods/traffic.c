@@ -61,6 +61,8 @@ extern void phys7(char* v) __asm__("func_0011E0E8");
 static int doneSerial = -1;
 static char* cars;       /* traffic vehicle array */
 static int ncars;
+static int deadT[MAXCARS];   /* frames since destroyed (0 = alive) */
+static void respawn(char* v);
 
 static void addFodder(char* v, void* cs, int name, int nameIndex)
 {
@@ -93,6 +95,7 @@ static void setup(void)
     char *drv, *hwdrv;
     static int gHead[64], gName[64], gFirst[64], gLast[64], order[64];
     ncars = 0;
+    for (i = 0; i < MAXCARS; i++) deadT[i] = 0;
     if (!D_004FAE38) return;
     for (i = 0; i < tmbr_numFodderLevels; i++)
         if (tmbr_fodderLevels[i].level == tmbr_levelIndex) {
@@ -223,7 +226,8 @@ extern char D_003156C0[];
 extern int netIsHost(void* net) __asm__("func_001734B8");
 extern void netChatSend(void* net, const char* text) __asm__("func_00171C08");
 #define SYNC_EVERY 3       /* frames between messages */
-#define SYNC_CARS 3        /* cars per message: 3 x 16 bytes = 55 chars */
+#define SYNC_CARS 3        /* cars per message: 3 x 17 bytes = 59 chars */
+#define SYNC_ENT 17
 #define SYNC_SNAP 0x3FC00000   /* 1.5 units (manhattan) */
 static int syncNext, syncTick, syncRecv, syncSent;
 static float K1[4] = { 5.0f, 0.2f, 127.0f, 0.0f };   /* pos scale, 1/scale, row scale */
@@ -253,14 +257,14 @@ static int unpack7(const char* in, unsigned char* out, int max)
 
 static void syncSend(void)
 {
-    unsigned char b[SYNC_CARS * 16];
+    unsigned char b[SYNC_CARS * SYNC_ENT];
     char msg[68];
     int c, n = 0, q;
     for (c = 0; c < SYNC_CARS && ncars; c++) {
         char* v = cars + syncNext * VSIZE;
         float* p = (float*)(v + 0x1D0);
         float* m = (float*)(v + 0xD0);
-        unsigned char* e = b + n * 16;
+        unsigned char* e = b + n * SYNC_ENT;
         e[0] = (unsigned char)syncNext;
         for (q = 0; q < 3; q++) {
             int iv = (int)(p[q] * K1[0]);
@@ -269,12 +273,13 @@ static void syncSend(void)
             e[1 + 2 * q] = (unsigned char)(iv & 0xFF); e[2 + 2 * q] = (unsigned char)((iv >> 8) & 0xFF);
         }
         for (q = 0; q < 9; q++) e[7 + q] = (unsigned char)(signed char)(int)(m[(q / 3) * 4 + q % 3] * K1[2]);
+        e[16] = deadT[syncNext] ? 2 : 1;
         n++;
         if (++syncNext >= ncars) syncNext = 0;
     }
     if (!n) return;
     msg[0] = 1; msg[1] = 'T'; msg[2] = 'R';
-    pack7(b, n * 16, msg + 3);
+    pack7(b, n * SYNC_ENT, msg + 3);
     netChatSend(D_003156C0, msg);
     syncSent++;
 }
@@ -282,15 +287,18 @@ static void syncSend(void)
 /* from skins.c's chat hook */
 void tmbr_TrafficSyncRecv(int client, const char* data)
 {
-    unsigned char b[SYNC_CARS * 16 + 4];
-    int n = unpack7(data, b, sizeof(b)) / 16, c, q;
+    unsigned char b[SYNC_CARS * SYNC_ENT + 4];
+    int n = unpack7(data, b, sizeof(b)) / SYNC_ENT, c, q;
     if (netIsHost(D_003156C0)) return;
     for (c = 0; c < n; c++) {
-        unsigned char* e = b + c * 16;
+        unsigned char* e = b + c * SYNC_ENT;
         char* v;
         float* p, *m, d = 0, t[3];
         if (e[0] >= ncars) continue;
         v = cars + e[0] * VSIZE;
+        if (e[16] == 2 && !deadT[e[0]]) { *(float*)(v + 0x404) = 0; deadT[e[0]] = 1; }   /* host: destroyed */
+        if (e[16] == 1 && deadT[e[0]] >= 120) { respawn(v); deadT[e[0]] = 0; }           /* host: back */
+        if (deadT[e[0]]) continue;
         p = (float*)(v + 0x1D0);
         m = (float*)(v + 0xD0);
         for (q = 0; q < 3; q++) {
@@ -306,16 +314,63 @@ void tmbr_TrafficSyncRecv(int client, const char* data)
     syncRecv++;
 }
 
-/* weapon hit on a traffic car (DispatchHit -> fodderTakeHit): logged for the destruction work */
+/* weapon hit on a traffic car (DispatchHit -> fodderTakeHit -> func_001E1C40). func_001E1C40 only takes health
+ * off a vehicle owned by this console (+0x20B4 1 = player, 4 = bot); traffic has 0, so hits did nothing. The car
+ * counts as a bot for the call; its damage report to the network (func_001740B0) is skipped for traffic. */
 extern void fodderTakeHit(char* v, void* pos, int a, int b) __asm__("fodderTakeHit__7VehicleP8_fvectorii");
 void tmbr_FodderTakeHit(char* v, void* pos, int a, int b)
 {
     float h0 = *(float*)(v + 0x404);
+    int own = F(v, 0x20B4);
+    F(v, 0x20B4) = 4;
     fodderTakeHit(v, pos, a, b);
+    F(v, 0x20B4) = own;
     if (TRAFFIC_DBG)
-        scePrintf("TMBR traffic hit: car %d dmg %d/%d health %d -> %d kind %d\n", ncars ? (int)(v - cars) / VSIZE : -1, a, b,
-            (int)h0, (int)*(float*)(v + 0x404), F(v, 0x590));
+        scePrintf("TMBR traffic hit: car %d dmg %d/%d health %d -> %d\n", ncars ? (int)(v - cars) / VSIZE : -1, a, b,
+            (int)h0, (int)*(float*)(v + 0x404));
 }
+
+extern void netVehicleDamage(void* net, char* victim, char* attacker, float dmg) __asm__("func_001740B0");
+void tmbr_NetVehicleDamage(void* net, char* victim, char* attacker, float dmg)
+{
+    char* g = D_004FA030;
+    if (victim < g || victim >= g + 8 * VSIZE) return;
+    netVehicleDamage(net, victim, attacker, dmg);
+}
+
+/* destroyed cars: the game blows them up but nothing removed them (retail's gameCheckNumFodder only walks the
+ * 8 slots). 2 s after health reaches 0 the car is hidden and leaves the update / collisions; 30 s later it comes
+ * back repaired on a new street point. */
+extern void hierSetSwitchT(void* sw, int i) __asm__("hierSetSwitch__FP11_hierswitchi");
+static void respawn(char* v)
+{
+    int q;
+    static const int sws[4] = { 0x2044, 0x2048, 0x2050, 0x2054 };
+    *(float*)(v + 0x404) = *(float*)(v + 0x400);
+    for (q = 0; q < 4; q++) if (F(v, sws[q])) hierSetSwitchT((void*)F(v, sws[q]), 0);
+    F(v, 0x590) = 3;
+    if (F(v, 0x2020)) fodderInit(v, D_004FA030);
+    if (F(v, 0x202C)) hierSetCsDrawMe((void*)F(v, 0x202C), 1);
+    hierSetCsDrawMe((void*)F(v, 0x2028), 1);
+}
+static void destructionStep(int j)
+{
+    char* v = cars + j * VSIZE;
+    if (deadT[j] == 0) {
+        if (F(v, 0x590) && *(float*)(v + 0x404) <= 0.0f) deadT[j] = 1;
+        return;
+    }
+    deadT[j]++;
+    if (deadT[j] == 120) {                    /* 2 s: gone */
+        F(v, 0x590) = 0;
+        hierSetCsDrawMe((void*)F(v, 0x2028), 0);
+        if (F(v, 0x202C)) hierSetCsDrawMe((void*)F(v, 0x202C), 0);
+        if (TRAFFIC_DBG) scePrintf("TMBR traffic: car %d destroyed\n", j);
+    }
+    if (deadT[j] >= 120 + 1800 && !netIsHost(D_003156C0)) deadT[j] = 120 + 1800 - 1;   /* clients wait for the host */
+    if (deadT[j] >= 120 + 1800) { respawn(v); deadT[j] = 0; if (TRAFFIC_DBG) scePrintf("TMBR traffic: car %d back\n", j); }
+}
+
 static int fb(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 
 /* Car-to-car collisions with traffic. collisCsToCsCollision (collis.s, 0x121B9C) asks IsInteractiveAVehicle
@@ -363,6 +418,7 @@ void tmbr_TrafficUpdate(void)
         setup();
     }
     if (ncars && netIsHost(D_003156C0) && ++syncTick >= SYNC_EVERY) { syncTick = 0; syncSend(); }
+    for (j = 0; j < ncars; j++) destructionStep(j);
     for (j = 0; j < ncars; j++) {
         char* v = cars + j * VSIZE;
         if (!F(v, 0x590)) continue;

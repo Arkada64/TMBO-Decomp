@@ -52,6 +52,7 @@ static float stick(int axis)
 }
 
 extern void tmbr_TrafficUpdate(void);
+extern void tmbr_SkinsFrame(void);
 extern void tmbr_BotsThink(void);
 extern unsigned int tmbr_Cycles(void);              /* perf.c */
 extern void tmbr_PerfAdd(int slot, unsigned int start);
@@ -70,6 +71,7 @@ void tmbr_CameraUpdate(char *cam)
     char *cs;
 
 #if TMBR_TRAFFIC_ON
+    tmbr_SkinsFrame();   /* skins.c: 12 Pak's armed special */
     { unsigned int t0 = tmbr_Cycles(); tmbr_TrafficUpdate(); tmbr_PerfAdd(3, t0); } /* traffic.c: per-frame traffic cars (after the game's vehicle loops); off in stable */
 #endif
 #ifndef TMBR_PNACH
