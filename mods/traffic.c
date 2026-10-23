@@ -334,10 +334,12 @@ extern void netVehicleDamage(void* net, char* victim, char* attacker, float dmg)
 /* damage reports (Twisted Metal: Head-On): "N Pts Damage" each time the local player hurts another car
  * (players, bots, traffic). Hits on the same victim within 1 s add up into one report, so machine-gun streams
  * read as a running total. Drawn with the game font (yellow, like the reticle countdown) a bit below the kill
- * feed for 1.5 s, so kill messages never hide it. */
-extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
-extern void fontPrint(int font, const char* s) __asm__("func_00203150");
+ * feed (same sprite font, centred) for 1.5 s, so kill messages never hide it. */
+extern void fontSpritePrintCenteredXY(int font, int x, int y, const char* s) __asm__("fontSpritePrintCenteredXY__FiiiPc");
+extern void fontSpriteEnd(int font) __asm__("func_00202C58");
 extern void fontSetColor(int font, int r, int g, int b) __asm__("fontSetColor__Fiiii");
+extern void* viewGetCurView(void) __asm__("viewGetCurView__Fv");
+extern void viewGetSize(void* view, int* w, int* h) __asm__("func_00243AA8");
 extern int sprintf(char* s, const char* f, ...);
 static char* dmgVictim;
 static float dmgSum;
@@ -348,9 +350,13 @@ void tmbr_DamageReportTick(void)
 {
     dmgClock++;
     if (!dmgLen || dmgClock - dmgTime > 90) return;
-    fontSetColor(0, 0xBA, 0xB4, 0x02);
-    fontSetCursorAtSubPixel(0, (320 - dmgLen * 9) * 16, 0x700);   /* centred, under the kill feed */
-    fontPrint(0, dmgText);
+    {   /* same font and centring as the kill feed (hud.s 0x14EC90: y 7), one line under it */
+        int wh[2];
+        viewGetSize(viewGetCurView(), &wh[0], &wh[1]);
+        fontSetColor(0, 0x7C, 0x78, 0x02);
+        fontSpritePrintCenteredXY(0, wh[0] / 2, 27, dmgText);
+        fontSpriteEnd(0);
+    }
 }
 static void damageReport(char* victim, char* attacker, float dmg)
 {

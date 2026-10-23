@@ -190,6 +190,8 @@ static int thinkTick;
 #define R_ROAMER 2
 #define R_CRUISER 3    /* drives the map (game cruise mode 4) and fights whatever it runs into */
 #define CRUISE_SEE 350
+/* sight range per role (manhattan units): beyond it a bot cruises instead of crossing the map to a fight */
+#define HUNT_SEE(rl) ((rl) == R_CRUISER ? CRUISE_SEE : (rl) == R_SNIPER ? 1000 : (rl) == R_ROAMER ? 1200 : 900)
 #define ROLE(v) (role[((int)((char*)(v) - D_004FA030) / 0x31B0) & 7])
 static int hunted[8], crowd[8];
 /* health in percent (vehicle+0x404 health, +0x3F0 max; floats, converted without float literals) */
@@ -206,8 +208,8 @@ static signed char role[8];          /* by vehicle index */
 static short roleT[8], rushT[8];
 static short fightT[8], leaveT[8];  /* think ticks (0.5 s) in a fight / left of a breakaway */
 
-/* Roles change during the match: every 15..40 s a bot rolls a new one (brawler 45 %, sniper 30 %, roamer
- * 25 %, re-rolled once if every other bot already has it), and a sniper that keeps getting caught up close
+/* Roles change during the match: every 15..40 s a bot rolls a new one (brawler 30 %, sniper 15 %, roamer
+ * 20 %, cruiser 35 %, re-rolled once if every other bot already has it), and a sniper that keeps getting caught up close
  * (target < 150 for 3 s) turns brawler on the spot. */
 /* Cruise to an empty part of the map: gamePickCruiseZone picks the nearest candidate zone, or the farthest when
  * the driver is in flee mode (3); so pick with the mode set to 3 for that one call, then cruise (4). */
@@ -221,7 +223,7 @@ static void cruiseFar(char* g, char* b, char* drv)
 
 static void rollRole(char* g, int k)
 {
-    int r = mathfRandI(0, 99), n = r < 35 ? R_BRAWLER : r < 55 ? R_SNIPER : r < 75 ? R_ROAMER : R_CRUISER, i, same = 0, bots = 0;
+    int r = mathfRandI(0, 99), n = r < 30 ? R_BRAWLER : r < 45 ? R_SNIPER : r < 65 ? R_ROAMER : R_CRUISER, i, same = 0, bots = 0;
     for (i = 0; i < NAI(g); i++) {
         char* b = LIST(g)[i];
         int j;
@@ -324,11 +326,16 @@ void tmbr_BotsThink(void)
         }
         if (!best) continue;
         if (curS >= 0 && curS * 2 < bestS * 3) best = cur;  /* keep fighting unless clearly better */
-        if (rl == R_CRUISER) {
-            /* cruise the map until someone is close, then fight it (hunt) until it gets away */
-            int bd = (int)manhat(POS(b), POS(best));
-            if (bd > CRUISE_SEE * 2 || (F(drv, 4) == 4 && bd > CRUISE_SEE)) {
-                if (F(drv, 4) != 4) cruiseFar(g, b, drv);
+        {
+            /* Every role only hunts what is within its sight range; past that it cruises the map instead of
+             * driving to wherever everyone else is (on big maps the whole match ended up in one spot).
+             * Once hunting, it follows the target out to 1.5x the range before letting it go. */
+            int bd = (int)manhat(POS(b), POS(best)), see = HUNT_SEE(rl);
+            if (bd > (rl == R_CRUISER ? see * 2 : see * 3 / 2) || (F(drv, 4) == 4 && bd > see)) {
+                if (F(drv, 4) != 4) {
+                    if (mathfRandI(0, 1)) cruiseFar(g, b, drv);
+                    else driverSetMode(drv, 4);
+                }
                 continue;
             }
         }
