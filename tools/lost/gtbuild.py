@@ -99,7 +99,10 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
     def node_for(h):
         if h in built:
             return built[h]
-        o, m = hdr2pk[h]
+        built[h] = build(hdr2pk[h][1])
+        return built[h]
+
+    def build(m):
         ctx = [tb.gs_ctx(k) for k in m['texrefs']]
         if m.get('hflags', 0) & 0x0E and os.environ.get('GT_ENV', '0') == '1' and len(ctx) == 1:
             ctx = ctx * 2      # env-mapped: TMB's env path reads a second texture slot (the reflection map)
@@ -107,8 +110,7 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
         m = dict(m, bake=BAKE and m['texrefs'] == [0x73ff0],
                  twosided=TWOSIDED and not (m.get('hflags', 0) & 0x800000))   # bit 23 clear = no culling in Head-On
         blob, slots, pairs, sph = hierobject(m, scale, ctx)
-        built[h] = (car.append(blob, slots, pairs), sph)
-        return built[h]
+        return car.append(blob, slots, pairs), sph
 
     def meshes(root, state):
         out = []
@@ -131,6 +133,10 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
                 dead.append(mesh_extent(car.n, t))
         hs = meshes(GT_HI, gt_states[st]) + GT_EXTRA
         kids = [node_for(h)[0] for h in hs]
+        from winpatch import patch
+        pm = patch([hdr2pk[h][1] for h in hs if h not in GT_EXTRA])   # close the open rear side window
+        if pm and not os.environ.get('GT_NOWINDOW'):
+            kids.append(build(pm)[0])
         sph = struct.unpack_from('<3ff', car.n, g + 0x10)
         newg = car.group(kids, sphere=sph)
         struct.pack_into('<HH', car.n, g + 8, 1, u32(car.n, g + 8) >> 16)
@@ -183,7 +189,7 @@ def main(stpdir, bddpath, outdir, scale=1.15, gt_states=(0, 0, 0)):
             continue
         import bisect
         ch = CHARS[bisect.bisect_left(CHARS, nd)] if nd < CHARS[-1] else None
-        if ch in ARM_CHARS and 2 in ts and not os.environ.get('GT_NOARMS'):
+        if ch in ARM_CHARS and (2 in ts or os.environ.get('GT_PANELS')) and not os.environ.get('GT_NOARMS'):
             continue
         cx, cy = struct.unpack_from('<2f', car.n, nd + 0x10)
         if os.environ.get('GT_KEEPGUNS') and abs(cx) >= 4.0 and cy >= 4.5:   # Sweet Tooth's fender guns (stick out of Gold Tooth)
