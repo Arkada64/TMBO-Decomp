@@ -44,7 +44,10 @@ extern unsigned char D_004FB748; /* PedPimp: number of peds in the pool */
 #define PACK_SLOT 9
 #define MAGIC 0x50424D54
 #define LEVEL_TEX 0x1C05670
-#define RTX_SCRATCH (LEVEL_TEX + 0x200000)  /* level RTX files are < 1 MB, the slot is 0x288D80 */
+/* blob 0 is read during the level's RTX stage, before its home may be free. LEVEL_TEX + 0x200000 was inside
+ * FREEWAY's loading-screen data (corrupt load screen until the map was in). The RAM gap after the car NGP slots
+ * is free during loading (blobs that live there are read later, at the db stage). */
+#define RTX_SCRATCH 0x1B93480
 typedef struct { char name[16]; u32 addr, size; } Blob;
 typedef struct {
     u32 magic, version, nblobs, hdr, pairs, npairs, tex, rtx, clutBlocks, ntex;
@@ -118,8 +121,8 @@ void tmbr_LevelRtxInit(int vram, char* rtx, int slot, char* shell)
     if (D_004FAE38 && slot == 0)
         for (i = 0; i < (int)(sizeof(PACKS) / sizeof(PACKS[0])); i++)
             if (PACKS[i].level == level) pack = i;
-    /* blob 0 goes to a scratch spot in the level TEX/RTX slot (free until the TEX is inflated over it), not to
-     * its home: FREEWAY's is the TEX slot tail, which still holds loading-screen data at this point */
+    /* blob 0 goes to a scratch spot (RTX_SCRATCH), not to its home: FREEWAY's is the TEX slot tail, which still
+     * holds loading-screen data at this point */
     if (pack >= 0 && (m = readBlob0(pack, RTX_SCRATCH)) != 0) {
         /* where the game will put the next CLUT: after the record with the highest address (as func_0023EC80
          * computes D_006F268C), then the terminator (size 0), which our records replace */
