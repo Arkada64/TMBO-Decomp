@@ -229,7 +229,8 @@ extern void driverSetTarget(char* drv, char* target) __asm__("func_00130C00");
 extern int attractGroupAt(void* points, void* pos) __asm__("func_0010B950");
 extern float manhat(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
 static int thinkTick;
-static int lives, lms, dm, alive, leader;   /* this think's mode state (tmbr_BotsThink) */
+static int lives, lms, dm, alive, leader, prey;   /* this think's mode state (tmbr_BotsThink) */
+#define PREY_CHASERS 2   /* Man Hunt: bots that commit to the prey at once (the rest fight as usual) */
 static int lastLife(char* v)
 {
     int slot = F(v, 0x2104);
@@ -385,6 +386,14 @@ void tmbr_BotsThink(void)
             if (kk > topK) { second = topK; topK = kk; top = k; } else if (kk > second) second = kk;
         }
         leader = dm && top >= 0 && topK >= second + 2 ? top : -1;     /* a clear kill leader (2+ ahead) */
+        /* Man Hunt (type 4): the prey is the car whose player slot (+0x20C0) is game info byte +0x1A (the
+         * radar's fox colour test, hud func_00149D08 0x14A980). Bots have slot -1: only a human can match. */
+        prey = -1;
+        if (type == 4) {
+            int ps = ((signed char*)GINFO())[0x1A];
+            for (k = 0; ps >= 0 && k < 8; k++)
+                if (live(g + k * 0x31B0) && F(g + k * 0x31B0, 0x20C0) == ps) { prey = k; break; }
+        }
     }
     for (i = 0; i < NAI(g); i++) {
         char *b = LIST(g)[i], *drv, *cur, *best = 0;
@@ -447,6 +456,7 @@ void tmbr_BotsThink(void)
             else sc = d + others * 200 + crowd[k] * 150;                                  /* brawler (avoids pile-ups) */
             sc -= (100 - hpPct(v)) * (rl == R_CRUISER ? 1 : 3);   /* finish off damaged cars (up to -300) */
             if (k == leader) sc -= 250;                                /* deathmatch: someone pulling away */
+            if (k == prey && others < PREY_CHASERS) sc -= 900;         /* Man Hunt: a couple of bots on the prey */
             if (v == cur) curS = sc;
             if (sc < bestS) { bestS = sc; best = v; }
         }
@@ -457,7 +467,8 @@ void tmbr_BotsThink(void)
              * driving to wherever everyone else is (on big maps the whole match ended up in one spot).
              * Once hunting, it follows the target out to 1.5x the range before letting it go. */
             int bd = (int)manhat(POS(b), POS(best)), see = HUNT_SEE(rl);
-            if (!(lms && alive <= 3) && (bd > (rl == R_CRUISER ? see * 2 : see * 3 / 2) || (F(drv, 4) == 4 && bd > see))) {
+            int chase = prey >= 0 && best == g + prey * 0x31B0;   /* the prey's chasers cross the map for it */
+            if (!(lms && alive <= 3) && !chase && (bd > (rl == R_CRUISER ? see * 2 : see * 3 / 2) || (F(drv, 4) == 4 && bd > see))) {
                 if (F(drv, 4) != 4) {
                     if (mathfRandI(0, 1)) cruiseFar(g, b, drv);
                     else driverSetMode(drv, 4);
