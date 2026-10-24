@@ -24,7 +24,7 @@ typedef struct { float x, y, z, w; } __attribute__((aligned(16))) fvec;
 #define PAD(v) ((unsigned char*)(v) + 0x594)
 #define NAV_RAYS 12      /* collision rays per frame for planning (all bots together) */
 #define NAV_EXP 700      /* A* expansions per plan */
-#define NAV_STEP 300     /* baked map: A* expansions per frame (a plan takes 1-9 frames) */
+#define NAV_STEP 120     /* baked map: A* expansions per frame (a plan takes 1-20 frames; 300 cost up to 4 ms) */
 #define NAV_ALWAYS 0
 #define NAVDBG 0         /* one log line per plan (emulog) */
 #define G 40
@@ -50,6 +50,7 @@ typedef struct {
     fvec goal;
     int n, i;        /* waypoints, current */
     int timer, cool, tick, lastD, noProg;
+    int al, alT;     /* aligning to a waypoint behind: 1 handbrake pivot, 2 reverse (3-point turn); frames left */
     char* tgt;
     fvec wp[MAXWP];
 } NavBot;
@@ -316,7 +317,22 @@ static int follow(NavBot* b, char* v)
         if (hdLos(&ra, &rb, res, 0)) b->i++;
     }
     if (b->i >= b->n) { b->st = 0; return 0; }
-    tmbr_NavSteer(v, b->wp[b->i].x - pos->x, b->wp[b->i].y - pos->y, 1);
+    {
+        /* waypoint well behind (past the handbrake angle): instead of looping round at full gas (which runs the
+         * car into walls on narrow routes), stop and line up: a handbrake pivot first, and if the nose is still
+         * off after it, a short reverse with the wheel the other way (3-point turn); then drive on */
+        unsigned char* pad = PAD(v);
+        float e = tmbr_NavSteer(v, b->wp[b->i].x - pos->x, b->wp[b->i].y - pos->y, 1);
+        if (b->alT > 0) {
+            b->alT--;
+            if (b->al == 1) { pad[4] = 1; pad[2] = 1; pad[6] = 0; }
+            else { unsigned char l = pad[9]; pad[4] = 0; pad[6] = 1; pad[2] = 0; pad[9] = pad[0xA]; pad[0xA] = l; }
+            if (e < K[9]) b->alT = 0, b->al = 0;
+        } else if (e > K[6]) {
+            b->al = b->al == 1 ? 2 : 1;
+            b->alT = b->al == 1 ? 30 : 36;
+        } else if (e < K[9]) b->al = 0;
+    }
     return 1;
 }
 

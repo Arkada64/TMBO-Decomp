@@ -381,7 +381,7 @@ void tmbr_BotsThink(void)
         {
             /* Breakaway: like players leaving a brawl, a bot that has been fighting for a while, or is in a
              * pile-up (3+ other cars within 400), may drive off for 8-15 s (game cruise mode, ignores targets)
-             * and come back fresh. Checked every 0.5 s: after 20 s of fighting 10 %, in a pile-up 6 %. */
+             * and come back fresh. Checked every 0.5 s: after 12 s of fighting 15 %, in a pile-up (after 3 s) 25 %. */
             int k2 = (int)(b - g) / 0x31B0 & 7, pile = crowd[k2] >= 3, retreat;
             if (leaveT[k2] > 0) {
                 leaveT[k2]--;
@@ -394,7 +394,7 @@ void tmbr_BotsThink(void)
             if (hpPct(b) >= 90) retreated[k2] = 0;
             retreat = !retreated[k2] && hpPct(b) < 35 && hunted[k2] >= 2 && mathfRandI(0, 99) < 25;
             if (retreat) retreated[k2] = 1;
-            if (retreat || (fightT[k2] > 40 && mathfRandI(0, 99) < 10) || (pile && fightT[k2] > 6 && mathfRandI(0, 99) < 15)) {
+            if (retreat || (fightT[k2] > 24 && mathfRandI(0, 99) < 15) || (pile && fightT[k2] > 6 && mathfRandI(0, 99) < 25)) {
                 leaveT[k2] = 16 + mathfRandI(0, 14);
                 fightT[k2] = 0;
                 cruiseFar(g, b, drv);       /* to the far side of the map: spreads the bots out */
@@ -614,6 +614,7 @@ static void aggressiveTurn(char* g, char* v, char* t)
 #define UNSTICK_FWD 25
 static float stkPos[8][4];
 static int stkTick[8], stkCount[8], unstT[8], unstSide[8], crawl[8];
+static float unstAt[8][4];          /* where each bot last needed an unstick ([3] != 0: set) */
 static void unstick(char* g, char* v)
 {
     int i = (int)(v - g) / 0x31B0 & 7;
@@ -637,6 +638,16 @@ static void unstick(char* g, char* v)
             stkCount[i] = 0;
             unstT[i] = UNSTICK_REV + UNSTICK_FWD;
             unstSide[i] ^= 1;
+            /* stuck again where it got stuck last time (Prison Passage pockets): reversing out is not enough,
+             * the route leads straight back in -> drop the target and head for the far side of the map */
+            if (unstAt[i][3] != 0 && fbits(manhat(p, unstAt[i])) < 0x43160000) {    /* < 150.0 */
+                char* drv = (char*)F(v, 0x2018);
+                if (drv) { leaveT[i] = 16 + mathfRandI(0, 10); cruiseFar(g, v, drv); }
+#if TMBR_NAV
+                tmbr_NavRoamFar(g, v);
+#endif
+            }
+            unstAt[i][0] = p[0]; unstAt[i][1] = p[1]; unstAt[i][2] = p[2]; unstAt[i][3] = p[0] == 0 ? 1 : p[0];
             scePrintf("TMBR unstick: bot %d at %d %d %d, mode %d, level %d\n", i, (int)p[0], (int)p[1], (int)p[2],
                 F(v, 0x2018) ? F(F(v, 0x2018), 4) : -1, tmbr_levelIndex);
         }
@@ -895,7 +906,7 @@ static int wpnPicked[8];           /* frame the current weapon was picked */
 static int heavyW(int w) { return w == 1 || w >= 4; }
 static int cooldown(int w)
 {
-    static const int heavy[3] = { 900, 600, 420 }, light[3] = { 150, 100, 70 };   /* frames: easy, medium, hard */
+    static const int heavy[3] = { 700, 450, 320 }, light[3] = { 90, 60, 40 };   /* frames: easy, medium, hard */
     int d = tmbr_botDiff < 0 ? 0 : tmbr_botDiff > 2 ? 2 : tmbr_botDiff;
     if (w == 1) return heavy[d] * 3 / 2;
     return heavyW(w) ? heavy[d] : light[d];
