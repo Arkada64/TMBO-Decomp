@@ -138,7 +138,7 @@ patch=1,EE,20139218,extended,{J(2, S["tmbr_SpecMark"]):08X}
 
 [Arkada Tweaks/ Damage Reports]
 author=TMB-Reloaded
-description=Twisted Metal: Head-On style "N Pts Damage" under the kill feed each time you hurt another car; hits on the same car within 1 s add up.
+description=Twisted Metal: Head-On style "N Pts Damage" under the kill feed. Confirmed damage only: online it shows the health your target actually lost (from its owner's update), so hits that only landed on your screen show nothing. Hits on the same car within 1 s add up.
 {NOPS}
 //every hit (func_001E1C40, before the owner check) -> tmbr_DmgGate (counts it, then the original check)
 patch=1,EE,201E2498,extended,{J(2, S["tmbr_DmgGate"]):08X}
