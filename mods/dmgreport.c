@@ -82,3 +82,25 @@ void tmbr_DmgSeen(char* victim, char* attacker, float dmg)
     wHp[k] = *(float*)(victim + 0x404);                       /* health before the owner's verdict */
     wEnd[k] = dmgClock + WATCH;
 }
+
+/* Rams on a car another console owns never reach func_001E1C40 here: func_001214C0 (car-to-car collision) sends
+ * the victim's console a game event instead (netSendGameEvent, type 60: ev[0] rammer's player index, ev[4]
+ * victim's, ev[5] damage) and that console applies the hit. Hook on that call (0x121744): send it, then watch
+ * the victim like a weapon hit. (Rams on cars this console owns go through func_001E1C40 and the gate.) */
+extern void netSendGameEvent(void* net, int to, int* ev) __asm__("netSendGameEvent");
+static char* byPlayer(int idx)
+{
+    char* g = D_004FA030;
+    int i;
+    for (i = 0; g && i < 8; i++)
+        if (*(int*)(g + i * VSIZE + 0x20C0) == idx && *(int*)(g + i * VSIZE + 0x590)) return g + i * VSIZE;
+    return 0;
+}
+void tmbr_RamSent(void* net, int to, int* ev)
+{
+    char *r, *v;
+    netSendGameEvent(net, to, ev);
+    if (ev[1] != 60) return;
+    r = byPlayer(ev[0]); v = byPlayer(ev[4]);
+    if (r && v && ev[5] > 0) tmbr_DmgSeen(v, r, (float)ev[5]);
+}

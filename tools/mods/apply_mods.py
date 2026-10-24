@@ -313,6 +313,8 @@ PATCHES = [
     # damage reports (mods/dmgreport.c): every hit by the local player, before the car-owner check
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E2498", "lw", "j          tmbr_DmgGate"),
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E249C", "beql", "nop"),
+    # ... and rams on remote cars (sent to the victim's console as a game event instead of applied here)
+    (A("tmb/collis.s"), "00121744", "jal", "jal        tmbr_RamSent"),
     # 12 Pak's reticle special: the reticle's slot-5 ammo calls
     (A("nonmatchings/tmb/launch/func_001549A0.s"), "00155240", "jal", "jal        tmbr_ReticleUsed"),
     (A("nonmatchings/tmb/launch/func_00156118.s"), "00156268", "jal", "jal        tmbr_ReticleUsed"),

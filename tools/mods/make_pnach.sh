@@ -81,7 +81,7 @@ i = community.find("\nauthor=TMB-Reloaded")
 if i >= 0:
     peds = community[i:].strip(); community = community[:i]
     peds = peds.replace("author=TMB-Reloaded\n", "", 1)
-hooks = {0x17BF00, 0x17BF78, 0x139D38, 0x1395E0, 0x1E2498, 0x1E249C}   # 0x139218: the Spectator/ Alternate View codes (turn them off)
+hooks = {0x17BF00, 0x17BF78, 0x139D38, 0x1395E0, 0x1E2498, 0x1E249C, 0x121744}   # 0x139218: the Spectator/ Alternate View codes (turn them off)
 for m in re.finditer(r"patch=\d,EE,([0-9A-Fa-f]{8}),", community):
     a = int(m.group(1)[1:], 16)
     assert not (cave <= a < end) and not (cave2 <= a < end2) and a not in hooks, f"community patch at {a:08X} overlaps"
@@ -138,11 +138,13 @@ patch=1,EE,20139218,extended,{J(2, S["tmbr_SpecMark"]):08X}
 
 [Arkada Tweaks/ Damage Reports]
 author=TMB-Reloaded
-description=Twisted Metal: Head-On style "N Pts Damage" under the kill feed. Confirmed damage only: online it shows the health your target actually lost (from its owner's update), so hits that only landed on your screen show nothing. Hits on the same car within 1 s add up.
+description=Twisted Metal: Head-On style "N Pts Damage" under the kill feed. Confirmed damage only: online it shows the health your target actually lost (from its owner's update), so hits that only landed on your screen show nothing. Rams count too. Hits on the same car within 1 s add up.
 {NOPS}
 //every hit (func_001E1C40, before the owner check) -> tmbr_DmgGate (counts it, then the original check)
 patch=1,EE,201E2498,extended,{J(2, S["tmbr_DmgGate"]):08X}
 patch=1,EE,201E249C,extended,00000000
+//rams on remote cars (sent as a game event) -> tmbr_RamSent (sends it, then watches the victim)
+patch=1,EE,20121744,extended,{J(3, S["tmbr_RamSent"]):08X}
 {lines(words(S["tmbr_DmgGate"], S["tmbr_DmgGate_end"]))}
 {FRAME}
 {EN(1)}
