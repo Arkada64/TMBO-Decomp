@@ -28,21 +28,38 @@ def packet_of(n, o):
     return q
 
 MERGE_CELL = float(os.environ.get('LV_MERGE', '800'))   # 0 = off
+MERGE_NSV = int(os.environ.get('LV_MERGE_NSV', '800'))  # strip vertices per merged object
 def merge_meshes(meshes, cell):
     """Fewer, bigger render objects: the game builds one VU1 packet entry per drawn object into a fixed buffer
     (pktAddVu1ObjAsm hits `break 0` when it is full - the hang right after the level loads). Head-On splits
     its levels into many tiny meshes (median ~22 vertices), so meshes with the same texture list in the same
     cell x cell square are joined into one (positions/normals appended, strip indices offset; the strip tags
     keep selecting textures by position in the shared list)."""
+    split = []
+    for m in meshes:      # big single meshes: split by strips (each part keeps the shared position list)
+        nsv = sum(len(s_['idx']) for s_ in m['strips'])
+        if nsv <= MERGE_NSV: split.append(m); continue
+        cur, k = [], 0
+        for s_ in m['strips']:
+            if cur and k + len(s_['idx']) > MERGE_NSV:
+                split.append(dict(m, strips=cur)); cur, k = [], 0
+            cur.append(s_); k += len(s_['idx'])
+        if cur: split.append(dict(m, strips=cur))
+    meshes = split
     out = {}
     for m in meshes:
         P = np.array(m['pos']); c = (P.max(0) + P.min(0)) / 2
         key = (math.floor(c[0] / cell), math.floor(c[1] / cell), tuple(m['texrefs']))
         nrm = list(m['nrm']) + [(0.0, 0.0, 1.0)] * (len(m['pos']) - len(m['nrm']))
+        nsv = sum(len(s_['idx']) for s_ in m['strips'])
+        if key in out and out[key]['_nsv'] + nsv > MERGE_NSV:     # keep packets retail-sized (retail max ~1650 qw)
+            k2 = 1
+            while key + (k2,) in out and out[key + (k2,)]['_nsv'] + nsv > MERGE_NSV: k2 += 1
+            key = key + (k2,)
         if key not in out:
-            out[key] = dict(m, pos=list(m['pos']), nrm=nrm, strips=[dict(s_) for s_ in m['strips']])
+            out[key] = dict(m, pos=list(m['pos']), nrm=nrm, strips=[dict(s_) for s_ in m['strips']], _nsv=nsv)
             continue
-        g = out[key]; base = len(g['pos'])
+        g = out[key]; base = len(g['pos']); g['_nsv'] += nsv
         g['pos'] += list(m['pos']); g['nrm'] += nrm
         for s_ in m['strips']:
             g['strips'].append(dict(s_, idx=[i + base for i in s_['idx']]))
