@@ -244,7 +244,9 @@ def build(path, outdir, name, scale=1.15, donor=None):
     placed = []; nfail = 0
     for m in meshes:
         ctx = [LT.gs_ctx(k) for k in m['texrefs']]
-        m['level'] = True; m['alpha'] = any(tl.get(k) for k in m['texrefs'])   # retail arenas: ~15% alpha meshes
+        m['level'] = True
+        if os.environ.get('LV_ALPHA', '1') == '1':
+            m['alpha'] = any(tl.get(k) for k in m['texrefs'])   # retail arenas: ~15% alpha meshes
         try:
             blob, rel, pairs, sph = hierobject(m, 1.0, ctx)
         except Exception as e:
@@ -252,7 +254,7 @@ def build(path, outdir, name, scale=1.15, donor=None):
         if max(abs(sph[0]), abs(sph[1]), abs(sph[2])) > 50000: nfail += 1; continue   # bad transform path
         off = car.append(blob, rel, pairs)
         placed.append((off, sph))
-    print('  meshes', len(placed), 'failed', nfail, 'alpha', sum(m['alpha'] for m in meshes))
+    print('  meshes', len(placed), 'failed', nfail, 'alpha', sum(bool(m.get('alpha')) for m in meshes))
     def bound(lst):
         P = np.array([s[:3] for _, s in lst]); c = tuple((P.max(0) + P.min(0)) / 2)
         return (*c, max(math.dist(c, s[:3]) + s[3] for _, s in lst))
@@ -266,9 +268,21 @@ def build(path, outdir, name, scale=1.15, donor=None):
         return kd(lst[:h]) + kd(lst[h:])
     groups = []
     # very large meshes (backdrops, terrain sheets) go straight under the root; the rest into the tree
-    big = [e for e in placed if e[1][3] > 3000]; small = [e for e in placed if e[1][3] <= 3000]
-    if small: groups += kd(small)
-    for off, sph in big: groups.append((car.group([off], sphere=sph), sph))
+    if os.environ.get('LV_GROUPS', 'kd') == 'tiles':
+        # the first layout (loaded in game, much missing): 1200-unit tiles, up to 250 meshes per group
+        tiles = collections.defaultdict(list)
+        for off, sph in placed: tiles[(math.floor(sph[0] / 1200.0), math.floor(sph[1] / 1200.0))].append((off, sph))
+        for key, lst in tiles.items():
+            xs = [s[0] for _, s in lst]; ys = [s[1] for _, s in lst]; zs = [s[2] for _, s in lst]
+            c = ((max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2, (max(zs) + min(zs)) / 2)
+            r = max(math.dist(c, s[:3]) + s[3] for _, s in lst)
+            for i in range(0, len(lst), 250):
+                part = lst[i:i + 250]
+                groups.append((car.group([o for o, _ in part], sphere=(*c, r)), (*c, r)))
+    else:
+        big = [e for e in placed if e[1][3] > 3000]; small = [e for e in placed if e[1][3] <= 3000]
+        if small: groups += kd(small)
+        for off, sph in big: groups.append((car.group([off], sphere=sph), sph))
     # ---- collision: one op18 per Head-On collision piece
     col = []; colpts = []; cn = 0
     for node, op, M, bb in collision_objects(n):
