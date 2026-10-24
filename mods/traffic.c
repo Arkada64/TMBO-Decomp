@@ -53,6 +53,7 @@ extern void phys7(char* v) __asm__("func_0011E0E8");
 /* free RAM gap after the 8 car NGP slots (point-file read buffer after it); PRISON / SHIP / ASYLUM packs use it */
 #define GAP 0x1B93480
 #define GAP_END 0x1BE0000
+static int trafDummy[16] __attribute__((aligned(16)));   /* stands in for the +0x2034 object (setup) */
 
 #define VSIZE 0x31B0
 #define TRAFFIC_DBG 1   /* setup progress + car state every 2 s (first 4 cars) */
@@ -189,6 +190,9 @@ static void setup(void)
         F(v, 0x2104) = (int)((u32)(v - game) / VSIZE);
         F(v, 0x2100) = j;
         F(v, 0x2010) = 0; F(v, 0x2014) = 0; F(v, 0x2018) = 0;
+        /* the vehicle init (func_001D6F78) clears a byte of the object at +0x2034, which retail's SetFodderCar
+         * sets and online never does: a null write per car at setup (TLB miss, log 2026-10-24). A dummy. */
+        if (!F(v, 0x2034)) F(v, 0x2034) = (int)trafDummy;
         if (hw) {
             F(v, 0x2020) = 0;
             F(v, 0x201C) = (int)(hwdrv + j * 0x30);
@@ -464,7 +468,9 @@ void tmbr_TrafficUpdate(void)
          * is off screen (fodderUpdateCheapMode: cs +0xE = drawn this frame). Cars far from every player get the
          * cheap way too: their "drawn" flag reads 0 during their update (restored after, the renderer still
          * draws them). LOD_IN / LOD_OUT give hysteresis so a car on the edge does not flip every frame. */
-        far = cs && lodFar(v, j);
+        /* (on screen: always full physics - the cheap way slides the car along its lane at lane height, so far
+         * cars on screen floated until a player came close, log 2026-10-24. Off screen the game is cheap anyway.) */
+        far = cs && !cs[0xE] && lodFar(v, j);
         if (far) { vis = (unsigned char)cs[0xE]; cs[0xE] = 0; }
         vehicleUpdate(v);
         if (far) cs[0xE] = (char)vis;

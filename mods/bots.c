@@ -261,6 +261,8 @@ static signed char retreated[8];  /* already retreated this life */         /* f
 static signed char role[8];          /* by vehicle index */
 static short roleT[8], rushT[8];
 static short fightT[8], leaveT[8];  /* think ticks (0.5 s) in a fight / left of a breakaway */
+static short chaseT[8], giveUpT[8]; static signed char giveUpK[8];  /* long chases of a human: give up for a while */
+#define HUMAN_MAX_BOTS 2   /* bots on one human at once (log 2026-10-24: down two lives first in a big fight) */
 
 /* Roles change during the match: every 15..40 s a bot rolls a new one (brawler 30 %, sniper 15 %, roamer
  * 20 %, cruiser 35 %, re-rolled once if every other bot already has it), and a sniper that keeps getting caught up close
@@ -442,6 +444,13 @@ void tmbr_BotsThink(void)
             }
         }
         if (cur) ci = (int)(cur - g) / 0x31B0;
+        {   /* chasing a human for 15 s without getting within 350: leave that human alone for 10 s */
+            int k2 = (int)(b - g) / 0x31B0 & 7;
+            if (giveUpT[k2] > 0) giveUpT[k2]--;
+            if (cur && F(cur, 0x590) == 1 && ci != prey && (int)manhat(POS(b), POS(cur)) > 350) {
+                if (++chaseT[k2] >= 30) { giveUpT[k2] = 20; giveUpK[k2] = ci; chaseT[k2] = 0; cur = 0; ci = -1; }
+            } else chaseT[k2] = 0;
+        }
         for (k = 0; k < 8; k++) {
             char* v = g + k * 0x31B0;
             int others;
@@ -449,7 +458,12 @@ void tmbr_BotsThink(void)
             if (tmbr_Opt(OPT_TEAMS) && tmbr_TeamOf(v) == tmbr_TeamOf(b)) continue;   /* teammate */
             d = (int)manhat(POS(b), POS(v));
             others = hunted[k] - (k == ci);              /* other bots already on it */
-            if (F(v, 0x590) == 1 && others > 0) d += others * 300;  /* a human already fought by a bot: look elsewhere */
+            if (F(v, 0x590) == 1) {                      /* humans: never more than HUMAN_MAX_BOTS bots at once */
+                int k2 = (int)(b - g) / 0x31B0 & 7;
+                if (others >= HUMAN_MAX_BOTS && k != prey) continue;
+                if (giveUpT[k2] > 0 && giveUpK[k2] == k) continue;
+                d += others * 450;
+            }
             if (rl == R_CRUISER) sc = d;
             else if (rl == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
             else if (rl == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
@@ -468,7 +482,8 @@ void tmbr_BotsThink(void)
              * Once hunting, it follows the target out to 1.5x the range before letting it go. */
             int bd = (int)manhat(POS(b), POS(best)), see = HUNT_SEE(rl);
             int chase = prey >= 0 && best == g + prey * 0x31B0;   /* the prey's chasers cross the map for it */
-            if (!(lms && alive <= 3) && !chase && (bd > (rl == R_CRUISER ? see * 2 : see * 3 / 2) || (F(drv, 4) == 4 && bd > see))) {
+            int keep = F(best, 0x590) == 1 ? see : rl == R_CRUISER ? see * 2 : see * 3 / 2;   /* humans: easier to lose */
+            if (!(lms && alive <= 3) && !chase && (bd > keep || (F(drv, 4) == 4 && bd > see))) {
                 if (F(drv, 4) != 4) {
                     if (mathfRandI(0, 1)) cruiseFar(g, b, drv);
                     else driverSetMode(drv, 4);
