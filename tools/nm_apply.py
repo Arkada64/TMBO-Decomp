@@ -60,12 +60,30 @@ def apply(src):
             (W / "one.c").write_text(f'#include "{hdr}"\n{c}')
             if cc(W / "one.c")[0]: chosen[n] = c; break
         else: st["no_compile"] += 1
+    # a function's .s can carry its own rodata (strings, constants, jump tables) ahead of the code; other code
+    # and the data pointer tables use those symbols, so the C version keeps that rodata: <name>_nmro.s (jump
+    # tables dropped - they point at labels inside the asm being replaced)
+    ro = {}
+    for n in chosen:
+        m = re.search(rf'^INCLUDE_ASM\("([^"]*)", {re.escape(n)}\);', text, re.M)
+        sf = Path(m.group(1)) / f"{n}.s" if m else None
+        if not sf or not sf.exists(): continue
+        t = sf.read_text()
+        if ".section .rodata" not in t: continue
+        part = t[t.index(".section .rodata"):t.index(".section .text")] if ".section .text" in t else ""
+        blocks_ = re.split(r"(?=^(?:\.align \d+\n)?nonmatching )", part, flags=re.M)
+        keep = [b for b in blocks_ if not re.search(r"\.word\s+\.L", b)]
+        body = "".join(keep).strip()
+        if not body.startswith(".section"): body = ".section .rodata\n" + body
+        if "dlabel" not in body: continue
+        (sf.parent / f"{n}_nmro.s").write_text(body + "\n.section .text\n")
+        ro[n] = f'INCLUDE_ASM("{m.group(1)}", {n}_nmro);\n'
     # in context: compile the whole file with NON_MATCHING, drop blocks the compiler names, repeat
     for _ in range(40):
         new = text
         for n, c in chosen.items():
             new = re.sub(rf'^(INCLUDE_ASM\("[^"]*", {re.escape(n)}\);)\n',
-                         lambda m: f"#ifdef NON_MATCHING\n/* NM:{n} */\n{c}#else\n{m.group(1)}\n#endif\n", new, count=1, flags=re.M)
+                         lambda m: f"#ifdef NON_MATCHING\n/* NM:{n} */\n{ro.get(n, '')}{c}#else\n{m.group(1)}\n#endif\n", new, count=1, flags=re.M)
         src.write_text(new)
         ok, err = cc(src, ["-DNON_MATCHING"], whole=True)
         if ok: break
