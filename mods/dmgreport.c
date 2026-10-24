@@ -39,6 +39,11 @@ static void report(char* victim, float dmg)
     dmgLen = sprintf(dmgText, DMG_FMT, n);
 }
 
+#ifndef DMG_DBG
+#define DMG_DBG 0
+#endif
+extern int scePrintf(const char* fmt, ...);
+static char DBG_HP[] = "TMBR dmg: watched car %x health %d -> %d\n";
 void tmbr_DamageReportTick(void)
 {
     int wh[2], i;
@@ -50,7 +55,10 @@ void tmbr_DamageReportTick(void)
         float hp;
         if (!wCar[i]) continue;
         hp = *(float*)(wCar[i] + 0x404);
-        if (hp < wHp[i]) report(wCar[i], wHp[i] - hp);
+        if (hp < wHp[i]) {
+            report(wCar[i], wHp[i] - hp);
+            if (DMG_DBG) scePrintf(DBG_HP, (int)wCar[i], (int)wHp[i], (int)hp);
+        }
         wHp[i] = hp;                       /* also follows repairs / respawns upward */
         if (dmgClock - wEnd[i] > 0) wCar[i] = 0;
     }
@@ -96,11 +104,19 @@ static char* byPlayer(int idx)
         if (*(int*)(g + i * VSIZE + 0x20C0) == idx && *(int*)(g + i * VSIZE + 0x590)) return g + i * VSIZE;
     return 0;
 }
+#ifndef DMG_DBG
+#define DMG_DBG 0
+#endif
+extern int scePrintf(const char* fmt, ...);
+static char DBG_RAM[] = "TMBR ram: to %d ev %d %d %d %d %d %d -> rammer %x (own %d) victim %x (own %d hp %d)\n";
 void tmbr_RamSent(void* net, int to, int* ev)
 {
     char *r, *v;
     netSendGameEvent(net, to, ev);
-    if (ev[1] != 60) return;
     r = byPlayer(ev[0]); v = byPlayer(ev[4]);
+    if (DMG_DBG)
+        scePrintf(DBG_RAM, to, ev[0], ev[1], ev[4], ev[5], ev[6], ev[2], (int)r, r ? *(int*)(r + 0x20B4) : -1,
+                  (int)v, v ? *(int*)(v + 0x20B4) : -1, v ? (int)*(float*)(v + 0x404) : -1);
+    if (ev[1] != 60) return;
     if (r && v && ev[5] > 0) tmbr_DmgSeen(v, r, (float)ev[5]);
 }
