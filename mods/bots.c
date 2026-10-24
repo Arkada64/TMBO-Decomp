@@ -823,7 +823,10 @@ int tmbr_AiUpdate(char* v)
     int r;
     if (F(D_003156C0, 0x1BB4) == 0xA && F(v, 0x2014)) { padClear(v); return 0; }   /* sync hold: bots frozen */
     r = aiUpdate(v);
-    if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030) { dodge(D_004FA030, v); unstick(D_004FA030, v); }
+    /* match over (game type 1): the game stops every car - no dodging / unsticking then (log 2026-10-24) */
+    if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030 && !(GINFO() && ((F(GINFO(), 0) >> 1) & 0xF) == 1)) {
+        dodge(D_004FA030, v); unstick(D_004FA030, v);
+    }
     return r;
 }
 
