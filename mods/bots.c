@@ -229,6 +229,12 @@ extern void driverSetTarget(char* drv, char* target) __asm__("func_00130C00");
 extern int attractGroupAt(void* points, void* pos) __asm__("func_0010B950");
 extern float manhat(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
 static int thinkTick;
+static int lives, lms, dm, alive, leader;   /* this think's mode state (tmbr_BotsThink) */
+static int lastLife(char* v)
+{
+    int slot = F(v, 0x2104);
+    return lms && lives && slot >= 0 && slot < 8 && F(D_003156C0, 0x2F48 + 4 * slot) >= lives - 1;
+}
 /* Roles (by AI index, so 3 bots get one of each): brawler = closest target, gets in close (dogfight);
  * sniper = targets ~450 away, holds a 250..550 band and backs off when rushed; roamer = picks the most
  * isolated car nobody else is on, fights like a brawler. Spreads the bots out instead of one mosh pit. */
@@ -363,6 +369,23 @@ void tmbr_BotsThink(void)
         for (j = 0; j < 8; j++)
             if (j != k && live(g + j * 0x31B0) && (int)manhat(POS(v), POS(g + j * 0x31B0)) < 400) crowd[k]++;
     }
+    /* game mode (game info word 0 bits 1-4: 1 over, 3 Last Man Standing, 4/5 Man Hunt / Collector, else
+     * deathmatch), lives (info byte 5), deaths per car (net +0x2F48 [car +0x2104]), kills (net +0x2F28 [car]) */
+    {
+        int type = GINFO() ? (F(GINFO(), 0) >> 1) & 0xF : 0, top = -1, topK = 0, second = 0;
+        lives = GINFO() ? ((unsigned char*)GINFO())[5] : 0;
+        lms = type == 3;
+        dm = type != 3 && type != 4 && type != 5;
+        alive = 0;
+        for (k = 0; k < 8; k++) {
+            char* v = g + k * 0x31B0;
+            int kk = F(D_003156C0, 0x2F28 + 4 * k);
+            if (!live(v)) continue;
+            alive++;
+            if (kk > topK) { second = topK; topK = kk; top = k; } else if (kk > second) second = kk;
+        }
+        leader = dm && top >= 0 && topK >= second + 2 ? top : -1;     /* a clear kill leader (2+ ahead) */
+    }
     for (i = 0; i < NAI(g); i++) {
         char *b = LIST(g)[i], *drv, *cur, *best = 0;
         int d, sc, bestS = 0x7FFFFFF, curS = -1, rl, ci = -1;   /* ints: float literals would need .lit4 (gp) */
@@ -383,6 +406,8 @@ void tmbr_BotsThink(void)
              * pile-up (3+ other cars within 400), may drive off for 8-15 s (game cruise mode, ignores targets)
              * and come back fresh. Checked every 0.5 s: after 12 s of fighting 15 %, in a pile-up (after 3 s) 25 %. */
             int k2 = (int)(b - g) / 0x31B0 & 7, pile = crowd[k2] >= 3, retreat;
+            int endgame = lms && alive <= 3, careful = lastLife(b) && !endgame;
+            if (endgame) leaveT[k2] = 0;                 /* Last Man Standing, 3 or fewer left: finish it */
             if (leaveT[k2] > 0) {
                 leaveT[k2]--;
                 if (F(drv, 4) != 4) cruiseFar(g, b, drv);
@@ -393,8 +418,10 @@ void tmbr_BotsThink(void)
             /* online has no health to recover, so a retreat is short (8-15 s) and once per life */
             if (hpPct(b) >= 90) retreated[k2] = 0;
             retreat = !retreated[k2] && hpPct(b) < 35 && hunted[k2] >= 2 && mathfRandI(0, 99) < 25;
+            if (careful)                                 /* last life: back off earlier and more often */
+                retreat = !retreated[k2] && hpPct(b) < 50 && hunted[k2] >= 1 && mathfRandI(0, 99) < 40;
             if (retreat) retreated[k2] = 1;
-            if (retreat || (fightT[k2] > 24 && mathfRandI(0, 99) < 15) || (pile && fightT[k2] > 6 && mathfRandI(0, 99) < 25)) {
+            if (!endgame && (retreat || (fightT[k2] > 24 && mathfRandI(0, 99) < 15) || (pile && fightT[k2] > 6 && mathfRandI(0, 99) < 25))) {
                 leaveT[k2] = 16 + mathfRandI(0, 14);
                 fightT[k2] = 0;
                 cruiseFar(g, b, drv);       /* to the far side of the map: spreads the bots out */
@@ -419,6 +446,7 @@ void tmbr_BotsThink(void)
             else if (rl == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
             else sc = d + others * 200 + crowd[k] * 150;                                  /* brawler (avoids pile-ups) */
             sc -= (100 - hpPct(v)) * (rl == R_CRUISER ? 1 : 3);   /* finish off damaged cars (up to -300) */
+            if (k == leader) sc -= 250;                                /* deathmatch: someone pulling away */
             if (v == cur) curS = sc;
             if (sc < bestS) { bestS = sc; best = v; }
         }
@@ -429,7 +457,7 @@ void tmbr_BotsThink(void)
              * driving to wherever everyone else is (on big maps the whole match ended up in one spot).
              * Once hunting, it follows the target out to 1.5x the range before letting it go. */
             int bd = (int)manhat(POS(b), POS(best)), see = HUNT_SEE(rl);
-            if (bd > (rl == R_CRUISER ? see * 2 : see * 3 / 2) || (F(drv, 4) == 4 && bd > see)) {
+            if (!(lms && alive <= 3) && (bd > (rl == R_CRUISER ? see * 2 : see * 3 / 2) || (F(drv, 4) == 4 && bd > see))) {
                 if (F(drv, 4) != 4) {
                     if (mathfRandI(0, 1)) cruiseFar(g, b, drv);
                     else driverSetMode(drv, 4);
