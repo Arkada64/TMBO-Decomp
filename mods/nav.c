@@ -218,11 +218,13 @@ static void planStep(void)
 extern int tmbr_NavBaked(void);            /* navbake.c: route map of this level loaded */
 extern int tmbr_NavBakedPlan(fvec* from, fvec* to, fvec* wp, int maxwp, int* full);
 extern float tmbr_NavArrive(void);
+extern void tmbr_NavLateLoad(void);
 void tmbr_NavFrame(void)
 {
     char* g = D_004FA030;
     int k, i;
     if (tmbr_botCount < 0 || !g) return;
+    tmbr_NavLateLoad();
     if (tmbr_NavBaked()) {                    /* one plan per frame on the baked map, all at once */
         for (k = 0; k < 8; k++) {
             i = (rr + k) % 8;

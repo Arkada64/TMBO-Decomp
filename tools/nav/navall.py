@@ -10,13 +10,14 @@ TEX = dict(asylum=1542656, city=2089984, death1=2147328, death2=1674496, death3=
            miniburb=2220160, minicity=2054016, prison=2399232, roofboss=1242496, rooftop=2143232, rooftop2=1726976,
            ship=1220608, stadium=1147904, suburb=2434432)
 CAR_TEX1, CAR_NGP1 = 0x1E8E3F0, 0x15FEA80
+PTSBUF, LEVEL_TEX = 0x1BE0000, 0x1C05670
 def region(name):
     """free memory for the map: the level TEX tail (packs keep data there too), except where a pack or traffic
     uses it: FREEWAY (TEX tail 60 KB, ZFP0) -> NGP tail after the ZFP1 pack; PRISON -> TEX tail after ZRP2;
     SUBURB (TEX tail = its traffic) -> NGP tail after ZSF1. The RAM gap is traffic's on the other traffic maps."""
     if name == "freeway": a = A128(0x14CC680 + 514048); return a, (CAR_NGP1 - a) // 2048 * 2048
-    if name == "prison": return 0x1E84280, (CAR_TEX1 - 0x1E84280) // 2048 * 2048
-    if name == "suburb": return 0x15EBF00, (CAR_NGP1 - 0x15EBF00) // 2048 * 2048
+    if name in ("prison", "suburb"):        # the point-file read buffer, free once the level has loaded (late load)
+        return PTSBUF, (LEVEL_TEX - PTSBUF) // 2048 * 2048
     a = A128(0x1C05670 + TEX[name])
     return a, (CAR_TEX1 - a) // 2048 * 2048
 def largest(G):
@@ -38,7 +39,7 @@ table = []
 for name, lvl in LEVEL.items():
     H = np.load(f"{name}_H.npy"); R = pickle.load(open(f"{name}_R.pkl", "rb"))
     addr, cap = region(name)
-    for lat in (8, 10, 12, 14, 16, 20):
+    for lat in (8, 9, 10, 12, 14, 16, 20):
         G = largest(build(H, R, lat))
         b = pack(G, R)
         if len(b) <= cap: break
@@ -51,4 +52,5 @@ pickle.dump(table, open("navtable.pkl", "wb"))
 
 with open("navlevels.inc", "w") as f:
     for lvl, name, addr, cap, size, lat, n in table:
-        f.write(f"    {{ {lvl}, 0x{addr:X}, {cap} }},  /* {name.upper()}: {size // 1024} KB, {n} nodes, {lat * 4}-unit cells */\n")
+        late = 1 if addr == PTSBUF else 0
+        f.write(f"    {{ {lvl}, 0x{addr:X}, {cap}, {late} }},  /* {name.upper()}: {size // 1024} KB, {n} nodes, {lat * 4}-unit cells */\n")

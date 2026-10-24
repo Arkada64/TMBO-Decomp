@@ -290,6 +290,7 @@ static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v,
 #define GINFO() (*(char**)(D_003156C0 + 0x3148))
 #define OPT_TRAFFIC 1      /* traffic ON (off by default) */
 #define OPT_TEAMS 2
+#define OPT_TEAMS4 4      /* four teams */
 extern void netSendGameInfo(void* net, int to) __asm__("func_00174988");
 extern int tmbr_levelSerial;
 int tmbr_Opt(int bit)
@@ -778,6 +779,7 @@ extern int sprintf(char* d, const char* f, ...);
  * Holding Select shows the two rosters (red / blue), holding R3 the controls. */
 extern void tmbr_TeamColor(int t);       /* teams.c */
 extern int tmbr_MyTeam(void);
+extern const char* tmbr_TeamName(int t);
 extern void fontSetColor(int font, int r, int g, int b) __asm__("fontSetColor__Fiiii");
 static void lobbyLine(int row, int color, const char* t)   /* color: -1 = the game's tan, 0 red, 1 blue */
 {
@@ -820,15 +822,19 @@ void tmbr_LobbyFrame(void)
         else {
             extern int tmbr_botTeamMode;
             if (tmbr_botTeamMode) sprintf(buf2, "HUMANS VS BOTS (SELECT)");
-            else sprintf(buf2, "YOU: %s TEAM (SELECT)", tmbr_MyTeam() ? "BLUE" : "RED");
+            else sprintf(buf2, "YOU: %s TEAM (SELECT)", tmbr_TeamName(tmbr_MyTeam()));
             lobbyLine(11, tmbr_MyTeam(), buf2);
         }
     }
     fontSetColor(0, 0x50, 0x44, 0x2C);
     if (!host) return;
     if ((pad & 0x4) && (pressed & 0x50)) {
-        optSync(((pressed & 0x10) ? OPT_TRAFFIC : 0) | ((pressed & 0x40) ? OPT_TEAMS : 0));
-        scePrintf("TMBR lobby: traffic %s, teams %s\n", tmbr_Opt(OPT_TRAFFIC) ? "on" : "off", tmbr_Opt(OPT_TEAMS) ? "on" : "off");
+        {   /* Down cycles: teams off -> 2 teams -> 4 teams -> off */
+            int f = (pressed & 0x10) ? OPT_TRAFFIC : 0;
+            if (pressed & 0x40) f |= !tmbr_Opt(OPT_TEAMS) ? OPT_TEAMS : !tmbr_Opt(OPT_TEAMS4) ? OPT_TEAMS4 : (OPT_TEAMS | OPT_TEAMS4);
+            optSync(f);
+        }
+        scePrintf("TMBR lobby: traffic %s, teams %s\n", tmbr_Opt(OPT_TRAFFIC) ? "on" : "off", !tmbr_Opt(OPT_TEAMS) ? "off" : tmbr_Opt(OPT_TEAMS4) ? "4" : "2");
     } else optSync(0);
     if ((pad & 0x4) && (pressed & 0xF00)) {
         if (pressed & 0x800) tmbr_botCount++;
