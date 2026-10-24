@@ -89,8 +89,15 @@ op15 grid + op7 list built, spawn points found, then a test disc (swap into a le
   ~1 node per triangle (SU 70K nodes = 2.2 MB).
 - Level DB callback ids (online func_00127650): 1 = arena (render + collision, func_00242F30), 2 = 4 x
   func_00242FE0, 5 = tdSetEpNode, 13 = g+0x97B40, 14 = extra collision groups (op18 only), 0x20-0x400 static
-  vehicles, 5000+ pickup models, 4000+ weapons, 7000-10620 effects / parts. op15 entry = runtime grid
-  (n cells, 100-unit, bounds; cell buffer zero on disc). op7 entry = op25 animated objects.
+  vehicles, 5000+ pickup models, 4000+ weapons, 7000-10620 effects / parts. op7 entry = op25 animated objects.
+- **op15 entry = the collision grid** (hdColGrid_hdhat; the car height / collision lookup): header
+  {0xf, s16 cols, f32 cell 100, minx, miny, maxx, maxy, ptr}, then cols x rows cell pointers INLINE from +0x20
+  (rows from the bounds). A cell -> linked entries {next, path}; path {0, n, n node pointers from entry 0's root
+  down to an op1 that holds exactly one op18}. The handler walks the path applying op3 / op4 / op6 / op31 / op17
+  / op25 transforms and op1 sphere tests (skipped if group flags & 0xC). First test: without it every car fell
+  through (and a bogus grid crashed in hdColGrid at 0x20E2CC).
+- TMB BSP convention (all retail levels): front leaf always 0x200, back leaf always a material; the material
+  fields are filled on internal children too. lvcol.normalize flips nodes to match.
 - Donor: DEATH4. Its arena meshes are compacted out (1.08 MB), the id-1 node points at our tree, id-14 nodes'
   ids cleared, op15 resized, arena-only textures dropped (28), ours appended (ids / CLUT blocks after the donor's;
   identical palettes shared; textures halved / 16-colour if over budget).
