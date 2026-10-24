@@ -10,7 +10,7 @@
     { 9, 0x1D86080, 1081344, 0 },  /* DEATH3: 65 KB, 8424 nodes, 32-unit cells */
     { 10, 0x1D0F080, 1568768, 0 },  /* DEATH4: 17 KB, 2179 nodes, 32-unit cells */
     { 11, 0x1D86300, 1081344, 0 },  /* DEATH5: 25 KB, 3286 nodes, 32-unit cells */
-    { 12, 0x1D71700, 1165312, 0 },  /* DEATH6: 239 KB, 30686 nodes, 32-unit cells */
+    { 12, 0x1524000, 894976, 0 },  /* DEATH6 (or DEATH7 on the DEATH7 test disc): NGP tail past DEATH7's NGP + PTR, 239 KB, 30686 nodes, 32-unit cells */
     { 13, 0x1DAB080, 929792, 0 },  /* ROOFTOP2: 70 KB, 9033 nodes, 32-unit cells */
     { 14, 0x1D1DA80, 1509376, 0 },  /* STADIUM: 12 KB, 1554 nodes, 32-unit cells */
     { 15, 0x1D2F680, 1435648, 0 },  /* SHIP: 37 KB, 4816 nodes, 32-unit cells */

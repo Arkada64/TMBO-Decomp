@@ -16,6 +16,8 @@ def region(name):
     uses it: FREEWAY (TEX tail 60 KB, ZFP0) -> NGP tail after the ZFP1 pack; PRISON -> TEX tail after ZRP2;
     SUBURB (TEX tail = its traffic) -> NGP tail after ZSF1. The RAM gap is traffic's on the other traffic maps."""
     if name == "freeway": a = A128(0x14CC680 + 514048); return a, (CAR_NGP1 - a) // 2048 * 2048
+    if name == "death6":                    # NGP tail past the end of DEATH7's NGP + PTR (the DEATH7 test disc swaps it in)
+        return 0x1524000, (CAR_NGP1 - 0x1524000) // 2048 * 2048
     if name in ("prison", "suburb"):        # the point-file read buffer, free once the level has loaded (late load)
         return PTSBUF, (LEVEL_TEX - PTSBUF) // 2048 * 2048
     a = A128(0x1C05670 + TEX[name])
