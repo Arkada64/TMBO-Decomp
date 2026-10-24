@@ -7,7 +7,7 @@ SCRIPT.json: {"steps": [["CROSS", 10], ["", 120], ...], "loop_from": 12,
               "shots": [70, 80, 90], "stop": 100}
   a step is [buttons, frames]; buttons = names joined with + (START, CROSS, CIRCLE, TRIANGLE, SQUARE, UP, DOWN,
   LEFT, RIGHT, L1, R1, L2, R2, SELECT, L3, R3) or "" to wait.
-  shots = seconds after launch to capture; stop = seconds after launch to kill PCSX2. Output: qb_out/<timestamp>/ (emulog.txt + PNGs)."""
+  shots = seconds after launch to capture; stop = seconds after launch to kill PCSX2; state_at = seconds after launch to save a savestate (PINE). Output: qb_out/<timestamp>/ (emulog.txt + PNGs)."""
 import sys, os, json, struct, time, subprocess, shutil, glob, argparse
 
 W = "/mnt/c/Users/Ark/Desktop/TMB Decomp"
@@ -43,6 +43,8 @@ def main():
     open('test/QUICK.ELF', 'wb').write(patch(a.elf, script))
     ini = f'{P}/inis/PCSX2.ini'; shutil.copy(ini, ini + '.qbbak')
     s = open(ini).read().replace('StandardVolume = 100', 'StandardVolume = 0').replace('FastForwardVolume = 100', 'FastForwardVolume = 0')
+    # PINE on (savestates on request, for the EE registers of a hang) and uncompressed savestates
+    s = s.replace('EnablePINE = false', 'EnablePINE = true').replace('SavestateCompressionType = 2', 'SavestateCompressionType = 0')
     open(ini, 'w').write(s)
     snaps = f'{P}/snaps'; before = set(glob.glob(f'{snaps}/**/*.png', recursive=True))
     iso = WW + '\\' + a.iso.replace('/', '\\')
@@ -54,6 +56,12 @@ def main():
             time.sleep(max(0, t - (time.time() - t0)))
             k = len(shots); shots.append(f'{WW}\\qb_tmp_{k}.png')
             print('shot at', round(time.time() - t0, 1), ps(f"& '{WW}\\tools\\qb\\winshot.ps1' '{shots[-1]}'").strip(), flush=True)
+        if 'state_at' in script:
+            time.sleep(max(0, script['state_at'] - (time.time() - t0)))
+            # PINE MsgSaveState (opcode 9) slot 9: u32 size, u8 op, u8 slot
+            print('savestate', ps("$c=New-Object Net.Sockets.TcpClient('127.0.0.1',28011); $s=$c.GetStream(); "
+                                  "$m=[byte[]](6,0,0,0,9,9); $s.Write($m,0,6); Start-Sleep 3; $c.Close(); 'sent'").strip(), flush=True)
+            time.sleep(5)
         time.sleep(max(0, script.get('stop', 60) - (time.time() - t0)))
     finally:
         subprocess.run(['taskkill.exe', '/IM', 'pcsx2-qt.exe', '/F'], capture_output=True)
@@ -65,6 +73,8 @@ def main():
     for i in range(len(shots)):
         f = f'{W}/qb_tmp_{i}.png'
         if os.path.exists(f): shutil.move(f, f'{out}/shot{i}.png'); n += 1
+    st = sorted(glob.glob(f'{P}/sstates/*.09.p2s'), key=os.path.getmtime)
+    if st and os.path.getmtime(st[-1]) > t0: shutil.move(st[-1], f'{out}/state.p2s'); print('state saved')
     print('OUT', out, 'shots', n)
     log = open(f'{out}/emulog.txt', errors='replace').read().splitlines()
     for l in log:
