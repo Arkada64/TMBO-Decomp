@@ -57,6 +57,7 @@ def apply(src):
         if n in hooked or n in SKIP or n.endswith("Asm") or "Asm__" in n: st["kept_asm"] += 1; continue
         if n not in variants: st["no_draft"] += 1; continue
         for c in variants[n]:
+            if re.search(r"\bM2C_(BREAK|ERROR|TRAP|SYNC|UNK_)\w*\s*\(", c): continue   # m2c placeholders: compile, never link
             (W / "one.c").write_text(f'#include "{hdr}"\n{c}')
             if cc(W / "one.c")[0]: chosen[n] = c; break
         else: st["no_compile"] += 1
