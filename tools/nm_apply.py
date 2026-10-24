@@ -34,6 +34,19 @@ def cc(path, extra=(), whole=False):
 # functions the mods patch in their .s files: keep them asm in every build
 hooked = set(re.findall(r'A\("[^"]*/([A-Za-z_0-9]+)\.s"\)', (R / "tools/mods/apply_mods.py").read_text()))
 hooked |= {"func_00127650"}          # the level loader (LOADER in apply_mods.py)
+# functions mods/postlink.txt patches by address (respawn shield) stay asm too
+try:
+    _sa = []
+    for l in (R / "config/US/symbol_addrs.txt").read_text().splitlines():
+        m = re.match(r"\s*(\S+)\s*=\s*(0x[0-9A-Fa-f]+);.*size:(0x[0-9A-Fa-f]+)", l)
+        if m: _sa.append((int(m.group(2), 16), int(m.group(3), 16), m.group(1)))
+    for l in (R / "mods/postlink.txt").read_text().splitlines():
+        f = l.split("#")[0].split()
+        if f:
+            a = int(f[0], 16)
+            hooked |= {n for s0, sz, n in _sa if s0 <= a < s0 + sz}
+except FileNotFoundError:
+    pass
 # drafts known to break the game (found by boot tests): keep them asm. NM_SKIP=a,b adds more for a test.
 SKIP = set(filter(None, os.environ.get("NM_SKIP", "").split(","))) | set(
     l.split()[0] for l in (R / "logs/nm_skip.txt").read_text().splitlines() if l.strip() and not l.startswith("#")
