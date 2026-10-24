@@ -1,0 +1,4 @@
+# C drafts that broke a boot test: kept as asm (cloud/in/nm_loop.sh adds to this)
+func_00242930  # view.c: called viewSetVUPacketMat with a null matrix (boot fault)
+viewGetCenter__FiPiT1  # view.c: boot fault
+func_00243AA8  # view.c: boot fault pc 243b00
