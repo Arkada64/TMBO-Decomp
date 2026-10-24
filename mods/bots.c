@@ -654,80 +654,152 @@ static void unstick(char* g, char* v)
 }
 
 /* ---- Dodging: incoming weapons (the weapon table at game+0x6C3C0, 200 x 0x210: +0 in use, +0x130 the firing
- * car, +0x200 its cs, position at cs+0x10). Positions are snapshot every frame (tmbr_DodgeFrame, nav.c's
- * frame hook) to get velocities. A bot sees a shot that will pass within DODGE_MISS of it in 0.25-1.2 s, rolls
- * once per shot by difficulty, and after its reaction delay swerves off the shot's line for ~0.4 s. */
+ * car, +0x200 its cs, position at cs+0x10; +0x14 is the weapon kind but its numbering isn't mapped yet, so shots
+ * are told apart by how they move). Positions are snapshot every frame (tmbr_DodgeFrame, nav.c's frame hook):
+ *  - straight (power missile, ricochet, fire missile mostly): will pass within DODGE_MISS in 0.25-1.2 s ->
+ *    swerve off its line for ~0.4 s after the reaction delay;
+ *  - homing (its heading keeps turning): sidestepping early just gets followed; wait until it is a few frames
+ *    out and then turn hard across its path (handbrake) so it overshoots. The wait is the skill: hard turns at
+ *    ~8 frames, easy at ~18 (too early, the missile re-aims);
+ *  - lobbed (napalm, gas can, remote bomb throw: falling): work out where it lands; if that's on us, drive
+ *    away from the landing point until it's down.
+ * Each bot rolls once per shot (difficulty: chance, reaction delay). Units: x/y x4, z x16 fixed point. */
 #define NW 200
 #define DODGE_MISS 45
-static int wpx[NW], wpy[NW], wvx[NW], wvy[NW];
-static unsigned char wok[NW];
+static int wpx[NW], wpy[NW], wpz[NW], wvx[NW], wvy[NW], wvz[NW], wax[NW];
+static unsigned char wok[NW], wturn[NW], wfall[NW];
 static int bpx[8], bpy[8];
-static short dodgeT[8], reactT[8], judged[8];
-static int dodgeX[8], dodgeY[8];
-static const unsigned char dodgeDelay[3] = { 24, 14, 8 }, dodgeChance[3] = { 30, 55, 80 };
+static short dodgeT[8], reactT[8], judged[8], hWait[8], dodgeHb[8], pendT[8];
+static int dodgeX[8], dodgeY[8], dodgeF[8];   /* dodgeF: blend in the car's heading */
+static const unsigned char dodgeDelay[3] = { 24, 14, 8 }, dodgeChance[3] = { 30, 55, 80 }, homingTurn[3] = { 18, 12, 8 };
+static const float FX[2] = { 4.0f, 16.0f };
 void tmbr_DodgeFrame(void)
 {
     char* g = D_004FA030;
-    int i, x, y;
+    int i, x, y, z, vx, vy, vz, c, sp;
     if (!g || tmbr_botCount < 0) return;
     for (i = 0; i < NW; i++) {
         char* w = g + 0x6C3C0 + i * 0x210;
         char* cs = (char*)F(w, 0x200);
-        if (!F(w, 0) || !cs) { wok[i] = 0; continue; }
-        x = (int)*(float*)(cs + 0x10); y = (int)*(float*)(cs + 0x14);
-        if (wok[i]) { wvx[i] = x - wpx[i]; wvy[i] = y - wpy[i]; }
-        wpx[i] = x; wpy[i] = y;
-        if (wok[i] < 2) wok[i]++;
+        if (!F(w, 0) || !cs) { wok[i] = 0; wturn[i] = 0; wfall[i] = 0; continue; }
+        x = (int)(*(float*)(cs + 0x10) * FX[0]); y = (int)(*(float*)(cs + 0x14) * FX[0]); z = (int)(*(float*)(cs + 0x18) * FX[1]);
+        if (wok[i]) {
+            vx = x - wpx[i]; vy = y - wpy[i]; vz = z - wpz[i];
+            if (wok[i] >= 2) {
+                /* turning: heading change per frame > ~1 degree, three frames running */
+                c = wvx[i] * vy - wvy[i] * vx; if (c < 0) c = -c;
+                sp = vx * vx + vy * vy;
+                if (sp > 16 && c > sp / 50) { if (wturn[i] < 10) wturn[i]++; } else wturn[i] = 0;
+                /* falling: vertical speed dropping (gravity), two frames running */
+                wax[i] = vz - wvz[i];
+                if (wax[i] < -1) { if (wfall[i] < 10) wfall[i]++; } else wfall[i] = 0;
+            }
+            wvx[i] = vx; wvy[i] = vy; wvz[i] = vz;
+        }
+        wpx[i] = x; wpy[i] = y; wpz[i] = z;
+        if (wok[i] < 3) wok[i]++;
     }
 }
 static int iabs(int x) { return x < 0 ? -x : x; }
 extern int tmbr_SameTeam(char* a, char* b);
 extern float tmbr_NavSteer(char* v, float dx, float dy, int gas);
+static void dodgeStart(int k, int vx, int vy, int dx, int dy)
+{
+    int n = iabs(vx) + iabs(vy);
+    if (!n) n = 1;
+    if (vx * dy - vy * dx > 0) { dodgeX[k] = -vy * 100 / n; dodgeY[k] = vx * 100 / n; }
+    else { dodgeX[k] = vy * 100 / n; dodgeY[k] = -vx * 100 / n; }
+}
 static void dodge(char* g, char* v)
 {
-    int k = (int)(v - g) / 0x31B0 & 7, i, x, y, fx, fy, n;
+    int k = (int)(v - g) / 0x31B0 & 7, i, x, y, z, fx, fy, n;
     int diff = tmbr_botDiff < 0 ? 0 : tmbr_botDiff > 2 ? 2 : tmbr_botDiff;
-    x = (int)*(float*)(F(v, 0x2028) + 0x10); y = (int)*(float*)(F(v, 0x2028) + 0x14);
-    fx = x - bpx[k]; fy = y - bpy[k];
+    char* cs = (char*)F(v, 0x2028);
+    unsigned char* pad = (unsigned char*)v + 0x594;
+    x = (int)(*(float*)(cs + 0x10) * FX[0]); y = (int)(*(float*)(cs + 0x14) * FX[0]); z = (int)(*(float*)(cs + 0x18) * FX[1]);
+    fx = x - bpx[k]; fy = y - bpy[k];                /* our own motion per frame */
     bpx[k] = x; bpy[k] = y;
-    if (*(signed char*)(v + 0x497) >= 4 || F(v, 0x444) >= 30) { dodgeT[k] = reactT[k] = 0; return; }
+    if (*(signed char*)(v + 0x497) >= 4 || F(v, 0x444) >= 30) { dodgeT[k] = reactT[k] = hWait[k] = 0; return; }
     if (dodgeT[k] > 0) {
-        /* swerve: half forward, half off the shot's line (both scaled to ~100) */
+        int ox = dodgeX[k], oy = dodgeY[k];
         n = iabs(fx) + iabs(fy);
-        if (n > 0) { fx = fx * 100 / n; fy = fy * 100 / n; } else { fx = dodgeX[k]; fy = dodgeY[k]; }
-        tmbr_NavSteer(v, (float)(fx + dodgeX[k]), (float)(fy + dodgeY[k]), 1);
-        if (diff == 2) ((unsigned char*)v)[0x594 + 7] = 1;   /* hard: turbo out of it */
+        if (dodgeF[k] && n > 0) { ox += fx * 100 / n; oy += fy * 100 / n; }
+        tmbr_NavSteer(v, (float)ox, (float)oy, 1);
+        if (dodgeHb[k] > 0) { pad[2] = 1; dodgeHb[k]--; }
+        else if (diff == 2) pad[7] = 1;            /* hard: turbo out of it */
         dodgeT[k]--;
         return;
     }
-    if (reactT[k] > 0) { if (--reactT[k] == 0) dodgeT[k] = 25; return; }
+    if (hWait[k]) {                                 /* homing: wait for the moment to turn */
+        int w = hWait[k] - 1, vx = wvx[w], vy = wvy[w], dx, dy, sp, t;
+        if (wok[w] < 3) { hWait[k] = 0; return; }
+        dx = x - wpx[w]; dy = y - wpy[w];
+        sp = vx * vx + vy * vy;
+        if (sp < 16 || dx * vx + dy * vy <= 0 || iabs(dx) + iabs(dy) > 4 * 900) { hWait[k] = 0; return; }   /* lost us */
+        t = (iabs(dx) + iabs(dy)) / (iabs(vx) + iabs(vy) + 1);
+        if (t <= homingTurn[diff]) {
+            dodgeStart(k, vx, vy, dx, dy);
+            dodgeF[k] = 0; dodgeHb[k] = 6; dodgeT[k] = 14; hWait[k] = 0;
+            if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d breaks from homing shot %d at %d frames\n", k, w, t);
+        }
+        return;
+    }
+    if (reactT[k] > 0) { if (--reactT[k] == 0) dodgeT[k] = pendT[k]; return; }
     for (i = 0; i < NW; i++) {
         char* w = g + 0x6C3C0 + i * 0x210;
         char* own;
-        int vx, vy, dx, dy, sp, dot, t, cx, cy;
-        if (wok[i] < 2 || !F(w, 0)) continue;
+        int vx, vy, dx, dy, sp, dot, t, cx, cy, kind;
+        if (wok[i] < 3 || !F(w, 0)) continue;
         own = (char*)F(w, 0x130);
         if (own == v || (own && tmbr_SameTeam(own, v))) continue;
         dx = x - wpx[i]; dy = y - wpy[i];
-        if (iabs(dx) + iabs(dy) > 1500) continue;
-        vx = wvx[i]; vy = wvy[i];                  /* per frame */
+        if (iabs(dx) + iabs(dy) > 4 * 1500) continue;
+        vx = wvx[i]; vy = wvy[i];
         sp = vx * vx + vy * vy;
-        if (sp < 9) continue;                      /* parked (mines etc.) */
+        if (sp < 36) continue;                     /* parked (mines, a remote bomb on the ground) */
         dot = dx * vx + dy * vy;
         if (dot <= 0) continue;                    /* going away */
-        t = dot / sp;                              /* frames to the closest point */
+        kind = wfall[i] >= 2 ? 3 : wturn[i] >= 3 ? 2 : 1;
+        if (kind == 3) {                           /* lobbed: where does it come down? */
+            int dz = wpz[i] - z, vz = wvz[i], a = wax[i], lx, ly;
+            for (t = 1; t < 120; t++) if (dz + vz * t + a * t * t / 2 <= 0) break;
+            if (t >= 120 || t < 6) continue;
+            lx = wpx[i] + vx * t - (x + fx * t); ly = wpy[i] + vy * t - (y + fy * t);   /* landing vs where we'll be */
+            if (iabs(lx) + iabs(ly) > 4 * 90) continue;
+            if (judged[k] == i + 1) return;
+            judged[k] = i + 1;
+            if (mathfRandI(0, 99) >= dodgeChance[diff]) return;
+            n = iabs(lx) + iabs(ly); if (!n) { lx = -fy; ly = fx; n = iabs(lx) + iabs(ly) + 1; }
+            dodgeX[k] = -lx * 100 / n; dodgeY[k] = -ly * 100 / n;   /* away from the landing point */
+            dodgeF[k] = 1; dodgeHb[k] = 0;
+            pendT[k] = t + 10 - dodgeDelay[diff];
+            if (pendT[k] < 8) pendT[k] = 8;
+            reactT[k] = dodgeDelay[diff];
+            if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d sees lobbed shot %d landing in %d\n", k, i, t);
+            return;
+        }
+        if (kind == 2) {                           /* homing: coming our way at all? */
+            if (iabs(dx * vy - dy * vx) > dot) continue;   /* heading within ~45 degrees of us */
+            if (iabs(dx) + iabs(dy) > 4 * 700) continue;
+            if (judged[k] == i + 1) return;
+            judged[k] = i + 1;
+            if (mathfRandI(0, 99) >= dodgeChance[diff]) return;
+            hWait[k] = i + 1;
+            if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d tracks homing shot %d\n", k, i);
+            return;
+        }
+        t = dot / sp;                              /* straight: frames to the closest point */
         if (t < 15 || t > 72) continue;
         cx = dx - vx * t; cy = dy - vy * t;
-        if (cx * cx + cy * cy > DODGE_MISS * DODGE_MISS) continue;
+        if (iabs(cx) + iabs(cy) > 4 * DODGE_MISS * 2) continue;
+        if (cx * cx + cy * cy > 16 * DODGE_MISS * DODGE_MISS) continue;
         if (judged[k] == i + 1) return;            /* rolled for this shot already */
         judged[k] = i + 1;
         if (mathfRandI(0, 99) >= dodgeChance[diff]) return;
-        /* away from the line: perpendicular to the shot, on our side of it */
-        n = iabs(vx) + iabs(vy);
-        if (vx * dy - vy * dx > 0) { dodgeX[k] = -vy * 100 / n; dodgeY[k] = vx * 100 / n; }
-        else { dodgeX[k] = vy * 100 / n; dodgeY[k] = -vx * 100 / n; }
+        dodgeStart(k, vx, vy, dx, dy);
+        dodgeF[k] = 1; dodgeHb[k] = 0; pendT[k] = 25;
         reactT[k] = dodgeDelay[diff] + mathfRandI(0, dodgeDelay[diff] / 2);
-        if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d sees shot %d (%d frames, miss %d)\n", k, i, t, iabs(cx) + iabs(cy));
+        if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d sees shot %d (%d frames, miss %d)\n", k, i, t, (iabs(cx) + iabs(cy)) / 4);
         return;
     }
 }
