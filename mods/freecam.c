@@ -64,20 +64,8 @@ extern int scePrintf(const char* fmt, ...);
 #ifndef TMBR_TRAFFIC_ON
 #define TMBR_TRAFFIC_ON 1   /* traffic (traffic.c) per-frame update (on since the 2026-10-23 test round) */
 #endif
-void tmbr_CameraUpdate(char *cam)
+static void hudDefault(void)
 {
-    int b, pad, pressed, i;
-    float *m, *out, lx, ly, rx, ry, speed;
-    char *cs;
-
-#if TMBR_TRAFFIC_ON
-    tmbr_SkinsFrame();   /* skins.c: 12 Pak's armed special */
-    { unsigned int t0 = tmbr_Cycles(); tmbr_TrafficUpdate(); tmbr_PerfAdd(3, t0); } /* traffic.c: per-frame traffic cars (after the game's vehicle loops); off in stable */
-#endif
-#ifndef TMBR_PNACH
-    { unsigned int t0 = tmbr_Cycles(); tmbr_BotsThink(); tmbr_PerfAdd(0, t0); } /* bots.c: free-for-all targets (not in the pnach build) */
-    tmbr_PerfFrame();     /* perf.c: per-frame cost log every 5 s */
-    tmbr_PedsRetype();    /* packs.c: inmates into SHIP / ASYLUM ped groups after load */
     /* Weapon bay: start in the list view (what Select+Right = func_00145818 cycles to from the default: HUD
      * (game + 0x97B50 + viewport * 0xA20) +0x7F4, 0 -> 1). Set a few frames after match start, after the HUD
      * init; only from the default, so a player's own choice stays. */
@@ -89,6 +77,32 @@ void tmbr_CameraUpdate(char *cam)
             for (vp = 0; vp < 4; vp++)
                 if (*(int*)(gg + 0x97B50 + vp * 0xA20 + 0x7F4) == 0) *(int*)(gg + 0x97B50 + vp * 0xA20 + 0x7F4) = 1;
     }
+}
+
+#ifdef TMBR_PNACH
+/* vanilla pnach: one shared hook, each pnach section switches its part on (tmbr_en lives in the cave,
+ * written by that section only): [0] spectator free cam, [1] damage reports, [2] weapon list default */
+extern int tmbr_en[3];
+extern void tmbr_DamageReportTick(void);   /* dmgreport.c */
+#endif
+void tmbr_CameraUpdate(char *cam)
+{
+    int b, pad, pressed, i;
+    float *m, *out, lx, ly, rx, ry, speed;
+    char *cs;
+
+#if TMBR_TRAFFIC_ON
+    tmbr_SkinsFrame();   /* skins.c: 12 Pak's armed special */
+    { unsigned int t0 = tmbr_Cycles(); tmbr_TrafficUpdate(); tmbr_PerfAdd(3, t0); } /* traffic.c: per-frame traffic cars (after the game's vehicle loops); off in stable */
+#endif
+#ifdef TMBR_PNACH
+    if (tmbr_en[1]) tmbr_DamageReportTick();
+    if (tmbr_en[2]) hudDefault();
+#else
+    hudDefault();
+    { unsigned int t0 = tmbr_Cycles(); tmbr_BotsThink(); tmbr_PerfAdd(0, t0); } /* bots.c: free-for-all targets (not in the pnach build) */
+    tmbr_PerfFrame();     /* perf.c: per-frame cost log every 5 s */
+    tmbr_PedsRetype();    /* packs.c: inmates into SHIP / ASYLUM ped groups after load */
     {   /* debug (rear fire via L1+Down does nothing, the d-pad combo works): when a human's combo state is 3
          * (rear fire) log the fields func_001E4690 / the launcher check, for 20 frames */
         extern char* D_004FA030;
@@ -120,6 +134,9 @@ void tmbr_CameraUpdate(char *cam)
     }
 #endif
     cameraUpdate(cam);
+#ifdef TMBR_PNACH
+    if (!tmbr_en[0]) return;
+#endif
 
     pad = inputGetPadButtons(0);
     b = pad & (IN_SELECT | IN_L3 | IN_R3);
