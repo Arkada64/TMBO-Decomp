@@ -27,6 +27,27 @@ def packet_of(n, o):
         q += 16
     return q
 
+MERGE_CELL = float(os.environ.get('LV_MERGE', '800'))   # 0 = off
+def merge_meshes(meshes, cell):
+    """Fewer, bigger render objects: the game builds one VU1 packet entry per drawn object into a fixed buffer
+    (pktAddVu1ObjAsm hits `break 0` when it is full - the hang right after the level loads). Head-On splits
+    its levels into many tiny meshes (median ~22 vertices), so meshes with the same texture list in the same
+    cell x cell square are joined into one (positions/normals appended, strip indices offset; the strip tags
+    keep selecting textures by position in the shared list)."""
+    out = {}
+    for m in meshes:
+        P = np.array(m['pos']); c = (P.max(0) + P.min(0)) / 2
+        key = (math.floor(c[0] / cell), math.floor(c[1] / cell), tuple(m['texrefs']))
+        nrm = list(m['nrm']) + [(0.0, 0.0, 1.0)] * (len(m['pos']) - len(m['nrm']))
+        if key not in out:
+            out[key] = dict(m, pos=list(m['pos']), nrm=nrm, strips=[dict(s_) for s_ in m['strips']])
+            continue
+        g = out[key]; base = len(g['pos'])
+        g['pos'] += list(m['pos']); g['nrm'] += nrm
+        for s_ in m['strips']:
+            g['strips'].append(dict(s_, idx=[i + base for i in s_['idx']]))
+    return list(out.values())
+
 def placed_meshes(n, scale):
     ms, st, unk = walk(n)
     out = []
@@ -222,6 +243,8 @@ def build(path, outdir, name, scale=1.15, donor=None):
     keys = sorted({k for m in meshes for k in m['texrefs']})
     missing = [k for k in keys if k not in T]
     meshes = [m for m in meshes if all(k in T for k in m['texrefs'])]
+    if MERGE_CELL:
+        n0 = len(meshes); meshes = merge_meshes(meshes, MERGE_CELL); print('  merged', n0, '->', len(meshes))
     if donor:
         car = Car(*[open(f'{donor}.{k}', 'rb').read() for k in ('NGP', 'PTR', 'TEX', 'RTX')])
         dn = donor_prepare(car)
