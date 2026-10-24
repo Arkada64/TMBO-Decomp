@@ -19,7 +19,7 @@ from lvcol import build_piece, encode
 
 TEX_BUDGET = 2654208          # level TEX slot 0x1C05670 .. 0x1E8E3F0 (0x288D80)
 CLUT_BUDGET = 0x411           # level CLUT blocks
-TILE = 1200.0                 # render groups: square tiles (culling)
+LEAF = 16                     # meshes per leaf render group (retail: 12-16)
 
 def packet_of(n, o):
     q = o
@@ -237,22 +237,40 @@ def build(path, outdir, name, scale=1.15, donor=None):
         car = Car(struct.pack('<4I', 3, 0, 0, 0), struct.pack('<II', 0, 0), b'', b'')
     tex_total, clut_total = LT.plan(keys)
     tiles = collections.defaultdict(list)
+    def translucent(k):
+        a = T[k]['img'][..., 3]
+        return float((a < a.max()).mean()) > 0.02
+    tl = {k: translucent(k) for k in keys if k in T}
+    placed = []; nfail = 0
     for m in meshes:
         ctx = [LT.gs_ctx(k) for k in m['texrefs']]
+        m['level'] = True; m['alpha'] = any(tl.get(k) for k in m['texrefs'])   # retail arenas: ~15% alpha meshes
         try:
             blob, rel, pairs, sph = hierobject(m, 1.0, ctx)
         except Exception as e:
-            continue
+            nfail += 1; continue
+        if max(abs(sph[0]), abs(sph[1]), abs(sph[2])) > 50000: nfail += 1; continue   # bad transform path
         off = car.append(blob, rel, pairs)
-        tiles[(math.floor(sph[0] / TILE), math.floor(sph[1] / TILE))].append((off, sph))
+        placed.append((off, sph))
+    print('  meshes', len(placed), 'failed', nfail, 'alpha', sum(m['alpha'] for m in meshes))
+    def bound(lst):
+        P = np.array([s[:3] for _, s in lst]); c = tuple((P.max(0) + P.min(0)) / 2)
+        return (*c, max(math.dist(c, s[:3]) + s[3] for _, s in lst))
+    def kd(lst):
+        # retail arenas: small leaf groups (~12-16 meshes) inside a tree of op1 groups, so whole areas cull
+        if len(lst) <= LEAF:
+            b_ = bound(lst); return car.group([o for o, _ in lst], sphere=b_), b_
+        P = np.array([s[:3] for _, s in lst]); ax = int(np.argmax(P.max(0) - P.min(0)))
+        lst = sorted(lst, key=lambda e: e[1][ax]); h = len(lst) // 2
+        kids = [kd(lst[:h]), kd(lst[h:])]
+        P2 = np.array([b_[:3] for _, b_ in kids]); c = tuple((P2.max(0) + P2.min(0)) / 2)
+        b_ = (*c, max(math.dist(c, k[1][:3]) + k[1][3] for k in kids))
+        return car.group([g for g, _ in kids], sphere=b_), b_
     groups = []
-    for key, lst in tiles.items():
-        xs = [s[0] for _, s in lst]; ys = [s[1] for _, s in lst]; zs = [s[2] for _, s in lst]
-        c = ((max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2, (max(zs) + min(zs)) / 2)
-        r = max(math.dist(c, s[:3]) + s[3] for _, s in lst)
-        for i in range(0, len(lst), 250):
-            part = lst[i:i + 250]
-            groups.append((car.group([o for o, _ in part], sphere=(*c, r)), (*c, r)))
+    # very large meshes (backdrops, terrain sheets) go straight under the root; the rest into the tree
+    big = [e for e in placed if e[1][3] > 3000]; small = [e for e in placed if e[1][3] <= 3000]
+    if small: groups.append(kd(small))
+    for off, sph in big: groups.append((car.group([off], sphere=sph), sph))
     # ---- collision: one op18 per Head-On collision piece
     col = []; colpts = []; cn = 0
     for node, op, M, bb in collision_objects(n):
