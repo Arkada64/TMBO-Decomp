@@ -45,6 +45,9 @@ static float K[12] = { 0.0f, 3.0f, 14.0f, 40.0f, 0.8f, 0.12f, 1.6f, 2.0f, 0.5f, 
 
 typedef struct {
     int st;          /* 0 idle, 1 waiting for the planner, 2 following */
+    int roam;        /* the plan goes to `goal` (cruising / breaking away), not to the target car */
+    int far;         /* next roam goal: far away (breakaway) */
+    fvec goal;
     int n, i;        /* waypoints, current */
     int timer, cool, tick, lastD, noProg;
     char* tgt;
@@ -224,16 +227,18 @@ extern unsigned int tmbr_Cycles(void);              /* perf.c */
 extern void tmbr_PerfAdd(int slot, unsigned int start);
 extern float tmbr_NavArrive(void);
 extern void tmbr_NavLateLoad(void);
+extern void tmbr_DodgeFrame(void);   /* bots.c */
 void tmbr_NavFrame(void)
 {
     char* g = D_004FA030;
     int k, i;
     if (tmbr_botCount < 0 || !g) return;
+    tmbr_DodgeFrame();
     tmbr_NavLateLoad();
     if (tmbr_NavBaked()) {                    /* baked map: one plan at a time, NAV_STEP expansions per frame */
         static int cur = -1;
         unsigned int t0 = tmbr_Cycles();
-        if (cur >= 0 && (nb[cur].st != 1 || !live(g + cur * 0x31B0) || !live(nb[cur].tgt))) {
+        if (cur >= 0 && (nb[cur].st != 1 || !live(g + cur * 0x31B0) || (!nb[cur].roam && !live(nb[cur].tgt)))) {
             if (nb[cur].st == 1) nb[cur].st = 0;
             cur = -1;
         }
@@ -242,8 +247,8 @@ void tmbr_NavFrame(void)
                 i = (rr + k) % 8;
                 if (nb[i].st != 1) continue;
                 rr = i + 1;
-                if (!live(g + i * 0x31B0) || !live(nb[i].tgt)) { nb[i].st = 0; continue; }
-                if (tmbr_NavBakedBegin(POSV(g + i * 0x31B0), POSV(nb[i].tgt))) { cur = i; break; }
+                if (!live(g + i * 0x31B0) || (!nb[i].roam && !live(nb[i].tgt))) { nb[i].st = 0; continue; }
+                if (tmbr_NavBakedBegin(POSV(g + i * 0x31B0), nb[i].roam ? &nb[i].goal : POSV(nb[i].tgt))) { cur = i; break; }
                 nb[i].st = 0; nb[i].cool = 180;           /* off the map: the old driving */
             }
         if (cur >= 0 && tmbr_NavBakedStep(NAV_STEP)) {
@@ -274,50 +279,84 @@ void tmbr_NavFrame(void)
 }
 
 /* after a bot's AI frame (bots.c tmbr_AiUpdate). Returns 1 when it drove the car this frame. */
+extern int tmbr_NavRandomGoal(fvec* from, int minD, int maxD, int far, fvec* out);   /* navbake.c */
+/* steer toward a world direction (pads after the AI frame); returns the heading error, radians, absolute */
+float tmbr_NavSteer(char* v, float dx, float dy, int gas)
+{
+    unsigned char* pad = PAD(v);
+    float err;
+    dv.x = dx; dv.y = dy; dv.z = K[0]; dv.w = K[0];
+    rotFromVec(&rot, &dv);
+    err = rot.z - FL(CS(v), 0x68);
+    boundAngle(&err);
+    pad[2] = 0; pad[6] = 0; pad[8] = 0; pad[9] = 0; pad[0xA] = 0;
+    pad[4] = gas;
+    if (err > K[5]) pad[0xA] = 1;
+    else if (err < -K[5]) pad[9] = 1;
+    if (fabs_(err) > K[6]) pad[2] = 1;
+    return fabs_(err);
+}
+/* breakaway (bots.c): the next roam goal should be far from here */
+void tmbr_NavRoamFar(char* g, char* v) { int i = vidx(g, v); if (i >= 0) { nb[i].far = 1; if (nb[i].roam) nb[i].st = 0; } }
+
+/* follow the current path; returns 1 when it drove the car this frame, 0 when the path ended or broke */
+static int follow(NavBot* b, char* v)
+{
+    fvec* pos = POSV(v);
+    float d;
+    if (++b->timer > 900 || b->i >= b->n || F(v, 0x444) >= 60) {
+        if (F(v, 0x444) >= 60) b->cool = 120;   /* stuck: the unstick logic / the AI's own reverse takes over */
+        b->st = 0;
+        return 0;
+    }
+    d = fabs_(b->wp[b->i].x - pos->x) + fabs_(b->wp[b->i].y - pos->y);
+    if (d < (tmbr_NavBaked() ? tmbr_NavArrive() : P.cell * K[4] + K[2] * K[8])) b->i++;
+    else if ((b->timer & 7) == 0 && b->i + 1 < b->n) {   /* shortcut when the next point is in sight */
+        ra = *pos; ra.z += K[1]; rb = b->wp[b->i + 1];
+        if (hdLos(&ra, &rb, res, 0)) b->i++;
+    }
+    if (b->i >= b->n) { b->st = 0; return 0; }
+    tmbr_NavSteer(v, b->wp[b->i].x - pos->x, b->wp[b->i].y - pos->y, 1);
+    return 1;
+}
+
+/* after a bot's AI frame (bots.c tmbr_AiUpdate). Returns 1 when it drove the car this frame.
+ * With a baked map the game's own route-point driving is not used at all:
+ *  - cruising (driver mode 4) / fleeing (3) / no live target: roam between random reachable points of the map
+ *    (far ones after a breakaway), planned and followed here;
+ *  - hunting (mode 5) without sight of the target: a route to the target;
+ *  - hunting with the target in sight: 0, the fight steering (bots.c aggressiveTurn) drives. */
 int tmbr_NavDrive(char* g, char* v, char* t)
 {
     char* br = (char*)F(v, 0x2014);
     char* drv = (char*)F(v, 0x2018);
-    int i = vidx(g, v), noLos, dist, want;
+    int i = vidx(g, v), noLos, dist, want, mode;
     NavBot* b;
-    unsigned char* pad;
-    fvec* pos;
-    float err, d;
     if (i < 0 || !br || !drv) return 0;
     b = &nb[i];
-    if (F(drv, 4) != 5 || !live(t)) { if (b->st == 2) b->st = 0; return 0; }
+    mode = F(drv, 4);
+    if (b->cool > 0) b->cool--;
+    if (tmbr_NavBaked() && (mode == 4 || mode == 3 || !live(t))) {
+        if (!b->roam) { b->roam = 1; b->st = 0; }
+        if (b->st == 2) return follow(b, v);
+        if (b->st == 0 && !b->cool) {
+            if (tmbr_NavRandomGoal(POSV(v), 400, 1800, b->far, &b->goal)) { b->st = 1; b->tgt = 0; }
+            else b->cool = 120;
+            b->far = 0;
+        }
+        return 0;                                   /* waiting for the plan: the game drives for a few frames */
+    }
+    if (b->roam) { b->roam = 0; b->st = 0; }
+    if (mode != 5 || !live(t)) { if (b->st == 2) b->st = 0; return 0; }
     noLos = F(br, 0x4B0);
     dist = (int)FL(br, 0x20);
-    if (b->cool > 0) b->cool--;
     if (++b->tick % 240 == 0) {            /* closing in? (4 s) */
         b->noProg = dist * 100 >= b->lastD * 85;
         b->lastD = dist;
     }
     if (b->st == 2) {
-        if ((noLos < 10 && dist < 500) || t != b->tgt || ++b->timer > 900 || b->i >= b->n || F(v, 0x444) >= 60) {
-            if (F(v, 0x444) >= 60) b->cool = 120;   /* stuck: the AI's own reverse/turn takes over */
-            b->st = 0;
-            return 0;
-        }
-        pos = POSV(v);
-        d = fabs_(b->wp[b->i].x - pos->x) + fabs_(b->wp[b->i].y - pos->y);
-        if (d < (tmbr_NavBaked() ? tmbr_NavArrive() : P.cell * K[4] + K[2] * K[8])) b->i++;
-        else if ((b->timer & 7) == 0 && b->i + 1 < b->n) {   /* shortcut when the next point is in sight */
-            ra = *pos; ra.z += K[1]; rb = b->wp[b->i + 1];
-            if (hdLos(&ra, &rb, res, 0)) b->i++;
-        }
-        if (b->i >= b->n) { b->st = 0; return 0; }
-        dv.x = b->wp[b->i].x - pos->x; dv.y = b->wp[b->i].y - pos->y; dv.z = b->wp[b->i].z - pos->z; dv.w = K[0];
-        rotFromVec(&rot, &dv);
-        err = rot.z - FL(CS(v), 0x68);
-        boundAngle(&err);
-        pad = PAD(v);
-        pad[2] = 0; pad[6] = 0; pad[8] = 0; pad[9] = 0; pad[0xA] = 0;
-        pad[4] = 1;
-        if (err > K[5]) pad[0xA] = 1;
-        else if (err < -K[5]) pad[9] = 1;
-        if (fabs_(err) > K[6]) pad[2] = 1;
-        return 1;
+        if ((noLos < 10 && dist < 500) || t != b->tgt) { b->st = 0; return 0; }
+        return follow(b, v);
     }
     want = noLos >= 60 && dist > 60 && !b->cool && (NAV_ALWAYS || b->noProg || !F(drv, 0x270));
     if (tmbr_NavBaked()) want = noLos >= 30 && dist > 60 && !b->cool;   /* baked map: cheap and reliable, use it whenever the target is out of sight */

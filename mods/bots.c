@@ -28,6 +28,7 @@ extern int scePrintf(const char* fmt, ...);
 extern int mathfRandI(int lo, int hi) __asm__("mathfRand__Fii");
 extern void pickCruiseZone(char* g, char* v, int i) __asm__("gamePickCruiseZone__7TheGameP7Vehiclei");
 extern int tmbr_NavDrive(char* g, char* v, char* t);   /* nav.c */
+extern void tmbr_NavRoamFar(char* g, char* v);
 extern void tmbr_NavFrame(void);
 extern unsigned int tmbr_Cycles(void);              /* perf.c */
 extern void tmbr_PerfAdd(int slot, unsigned int start);
@@ -397,6 +398,9 @@ void tmbr_BotsThink(void)
                 leaveT[k2] = 16 + mathfRandI(0, 14);
                 fightT[k2] = 0;
                 cruiseFar(g, b, drv);       /* to the far side of the map: spreads the bots out */
+#if TMBR_NAV
+                tmbr_NavRoamFar(g, b);
+#endif
                 if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d breaks away (%s)\n", k2, pile ? "pile-up" : "long fight");
                 continue;
             }
@@ -649,6 +653,85 @@ static void unstick(char* g, char* v)
     stkPos[i][0] = p[0]; stkPos[i][1] = p[1]; stkPos[i][2] = p[2];
 }
 
+/* ---- Dodging: incoming weapons (the weapon table at game+0x6C3C0, 200 x 0x210: +0 in use, +0x130 the firing
+ * car, +0x200 its cs, position at cs+0x10). Positions are snapshot every frame (tmbr_DodgeFrame, nav.c's
+ * frame hook) to get velocities. A bot sees a shot that will pass within DODGE_MISS of it in 0.25-1.2 s, rolls
+ * once per shot by difficulty, and after its reaction delay swerves off the shot's line for ~0.4 s. */
+#define NW 200
+#define DODGE_MISS 45
+static int wpx[NW], wpy[NW], wvx[NW], wvy[NW];
+static unsigned char wok[NW];
+static int bpx[8], bpy[8];
+static short dodgeT[8], reactT[8], judged[8];
+static int dodgeX[8], dodgeY[8];
+static const unsigned char dodgeDelay[3] = { 24, 14, 8 }, dodgeChance[3] = { 30, 55, 80 };
+void tmbr_DodgeFrame(void)
+{
+    char* g = D_004FA030;
+    int i, x, y;
+    if (!g || tmbr_botCount < 0) return;
+    for (i = 0; i < NW; i++) {
+        char* w = g + 0x6C3C0 + i * 0x210;
+        char* cs = (char*)F(w, 0x200);
+        if (!F(w, 0) || !cs) { wok[i] = 0; continue; }
+        x = (int)*(float*)(cs + 0x10); y = (int)*(float*)(cs + 0x14);
+        if (wok[i]) { wvx[i] = x - wpx[i]; wvy[i] = y - wpy[i]; }
+        wpx[i] = x; wpy[i] = y;
+        if (wok[i] < 2) wok[i]++;
+    }
+}
+static int iabs(int x) { return x < 0 ? -x : x; }
+extern int tmbr_SameTeam(char* a, char* b);
+extern float tmbr_NavSteer(char* v, float dx, float dy, int gas);
+static void dodge(char* g, char* v)
+{
+    int k = (int)(v - g) / 0x31B0 & 7, i, x, y, fx, fy, n;
+    int diff = tmbr_botDiff < 0 ? 0 : tmbr_botDiff > 2 ? 2 : tmbr_botDiff;
+    x = (int)*(float*)(F(v, 0x2028) + 0x10); y = (int)*(float*)(F(v, 0x2028) + 0x14);
+    fx = x - bpx[k]; fy = y - bpy[k];
+    bpx[k] = x; bpy[k] = y;
+    if (*(signed char*)(v + 0x497) >= 4 || F(v, 0x444) >= 30) { dodgeT[k] = reactT[k] = 0; return; }
+    if (dodgeT[k] > 0) {
+        /* swerve: half forward, half off the shot's line (both scaled to ~100) */
+        n = iabs(fx) + iabs(fy);
+        if (n > 0) { fx = fx * 100 / n; fy = fy * 100 / n; } else { fx = dodgeX[k]; fy = dodgeY[k]; }
+        tmbr_NavSteer(v, (float)(fx + dodgeX[k]), (float)(fy + dodgeY[k]), 1);
+        if (diff == 2) ((unsigned char*)v)[0x594 + 7] = 1;   /* hard: turbo out of it */
+        dodgeT[k]--;
+        return;
+    }
+    if (reactT[k] > 0) { if (--reactT[k] == 0) dodgeT[k] = 25; return; }
+    for (i = 0; i < NW; i++) {
+        char* w = g + 0x6C3C0 + i * 0x210;
+        char* own;
+        int vx, vy, dx, dy, sp, dot, t, cx, cy;
+        if (wok[i] < 2 || !F(w, 0)) continue;
+        own = (char*)F(w, 0x130);
+        if (own == v || (own && tmbr_SameTeam(own, v))) continue;
+        dx = x - wpx[i]; dy = y - wpy[i];
+        if (iabs(dx) + iabs(dy) > 1500) continue;
+        vx = wvx[i]; vy = wvy[i];                  /* per frame */
+        sp = vx * vx + vy * vy;
+        if (sp < 9) continue;                      /* parked (mines etc.) */
+        dot = dx * vx + dy * vy;
+        if (dot <= 0) continue;                    /* going away */
+        t = dot / sp;                              /* frames to the closest point */
+        if (t < 15 || t > 72) continue;
+        cx = dx - vx * t; cy = dy - vy * t;
+        if (cx * cx + cy * cy > DODGE_MISS * DODGE_MISS) continue;
+        if (judged[k] == i + 1) return;            /* rolled for this shot already */
+        judged[k] = i + 1;
+        if (mathfRandI(0, 99) >= dodgeChance[diff]) return;
+        /* away from the line: perpendicular to the shot, on our side of it */
+        n = iabs(vx) + iabs(vy);
+        if (vx * dy - vy * dx > 0) { dodgeX[k] = -vy * 100 / n; dodgeY[k] = vx * 100 / n; }
+        else { dodgeX[k] = vy * 100 / n; dodgeY[k] = -vx * 100 / n; }
+        reactT[k] = dodgeDelay[diff] + mathfRandI(0, dodgeDelay[diff] / 2);
+        if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d sees shot %d (%d frames, miss %d)\n", k, i, t, iabs(cx) + iabs(cy));
+        return;
+    }
+}
+
 static int aiUpdate(char* v);
 extern void padClear(char* v) __asm__("vehicleSaveAndClearPadFlags__7Vehicle");
 int tmbr_AiUpdate(char* v)
@@ -656,7 +739,7 @@ int tmbr_AiUpdate(char* v)
     int r;
     if (F(D_003156C0, 0x1BB4) == 0xA && F(v, 0x2014)) { padClear(v); return 0; }   /* sync hold: bots frozen */
     r = aiUpdate(v);
-    if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030) unstick(D_004FA030, v);
+    if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030) { dodge(D_004FA030, v); unstick(D_004FA030, v); }
     return r;
 }
 
@@ -675,6 +758,9 @@ static int aiUpdate(char* v)
         if (shieldT[si] == 0) scePrintf("TMBR shield: bot %d on (20B4 %d 498 %d 464 %d)\n", si, F(v, 0x20B4), *(signed char*)(v + 0x498), F(v, 0x464));
         if (++shieldT[si] > 600) { shieldOff(v); shieldT[si] = 0; scePrintf("TMBR shield: bot %d off\n", si); }    /* 10 s, like the players' shield */
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
+#if TMBR_NAV
+        tmbr_NavDrive(g, v, 0);          /* roam the route map */
+#endif
         return r;
     }
     shieldT[(int)(v - g) / 0x31B0 & 7] = 0;
@@ -685,7 +771,13 @@ static int aiUpdate(char* v)
         F(F(v, 0x2014), 0x48) = 0;
         if (drv && t && F(drv, 4) >= 2 && F(drv, 4) <= 4 && !(F(drv, 4) == 4 && (ROLE(v) == R_CRUISER || leaveT[(int)(v - g) / 0x31B0 & 7] > 0))) { driverSetMode(drv, 5); driverSetTarget(drv, t); }
     }
-    if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) { t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0); return r; }
+    if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) {
+        t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
+#if TMBR_NAV
+        if (tmbr_botCount >= 0 && F(v, 0x2014)) tmbr_NavDrive(g, v, 0);
+#endif
+        return r;
+    }
     swap = F(t, 0x590) == 2;
     k = F(t, 0x2100) & 7;
     if (swap) {

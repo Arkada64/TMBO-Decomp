@@ -269,3 +269,24 @@ int tmbr_NavBakedResult(fvec* wp, int maxwp, int* full)
     }
     return k;
 }
+
+/* a random reachable point for roaming: tries random nodes, keeps the first between minD and maxD (manhattan)
+ * from `from`, or with far set the farthest of the tries */
+extern int mathfRand(int lo, int hi) __asm__("mathfRand__Fii");
+int tmbr_NavRandomGoal(fvec* from, int minD, int maxD, int far, fvec* out)
+{
+    int k, best = -1, bd = -1;
+    if (!tmbr_NavBaked() || !nav->n) return 0;
+    for (k = 0; k < 24; k++) {
+        int n = mathfRand(0, (int)nav->n - 1), d;
+        fvec q;
+        nodePos(n, &q);
+        d = (int)(q.x - from->x); if (d < 0) d = -d;
+        { int dy = (int)(q.y - from->y); d += dy < 0 ? -dy : dy; }
+        if (far) { if (d > bd) { bd = d; best = n; } continue; }
+        if (d >= minD && d <= maxD) { best = n; break; }
+    }
+    if (best < 0) return 0;
+    nodePos(best, out);
+    return 1;
+}
