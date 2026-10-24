@@ -159,6 +159,10 @@ void tmbr_TeamsKill(int victim, int killer) { (void)victim; (void)killer; }
 /* Team totals from the game's per-car stats (net D_003156C0: kills +0x2F28 [car], score +0x2F88 [car], deaths
  * +0x2F48 [car +0x2104]; limits: kills u16 +0x3098, score +0x308C, lives = game info byte +5; func_001761E8). */
 typedef struct { int kills[4], pts[4], members[4], alive[4]; } TeamStats;
+/* each car's team as last seen while the match ran (-1 = not playing): when a match ends on the frame of the
+ * deciding kill, the game has already taken the cars out of play (state no longer 1 / 2) - their kills still
+ * count for that team (log 2026-10-24: a 1-kill limit win came out "TEAMS TIED") */
+static signed char memb[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
 static void teamStats(TeamStats* ts)
 {
     char *g = D_004FA030, *gi = *(char**)(D_003156C0 + 0x3148);
@@ -168,8 +172,9 @@ static void teamStats(TeamStats* ts)
     for (k = 0; k < 8; k++) {
         char* v = g + k * VSIZE;
         int t, d, slot;
-        if (!F(v, 0x20D8) || (F(v, 0x590) != 1 && F(v, 0x590) != 2)) continue;
-        t = tmbr_TeamOf(v) & 3;
+        if (F(v, 0x20D8) && (F(v, 0x590) == 1 || F(v, 0x590) == 2)) t = tmbr_TeamOf(v) & 3;
+        else if (memb[k] >= 0) t = memb[k] & 3;
+        else continue;
         ts->kills[t] += F(D_003156C0, 0x2F28 + 4 * k);
         ts->pts[t] += F(D_003156C0, 0x2F88 + 4 * k);
         ts->members[t]++;
@@ -233,7 +238,7 @@ void tmbr_TeamsFrame(void)
         score[0] = score[1] = 0;
         overShown = 0;
         winner = -1;
-        for (k = 0; k < 8; k++) rcvVeh[k] = -1;
+        for (k = 0; k < 8; k++) rcvVeh[k] = -1, memb[k] = -1;
         for (k = 0; k < 8; k++) {
             char* v = g + k * VSIZE;
             if (F(v, 0x590)) scePrintf("TMBR teams: car %d kind %d slot %d team %s\n", k, F(v, 0x590), F(v, 0x20C0), TEAMNAME[tmbr_TeamOf(v) & 3]);
@@ -243,7 +248,13 @@ void tmbr_TeamsFrame(void)
         for (s = 0; s < 8; s++) if (HUMAN(s) && !botSlot[s]) tmbr_team[s] = 0;
     for (s = 0; s < 8; s++) F(CLIENT(s), 0x14) = tmbr_team[s];
     if (netIsHost(D_003156C0) && (dirty || ++sendTick >= 120)) { dirty = 0; sendTick = 0; sendTable(); }
-    if (gameType() > 1) lastType = gameType();
+    if (gameType() > 1) {
+        lastType = gameType();
+        for (k = 0; k < 8; k++) {
+            char* v = g + k * VSIZE;
+            if (F(v, 0x20D8) && (F(v, 0x590) == 1 || F(v, 0x590) == 2)) memb[k] = tmbr_TeamOf(v) & 3;
+        }
+    }
     if (netIsHost(D_003156C0) && winner < 0) teamLimits();
 }
 
@@ -302,7 +313,7 @@ void tmbr_TeamsHud(void)
     viewGetSize(viewGetCurView(), &wh[0], &wh[1]);
     if (winShown < 0) { sprintf(buf, "TEAMS TIED"); fontSetColor(0, 0x80, 0x80, 0x80); }
     else { sprintf(buf, "%s TEAM WINS", TEAMNAME[winShown & 3]); tmbr_TeamColor(winShown); }
-    fontSpritePrintCenteredXY(0, wh[0] / 2, wh[1] / 2 - 40, buf);
+    fontSpritePrintCenteredXY(0, wh[0] / 2, TEAM_Y(wh[1]), buf);         /* bottom centre, under the scoreboard */
     fontSpriteEnd(0);
 }
 
