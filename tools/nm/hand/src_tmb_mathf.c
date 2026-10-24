@@ -271,3 +271,45 @@ void func_0021F928(float* out, float* q)
     }
     out[3] = q[3];
 }
+//@@ mathfTransform3dTo2d__FiP8_fvectorT1 hand
+/* world point p -> screen for view i: t = p + the view's world-eye offset (w = 1), r = WorldToScreen * t;
+ * out = (r.x / r.w, r.y / r.w, r.w, r.z / r.w). Nothing when p or out is NULL. */
+extern float* viewGetWeTrans__Fi(int i);
+extern float* viewGetWorldToScreenMat__Fi(int i);
+extern void mathfMulVec4x4__FPA3_fP8_fvectorT1(float* m, float* v, float* out);
+void mathfTransform3dTo2d__FiP8_fvectorT1(int i, float* p, float* out)
+{
+    float t[4] __attribute__((aligned(16))), r[4] __attribute__((aligned(16)));
+    float* we = viewGetWeTrans__Fi(i);
+    float* m = viewGetWorldToScreenMat__Fi(i);
+    float k;
+    if (!p || !out) return;
+    t[0] = p[0] + we[0]; t[1] = p[1] + we[1]; t[2] = p[2] + we[2]; t[3] = 1.0f;
+    mathfMulVec4x4__FPA3_fP8_fvectorT1(m, t, r);
+    k = 1.0f / r[3];
+    out[2] = r[3];
+    out[3] = r[2] * k;
+    out[0] = r[0] * k;
+    out[1] = r[1] * k;
+}
+//@@ func_0021ED78 hand
+/* re-orthonormalize a rotation's rows: r0 = norm(r1 x r2), r1 = norm(r2 x r0), r2 = norm(r0 x r1).
+ * The VU0 code stores whole quads, so the w words move too: m[3] = old m[7], m[7] = old m[11], m[11] = new m[3]. */
+#ifdef __mips__
+static float nm_sqrtC(float x) { float r; __asm__("sqrt.s %0, %1" : "=f"(r) : "f"(x)); return r; }
+#else
+#include <math.h>
+#define nm_sqrtC sqrtf
+#endif
+static void nm_crossNorm(float* out, float* a, float* b, float w)
+{
+    float x = a[1] * b[2] - b[1] * a[2], y = a[2] * b[0] - b[2] * a[0], z = a[0] * b[1] - b[0] * a[1];
+    float k = 1.0f / nm_sqrtC(x * x + y * y + z * z);
+    out[0] = x * k; out[1] = y * k; out[2] = z * k; out[3] = w;
+}
+void func_0021ED78(float* m)
+{
+    nm_crossNorm(m, m + 4, m + 8, m[7]);
+    nm_crossNorm(m + 4, m + 8, m, m[11]);
+    nm_crossNorm(m + 8, m, m + 4, m[3]);
+}
