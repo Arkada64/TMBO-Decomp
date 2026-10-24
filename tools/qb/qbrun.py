@@ -39,6 +39,8 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument('script'); ap.add_argument('--iso', default='test/TMBR_LOST.iso')
     ap.add_argument('--elf', default='test/TMBR_TEST.ELF'); a = ap.parse_args()
     os.chdir(W)
+    if 'pcsx2-qt.exe' in subprocess.run(['tasklist.exe'], capture_output=True, text=True).stdout:
+        sys.exit('PCSX2 is already running (someone is playing): not starting a test run')
     script = json.load(open(a.script))
     open('test/QUICK.ELF', 'wb').write(patch(a.elf, script))
     ini = f'{P}/inis/PCSX2.ini'; shutil.copy(ini, ini + '.qbbak')
@@ -64,7 +66,9 @@ def main():
             time.sleep(5)
         time.sleep(max(0, script.get('stop', 60) - (time.time() - t0)))
     finally:
-        subprocess.run(['taskkill.exe', '/IM', 'pcsx2-qt.exe', '/F'], capture_output=True)
+        # only the PCSX2 this run started (never the user's own session)
+        ps("Get-CimInstance Win32_Process -Filter \"Name='pcsx2-qt.exe'\" | Where-Object { $_.CommandLine -match 'QUICK.ELF' } | "
+           "ForEach-Object { Stop-Process -Id $_.ProcessId -Force }")
         time.sleep(2)
         shutil.copy(ini + '.qbbak', ini)
     out = time.strftime('cloud/qb_out/%Y%m%d_%H%M%S'); os.makedirs(out, exist_ok=True)
