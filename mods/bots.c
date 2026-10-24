@@ -11,13 +11,13 @@
  * owner as -2/-3); bot-vs-bot targeting. */
 typedef unsigned int u32;
 #define F(p, off) (*(int*)((char*)(p) + (off)))
-#define MAXBOTS 6
+#define MAXBOTS 7       /* 1 player + 7 bots = the 8 car slots */
 #define TMBR_BOTDBG 0
 #ifndef TMBR_NAV
 #define TMBR_NAV 1
 #endif
 #define LIST(g) ((char**)((g) + 0x9E690))
-#define SORT(g) ((int*)((g) + 0x9E6A8))
+#define SORT(g) ((int*)((g) + 0x9E6AC))   /* after the 7-entry AI list (apply_mods.py: 0x139B0C, 0x13C178) */
 #define NAI(g) F(g, 0x9FEE4)
 
 extern char* D_004FA030;   /* game */
@@ -43,7 +43,7 @@ extern void vehNetDrop(char* v) __asm__("func_001DC130");
 extern void vehicleDisable(char* v) __asm__("vehicleDisable__7Vehicle");
 extern void radarName(int slot, int name) __asm__("func_0014ECE8");
 
-int tmbr_botCount = -1;    /* -1: original rule */
+int tmbr_botCount = 0;     /* bots in the match; the original "3 - humans" rule (AUTO) and USE BOTS are gone */
 int tmbr_botDiff = 1;      /* AI difficulty (game+0x9A3D4) used with a chosen count: 0 easy, 1 medium, 2 hard */
 static int prevPad;
 
@@ -72,7 +72,16 @@ static int wanted(int mid)
     return n < 0 ? 0 : n;
 }
 
-int tmbr_BotsPlanned(void) { return F(D_003156C0, 0x3148) ? wanted(0) : 0; }
+static void botsShown(int* c, int* d);
+int tmbr_BotsPlanned(void)
+{
+    int c, d, h = humans();
+    if (!F(D_003156C0, 0x3148)) return 0;
+    if (netIsHost(D_003156C0)) return wanted(0);
+    botsShown(&c, &d);
+    if (c > 8 - h) c = 8 - h;
+    return c < 0 ? 0 : c;
+}
 
 /* AI index of every bot = its list position: vehicle, sort list, brain, net objects, radar */
 static void reindex(char* g)
@@ -298,6 +307,13 @@ int tmbr_Opt(int bit)
     char* gi = GINFO();
     return gi && (gi[0xC6] & bit);
 }
+/* bot count / difficulty for everyone's lobby: game info byte +0xC7 = 0x80 | count | difficulty << 3 */
+static void botsShown(int* c, int* d)
+{
+    char* gi = GINFO();
+    if (netIsHost(D_003156C0) || !gi || !(gi[0xC7] & 0x80)) { *c = tmbr_botCount; *d = tmbr_botDiff; return; }
+    *c = gi[0xC7] & 7; *d = (gi[0xC7] >> 3) & 3;
+}
 static void optSync(int flip)
 {
     char* gi = GINFO();
@@ -307,6 +323,10 @@ static void optSync(int flip)
     want = (gi[0xC6] & OPT_TEAMS) != 0;
     has = (F(gi, 0) >> 12) & 1;
     if (want != has) F(gi, 0) ^= 0x1000;   /* the mode presets clear it: put it back */
+    {
+        char bb = (char)(0x80 | (tmbr_botCount & 7) | (tmbr_botDiff & 3) << 3);
+        if (gi[0xC7] != bb) { gi[0xC7] = bb; flip = 1; }
+    }
     if (flip || want != has) netSendGameInfo(D_003156C0, -1);
 }
 extern int tmbr_TeamOf(char* v);         /* teams.c */
@@ -788,10 +808,31 @@ static void lobbyLine(int row, int color, const char* t)   /* color: -1 = the ga
     fontSetCursorAtSubPixel(0, 0x1810, 0xFA0 + row * 0x100);
     fontPrint(0, t);
 }
+/* The deathmatch settings editor (func_001C7C28) has 8 rows from parallel tables (text, min, max, value
+ * pointer, step, value printer jtbl_004EEFC0): row 6 "USE BOTS", row 7 "SYNCHRONOUS ENTRY", and the two were
+ * mutually exclusive (bots only in asynchronous games). Row 7 moves into row 6 and the row count is 7
+ * (apply_mods.py: 0x1C7C3C; the exclusion at 0x1C8334 is skipped). The waiting room's settings list line
+ * "USE BOTS : YES/NO" (both strings) shows our count instead. */
+extern u32 D_004EEF28[], D_004EEF48[], D_004EEF68[], D_004EEF88[], D_004EEFA8[], jtbl_004EEFC0[];
+extern char D_004EEBC8[], D_004EEBD8[];
+static void settingsRows(void)
+{
+    u32* t[6];
+    int k, c, d;
+    char line[16];
+    t[0] = D_004EEF28; t[1] = D_004EEF48; t[2] = D_004EEF68; t[3] = D_004EEF88; t[4] = D_004EEFA8; t[5] = jtbl_004EEFC0;
+    if (D_004EEF88[6] != D_004EEF88[7])
+        for (k = 0; k < 6; k++) t[k][6] = t[k][7];
+    botsShown(&c, &d);
+    sprintf(line, "BOTS : %d %s", c, d == 0 ? "EASY" : d == 1 ? "MED" : "HARD");   /* 13 chars max: fits both */
+    for (k = 0; line[k]; k++) { D_004EEBC8[k] = line[k]; D_004EEBD8[k] = line[k]; }
+    D_004EEBC8[k] = 0; D_004EEBD8[k] = 0;
+}
 void tmbr_LobbyFrame(void)
 {
     int pad = 0, pressed, host, teams;
     char buf[48], buf2[48], ra[40], rb[40];
+    settingsRows();
     lobbyFrame();
     tmbr_SkinsLobby();
     tmbr_PedNamesInit();
@@ -814,9 +855,11 @@ void tmbr_LobbyFrame(void)
         lobbyLine(10, 0, ra);
         lobbyLine(11, 1, rb);
     } else {
-        if (tmbr_botCount < 0) sprintf(buf, "BOTS : AUTO  TRAFFIC %s", tmbr_Opt(OPT_TRAFFIC) ? "ON" : "OFF");
-        else sprintf(buf, "BOTS : %d %s  TRAFFIC %s", tmbr_botCount, tmbr_botDiff == 0 ? "EASY" : tmbr_botDiff == 1 ? "MED" : "HARD",
-            tmbr_Opt(OPT_TRAFFIC) ? "ON" : "OFF");
+        {
+            int bc, bd;
+            botsShown(&bc, &bd);
+            sprintf(buf, "BOTS : %d %s  TRAFFIC %s", bc, bd == 0 ? "EASY" : bd == 1 ? "MED" : "HARD", tmbr_Opt(OPT_TRAFFIC) ? "ON" : "OFF");
+        }
         lobbyLine(10, -1, buf);
         if (!teams) lobbyLine(11, -1, "TEAMS OFF  (HOLD R3: HELP)");
         else {
@@ -841,7 +884,7 @@ void tmbr_LobbyFrame(void)
         if (pressed & 0x400) tmbr_botCount--;
         if (pressed & 0x200) tmbr_botDiff++;
         if (pressed & 0x100) tmbr_botDiff--;
-        if (tmbr_botCount < -1) tmbr_botCount = -1;
+        if (tmbr_botCount < 0) tmbr_botCount = 0;
         if (tmbr_botCount > MAXBOTS) tmbr_botCount = MAXBOTS;
         if (tmbr_botDiff < 0) tmbr_botDiff = 0;
         if (tmbr_botDiff > 2) tmbr_botDiff = 2;

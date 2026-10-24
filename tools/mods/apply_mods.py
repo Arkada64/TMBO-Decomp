@@ -136,12 +136,12 @@ PATCHES = [
     (A("tmb/shell.s"), "001889E4", "jal", "jal        tmbr_LevelTexInitStub"),
     # ... and the level RTX init (func_00188688), where the pack's CLUTs join the level's
     (A("tmb/shell.s"), "0018873C", "jal", "jal        tmbr_LevelRtxStub"),
-    # bots (mods/bots.c): AI list game+0x9E690 2 -> 6 entries, AI sort list 0x9FC98 -> 0x9E6A8
-    (A("nonmatchings/online/after_freewaytrain_18/func_00137E08.s"), "00137E70", "addiu", "addiu      $3, $0, 0x6"),
-    (A("nonmatchings/tmb/game/InitTypeOfVehicles__7TheGame.s"), "00138340", "slti", "slti       $2, $3, 0x6"),
-    (A("nonmatchings/online/net/func_001756A0.s"), "0017576C", "slti", "slti       $2, $18, 0x6"),
-    (A("nonmatchings/tmb/game/func_001399A8.s"), "00139B0C", "sw", "sw         $16, 0x18($3)"),
-    (A("nonmatchings/tmb/game/func_0013BEA0.s"), "0013C178", "addiu", "addiu      $12, $13, 0x66A8"),
+    # bots (mods/bots.c): AI list game+0x9E690 2 -> 7 entries, AI sort list 0x9FC98 -> 0x9E6AC
+    (A("nonmatchings/online/after_freewaytrain_18/func_00137E08.s"), "00137E70", "addiu", "addiu      $3, $0, 0x7"),
+    (A("nonmatchings/tmb/game/InitTypeOfVehicles__7TheGame.s"), "00138340", "slti", "slti       $2, $3, 0x7"),
+    (A("nonmatchings/online/net/func_001756A0.s"), "0017576C", "slti", "slti       $2, $18, 0x7"),
+    (A("nonmatchings/tmb/game/func_001399A8.s"), "00139B0C", "sw", "sw         $16, 0x1C($3)"),
+    (A("nonmatchings/tmb/game/func_0013BEA0.s"), "0013C178", "addiu", "addiu      $12, $13, 0x66AC"),
     # ... game start: any mode (also Last Man Standing), our count instead of "3 - humans"
     (A("nonmatchings/tmb/game/func_001399A8.s"), "00139A50", "beqz", "nop"),
     (A("nonmatchings/tmb/game/func_001399A8.s"), "00139A98", "beqz", "nop"),
@@ -205,6 +205,9 @@ PATCHES = [
     (A("nonmatchings/online/net/func_00176EA0.s"), "00176EA4", "lui", "nop"),
     (A("nonmatchings/online/after_game_19/func_0013EED0.s"), "0013EED0", "addiu", "j          tmbr_BotRemove"),
     (A("nonmatchings/online/after_game_19/func_0013EED0.s"), "0013EED4", "sq", "nop"),
+    # ... deathmatch settings: "USE BOTS" row removed (bots.c settingsRows), bots no longer exclude sync entry
+    (A("tmb/ui.s"), "001C7C3C", "addiu", "addiu      $s7, $zero, 0x7"),
+    (A("tmb/ui.s"), "001C8334", "bne", "b          .L001C8368"),
     # ... bot count picked in the waiting room
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B39B4", "jal", "jal        tmbr_LobbyFrame"),
     # ... bot targets' attractor group during the hunter's whole AI frame (bot vs bot)
