@@ -63,11 +63,15 @@ def apply(src):
     st = dict(asm=len(names), used=0, no_draft=0, no_compile=0, dropped=0, kept_asm=0)
     if not names: return st
     blocks = re.split(r"^//@@ (\S+)[^\n]*\n", drafts.read_text(), flags=re.M)[1:] if drafts.exists() else []
+    # hand-written C (tools/nm/hand/<slug>.c, same //@@ format) goes first: tried before the m2c drafts
+    hand = R / f"logs/hand/{slug}.c"
+    handb = re.split(r"^//@@ (\S+)[^\n]*\n", hand.read_text(), flags=re.M)[1:] if hand.exists() else []
+    handn = set(handb[0::2]); blocks = handb + blocks
     variants = {}
     for n, c in zip(blocks[0::2], blocks[1::2]): variants.setdefault(n, []).append(c.rstrip() + "\n")
     hdr = header_for(rel); chosen = {}
     for n in names:
-        if n in hooked or n in SKIP or n.endswith("Asm") or "Asm__" in n: st["kept_asm"] += 1; continue
+        if n in hooked or n in SKIP or ((n.endswith("Asm") or "Asm__" in n) and n not in handn): st["kept_asm"] += 1; continue
         if n not in variants: st["no_draft"] += 1; continue
         for c in variants[n]:
             if re.search(r"\bM2C_(BREAK|ERROR|TRAP|SYNC|UNK_)\w*\s*\(", c): continue   # m2c placeholders: compile, never link
