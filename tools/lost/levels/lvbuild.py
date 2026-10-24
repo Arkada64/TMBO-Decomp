@@ -278,7 +278,7 @@ def build(path, outdir, name, scale=1.15, donor=None):
     rr = max(math.dist(cc, g[1][:3]) + g[1][3] for g in groups)
     root = car.group([g for g, _ in groups], sphere=(*cc, rr))
     # ---- op15 collision grid (hdColGrid): cols x rows inline cell pointers after a 0x20 header
-    # {0xf, u16 cols, f32 cell, f32 minx, miny, maxx, maxy, ptr}; a cell -> linked entries {next, path};
+    # {0xf, u16 cols, f32 cell, f32 minx, miny, maxx, maxy, run-time table}; a cell -> linked entries {next, path};
     # path {0, n, n node pointers from the entry root down to the op1 that holds one op18}
     P = np.concatenate(colpts) if colpts else np.zeros((1, 3))
     x0, y0 = math.floor(P[:, 0].min() - 100), math.floor(P[:, 1].min() - 100)
@@ -306,7 +306,8 @@ def build(path, outdir, name, scale=1.15, donor=None):
     g15 = bytearray(0x20 + 4 * cols * rows)
     struct.pack_into('<IIf4f', g15, 0, 0xf, cols, 100.0, x0, y0, x0 + 100.0 * cols, y0 + 100.0 * rows)
     e15 = car.append(bytes(g15))
-    if ents_start is not None: car.setp(e15 + 0x1C, ents_start)
+    # +0x1C: a second cols x rows table the game fills at run time (dynamic objects per cell, hdcar); zero on disc
+    dyn = car.append(bytes(4 * cols * rows)); car.setp(e15 + 0x1C, dyn)
     for k, h_ in enumerate(heads):
         if h_ is not None: car.setp(e15 + 0x20 + 4 * k, h_)
     ncell = cols * rows
