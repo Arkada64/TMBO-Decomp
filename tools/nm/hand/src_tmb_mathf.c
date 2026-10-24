@@ -153,3 +153,121 @@ float func_0021ED28(float* a, float* b, float* out, float* tmp)
     out[0] = a[0] - t0; out[1] = a[1] - t1; out[2] = a[2] - t2; out[3] = a[3];
     return k;
 }
+//@@ func_0021D810 hand
+/* normalize the three columns of the 3x3 part (rows 16 bytes apart); a column shorter than 1e-7 becomes (0,0,1) */
+#ifdef __mips__
+static float nm_sqrt6(float x) { float r; __asm__("sqrt.s %0, %1" : "=f"(r) : "f"(x)); return r; }
+#else
+#include <math.h>
+#define nm_sqrt6 sqrtf
+#endif
+void func_0021D810(float* m)
+{
+    int i;
+    for (i = 0; i < 3; i++) {
+        float x = m[i], y = m[4 + i], z = m[8 + i];
+        float len = nm_sqrt6(x * x + y * y + z * z);
+        if (len < 1.0e-7f) { m[i] = 0.0f; m[4 + i] = 0.0f; m[8 + i] = 1.0f; }
+        else { float k = 1.0f / len; m[8 + i] = z * k; m[i] = x * k; m[4 + i] = y * k; }
+    }
+}
+//@@ mathfMatrixFromNormal__FPA3_fP8_fvector hand
+/* orientation with row 1 = n: row 0 = (ny, -nx, 0) / |n.xy|, row 2 = (-nx nz / h, -ny nz / h, h); rest identity.
+ * |n.xy| below 1e-6 (n straight up / down): row 0 = (1,0,0), row 2 = (0, -nz, h) */
+#ifdef __mips__
+static float nm_sqrt7(float x) { float r; __asm__("sqrt.s %0, %1" : "=f"(r) : "f"(x)); return r; }
+#else
+#include <math.h>
+#define nm_sqrt7 sqrtf
+#endif
+void mathfMatrixFromNormal__FPA3_fP8_fvector(float* m, float* n)
+{
+    float nz = n[2], h;
+    m[4] = n[0]; m[5] = n[1]; m[6] = nz;
+    h = nm_sqrt7(n[0] * n[0] + n[1] * n[1]);
+    if (h > 1.0e-6f) {
+        float a = n[1] / h, b = -n[0] / h;
+        m[0] = a; m[1] = b;
+        m[8] = b * n[2]; m[9] = -a * n[2];
+    } else {
+        m[0] = 1.0f; m[1] = 0.0f; m[8] = 0.0f; m[9] = -nz;
+    }
+    m[10] = h; m[15] = 1.0f;
+    m[2] = 0.0f; m[11] = 0.0f; m[7] = 0.0f; m[3] = 0.0f; m[14] = 0.0f; m[13] = 0.0f; m[12] = 0.0f;
+}
+//@@ func_0021EAB0 hand
+/* orientation looking from a to b: mathfMatrixFromNormal(m, normalize(b - a)); nothing when a == b */
+extern void mathfMatrixFromNormal__FPA3_fP8_fvector(float* m, float* n);
+#ifdef __mips__
+static float nm_sqrt8(float x) { float r; __asm__("sqrt.s %0, %1" : "=f"(r) : "f"(x)); return r; }
+#else
+#include <math.h>
+#define nm_sqrt8 sqrtf
+#endif
+void func_0021EAB0(float* m, float* a, float* b)
+{
+    float d[4] __attribute__((aligned(16)));
+    float l2, k;
+    d[0] = b[0] - a[0]; d[1] = b[1] - a[1]; d[2] = b[2] - a[2]; d[3] = b[3];
+    l2 = d[0] * d[0] + d[1] * d[1] + d[2] * d[2];
+    if (!(0.0f < l2)) return;
+    k = 1.0f / nm_sqrt8(l2);
+    d[0] *= k; d[1] *= k; d[2] *= k;
+    mathfMatrixFromNormal__FPA3_fP8_fvector(m, d);
+}
+//@@ func_0021F7F8 hand
+/* quaternion turning unit vector a onto unit vector b: s = sqrt(2 (1 + a.b)); q.xyz = (a x b) / s, q.w = s / 2 */
+#ifdef __mips__
+static float nm_sqrt9(float x) { float r; __asm__("sqrt.s %0, %1" : "=f"(r) : "f"(x)); return r; }
+#else
+#include <math.h>
+#define nm_sqrt9 sqrtf
+#endif
+void func_0021F7F8(float* q, float* a, float* b)
+{
+    float cx = a[1] * b[2] - b[1] * a[2];
+    float cy = a[2] * b[0] - b[2] * a[0];
+    float cz = a[0] * b[1] - b[0] * a[1];
+    float d = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    float s = nm_sqrt9((d + 1.0f) + (d + 1.0f));
+    float k = 1.0f / s;
+    q[0] = cx * k; q[1] = cy * k; q[2] = cz * k;
+    q[3] = s * 0.5f;
+}
+//@@ func_0021F878 hand
+/* normalize quaternion q into out, unless its squared length is already within ~1e-6 of 1 (out untouched then) */
+#ifdef __mips__
+static float nm_sqrtA(float x) { float r; __asm__("sqrt.s %0, %1" : "=f"(r) : "f"(x)); return r; }
+#else
+#include <math.h>
+#define nm_sqrtA sqrtf
+#endif
+void func_0021F878(float* out, float* q)
+{
+    float l2 = q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3];
+    float k;
+    if (!(1.00000095367431640625f <= l2) && !(l2 <= 0.99999904632568359375f)) return;
+    k = 1.0f / nm_sqrtA(l2);
+    out[0] = q[0] * k; out[1] = q[1] * k; out[2] = q[2] * k; out[3] = q[3] * k;
+}
+//@@ func_0021F928 hand
+/* rescale the vector part so q is a unit quaternion for its w: xyz *= sqrt((1 - w^2) / |xyz|^2);
+ * |xyz|^2 below 1e-7: xyz = (0, 0, sqrt(1 - w^2)). out.w = q.w */
+#ifdef __mips__
+static float nm_sqrtB(float x) { float r; __asm__("sqrt.s %0, %1" : "=f"(r) : "f"(x)); return r; }
+#else
+#include <math.h>
+#define nm_sqrtB sqrtf
+#endif
+void func_0021F928(float* out, float* q)
+{
+    float l2 = q[0] * q[0] + q[1] * q[1] + q[2] * q[2];
+    if (l2 < 1.0e-7f) {
+        out[0] = 0.0f; out[1] = 0.0f;
+        out[2] = nm_sqrtB(1.0f - q[3] * q[3]);
+    } else {
+        float k = nm_sqrtB((1.0f - q[3] * q[3]) / l2);
+        out[0] = q[0] * k; out[1] = q[1] * k; out[2] = q[2] * k;
+    }
+    out[3] = q[3];
+}
