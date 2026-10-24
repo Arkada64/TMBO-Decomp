@@ -207,7 +207,11 @@ PATCHES = [
     (A("nonmatchings/online/after_game_19/func_0013EED0.s"), "0013EED4", "sq", "nop"),
     # ... deathmatch settings: "USE BOTS" row removed (bots.c settingsRows), bots no longer exclude sync entry
     (A("tmb/ui.s"), "001C7C3C", "addiu", "addiu      $s7, $zero, 0x7"),
-    (A("tmb/ui.s"), "001C8334", "bne", "b          .L001C8368"),
+    # skip the use-bots / sync exclusion but keep $s0 = &net (.L001C8364): branching to .L001C8368 left $s0 = row
+    # index and the next lw 0x3148($s0) faulted (TLB miss at 0x1C8368, addr 0x314E): sync entry could not be set
+    (A("tmb/ui.s"), "001C8334", "bne", "b          .L001C8364"),
+    # draw 7 rows, not 8: row 7 (sync entry) is shown in row 6's place by settingsRows, it was listed twice
+    (A("tmb/ui.s"), "001C80BC", "slti", "slti       $v0, $s1, 0x7"),
     # ... bot count picked in the waiting room
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B39B4", "jal", "jal        tmbr_LobbyFrame"),
     # ... bot targets' attractor group during the hunter's whole AI frame (bot vs bot)

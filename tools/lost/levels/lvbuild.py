@@ -265,18 +265,18 @@ def build(path, outdir, name, scale=1.15, donor=None):
         hdr = bytearray(0x20)
         struct.pack_into('<IffI3fI', hdr, 0, 0x12, rad * rad, rad, BASE + base, *c, 0)
         o18 = car.append(bytes(hdr)); car.slots.append(o18 + 0xC)
-        wrap = car.group([o18], sphere=(*c, rad))        # TMB: every op18 sits alone in an op1 (the grid's path leaf)
+        wrap = car.group([o18], sphere=(*c, rad), flags=2)   # alone in an op1 (the grid's path leaf); flag 2 = holds collision
         col.append((wrap, (*c, rad))); colpts.append(used)
     colgroups = []
     for i in range(0, len(col), 250):
         part = col[i:i + 250]
         cs = np.array([s_[:3] for _, s_ in part]); c = tuple((cs.max(0) + cs.min(0)) / 2)
         r = max(math.dist(c, s_[:3]) + s_[3] for _, s_ in part)
-        g_ = car.group([o for o, _ in part], sphere=(*c, r))
+        g_ = car.group([o for o, _ in part], sphere=(*c, r), flags=2)   # hdTraverse_hdcar skips groups without flag 2
         groups.append((g_, (*c, r))); colgroups.append((g_, part))
     allc = np.array([g[1][:3] for g in groups]); cc = tuple((allc.max(0) + allc.min(0)) / 2)
     rr = max(math.dist(cc, g[1][:3]) + g[1][3] for g in groups)
-    root = car.group([g for g, _ in groups], sphere=(*cc, rr))
+    root = car.group([g for g, _ in groups], sphere=(*cc, rr), flags=3)   # 1 = drawable, 2 = collision below
     # ---- op15 collision grid (hdColGrid): cols x rows inline cell pointers after a 0x20 header
     # {0xf, u16 cols, f32 cell, f32 minx, miny, maxx, maxy, run-time table}; a cell -> linked entries {next, path};
     # path {0, n, n node pointers from the entry root down to the op1 that holds one op18}
