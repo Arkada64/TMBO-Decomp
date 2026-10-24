@@ -331,55 +331,12 @@ void tmbr_FodderTakeHit(char* v, void* pos, int a, int b)
 }
 
 extern void netVehicleDamage(void* net, char* victim, char* attacker, float dmg) __asm__("func_001740B0");
-/* damage reports (Twisted Metal: Head-On): "N Pts Damage" each time the local player hurts another car
- * (players, bots, traffic). Hits on the same victim within 1 s add up into one report, so machine-gun streams
- * read as a running total. Drawn with the game font (yellow, like the reticle countdown) a bit below the kill
- * feed (same sprite font, centred) for 1.5 s, so kill messages never hide it. */
-extern void fontSpritePrintCenteredXY(int font, int x, int y, const char* s) __asm__("fontSpritePrintCenteredXY__FiiiPc");
-extern void fontSpriteEnd(int font) __asm__("func_00202C58");
-extern void fontSetColor(int font, int r, int g, int b) __asm__("fontSetColor__Fiiii");
-extern void* viewGetCurView(void) __asm__("viewGetCurView__Fv");
-extern void viewGetSize(void* view, int* w, int* h) __asm__("func_00243AA8");
-extern int sprintf(char* s, const char* f, ...);
-static char* dmgVictim;
-static float dmgSum;
-static int dmgTime, dmgClock, dmgLen;
-static char dmgText[32];
-static float DMG_K[2] = { 0.5f, 0.0f };
-extern void tmbr_TeamsHud(void);   /* teams.c */
-void tmbr_DamageReportTick(void)
-{
-    dmgClock++;
-    tmbr_TeamsHud();
-    if (!dmgLen || dmgClock - dmgTime > 90) return;
-    {   /* same font and centring as the kill feed (hud.s 0x14EC90: y 7), one line under it */
-        int wh[2];
-        viewGetSize(viewGetCurView(), &wh[0], &wh[1]);
-        fontSetColor(0, 0x7C, 0x78, 0x02);
-        fontSpritePrintCenteredXY(0, wh[0] / 2, 27, dmgText);
-        fontSpriteEnd(0);
-    }
-}
-static void damageReport(char* victim, char* attacker, float dmg)
-{
-    char* g = D_004FA030;
-    int n;
-    if (!g || !attacker || attacker == victim || !(dmg > DMG_K[1])) return;
-    if (attacker < g || attacker >= g + 8 * VSIZE || *(int*)(attacker + 0x20B4) != 1) return;
-    if (*(int*)(attacker + 0x210C) != 0) return;              /* first screen only */
-    if (dmgVictim == victim && dmgClock - dmgTime < 60) dmgSum += dmg;
-    else { dmgSum = dmg; dmgVictim = victim; }
-    dmgTime = dmgClock;
-    n = (int)(dmgSum + DMG_K[0]);
-    if (n < 1) n = 1;
-    dmgLen = sprintf(dmgText, "%d Pts Damage", n);
-}
+/* (damage reports: mods/dmgreport.c, hooked before this call in func_001E1C40) */
 int tmbr_KillFeedShown(int p) { (void)p; return 0; }
 
 void tmbr_NetVehicleDamage(void* net, char* victim, char* attacker, float dmg)
 {
     char* g = D_004FA030;
-    damageReport(victim, attacker, dmg);
     if (victim < g || victim >= g + 8 * VSIZE) return;
     netVehicleDamage(net, victim, attacker, dmg);
 }

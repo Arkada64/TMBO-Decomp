@@ -310,6 +310,9 @@ PATCHES = [
     (A("nonmatchings/tmb/launch/func_00156E08.s"), "00157D10", "jal", "jal        tmbr_FireSpecial"),
     # traffic: weapon damage on traffic is not reported to the network as player damage
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E24C0", "jal", "jal        tmbr_NetVehicleDamage"),
+    # damage reports (mods/dmgreport.c): every hit by the local player, before the car-owner check
+    (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E2498", "lw", "j          tmbr_DmgGate"),
+    (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E249C", "beql", "nop"),
     # 12 Pak's reticle special: the reticle's slot-5 ammo calls
     (A("nonmatchings/tmb/launch/func_001549A0.s"), "00155240", "jal", "jal        tmbr_ReticleUsed"),
     (A("nonmatchings/tmb/launch/func_00156118.s"), "00156268", "jal", "jal        tmbr_ReticleUsed"),
@@ -332,6 +335,8 @@ LABELS = [
     (A("nonmatchings/tmb/player/func_0017BE80.s"), "0017C060", "tmbr_ret_17C060"),
     (A("nonmatchings/tmb/game/func_00138C90.s"), "00139220", "tmbr_ret_139220"),
     (A("tmb/collis.s"), "00122D8C", "tmbr_ret_122D8C"),
+    (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E24A4", "tmbr_ret_1E24A4"),
+    (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E24D0", "tmbr_ret_1E24D0"),
 ]
 # Patches to functions that are already decompiled (matched C): (file, exact old text, new text)
 # NOTE: any change in code SIZE moves everything after it, and the shiftable build still has stale data

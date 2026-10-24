@@ -1,4 +1,4 @@
-# Vanilla pnach: damage reports for every hit, also on remote players' cars (func_001E1C40 only reports damage
+# Damage reports (mod build and vanilla pnach) for every hit, also on remote players' cars (func_001E1C40 only reports damage
 # to the network for cars this console owns, so a hook on that call never sees online opponents).
 # Replaces 0x1E2498 `lw $3, 0x20B4($17)` + 0x1E249C `beql $3, $2, 0x1E24D0` (delay: lwc1 $f1, 0x404($17)).
 # Live here: $2 (= 2), $f0 (= 0, used on the 0x1E24D0 path), callee-saved s1 victim, s3 attacker, $f22 damage.

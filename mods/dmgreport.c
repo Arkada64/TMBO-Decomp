@@ -1,10 +1,10 @@
-/* TMB-Reloaded, vanilla pnach build only (tools/mods/make_pnach.sh): damage reports as in Twisted Metal: Head-On.
+/* TMB-Reloaded: damage reports as in Twisted Metal: Head-On (mod build and the vanilla pnach, tools/mods/make_pnach.sh).
  * "N Pts Damage" each time the local player hurts another car; hits on the same victim within 1 s add up.
  * Confirmed damage only: a hit only arms a watch on that car; what is reported is the car's actual health drop
  * in the next 3/4 s. Online that health comes from the car owner's console (netObjUpdateVehicleCB writes +0x404
  * from the update packet), so a hit that landed on your screen but not on theirs reports nothing.
  * (Someone else hitting the same car inside that window is counted too.)
- * Same code as the mod build's (traffic.c tmbr_NetVehicleDamage / tmbr_DamageReportTick) without traffic and teams.
+ * Mod build: hooks in tools/mods/apply_mods.py; the tick runs from skins.c every frame and also draws the team score.
  * Hook (pnach): tmbr_DmgGate (dmgreport_pnach.s) in func_001E1C40, on every hit with damage > 0 (all owners);
  * the per-frame draw runs from tmbr_CameraUpdate (freecam.c) while tmbr_en[1] is set. */
 #define VSIZE 0x31B0
@@ -43,6 +43,9 @@ void tmbr_DamageReportTick(void)
 {
     int wh[2], i;
     dmgClock++;
+#ifndef TMBR_PNACH
+    { extern void tmbr_TeamsHud(void); tmbr_TeamsHud(); }   /* teams.c: team score under the report */
+#endif
     for (i = 0; i < NW; i++) {
         float hp;
         if (!wCar[i]) continue;

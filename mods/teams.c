@@ -260,7 +260,7 @@ int tmbr_MyTeam(void)
     return me >= 0 && me < 8 ? tmbr_team[me] % NT() : 0;
 }
 
-/* HUD (traffic.c tmbr_DamageReportTick, every frame): team score under the damage report */
+/* HUD (dmgreport.c tmbr_DamageReportTick, every frame): team score under the damage report */
 void tmbr_TeamsHud(void)
 {
     char buf[48];
