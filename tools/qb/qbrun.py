@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+"""Unattended test run: patch a quick-boot script into a copy of the test ELF (mods/quickboot.c block), run
+PCSX2 muted on a disc, take screenshots of its window (winshot.ps1, PrintWindow), stop it, and collect the log + screenshots.
+Runs in WSL on the test PC.
+  python3 tools/qb/qbrun.py SCRIPT.json [--iso test/TMBR_LOST.iso] [--elf test/TMBR_TEST.ELF]
+SCRIPT.json: {"steps": [["CROSS", 10], ["", 120], ...], "loop_from": 12,
+              "shots": [70, 80, 90], "stop": 100}
+  a step is [buttons, frames]; buttons = names joined with + (START, CROSS, CIRCLE, TRIANGLE, SQUARE, UP, DOWN,
+  LEFT, RIGHT, L1, R1, L2, R2, SELECT, L3, R3) or "" to wait.
+  shots = seconds after launch to capture; stop = seconds after launch to kill PCSX2. Output: qb_out/<timestamp>/ (emulog.txt + PNGs)."""
+import sys, os, json, struct, time, subprocess, shutil, glob, argparse
+
+W = "/mnt/c/Users/Ark/Desktop/TMB Decomp"
+P = "/mnt/c/Users/Ark/Desktop/TMBO Ready2Play Edition"
+WP = r"C:\Users\Ark\Desktop\TMBO Ready2Play Edition"
+WW = r"C:\Users\Ark\Desktop\TMB Decomp"
+BTN = dict(SELECT=0x1, L3=0x2, R3=0x4, START=0x8, UP=0x10, RIGHT=0x20, DOWN=0x40, LEFT=0x80, L2=0x100, R2=0x200,
+           L1=0x400, R1=0x800, TRIANGLE=0x1000, CIRCLE=0x2000, CROSS=0x4000, SQUARE=0x8000)
+MAGIC = struct.pack('<I', 0x42514D54)
+QB_STEPS = 120
+
+def patch(elf, script):
+    d = bytearray(open(elf, 'rb').read())
+    o = d.find(MAGIC)
+    assert o >= 0 and d.find(MAGIC, o + 1) < 0, 'quick-boot block not found (or twice) in ' + elf
+    steps = script['steps']
+    assert len(steps) <= QB_STEPS
+    struct.pack_into('<III', d, o + 4, 1, len(steps), script.get('loop_from', 0xFFFF))
+    for i, (b, n) in enumerate(steps):
+        m = 0
+        for k in filter(None, b.upper().split('+')): m |= BTN[k]
+        struct.pack_into('<HH', d, o + 16 + 4 * i, m, n)
+    return bytes(d)
+
+def ps(cmd):
+    return subprocess.run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', cmd], capture_output=True, text=True).stdout
+
+def main():
+    ap = argparse.ArgumentParser(); ap.add_argument('script'); ap.add_argument('--iso', default='test/TMBR_LOST.iso')
+    ap.add_argument('--elf', default='test/TMBR_TEST.ELF'); a = ap.parse_args()
+    os.chdir(W)
+    script = json.load(open(a.script))
+    open('test/QUICK.ELF', 'wb').write(patch(a.elf, script))
+    ini = f'{P}/inis/PCSX2.ini'; shutil.copy(ini, ini + '.qbbak')
+    s = open(ini).read().replace('StandardVolume = 100', 'StandardVolume = 0').replace('FastForwardVolume = 100', 'FastForwardVolume = 0')
+    open(ini, 'w').write(s)
+    snaps = f'{P}/snaps'; before = set(glob.glob(f'{snaps}/**/*.png', recursive=True))
+    iso = WW + '\\' + a.iso.replace('/', '\\')
+    t0 = time.time(); shots = []
+    subprocess.Popen(['cmd.exe', '/c', 'start', '', f'{WP}\\pcsx2-qt.exe', '-elf', f'{WW}\\test\\QUICK.ELF', '--', iso])
+    try:
+        for t in sorted(script.get('shots', [])):
+            time.sleep(max(0, t - (time.time() - t0)))
+            k = len(shots); shots.append(f'{WW}\\qb_tmp_{k}.png')
+            print('shot at', round(time.time() - t0, 1), ps(f"& '{WW}\\tools\\qb\\winshot.ps1' '{shots[-1]}'").strip(), flush=True)
+        time.sleep(max(0, script.get('stop', 60) - (time.time() - t0)))
+    finally:
+        subprocess.run(['taskkill.exe', '/IM', 'pcsx2-qt.exe', '/F'], capture_output=True)
+        time.sleep(2)
+        shutil.copy(ini + '.qbbak', ini)
+    out = time.strftime('cloud/qb_out/%Y%m%d_%H%M%S'); os.makedirs(out, exist_ok=True)
+    shutil.copy(f'{P}/logs/emulog.txt', f'{out}/emulog.txt')
+    n = 0
+    for i in range(len(shots)):
+        f = f'{W}/qb_tmp_{i}.png'
+        if os.path.exists(f): shutil.move(f, f'{out}/shot{i}.png'); n += 1
+    print('OUT', out, 'shots', n)
+    log = open(f'{out}/emulog.txt', errors='replace').read().splitlines()
+    for l in log:
+        if 'TMBR' in l or 'GIF' in l or 'TLB' in l or 'xception' in l: print(l[:160])
+
+if __name__ == '__main__':
+    main()

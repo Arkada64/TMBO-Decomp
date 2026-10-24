@@ -214,6 +214,8 @@ PATCHES = [
     (A("tmb/ui.s"), "001C80BC", "slti", "slti       $v0, $s1, 0x7"),
     # ... bot count picked in the waiting room
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B39B4", "jal", "jal        tmbr_LobbyFrame"),
+    # quick boot (mods/quickboot.c): scripted pad input for unattended test runs
+    (A("nonmatchings/tmb/input/func_00216840.s"), "00216CAC", "jal", "jal        tmbr_PadRead"),
     # ... bot targets' attractor group during the hunter's whole AI frame (bot vs bot)
     (A("nonmatchings/tmb/vehicle/func_001DC760.s"), "001DCB64", "jal", "jal        tmbr_AiUpdate"),
     # ... specials offered less often to bots (free-for-all)
