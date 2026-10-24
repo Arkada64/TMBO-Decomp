@@ -75,7 +75,7 @@ static void navRead(int level, int now)
         late = level;
         return;
     }
-    name[9] = '0' + level / 10; name[10] = '0' + level % 10;
+    name[8] = '0' + level / 10; name[9] = '0' + level % 10;     /* \PCAR\ZNxx: digits at 8, 9 */
     ((u32*)NAV_LEVELS[i].addr)[0] = 0;
     fileRead(name, (void*)NAV_LEVELS[i].addr);
     if (((NavHdr*)NAV_LEVELS[i].addr)->magic != 0x3156414E) {     /* "NAV1" */

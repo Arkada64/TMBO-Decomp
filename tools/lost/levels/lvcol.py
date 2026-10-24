@@ -153,7 +153,24 @@ def build_piece(W, T):
     root, mat = rec(list(range(len(planes))), np.arange(len(S)), SOLID, 0)
     if root is None:
         return None
+    normalize(nodes, root)
     return nodes, root, (S, lab)
+
+def normalize(nodes, root, solid_mat=SOLID):
+    """TMB's trees always have the empty side in front and the solid side behind (real levels: front leaf 0x200,
+    back leaf = a material, never the other way; the material is stored on both kinds of child). Flip every node
+    whose front leaf is solid or whose back leaf is empty."""
+    st = [root]; seen = set()
+    while st:
+        i = st.pop()
+        if i is None or i in seen: continue
+        seen.add(i)
+        f, b, fm, bm, (n_, w_) = nodes[i]
+        if (f is None and fm != EMPTY) or (b is None and bm == EMPTY):
+            f, b, fm, bm, n_, w_ = b, f, bm, fm, -n_, -w_
+        nodes[i] = [f, b, EMPTY, solid_mat, (n_, w_)]
+        assert not (f is None and fm != EMPTY) and not (b is None and bm == EMPTY), 'unrepresentable leaf pair'
+        st += [f, b]
 
 def encode(nodes, root, base_off):
     """-> bytes of the live nodes (0x20 each, renumbered), slots (relative offsets holding node pointers), root rel"""
@@ -172,7 +189,7 @@ def encode(nodes, root, base_off):
         o = 0x20 * k
         if f is not None: struct.pack_into('<I', out, o, base_off + 0x20 * live[f]); slots.append(o)
         if b is not None: struct.pack_into('<I', out, o + 4, base_off + 0x20 * live[b]); slots.append(o + 4)
-        struct.pack_into('<IHH4f', out, o + 8, 0, fm if f is None else 0, bm if b is None else 0, float(n_[0]), float(n_[1]), float(n_[2]), float(w_))
+        struct.pack_into('<IHH4f', out, o + 8, 0, fm, bm, float(n_[0]), float(n_[1]), float(n_[2]), float(w_))
     return bytes(out), slots, 0
 
 def classify(nodes, root, pts):
@@ -183,9 +200,9 @@ def classify(nodes, root, pts):
         while True:
             f, b, fm, bm, (n_, w_) = nodes[i]
             if p @ n_ - w_ >= 0:
-                if f is None: out[k] = fm != EMPTY; break
+                if f is None: out[k] = False; break
                 i = f
             else:
-                if b is None: out[k] = bm != EMPTY; break
+                if b is None: out[k] = True; break
                 i = b
     return out

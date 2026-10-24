@@ -173,7 +173,8 @@ def donor_prepare(car, drop=None, drop_c=None):
     from ngptrav import traverse
     from textconv import records, tex_rec_size, rtx_rec_size
     n = bytes(car.n); u = lambda o: struct.unpack_from('<I', n, o)[0]
-    v = traverse(n, [4 + 4 * i for i in range(u(0))])
+    par = {}
+    v = traverse(n, [4 + 4 * i for i in range(u(0))], parents=par)
     arena = set(); id1 = None; id14 = []
     for o, op, i1, i2 in v:
         if i1 == 1: id1 = o; arena |= full_walk(n, o)
@@ -200,7 +201,9 @@ def donor_prepare(car, drop=None, drop_c=None):
                    if ((gs >> 48) & 0xff) == 8)          # CLUT records (the others are VRAM-resident textures)
     op15 = next(u(4 + 4 * i) - BASE for i in range(u(0)) if (u(u(4 + 4 * i) - BASE) & 0x3f) == 15)
     arena_meshes = sorted(o for o in arena - asset if (u(o) & 0x3f) == 0)
-    return dict(drop=drop, drop_c=drop_c, arena_meshes=arena_meshes, id1=id1, id14=id14, op15=op15, keep_t=keep_t, keep_r=keep_r, next_id=next_id, next_cbp=next_cbp,
+    chain = [id1]
+    while par.get(chain[0]) is not None: chain.insert(0, par[chain[0]])
+    return dict(chain_id1=chain, drop=drop, drop_c=drop_c, arena_meshes=arena_meshes, id1=id1, id14=id14, op15=op15, keep_t=keep_t, keep_r=keep_r, next_id=next_id, next_cbp=next_cbp,
                 kept_bytes=sum(len(r) for r in keep_t), dropped=len(drop))
 
 def build(path, outdir, name, scale=1.15, donor=None):
@@ -262,36 +265,65 @@ def build(path, outdir, name, scale=1.15, donor=None):
         hdr = bytearray(0x20)
         struct.pack_into('<IffI3fI', hdr, 0, 0x12, rad * rad, rad, BASE + base, *c, 0)
         o18 = car.append(bytes(hdr)); car.slots.append(o18 + 0xC)
-        col.append((o18, (*c, rad))); colpts.append(used)
+        wrap = car.group([o18], sphere=(*c, rad))        # TMB: every op18 sits alone in an op1 (the grid's path leaf)
+        col.append((wrap, (*c, rad))); colpts.append(used)
+    colgroups = []
     for i in range(0, len(col), 250):
         part = col[i:i + 250]
         cs = np.array([s_[:3] for _, s_ in part]); c = tuple((cs.max(0) + cs.min(0)) / 2)
         r = max(math.dist(c, s_[:3]) + s_[3] for _, s_ in part)
-        groups.append((car.group([o for o, _ in part], sphere=(*c, r)), (*c, r)))
+        g_ = car.group([o for o, _ in part], sphere=(*c, r))
+        groups.append((g_, (*c, r))); colgroups.append((g_, part))
     allc = np.array([g[1][:3] for g in groups]); cc = tuple((allc.max(0) + allc.min(0)) / 2)
     rr = max(math.dist(cc, g[1][:3]) + g[1][3] for g in groups)
     root = car.group([g for g, _ in groups], sphere=(*cc, rr))
+    # ---- op15 collision grid (hdColGrid): cols x rows inline cell pointers after a 0x20 header
+    # {0xf, u16 cols, f32 cell, f32 minx, miny, maxx, maxy, ptr}; a cell -> linked entries {next, path};
+    # path {0, n, n node pointers from the entry root down to the op1 that holds one op18}
     P = np.concatenate(colpts) if colpts else np.zeros((1, 3))
-    x0, y0 = P[:, 0].min() - 200, P[:, 1].min() - 200; x1, y1 = P[:, 0].max() + 200, P[:, 1].max() + 200
-    ncell = int(math.ceil(max(x1 - x0, y1 - y0) / 100.0)) + 1
-    gbuf = car.append(bytes(4 * ncell * ncell))
+    x0, y0 = math.floor(P[:, 0].min() - 100), math.floor(P[:, 1].min() - 100)
+    cols = int(math.ceil((P[:, 0].max() + 100 - x0) / 100.0)); rows = int(math.ceil((P[:, 1].max() + 100 - y0) / 100.0))
+    prefix = (dn['chain_id1'] if dn else []) + [root]
+    cells = [[] for _ in range(cols * rows)]
+    for g_, part in colgroups:
+        for w_, (cx, cy, cz, r) in part:
+            pth = prefix + [g_, w_]
+            blob = struct.pack('<2I', 0, len(pth)) + b''.join(struct.pack('<I', BASE + q) for q in pth)
+            po = car.append(blob); car.slots += [po + 8 + 4 * k for k in range(len(pth))]
+            for j in range(max(0, int((cy - r - y0) // 100)), min(rows, int((cy + r - y0) // 100) + 1)):
+                for i_ in range(max(0, int((cx - r - x0) // 100)), min(cols, int((cx + r - x0) // 100) + 1)):
+                    cells[j * cols + i_].append(po)
+    ents_start = None; heads = [0] * len(cells)
+    for k, lst in enumerate(cells):
+        nxt = None
+        for po in lst:
+            e_ = car.append(struct.pack('<2I', 0, 0) + b'\0' * 8)
+            if ents_start is None: ents_start = e_
+            car.setp(e_ + 4, po)
+            if nxt is not None: car.setp(e_, nxt)
+            nxt = e_
+        heads[k] = nxt
+    g15 = bytearray(0x20 + 4 * cols * rows)
+    struct.pack_into('<IIf4f', g15, 0, 0xf, cols, 100.0, x0, y0, x0 + 100.0 * cols, y0 + 100.0 * rows)
+    e15 = car.append(bytes(g15))
+    if ents_start is not None: car.setp(e15 + 0x1C, ents_start)
+    for k, h_ in enumerate(heads):
+        if h_ is not None: car.setp(e15 + 0x20 + 4 * k, h_)
+    ncell = cols * rows
     if dn:
-        # donor: the id-1 node now holds our tree; id-14 extra collision off; its op15 grid resized to our map
+        # donor: the id-1 node now holds our tree; id-14 extra collision off; the entry point to its op15 grid
+        # replaced by ours
         o1 = dn['id1']
         struct.pack_into('<H', car.n, o1 + 8, 1)
         car.setp(o1 + 0x20, root)
         struct.pack_into('<f3ff', car.n, o1 + 0xC, rr * rr, *cc, rr)
         for o in dn['id14']:
             w0 = struct.unpack_from('<I', car.n, o)[0]; struct.pack_into('<I', car.n, o, w0 & 0x3ffff)
-        e15 = dn['op15']
-        struct.pack_into('<If4f', car.n, e15 + 4, ncell, 100.0, x0, y0, x0 + 100.0 * (ncell - 1), y0 + 100.0 * (ncell - 1))
-        car.setp(e15 + 0x1C, gbuf)
+        ne_ = struct.unpack_from('<I', car.n, 0)[0]
+        for i_ in range(ne_):
+            if struct.unpack_from('<I', car.n, 4 + 4 * i_)[0] == BASE + dn['op15']:
+                struct.pack_into('<I', car.n, 4 + 4 * i_, BASE + e15)
     else:
-        # entry points: op1 render + collision tree, op15 runtime grid (100-unit cells, filled by the game),
-        # op7 object list (animated objects: none)
-        g15 = bytearray(0x20)
-        struct.pack_into('<IIf4fI', g15, 0, 0xf, ncell, 100.0, x0, y0, x0 + 100.0 * (ncell - 1), y0 + 100.0 * (ncell - 1), BASE + gbuf)
-        e15 = car.append(bytes(g15)); car.slots.append(e15 + 0x1C)
         e7 = car.append(struct.pack('<4I', 7, 0, 0, 0))
         hdr = struct.pack('<4I', 3, BASE + root, BASE + e15, BASE + e7)
         car.n[0:16] = hdr
@@ -302,7 +334,7 @@ def build(path, outdir, name, scale=1.15, donor=None):
     for ext, d in files.items(): open(f'{outdir}/{name}.{ext}', 'wb').write(d)
     rep = dict(donor_compacted=dn.get('compacted', 0) if dn else 0, donor_dropped_tex=dn['dropped'] if dn else 0, to4=len(LT.to4), meshes=len(meshes), groups=len(groups), textures=len(LT.map), halved=len(LT.half), missing_tex=len(missing),
                tex_bytes=len(files['TEX']), tex_budget=TEX_BUDGET, clut_blocks=LT.next_cbp, clut_budget=CLUT_BUDGET,
-               ngp=len(files['NGP']), ptr=len(files['PTR']), col_pieces=len(col), bsp_nodes=cn, grid=ncell, unhandled=dict(unk), pickups=dict(sorted(seen.items())))
+               ngp=len(files['NGP']), ptr=len(files['PTR']), col_pieces=len(col), bsp_nodes=cn, grid=(cols, rows), grid_entries=sum(map(len, cells)), unhandled=dict(unk), pickups=dict(sorted(seen.items())))
     return rep
 
 if __name__ == '__main__':
