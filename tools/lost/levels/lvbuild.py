@@ -260,6 +260,19 @@ def build(path, outdir, name, scale=1.15, donor=None):
     keys = sorted({k for m in meshes for k in m['texrefs']})
     missing = [k for k in keys if k not in T]
     meshes = [m for m in meshes if all(k in T for k in m['texrefs'])]
+    # strip texture selectors: TMB's VU1 code reads GS context 1 + 3*k (k < texture count); Head-On meshes also have
+    # untextured meshes (no context at all), first strips that select nothing (inherit the previous object's
+    # context), out-of-range and flagged (0x8000) selectors - any of these feed the GS a garbage context
+    nt0 = len(meshes); meshes = [m for m in meshes if m['texrefs']]; fixed = 0
+    for m in meshes:
+        nt = len(m['texrefs'])
+        for i, s_ in enumerate(m['strips']):
+            t = s_['tag'][3]; t2 = t & 0x7fff
+            if t2 and ((t2 - 1) % 3 or t2 > 1 + 3 * (nt - 1)): t2 = 1 + 3 * min((t2 - 1) // 3, nt - 1)
+            if i == 0 and t2 == 0: t2 = 1
+            if t2 != t:
+                tag = list(s_['tag']); tag[3] = t2; m['strips'][i] = dict(s_, tag=tuple(tag)); fixed += 1
+    print('  untextured meshes dropped', nt0 - len(meshes), 'texture selectors fixed', fixed)
     if MERGE_CELL:
         n0 = len(meshes); meshes = merge_meshes(meshes, MERGE_CELL); print('  merged', n0, '->', len(meshes))
     if donor:
