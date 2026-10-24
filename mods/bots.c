@@ -995,10 +995,27 @@ static void settingsRows(void)
     for (k = 0; line[k]; k++) { D_004EEBC8[k] = line[k]; D_004EEBD8[k] = line[k]; }
     D_004EEBC8[k] = 0; D_004EEBD8[k] = 0;
 }
+/* The waiting room's game settings box (func_001C5768) ends with the ENTRY line; mods/lobby.s sends that print
+ * here with the box row it is on, and traffic / teams / your team follow it inside the box, like BOTS. */
+extern int tmbr_botTeamMode;
+void tmbr_PrintEntryC(int font, const char* s, int row)
+{
+    char b[40];
+    int teams = tmbr_Opt(OPT_TEAMS);
+    fontPrint(font, s);
+    lobbyLine(row + 1, -1, tmbr_Opt(OPT_TRAFFIC) ? "TRAFFIC : ON" : "TRAFFIC : OFF");
+    lobbyLine(row + 2, -1, !teams ? "TEAMS : OFF" : tmbr_Opt(OPT_TEAMS4) ? "TEAMS : 4" : "TEAMS : 2");
+    if (teams) {
+        if (tmbr_botTeamMode) sprintf(b, "HUMANS VS BOTS");
+        else sprintf(b, "YOU : %s TEAM", tmbr_TeamName(tmbr_MyTeam()));
+        lobbyLine(row + 3, tmbr_MyTeam(), b);
+    }
+    fontSetColor(0, 0x50, 0x44, 0x2C);
+}
 void tmbr_LobbyFrame(void)
 {
     int pad = 0, pressed, host, teams;
-    char buf[48], buf2[48], ra[40], rb[40];
+    char ra[40], rb[40];
     settingsRows();
     lobbyFrame();
     tmbr_SkinsLobby();
@@ -1022,19 +1039,9 @@ void tmbr_LobbyFrame(void)
         lobbyLine(10, 0, ra);
         lobbyLine(11, 1, rb);
     } else {
-        {
-            int bc, bd;
-            botsShown(&bc, &bd);
-            sprintf(buf, "BOTS : %d %s  TRAFFIC %s", bc, bd == 0 ? "EASY" : bd == 1 ? "MED" : "HARD", tmbr_Opt(OPT_TRAFFIC) ? "ON" : "OFF");
-        }
-        lobbyLine(10, -1, buf);
-        if (!teams) lobbyLine(11, -1, "TEAMS OFF  (HOLD R3: HELP)");
-        else {
-            extern int tmbr_botTeamMode;
-            if (tmbr_botTeamMode) sprintf(buf2, "HUMANS VS BOTS (SELECT)");
-            else sprintf(buf2, "YOU: %s TEAM (SELECT)", tmbr_TeamName(tmbr_MyTeam()));
-            lobbyLine(11, tmbr_MyTeam(), buf2);
-        }
+        /* the settings themselves are in the game settings box (tmbr_PrintEntryC); only the key hints here */
+        lobbyLine(10, -1, host ? "HOLD R3 : HOST CONTROLS" : teams ? "HOLD R3 : PICK TEAM" : "");
+        if (teams) lobbyLine(11, -1, "HOLD SELECT : TEAM LISTS");
     }
     fontSetColor(0, 0x50, 0x44, 0x2C);
     if (!host) return;
