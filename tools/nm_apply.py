@@ -34,6 +34,10 @@ def cc(path, extra=(), whole=False):
 # functions the mods patch in their .s files: keep them asm in every build
 hooked = set(re.findall(r'A\("[^"]*/([A-Za-z_0-9]+)\.s"\)', (R / "tools/mods/apply_mods.py").read_text()))
 hooked |= {"func_00127650"}          # the level loader (LOADER in apply_mods.py)
+# drafts known to break the game (found by boot tests): keep them asm. NM_SKIP=a,b adds more for a test.
+SKIP = set(filter(None, os.environ.get("NM_SKIP", "").split(","))) | set(
+    l.split()[0] for l in (R / "logs/nm_skip.txt").read_text().splitlines() if l.strip() and not l.startswith("#")
+) if (R / "logs/nm_skip.txt").exists() else set(filter(None, os.environ.get("NM_SKIP", "").split(",")))
 
 def header_for(rel):
     return "online/net.h" if rel == "src/online/net.c" else "common.h"
@@ -50,7 +54,7 @@ def apply(src):
     for n, c in zip(blocks[0::2], blocks[1::2]): variants.setdefault(n, []).append(c.rstrip() + "\n")
     hdr = header_for(rel); chosen = {}
     for n in names:
-        if n in hooked or n.endswith("Asm") or "Asm__" in n: st["kept_asm"] += 1; continue
+        if n in hooked or n in SKIP or n.endswith("Asm") or "Asm__" in n: st["kept_asm"] += 1; continue
         if n not in variants: st["no_draft"] += 1; continue
         for c in variants[n]:
             (W / "one.c").write_text(f'#include "{hdr}"\n{c}')
