@@ -21,9 +21,10 @@ source .venv/bin/activate
 HOME=$NH python3 tools/nm_apply.py "$@" | tail -3
 rm -f build/SCUS_971.96.rom; ninja > logs/nm_base.log 2>&1 || { tail -5 logs/nm_base.log; exit 1; }
 cmp -s build/SCUS_971.96.rom disks/SCUS_971.96.rom && echo "normal build: byte-identical" || { echo "normal build NOT identical"; exit 1; }
-# C replacements bring float literals (.lit4/.lit8) the matching link script discards: keep them with the
-# object's code (code may move in the shiftable build; the game's data stays put)
-sed -i 's#^\(\s*\)\(build/src/\S*\.c\.o\)(\.text);#&\n\1\2(.lit4);\n\1\2(.lit8);#' config/US/SCUS_971.96.ld
+# C replacements bring float literals (.lit4/.lit8) that the matching link script discards. The SN assembler
+# (-G8) loads them gp-relative, so they must sit in the small-data area: right after the game's .sdata
+# (_gp = SDATA_START + 0x7FF0 covers 64 KB from there). Only the bss after it moves.
+sed -i 's#^\(\s*\)build/asm/data/3F9600.sdata.s.o(.sdata);#&\n\1*(.lit4);\n\1*(.lit8);#' config/US/SCUS_971.96.ld
 # -DNON_MATCHING for the shiftable link only (build.ninja is restored by build_shiftable.sh)
 sed -i 's#^grep -q data_ptrs_shiftable#[ "${NONMATCHING:-0}" = 1 ] \&\& sed -i "s|tools/sn_cc.sh -c |tools/sn_cc.sh -c -DNON_MATCHING |" build.ninja\n&#' tools/build_shiftable.sh
 HOME=$NH NONMATCHING=1 bash tools/build_shiftable.sh 2>&1 | grep -vE "RWX|^\[" | tail -15
