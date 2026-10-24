@@ -6,16 +6,22 @@ gave full-screen green bars; a misaligned bss gave "NO CONTROLLER IN CONTROLLER 
     0x80 steps when it is bigger;
   - the C float literals (.lit4/.lit8, gp-relative under the SN assembler's -G8) go after the game's .sdata,
     padded to a multiple of 0x80, so .sbss/.bss move by 0x80 steps only.
-Original sizes come from the matching build's map.  Usage: nm_ld.py MAP LDSCRIPT"""
+Original sizes come from the matching build's map. Only the objects of the given C files are guarded (the mods
+change other objects on purpose, e.g. the level loader's hook block).  Usage: nm_ld.py MAP LDSCRIPT SRC.c ..."""
 import re, sys
 mp, ld = sys.argv[1], sys.argv[2]
+only = {'build/' + re.sub(r'^.*?/(src/)', r'\1', f) + '.o' for f in sys.argv[3:]}
+if not only:      # all files: the ones nm_apply.py gave C (logs/nm/summary.json)
+    import json, os
+    sm = json.load(open(os.path.join(os.path.dirname(os.path.abspath(ld)), "../../logs/nm/summary.json")))
+    only = {'build/' + f + '.o' for f, st in sm["files"].items() if st.get("used")}
 orig = {}
 for m in re.finditer(r"^ \.text\s+0x([0-9a-f]+)\s+0x([0-9a-f]+)\s+(build/src/\S+\.c\.o)", open(mp).read(), re.M):
     orig[m.group(3)] = int(m.group(2), 16)
 out = []; n = 0
 for l in open(ld).read().splitlines():
     m = re.match(r"^(\s*)(build/src/\S+\.c\.o)\(\.text\);$", l)
-    if m and m.group(2) in orig:
+    if m and m.group(2) in orig and m.group(2) in only:
         ind, o, sz = m.group(1), m.group(2), orig[m.group(2)]
         sym = "__nm_" + re.sub(r"\W", "_", o)
         out += [f"{ind}{sym} = .;", l,
