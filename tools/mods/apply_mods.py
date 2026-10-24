@@ -218,6 +218,8 @@ PATCHES = [
     (A("tmb/ui.s"), "001C6570", "jal", "jal        tmbr_PrintEntry"),
     (A("tmb/ui.s"), "001C6748", "jal", "jal        tmbr_PrintEntry"),
     (A("tmb/ui.s"), "001C675C", "jal", "jal        tmbr_PrintEntry"),
+    # ... Last Man Standing: no ENTRY line, the box ends with NUMBER OF LIVES
+    (A("tmb/ui.s"), "001C6304", "jal", "jal        tmbr_PrintLives"),
     # quick boot (mods/quickboot.c): scripted pad input for unattended test runs
     (A("nonmatchings/tmb/input/func_00216840.s"), "00216CAC", "jal", "jal        tmbr_PadRead"),
     # ... bot targets' attractor group during the hunter's whole AI frame (bot vs bot)

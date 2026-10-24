@@ -1010,11 +1010,28 @@ static void settingsRows(void)
 /* The waiting room's game settings box (func_001C5768) ends with the ENTRY line; mods/lobby.s sends that print
  * here with the box row it is on, and traffic / teams / your team follow it inside the box, like BOTS. */
 extern int tmbr_botTeamMode;
+static void extraLines(int row);
 void tmbr_PrintEntryC(int font, const char* s, int row)
+{
+    fontPrint(font, s);
+    extraLines(row);
+}
+/* Last Man Standing's box has no ENTRY line (it ends with NUMBER OF LIVES, 0x1C6304) and no USE BOTS row
+ * (where the other modes show BOTS): BOTS first, then the same lines */
+void tmbr_PrintLivesC(int font, const char* s, int row)
+{
+    char b[24];
+    int c, d;
+    fontPrint(font, s);
+    botsShown(&c, &d);
+    sprintf(b, "BOTS : %d %s", c, d == 0 ? "EASY" : d == 1 ? "MED" : "HARD");
+    lobbyLine(row + 1, -1, b);
+    extraLines(row + 1);
+}
+static void extraLines(int row)
 {
     char b[40];
     int teams = tmbr_Opt(OPT_TEAMS);
-    fontPrint(font, s);
     lobbyLine(row + 1, -1, tmbr_Opt(OPT_TRAFFIC) ? "TRAFFIC : ON" : "TRAFFIC : OFF");
     lobbyLine(row + 2, -1, !teams ? "TEAMS : OFF" : tmbr_Opt(OPT_TEAMS4) ? "TEAMS : 4" : "TEAMS : 2");
     if (teams) {

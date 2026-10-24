@@ -10,3 +10,8 @@
 tmbr_PrintEntry:                        # $a0 font, $a1 string -> tmbr_PrintEntryC(font, string, row)
     j       tmbr_PrintEntryC
     daddu   $6, $17, $0
+
+.globl tmbr_PrintLives
+tmbr_PrintLives:
+    j       tmbr_PrintLivesC
+    daddu   $6, $17, $0
