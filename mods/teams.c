@@ -260,13 +260,35 @@ int tmbr_MyTeam(void)
     return me >= 0 && me < 8 ? tmbr_team[me] % NT() : 0;
 }
 
-/* HUD (dmgreport.c tmbr_DamageReportTick, every frame): team score under the damage report */
+/* HUD (dmgreport.c tmbr_DamageReportTick, every frame): your team during the match, the winner after it.
+ * Team reminder position (text is centred on x): lower left */
+#define TEAM_X(w) ((w) / 9)
+#define TEAM_Y(h) ((h) - 34)
 void tmbr_TeamsHud(void)
 {
     char buf[48];
     int wh[2], w;
     TeamStats ts;
-    if (!tmbr_Opt(OPT_TEAMS) || !D_004FA030 || gameType() != 1) { overShown = 0; return; }
+    if (!tmbr_Opt(OPT_TEAMS) || !D_004FA030) { overShown = 0; return; }
+    if (gameType() != 1) {
+        /* during the match: which team you are on, in its colour, lower left */
+        char* g = D_004FA030;
+        int k;
+        overShown = 0;
+        for (k = 0; k < 8; k++) {
+            char* v = g + k * VSIZE;
+            if (F(v, 0x590) && F(v, 0x20B4) == 1 && F(v, 0x210C) == 0) {
+                int t = tmbr_TeamOf(v);
+                viewGetSize(viewGetCurView(), &wh[0], &wh[1]);
+                sprintf(buf, "%s TEAM", TEAMNAME[t & 3]);
+                tmbr_TeamColor(t);
+                fontSpritePrintCenteredXY(0, TEAM_X(wh[0]), TEAM_Y(wh[1]), buf);
+                fontSpriteEnd(0);
+                break;
+            }
+        }
+        return;
+    }
     /* match over: the winning team in its colour (nothing during the match) */
     if (!overShown) {
         overShown = 1;

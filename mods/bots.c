@@ -692,7 +692,8 @@ void tmbr_DodgeFrame(void)
     for (i = 0; i < NW; i++) {
         char* w = g + 0x6C3C0 + i * 0x210;
         char* cs = (char*)F(w, 0x200);
-        if (!F(w, 0) || !cs) { wok[i] = 0; wturn[i] = 0; wfall[i] = 0; continue; }
+        /* +0x200 is not a model pointer for every weapon kind (a float there faulted, log 2026-10-24): RAM only */
+        if (!F(w, 0) || (u32)cs < 0x100000 || (u32)cs >= 0x2000000 || ((u32)cs & 3)) { wok[i] = 0; wturn[i] = 0; wfall[i] = 0; continue; }
         x = (int)(*(float*)(cs + 0x10) * FX[0]); y = (int)(*(float*)(cs + 0x14) * FX[0]); z = (int)(*(float*)(cs + 0x18) * FX[1]);
         if (wok[i]) {
             vx = x - wpx[i]; vy = y - wpy[i]; vz = z - wpz[i];

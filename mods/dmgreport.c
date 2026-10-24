@@ -37,6 +37,14 @@ static void report(char* victim, float dmg)
     n = (int)(dmgSum + DMG_K[0]);
     if (n < 1) n = 1;
     dmgLen = sprintf(dmgText, DMG_FMT, n);
+#ifndef TMBR_PNACH
+    /* a report of hundreds in one go (log 2026-10-24): log the big ones to find the source */
+    if ((int)dmg >= 100 || n >= 200) {          /* (int compare: no float literal) */
+        extern int scePrintf(const char* fmt, ...);
+        scePrintf("TMBR dmg: +%d (shown %d) car %d own %d hp %d / %d\n", (int)dmg, n, (int)(victim - D_004FA030) / VSIZE,
+                  *(int*)(victim + 0x20B4), (int)*(float*)(victim + 0x404), (int)*(float*)(victim + 0x400));
+    }
+#endif
 }
 
 #ifndef DMG_DBG
