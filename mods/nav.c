@@ -215,11 +215,33 @@ static void planStep(void)
 }
 
 /* once per frame (bots.c tmbr_BotsThink, host) */
+extern int tmbr_NavBaked(void);            /* navbake.c: route map of this level loaded */
+extern int tmbr_NavBakedPlan(fvec* from, fvec* to, fvec* wp, int maxwp, int* full);
+extern float tmbr_NavArrive(void);
 void tmbr_NavFrame(void)
 {
     char* g = D_004FA030;
     int k, i;
     if (tmbr_botCount < 0 || !g) return;
+    if (tmbr_NavBaked()) {                    /* one plan per frame on the baked map, all at once */
+        for (k = 0; k < 8; k++) {
+            i = (rr + k) % 8;
+            if (nb[i].st == 1) {
+                char* v = g + i * 0x31B0;
+                int full, n;
+                rr = i + 1;
+                if (!live(v) || !live(nb[i].tgt)) { nb[i].st = 0; continue; }
+                n = tmbr_NavBakedPlan(POSV(v), POSV(nb[i].tgt), nb[i].wp, MAXWP, &full);
+                P.cell = tmbr_NavArrive();
+                nb[i].n = n; nb[i].i = 0; nb[i].timer = 0;
+                nb[i].st = n ? 2 : 0;
+                if (!n) nb[i].cool = 180;
+                if (NAVDBG) scePrintf("TMBR nav: car %d baked plan %d pts %s\n", i, n, full ? "to target" : "partial");
+                break;
+            }
+        }
+        return;
+    }
     if (!P.on) {
         for (k = 0; k < 8; k++) {
             i = (rr + k) % 8;
@@ -263,7 +285,7 @@ int tmbr_NavDrive(char* g, char* v, char* t)
         }
         pos = POSV(v);
         d = fabs_(b->wp[b->i].x - pos->x) + fabs_(b->wp[b->i].y - pos->y);
-        if (d < P.cell * K[4] + K[2] * K[8]) b->i++;
+        if (d < (tmbr_NavBaked() ? tmbr_NavArrive() : P.cell * K[4] + K[2] * K[8])) b->i++;
         else if ((b->timer & 7) == 0 && b->i + 1 < b->n) {   /* shortcut when the next point is in sight */
             ra = *pos; ra.z += K[1]; rb = b->wp[b->i + 1];
             if (hdLos(&ra, &rb, res, 0)) b->i++;
@@ -282,6 +304,7 @@ int tmbr_NavDrive(char* g, char* v, char* t)
         return 1;
     }
     want = noLos >= 60 && dist > 60 && !b->cool && (NAV_ALWAYS || b->noProg || !F(drv, 0x270));
+    if (tmbr_NavBaked()) want = noLos >= 30 && dist > 60 && !b->cool;   /* baked map: cheap and reliable, use it whenever the target is out of sight */
     if (want && b->st == 0) { b->st = 1; b->tgt = t; }
     if (b->st == 1 && b->tgt != t) b->st = 0;
     return 0;

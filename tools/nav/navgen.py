@@ -191,6 +191,12 @@ def rasterize(L, step=4.0, src=None, bounds=None):
     if bounds is None:
         xs = [c[0] - r for _, _, c, r in src] + [c[0] + r for _, _, c, r in src]
         ys = [c[1] - r for _, _, c, r in src] + [c[1] + r for _, _, c, r in src]
+        for node, M in L.ter:
+            cols, rows = struct.unpack_from("<HH", L.d, node + 0x9C)
+            TM = np.array(struct.unpack_from("<16f", L.d, node + 0x10)).reshape(4, 4)
+            for cu, cv in ((0, 0), (cols, 0), (0, rows), (cols, rows)):
+                p = TM @ np.array([cu, cv, 0, 1.0]); p = np.r_[p[:3], 1] @ M
+                xs.append(p[0]); ys.append(p[1])
         bounds = (min(xs), min(ys), max(xs), max(ys))
     x0, y0, x1, y1 = bounds
     nx = int((x1 - x0) / step) + 1; ny = int((y1 - y0) / step) + 1
@@ -212,6 +218,35 @@ def rasterize(L, step=4.0, src=None, bounds=None):
         rr, ta, tb = rr[keep], ta[keep], tb[keep]
         iv_c.append(jj[rr] * nx + ii[rr])
         iv_hi.append(ZTOP + ta * (ZBOT - ZTOP)); iv_lo.append(ZTOP + tb * (ZBOT - ZTOP))
+    # heightfield terrain cells (no BSP, cell flag 0x100 clear): ground where a triangle has a material
+    jj, ii = np.mgrid[0:ny, 0:nx]
+    X = (x0 + ii * step).ravel(); Y = (y0 + jj * step).ravel(); colid = (jj * nx + ii).ravel()
+    for node, M in L.ter:
+        d = L.d
+        cols, rows = struct.unpack_from("<HH", d, node + 0x9C)
+        stride = w(d, node + 0xA0)
+        TM = np.array(struct.unpack_from("<16f", d, node + 0x10)).reshape(4, 4)
+        cell = np.frombuffer(d, np.uint16, count=stride * rows * 4, offset=L.P(node + 0x90)).reshape(rows, stride, 4)
+        Wd = np.stack([X, Y, np.zeros_like(X), np.ones_like(X)], 1) @ np.linalg.inv(M)
+        loc = Wd @ np.linalg.inv(TM).T
+        u, v = loc[:, 0], loc[:, 1]
+        ci = np.floor(u).astype(int); cj = np.floor(v).astype(int)
+        inside = (ci >= 0) & (cj >= 0) & (ci < cols - 1) & (cj < rows - 1)
+        idx = np.flatnonzero(inside)
+        if not len(idx): continue
+        ci, cj, fu, fv = ci[idx], cj[idx], (u - np.floor(u))[idx], (v - np.floor(v))[idx]
+        e = cell[cj, ci]
+        hfc = (e[:, 3] & 0x100) == 0
+        mat = np.where(fu + fv < 1.0, e[:, 1] & 0x1F, (e[:, 1] >> 5) & 0x1F)
+        ok = hfc & (mat > 0)
+        h00 = cell[cj, ci, 0].astype(float); h10 = cell[cj, ci + 1, 0].astype(float)
+        h01 = cell[cj + 1, ci, 0].astype(float); h11 = cell[cj + 1, ci + 1, 0].astype(float)
+        h = h00 * (1 - fu) * (1 - fv) + h10 * fu * (1 - fv) + h01 * (1 - fu) * fv + h11 * fu * fv
+        zl = TM[2, 2] * h + TM[2, 3]
+        wz = (np.stack([u[idx], v[idx], h, np.ones_like(h)], 1) @ TM.T)
+        wz = np.concatenate([wz[:, :3], np.ones((len(h), 1))], 1) @ M
+        sel = ok
+        iv_c.append(colid[idx][sel]); iv_hi.append(wz[sel, 2]); iv_lo.append(np.full(sel.sum(), ZBOT))
     c = np.concatenate(iv_c); hi = np.concatenate(iv_hi); lo = np.concatenate(iv_lo)
     return dict(x0=x0, y0=y0, nx=nx, ny=ny, step=step, col=c, hi=hi, lo=lo)
 
