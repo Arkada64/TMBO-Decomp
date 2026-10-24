@@ -7,7 +7,7 @@ import sys, struct, math
 import numpy as np
 
 MAGIC_PED, MAGIC_PKP = 0x10242000, 0x08152000
-RING, RING_R, GROUPS = 5, 14.0, 20
+RING, RING_R, GROUPS = 8, 45.0, 14     # retail groups walk networks hundreds of units across
 ENTRIES = [(9, 4), (10, 1), (11, 1), (2, 1)]      # (type, behaviour) - PRISON uses 9/4, 10/1, 11/1
 
 
@@ -33,14 +33,16 @@ def group(c, gi):
                            for i in range(RING)]
     links = [list(range(1, RING + 1))] + [sorted({0, 1 + (i - 1) % RING, 1 + (i + 1) % RING}) for i in range(RING)]
     P = np.array(pts)
-    lo, hi = P.min(0) - 60, P.max(0) + 60
+    # bounds = the group's activation box: retail pads its walk network by 400 (xy) / 80 (z); ours had 60,
+    # so a group only woke up (and drew) with the car right next to it
+    lo, hi = P.min(0) - np.array([400, 400, 80]), P.max(0) + np.array([400, 400, 80])
     b = struct.pack('<BB', len(pts), 3)
     b += struct.pack('<4f', *lo, 0) + struct.pack('<4f', *hi, 0)
     for p, l in zip(pts, links):
         b += struct.pack('<4f', *p, 0) + bytes([24]) + b'\0' * 7 + bytes((l + [0] * 8)[:8])
-    for e in range(3):                                     # 3 spawns per group, ped types in turn
+    for e in range(3):                                     # 3 spawns per group, on ring points a third apart
         t, beh = ENTRIES[(gi + e) % len(ENTRIES)]
-        b += bytes([1 + (gi + e) % RING, t, beh])
+        b += bytes([1 + (gi + e * RING // 3) % RING, t, beh])
     return b
 
 
