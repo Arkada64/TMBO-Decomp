@@ -23,10 +23,12 @@ W = R / "logs/nm"; W.mkdir(parents=True, exist_ok=True)
 CFLAGS = ["-O2", "-G0", "-fno-exceptions", "-Iinclude", "-isystem", "include/gcc", "-isystem", "include/gcc/gcc-lib",
           "-isystem", "include/sdk", "-isystem", "include/sdk/common", "-isystem", "include/sdk/ee"]
 
-def cc(path, extra=()):
+def cc(path, extra=(), whole=False):
+    """whole=True: the real build's compiler wrapper (tools/sn_cc.sh handles INCLUDE_ASM), as build.ninja's cc rule"""
     obj = W / "t.o"; obj.unlink(missing_ok=True)
-    r = subprocess.run([f"{R / SN}/bin/ee-gcc.exe", f"-B{SN}/lib/gcc-lib/ee/2.95.3/", "-c", *CFLAGS, *extra,
-                        str(Path(path).relative_to(R)), "-o", str(obj.relative_to(R))], cwd=R, capture_output=True, text=True)
+    pre = ["tools/sn_cc.sh"] if whole else [f"{R / SN}/bin/ee-gcc.exe", f"-B{SN}/lib/gcc-lib/ee/2.95.3/"]
+    r = subprocess.run([*pre, "-c", *extra, *CFLAGS, str(Path(path).relative_to(R)), "-o", str(obj.relative_to(R))],
+                       cwd=R, capture_output=True, text=True)
     return r.returncode == 0 and obj.exists(), r.stdout + r.stderr
 
 # functions the mods patch in their .s files: keep them asm in every build
@@ -61,10 +63,11 @@ def apply(src):
             new = re.sub(rf'^(INCLUDE_ASM\("[^"]*", {re.escape(n)}\);)\n',
                          lambda m: f"#ifdef NON_MATCHING\n/* NM:{n} */\n{c}#else\n{m.group(1)}\n#endif\n", new, count=1, flags=re.M)
         src.write_text(new)
-        ok, err = cc(src, ["-DNON_MATCHING"])
+        ok, err = cc(src, ["-DNON_MATCHING"], whole=True)
         if ok: break
+        if os.environ.get('NM_DEBUG'): print('\n'.join(l for l in err.splitlines() if 'warning' not in l)[:3000])
         lines = new.splitlines(); bad = set()
-        for m in re.finditer(rf"{re.escape(rel)}:(\d+):", err):
+        for m in re.finditer(rf"{re.escape(rel)}:(\d+): (?!warning)", err):
             ln = int(m.group(1)) - 1
             for k in range(min(ln, len(lines) - 1), -1, -1):      # the NM block this line belongs to
                 mm = re.match(r"/\* NM:(\S+) \*/", lines[k])
@@ -77,7 +80,7 @@ def apply(src):
         src.write_text(text); st["dropped"] += len(chosen); chosen = {}
     # (the drafts carry their own #include "m2c_macros.h")
     # the normal build must not see any of it
-    ok, err = cc(src)
+    ok, err = cc(src, whole=True)
     if not ok: src.write_text(text); st["dropped"] += len(chosen); chosen = {}
     st["used"] = len(chosen)
     return st
