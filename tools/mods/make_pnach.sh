@@ -81,7 +81,7 @@ i = community.find("\nauthor=TMB-Reloaded")
 if i >= 0:
     peds = community[i:].strip(); community = community[:i]
     peds = peds.replace("author=TMB-Reloaded\n", "", 1)
-hooks = {0x17BF00, 0x17BF78, 0x139D38, 0x1395E0, 0x1E2498, 0x1E249C, 0x121744}   # 0x139218: the Spectator/ Alternate View codes (turn them off)
+hooks = {0x17BF00, 0x17BF78, 0x139D38, 0x1395E0, 0x1E2498, 0x1E249C, 0x121744, 0x134AA8, 0x14F184, 0x1DC7C4, 0x167938, 0x167D38, 0x167DA0, 0x167EC4}   # 0x139218: the Spectator/ Alternate View codes (turn them off)
 for m in re.finditer(r"patch=\d,EE,([0-9A-Fa-f]{8}),", community):
     a = int(m.group(1)[1:], 16)
     assert not (cave <= a < end) and not (cave2 <= a < end2) and a not in hooks, f"community patch at {a:08X} overlaps"
@@ -145,6 +145,14 @@ patch=1,EE,201E2498,extended,{J(2, S["tmbr_DmgGate"]):08X}
 patch=1,EE,201E249C,extended,00000000
 //rams on remote cars (sent as a game event) -> tmbr_RamSent (sends it, then watches the victim)
 patch=1,EE,20121744,extended,{J(3, S["tmbr_RamSent"]):08X}
+//every call of the hit function -> tmbr_TakeHit (real damage done for cars this console owns)
+patch=1,EE,20134AA8,extended,{J(3, S["tmbr_TakeHit"]):08X}
+patch=1,EE,2014F184,extended,{J(3, S["tmbr_TakeHit"]):08X}
+patch=1,EE,201DC7C4,extended,{J(3, S["tmbr_TakeHit"]):08X}
+patch=1,EE,20167938,extended,{J(3, S["tmbr_TakeHit"]):08X}
+patch=1,EE,20167D38,extended,{J(3, S["tmbr_TakeHit"]):08X}
+patch=1,EE,20167DA0,extended,{J(3, S["tmbr_TakeHit"]):08X}
+patch=1,EE,20167EC4,extended,{J(3, S["tmbr_TakeHit"]):08X}
 {lines(words(S["tmbr_DmgGate"], S["tmbr_DmgGate_end"]))}
 {FRAME}
 {EN(1)}

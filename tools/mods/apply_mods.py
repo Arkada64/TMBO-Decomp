@@ -317,6 +317,14 @@ PATCHES = [
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E249C", "beql", "nop"),
     # ... and rams on remote cars (sent to the victim's console as a game event instead of applied here)
     (A("tmb/collis.s"), "00121744", "jal", "jal        tmbr_RamSent"),
+    # every call of the hit function: team play without friendly fire, real damage for the reports (dmgreport.c)
+    (A("nonmatchings/tmb/fodder/fodderTakeHit__7VehicleP8_fvectorii.s"), "00134AA8", "jal", "jal        tmbr_TakeHit"),
+    (A("nonmatchings/tmb/interact/func_0014F108.s"), "0014F184", "jal", "jal        tmbr_TakeHit"),
+    (A("nonmatchings/tmb/vehicle/func_001DC760.s"), "001DC7C4", "jal", "jal        tmbr_TakeHit"),
+    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167938", "jal", "jal        tmbr_TakeHit"),
+    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167D38", "jal", "jal        tmbr_TakeHit"),
+    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167DA0", "jal", "jal        tmbr_TakeHit"),
+    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167EC4", "jal", "jal        tmbr_TakeHit"),
     # 12 Pak's reticle special: the reticle's slot-5 ammo calls
     (A("nonmatchings/tmb/launch/func_001549A0.s"), "00155240", "jal", "jal        tmbr_ReticleUsed"),
     (A("nonmatchings/tmb/launch/func_00156118.s"), "00156268", "jal", "jal        tmbr_ReticleUsed"),

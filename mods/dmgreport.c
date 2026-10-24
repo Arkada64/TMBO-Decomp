@@ -57,7 +57,9 @@ static void report(char* victim, float dmg)
 #define DMG_DBG 0
 #endif
 extern int scePrintf(const char* fmt, ...);
+#if DMG_DBG
 static char DBG_HP[] = "TMBR dmg: watched car %x health %d -> %d\n";
+#endif
 void tmbr_DamageReportTick(void)
 {
     int wh[2], i;
@@ -71,7 +73,9 @@ void tmbr_DamageReportTick(void)
         hp = *(float*)(wCar[i] + 0x404);
         if (hp < wHp[i]) {
             report(wCar[i], wHp[i] - hp);
-            if (DMG_DBG) scePrintf(DBG_HP, (int)wCar[i], (int)wHp[i], (int)hp);
+#if DMG_DBG
+            scePrintf(DBG_HP, (int)wCar[i], (int)wHp[i], (int)hp);
+#endif
         }
         wHp[i] = hp;                       /* also follows repairs / respawns upward */
         if (dmgClock - wEnd[i] > 0) wCar[i] = 0;
@@ -92,8 +96,9 @@ void tmbr_DmgSeen(char* victim, char* attacker, float dmg)
     if (!g || !attacker || !victim || attacker == victim || !(dmg > DMG_K[1])) return;
     if (attacker < g || attacker >= g + 8 * VSIZE || *(int*)(attacker + 0x20B4) != 1) return;
     if (*(int*)(attacker + 0x210C) != 0) return;              /* first screen only */
-    /* a car this console owns (bots / AI: 0x20B4 4) already took the damage above the hook - that is final */
-    if (*(int*)(victim + 0x20B4) != 2) { report(victim, dmg); return; }
+    /* cars this console owns (you, bots, traffic): tmbr_TakeHit reports their real health loss. (At this point
+     * of func_001E1C40 $f22 is no longer the damage for them: it held the car's health, log 2026-10-24) */
+    if (*(int*)(victim + 0x20B4) != 2) return;
     for (i = 0; i < NW; i++) if (wCar[i] == victim) { wEnd[i] = dmgClock + WATCH; return; }
     for (i = 0; i < NW; i++) if (!wCar[i]) { k = i; break; }
     if (k < 0) {                                              /* all busy: the one ending first */
@@ -122,15 +127,45 @@ static char* byPlayer(int idx)
 #define DMG_DBG 0
 #endif
 extern int scePrintf(const char* fmt, ...);
+#if DMG_DBG
 static char DBG_RAM[] = "TMBR ram: to %d ev %d %d %d %d %d %d -> rammer %x (own %d) victim %x (own %d hp %d)\n";
+#endif
 void tmbr_RamSent(void* net, int to, int* ev)
 {
     char *r, *v;
     netSendGameEvent(net, to, ev);
     r = byPlayer(ev[0]); v = byPlayer(ev[4]);
-    if (DMG_DBG)
+#if DMG_DBG
         scePrintf(DBG_RAM, to, ev[0], ev[1], ev[4], ev[5], ev[6], ev[2], (int)r, r ? *(int*)(r + 0x20B4) : -1,
                   (int)v, v ? *(int*)(v + 0x20B4) : -1, v ? (int)*(float*)(v + 0x404) : -1);
+#endif
     if (ev[1] != 60) return;
     if (r && v && ev[5] > 0) tmbr_DmgSeen(v, r, (float)ev[5]);
+}
+
+/* Every call of the game's hit function (func_001E1C40(car, pos, damage, attacker id, x), 7 call sites, all
+ * hooked) comes here:
+ *  - team play (mod build): a hit from a teammate is dropped before it is applied - no damage, no effect;
+ *  - damage reports for cars this console owns: health before minus health after = the damage really done.
+ * The attacker is the car whose +0x20FC is the id (+0x20D0 set), as func_001E1C40 looks it up. */
+extern int gameTakeHit(char* v, void* pos, int dmg, int att, int x) __asm__("func_001E1C40");
+int tmbr_TakeHit(char* v, void* pos, int dmg, int att, int x)
+{
+    char *g = D_004FA030, *a = 0;
+    int k, r;
+    float hp0;
+    for (k = 0; g && k < 8; k++)
+        if (*(int*)(g + k * VSIZE + 0x20FC) == att && *(int*)(g + k * VSIZE + 0x20D0)) { a = g + k * VSIZE; break; }
+#ifndef TMBR_PNACH
+    {
+        extern int tmbr_SameTeam(char* a, char* b);       /* teams.c: 0 unless team play is on */
+        if (a && a != v && tmbr_SameTeam(a, v)) return 0;
+    }
+#endif
+    hp0 = *(float*)(v + 0x404);
+    r = gameTakeHit(v, pos, dmg, att, x);
+    if (a && a != v && *(int*)(a + 0x20B4) == 1 && *(int*)(a + 0x210C) == 0 && *(int*)(v + 0x20B4) != 2 &&
+        *(float*)(v + 0x404) < hp0)
+        report(v, hp0 - *(float*)(v + 0x404));
+    return r;
 }
