@@ -97,7 +97,7 @@ def hierobject(m, scale, gsctx):
     nsv = sum(len(s['v']) for b in bs for s in b['strips'])
     alpha = any(s['tag'][1] & 0x200000 for b in bs for s in b['strips'])   # ABE bit (prim bit 6)
     if 'alpha' in m: alpha = m['alpha']      # levels: only meshes with really translucent textures
-    flags = (min(nsv, 0xFFFF) << 16) | (0 if m.get('level') else 0x0100) | (0x8000 if alpha else 0)
+    flags = (min(nsv, 0xFFFF) << 16) | 0x0100 | (0x8000 if alpha else 0)
     if m.get('env'):
         flags |= 0x06     # retail TMB reflective meshes: 0x106 (envMapSize 3), one texture = the reflection map
     elif ENV_MAP:   # envMapSize (bits 1-3): same bitfield in Head-On's object flags; TMB's VU1 code has an env-map path

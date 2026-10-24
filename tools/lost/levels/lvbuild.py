@@ -19,7 +19,7 @@ from lvcol import build_piece, encode
 
 TEX_BUDGET = 2654208          # level TEX slot 0x1C05670 .. 0x1E8E3F0 (0x288D80)
 CLUT_BUDGET = 0x411           # level CLUT blocks
-LEAF = 16                     # meshes per leaf render group (retail: 12-16)
+LEAF = 24                     # meshes per leaf render group (retail: 12-49)
 
 def packet_of(n, o):
     q = o
@@ -257,19 +257,17 @@ def build(path, outdir, name, scale=1.15, donor=None):
         P = np.array([s[:3] for _, s in lst]); c = tuple((P.max(0) + P.min(0)) / 2)
         return (*c, max(math.dist(c, s[:3]) + s[3] for _, s in lst))
     def kd(lst):
-        # retail arenas: small leaf groups (~12-16 meshes) inside a tree of op1 groups, so whole areas cull
+        # small spatial leaf groups (retail: ~12-16 meshes), all directly under the root: a nested tree
+        # (depth 11) blacked the screen in game, the old flat layout (depth 9) loads
         if len(lst) <= LEAF:
-            b_ = bound(lst); return car.group([o for o, _ in lst], sphere=b_), b_
+            b_ = bound(lst); return [(car.group([o for o, _ in lst], sphere=b_), b_)]
         P = np.array([s[:3] for _, s in lst]); ax = int(np.argmax(P.max(0) - P.min(0)))
         lst = sorted(lst, key=lambda e: e[1][ax]); h = len(lst) // 2
-        kids = [kd(lst[:h]), kd(lst[h:])]
-        P2 = np.array([b_[:3] for _, b_ in kids]); c = tuple((P2.max(0) + P2.min(0)) / 2)
-        b_ = (*c, max(math.dist(c, k[1][:3]) + k[1][3] for k in kids))
-        return car.group([g for g, _ in kids], sphere=b_), b_
+        return kd(lst[:h]) + kd(lst[h:])
     groups = []
     # very large meshes (backdrops, terrain sheets) go straight under the root; the rest into the tree
     big = [e for e in placed if e[1][3] > 3000]; small = [e for e in placed if e[1][3] <= 3000]
-    if small: groups.append(kd(small))
+    if small: groups += kd(small)
     for off, sph in big: groups.append((car.group([off], sphere=sph), sph))
     # ---- collision: one op18 per Head-On collision piece
     col = []; colpts = []; cn = 0

@@ -11,7 +11,7 @@ import sys, struct, zlib, os
 sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp")
 from ngpdb import rawfile
 S, O = "cloud/lost2", "packs/lost2"
-SLOTS = {"HCGD": "DEATH1", "HCSU": "DEATH2", "HCSC": "DEATH3", "HCND": "DEATH4", "HCST": "DEATH5"}
+SLOTS = {"HCGD": "DEATH1", "HCSU": "DEATH2", "HCSC": "DEATH4", "HCND": "DEATH3", "HCST": "DEATH5"}
 def wrap(orig, data):
     """re-pack into the game's zip-like container, header copied from the original disc file"""
     nl, xl = struct.unpack_from('<HH', orig, 26)
