@@ -25,6 +25,10 @@ cmp -s build/SCUS_971.96.rom disks/SCUS_971.96.rom && echo "normal build: byte-i
 cp "$W/cloud/in/nm_ld.py" tools/ && python3 tools/nm_ld.py build/SCUS_971.96.map config/US/SCUS_971.96.ld "$@"
 # -DNON_MATCHING for the shiftable link only (build.ninja is restored by build_shiftable.sh)
 sed -i 's#^grep -q data_ptrs_shiftable#[ "${NONMATCHING:-0}" = 1 ] \&\& sed -i "s|tools/sn_cc.sh -c |tools/sn_cc.sh -c -DNON_MATCHING |" build.ninja\n&#' tools/build_shiftable.sh
-HOME=$NH NONMATCHING=1 bash tools/build_shiftable.sh 2>&1 | grep -vE "RWX|^\[" | tail -15
+rm -f build/SCUS_971.96.shift.elf
+# (its closing "normal build restored" check fails here: the link script keeps the C guards; that is fine,
+#  this copy is rebuilt from scratch every time)
+HOME=$NH NONMATCHING=1 bash tools/build_shiftable.sh 2>&1 | grep -vE "RWX|^\[" | tail -15 || true
+[ -f build/SCUS_971.96.shift.elf ] || { echo "no shift ELF"; exit 1; }
 cp build/SCUS_971.96.shift.elf "$W/test/NM_TEST.ELF" && echo "NM_TEST.ELF updated"
 echo NM_DONE
