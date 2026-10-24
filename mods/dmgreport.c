@@ -41,8 +41,14 @@ static void report(char* victim, float dmg)
     /* a report of hundreds in one go (log 2026-10-24): log the big ones to find the source */
     if ((int)dmg >= 100 || n >= 200) {          /* (int compare: no float literal) */
         extern int scePrintf(const char* fmt, ...);
-        scePrintf("TMBR dmg: +%d (shown %d) car %d own %d hp %d / %d\n", (int)dmg, n, (int)(victim - D_004FA030) / VSIZE,
-                  *(int*)(victim + 0x20B4), (int)*(float*)(victim + 0x404), (int)*(float*)(victim + 0x400));
+        extern int tmbr_TeamOf(char* v);
+        char* g = D_004FA030;
+        int k, mine = -1;
+        for (k = 0; k < 8; k++)
+            if (*(int*)(g + k * VSIZE + 0x590) && *(int*)(g + k * VSIZE + 0x20B4) == 1) { mine = tmbr_TeamOf(g + k * VSIZE); break; }
+        scePrintf("TMBR dmg: +%d (shown %d) car %d own %d hp %d / max %d, team %d (mine %d)\n", (int)dmg, n,
+                  (int)(victim - g) / VSIZE, *(int*)(victim + 0x20B4), (int)*(float*)(victim + 0x404),
+                  (int)*(float*)(victim + 0x3F0), tmbr_TeamOf(victim), mine);
     }
 #endif
 }
