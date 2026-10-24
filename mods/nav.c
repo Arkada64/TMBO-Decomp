@@ -24,6 +24,7 @@ typedef struct { float x, y, z, w; } __attribute__((aligned(16))) fvec;
 #define PAD(v) ((unsigned char*)(v) + 0x594)
 #define NAV_RAYS 12      /* collision rays per frame for planning (all bots together) */
 #define NAV_EXP 700      /* A* expansions per plan */
+#define NAV_STEP 300     /* baked map: A* expansions per frame (a plan takes 1-9 frames) */
 #define NAV_ALWAYS 0
 #define NAVDBG 0         /* one log line per plan (emulog) */
 #define G 40
@@ -216,7 +217,11 @@ static void planStep(void)
 
 /* once per frame (bots.c tmbr_BotsThink, host) */
 extern int tmbr_NavBaked(void);            /* navbake.c: route map of this level loaded */
-extern int tmbr_NavBakedPlan(fvec* from, fvec* to, fvec* wp, int maxwp, int* full);
+extern int tmbr_NavBakedBegin(fvec* from, fvec* to);
+extern int tmbr_NavBakedStep(int budget);
+extern int tmbr_NavBakedResult(fvec* wp, int maxwp, int* full);
+extern unsigned int tmbr_Cycles(void);              /* perf.c */
+extern void tmbr_PerfAdd(int slot, unsigned int start);
 extern float tmbr_NavArrive(void);
 extern void tmbr_NavLateLoad(void);
 void tmbr_NavFrame(void)
@@ -225,23 +230,32 @@ void tmbr_NavFrame(void)
     int k, i;
     if (tmbr_botCount < 0 || !g) return;
     tmbr_NavLateLoad();
-    if (tmbr_NavBaked()) {                    /* one plan per frame on the baked map, all at once */
-        for (k = 0; k < 8; k++) {
-            i = (rr + k) % 8;
-            if (nb[i].st == 1) {
-                char* v = g + i * 0x31B0;
-                int full, n;
-                rr = i + 1;
-                if (!live(v) || !live(nb[i].tgt)) { nb[i].st = 0; continue; }
-                n = tmbr_NavBakedPlan(POSV(v), POSV(nb[i].tgt), nb[i].wp, MAXWP, &full);
-                P.cell = tmbr_NavArrive();
-                nb[i].n = n; nb[i].i = 0; nb[i].timer = 0;
-                nb[i].st = n ? 2 : 0;
-                if (!n) nb[i].cool = 180;
-                if (NAVDBG) scePrintf("TMBR nav: car %d baked plan %d pts %s\n", i, n, full ? "to target" : "partial");
-                break;
-            }
+    if (tmbr_NavBaked()) {                    /* baked map: one plan at a time, NAV_STEP expansions per frame */
+        static int cur = -1;
+        unsigned int t0 = tmbr_Cycles();
+        if (cur >= 0 && (nb[cur].st != 1 || !live(g + cur * 0x31B0) || !live(nb[cur].tgt))) {
+            if (nb[cur].st == 1) nb[cur].st = 0;
+            cur = -1;
         }
+        if (cur < 0)
+            for (k = 0; k < 8; k++) {
+                i = (rr + k) % 8;
+                if (nb[i].st != 1) continue;
+                rr = i + 1;
+                if (!live(g + i * 0x31B0) || !live(nb[i].tgt)) { nb[i].st = 0; continue; }
+                if (tmbr_NavBakedBegin(POSV(g + i * 0x31B0), POSV(nb[i].tgt))) { cur = i; break; }
+                nb[i].st = 0; nb[i].cool = 180;           /* off the map: the old driving */
+            }
+        if (cur >= 0 && tmbr_NavBakedStep(NAV_STEP)) {
+            int full, n = tmbr_NavBakedResult(nb[cur].wp, MAXWP, &full);
+            P.cell = tmbr_NavArrive();
+            nb[cur].n = n; nb[cur].i = 0; nb[cur].timer = 0;
+            nb[cur].st = n ? 2 : 0;
+            if (!n) nb[cur].cool = 180;
+            if (NAVDBG) scePrintf("TMBR nav: car %d baked plan %d pts %s\n", cur, n, full ? "to target" : "partial");
+            cur = -1;
+        }
+        tmbr_PerfAdd(4, t0);
         return;
     }
     if (!P.on) {

@@ -202,27 +202,36 @@ static int hcost(int a, int b)       /* octile distance in cells, x10 */
     return 10 * (dj + di) - 6 * (dj < di ? dj : di);
 }
 
-/* plan from `from` to `to`; fills up to maxwp waypoints (the first is the step after the start node).
- * Returns the number of waypoints, 0 = no map / no node near either end / no progress possible. */
-int tmbr_NavBakedPlan(fvec* from, fvec* to, fvec* wp, int maxwp, int* full)
+/* Planning is spread over frames: tmbr_NavBakedBegin, then tmbr_NavBakedStep(budget) each frame until it
+ * returns 1, then tmbr_NavBakedResult. One plan at a time (nav.c queues the bots). */
+static int pa, pb, pBest, pBestH, pExp, pFull, pOn;
+int tmbr_NavBakedBegin(fvec* from, fvec* to)
 {
-    static short path[512];
-    int a, b, i, s, best, bestH, exp = 0, n = 0, k;
+    int i, s;
+    pOn = 0;
     if (!tmbr_NavBaked()) return 0;
-    a = nearest(from); b = nearest(to);
-    if (a < 0 || b < 0) return 0;
+    pa = nearest(from); pb = nearest(to);
+    if (pa < 0 || pb < 0) return 0;
     for (i = 0; i < HB; i++) hs[i].node = -1;
     hn = 0;
-    s = slotOf(a, 1); hs[s].g = 0; fcost[s] = hcost(a, b); hpush(s);
-    best = s; bestH = fcost[s];
-    *full = 0;
-    while (hn && exp < BUDGET) {
-        int c = hpop(), node, d;
+    s = slotOf(pa, 1); hs[s].g = 0; fcost[s] = hcost(pa, pb); hpush(s);
+    pBest = s; pBestH = fcost[s]; pExp = 0; pFull = 0; pOn = 1;
+    return 1;
+}
+/* expand up to `budget` nodes; 1 = finished (found, exhausted or over BUDGET) */
+int tmbr_NavBakedStep(int budget)
+{
+    int done = 0;
+    if (!pOn) return 1;
+    while (budget-- > 0) {
+        int c, node, d;
+        if (!hn || pExp >= BUDGET) { done = 1; break; }
+        c = hpop();
         if (hs[c].closed) continue;
-        hs[c].closed = 1; exp++;
+        hs[c].closed = 1; pExp++;
         node = hs[c].node;
-        if (node == b) { best = c; *full = 1; break; }
-        if (hcost(node, b) < bestH) { bestH = hcost(node, b); best = c; }
+        if (node == pb) { pBest = c; pFull = 1; done = 1; break; }
+        if (hcost(node, pb) < pBestH) { pBestH = hcost(node, pb); pBest = c; }
         for (d = 0; d < 8; d++) {
             int m, ms, g;
             if (!(nodes[node].links & (1 << d))) continue;
@@ -233,14 +242,21 @@ int tmbr_NavBakedPlan(fvec* from, fvec* to, fvec* wp, int maxwp, int* full)
             g = hs[c].g + ((d & 1) ? 14 : 10);
             if (g >= hs[ms].g) continue;
             hs[ms].g = g; hs[ms].parent = (short)c;
-            fcost[ms] = g + hcost(m, b);
+            fcost[ms] = g + hcost(m, pb);
             if (hn < HB) hpush(ms);
         }
     }
-    /* walk back */
-    for (k = best; k >= 0 && n < 512; k = hs[k].parent) path[n++] = (short)k;
+    if (done) pOn = 0;
+    return done;
+}
+/* the finished plan as waypoints (the first is the step after the start node); 0 = no progress possible */
+int tmbr_NavBakedResult(fvec* wp, int maxwp, int* full)
+{
+    static short path[512];
+    int i, n = 0, k;
+    *full = pFull;
+    for (k = pBest; k >= 0 && n < 512; k = hs[k].parent) path[n++] = (short)k;
     if (n < 2) return 0;
-    /* path[n-1] is the start node: emit from the next one on, skipping straight runs */
     k = 0;
     for (i = n - 2; i >= 0 && k < maxwp; i--) {
         if (i > 0 && i < n - 2) {

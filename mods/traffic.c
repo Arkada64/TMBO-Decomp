@@ -458,6 +458,34 @@ void tmbr_CollideHit(char* v, int side, char* other, void* info)
 }
 
 extern int tmbr_Opt(int bit);   /* bots.c: lobby options in the game info */
+extern unsigned int tmbr_Cycles(void);              /* perf.c */
+extern void tmbr_PerfAdd(int slot, unsigned int start);
+#define LOD_OUT 650     /* manhattan distance to the nearest player car: beyond it, cheap driving */
+#define LOD_IN 500      /* ... and back to full physics inside this */
+static char lodState[MAXCARS];
+static int lodFar(char* v, int j)
+{
+    char* g = D_004FA030;
+    int k, best = 0x7FFFFFFF;
+    float* p = (float*)(F(v, 0x2028) + 0x10);
+    for (k = 0; k < 8; k++) {
+        char* h = g + k * VSIZE;
+        float* q;
+        int d;
+        if (F(h, 0x590) != 1 || !F(h, 0x2028)) continue;
+        q = (float*)(F(h, 0x2028) + 0x10);
+        d = (int)(p[0] - q[0]); if (d < 0) d = -d;
+        {
+            int dy = (int)(p[1] - q[1]), dz = (int)(p[2] - q[2]);
+            d += (dy < 0 ? -dy : dy) + (dz < 0 ? -dz : dz);
+        }
+        if (d < best) best = d;
+    }
+    if (best == 0x7FFFFFFF) return 0;
+    if (lodState[j] && best < LOD_IN) lodState[j] = 0;
+    else if (!lodState[j] && best > LOD_OUT) lodState[j] = 1;
+    return lodState[j];
+}
 void tmbr_TrafficUpdate(void)
 {
     int j;
@@ -470,8 +498,20 @@ void tmbr_TrafficUpdate(void)
     for (j = 0; j < ncars; j++) destructionStep(j);
     for (j = 0; j < ncars; j++) {
         char* v = cars + j * VSIZE;
+        char* cs = (char*)F(v, 0x2028);
+        int far;
+        unsigned char vis = 0;
+        unsigned int tp;
         if (!F(v, 0x590)) continue;
+        /* distance LOD: the game drives a traffic car the cheap way (along its lane, no physics) only while it
+         * is off screen (fodderUpdateCheapMode: cs +0xE = drawn this frame). Cars far from every player get the
+         * cheap way too: their "drawn" flag reads 0 during their update (restored after, the renderer still
+         * draws them). LOD_IN / LOD_OUT give hysteresis so a car on the edge does not flip every frame. */
+        far = cs && lodFar(v, j);
+        if (far) { vis = (unsigned char)cs[0xE]; cs[0xE] = 0; }
         vehicleUpdate(v);
+        if (far) cs[0xE] = (char)vis;
+        tp = tmbr_Cycles();
         if (!F(v, 0x2158) && (F(v, 0x1D0) || F(v, 0x1D4))) {
             /* physics: without this a car only moved in cheap (off-screen) mode and froze on screen */
             phys1(v); phys2(v); phys3(v); phys4(v); phys5(v); phys6(v);
@@ -493,6 +533,7 @@ void tmbr_TrafficUpdate(void)
              * at the origin (cs never set), so never on screen, so never out of cheap mode. */
             vehicleSetCsMat(v);
         }
+        tmbr_PerfAdd(5, tp);
     }
     if (TRAFFIC_DBG && ncars && dbgTick % 600 == 599)
         scePrintf("TMBR traffic sync: host %d, sent %d, received %d\n", netIsHost(D_003156C0), syncSent, syncRecv);
