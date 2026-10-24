@@ -1,5 +1,5 @@
 import sys, numpy as np
-sys.path.insert(0, '/home/claude/hc'); sys.path.insert(0, '/home/claude/lost')
+sys.path.insert(0, '/home/claude/lost')
 from hotx import walk
 from homesh import decode, triangles
 from horender import render

@@ -50,3 +50,28 @@ need downsizing.
 2. Collision: decode op26 fully, build TMB BSP trees (+ terrain if useful), verify with navgen.
 3. Points: pickups (type map), spawns, then a route map (navall) from the converted collision.
 4. Slot: swap into an existing level for testing (like the DEATH7 disc), later new level slots.
+
+## Stage 1 (2026-10-23): render + textures + pickups -> TMB files (tools/lost/levels/)
+- `lvbuild.py HC_xx.BDD OUTDIR NAME [scale]` -> NAME.NGP/.PTR/.TEX/.RTX (raw, base 0x980000) + NAME.PKP.
+  Scale 1.15 (Head-On cars are ~1/1.15 of TMB's, so the maps are scaled up to match).
+- Walk (hotx.py): + op7 (scene child +4, list at +0x20; +8 = op8, no meshes), op17 / op18 layouts, and the
+  **world-object table**: records {1, 0, node (op3), 0, 4x4 matrix} near the end of the ngp = extra roots (filled
+  the building holes on Suburban Terror). Guards: known ops only, child counts <= 512, sane matrices, depth 60.
+  First LOD / first damage state only. Placed meshes: SU 1815, GD 1106, SC 1216, ST 861, ND 448.
+- Textures (levtex.py): records = texture, its mip levels (same key), then its CLUT; pixels decoded page by page
+  (any size). Only textures used by placed meshes are kept; all five fit without downsizing:
+  GD 2.18 MB / 582 CLUT blocks, SC 1.79 MB / 498, SU 1.81 MB / 443, ST 1.48 MB / 303, ND 0.58 MB / 150
+  (budgets 2.65 MB / 1041 blocks). City of the Dead's full set (452 textures, 4.3 MB) is what doesn't fit.
+- Meshes: world transform baked into the vertices, then meshconv.hierobject (same encoder as Gold Tooth / 12 Pak);
+  grouped by 1200-unit tiles (op1 groups with spheres) under one op1 root = the only entry point for now.
+- Checks: lvcheck.py (TMB-decoder walk, PTR slots in range, every texture pair's id exists) and lvtexprev.py
+  (textured top view from the TMB files alone). All five pass.
+- Pickups (pkpconv.py): Head-On list 0 MG, 1 fire, 2 homing, 3 swarmer, 4 ricochet, 5 power, 6 health 30%,
+  7 environment, 8 remote bomb, 9 full health -> TMB online PKP {type, xyz, w} with 1 fire, 2 homing, 3 skill
+  weapon slot, 5 ricochet, 6 power, 7/8 health kinds, 9 slot 8; swarmer -> homing, remote bomb -> skill weapon.
+  Unverified: TMB 0 (MG?), 7 vs 8 (partial / full health), 9 (environment?).
+
+## Stage 2 (next): collision + the two other entry points
+TMB levels have 3 entry points: op1 (render), **op15** (grid: cell 100, bounds - the counterpart of Head-On's
+op12) and **op7** (object list). Need: Head-On op26 pieces decoded -> TMB op18 BSP trees (+ op13 terrain?),
+op15 grid + op7 list built, spawn points found, then a test disc (swap into a level slot) and route maps.
