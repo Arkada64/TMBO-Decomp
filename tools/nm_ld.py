@@ -19,8 +19,13 @@ if not only:      # all files: the ones nm_apply.py gave C (logs/nm/summary.json
 orig = {}        # (object, section) -> size in the matching build
 for m in re.finditer(r"^ (\.text|\.rodata|\.data)\s+0x([0-9a-f]+)\s+0x([0-9a-f]+)\s+(build/src/\S+\.c\.o)", open(mp).read(), re.M):
     orig[(m.group(4), m.group(1))] = int(m.group(3), 16)
+src_lines = open(ld).read().splitlines()
+# C objects whose original had no .rodata / .data in the link script (their C has some now): those sections
+# go into the padded block after .sdata with the literals
+listed = {(m.group(1), m.group(2)) for m in (re.match(r"^\s*(build/src/\S+\.c\.o)\((\.rodata|\.data)\);$", l) for l in src_lines) if m}
+extra = [f"{o}({sec});" for o in sorted(only) for sec in (".rodata", ".data") if (o, sec) not in listed]
 out = []; n = 0
-for l in open(ld).read().splitlines():
+for l in src_lines:
     m = re.match(r"^(\s*)(build/src/\S+\.c\.o)\((\.text|\.rodata|\.data)\);$", l)
     if m and m.group(2) in only:
         ind, o = m.group(1), m.group(2); sz = orig.get((o, m.group(3)), 0)
@@ -30,9 +35,9 @@ for l in open(ld).read().splitlines():
         n += 1; continue
     if re.match(r"^\s*build/asm/data/3F9600\.sdata\.s\.o\(\.sdata\);$", l):
         ind = re.match(r"^(\s*)", l).group(1)
-        out += [l, f"{ind}__nm_lit = .;", f"{ind}*(.lit4);", f"{ind}*(.lit8);",
+        out += [l, f"{ind}__nm_lit = .;", f"{ind}*(.lit4);", f"{ind}*(.lit8);"] + [ind + e for e in extra] + [
                 f"{ind}. = __nm_lit + ALIGN(. - __nm_lit, 0x80);"]
         continue
     out.append(l)
 open(ld, "w").write("\n".join(out) + "\n")
-print(f"nm_ld: {n} C objects size-guarded, literals after .sdata")
+print(f"nm_ld: {n} sections size-guarded, literals + {len(extra)} new sections after .sdata")
