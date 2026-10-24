@@ -47,7 +47,8 @@ def main():
     snaps = f'{P}/snaps'; before = set(glob.glob(f'{snaps}/**/*.png', recursive=True))
     iso = WW + '\\' + a.iso.replace('/', '\\')
     t0 = time.time(); shots = []
-    subprocess.Popen(['cmd.exe', '/c', 'start', '', f'{WP}\\pcsx2-qt.exe', '-elf', f'{WW}\\test\\QUICK.ELF', '--', iso])
+    # normal window even when this runs from a minimized console (a minimized PCSX2 captures black)
+    ps(f"Start-Process -WindowStyle Normal -FilePath '{WP}\\pcsx2-qt.exe' -ArgumentList '-elf','\"{WW}\\test\\QUICK.ELF\"','--','\"{iso}\"'")
     try:
         for t in sorted(script.get('shots', [])):
             time.sleep(max(0, t - (time.time() - t0)))
