@@ -10,29 +10,30 @@ import sys, struct, collections
 sys.path.insert(0, '/home/claude/lost')
 from bdd import bdd
 
-HO2TMB = {0: 0,      # machine gun -> type 0 (unverified)
+HO2TMB = {0: None,   # machine gun (no Black equivalent): dropped
           1: 1,      # fire missile
           2: 2,      # homing
-          3: 2,      # swarmer (not in Black) -> homing
+          3: None,   # swarmer (not in Black): dropped
           4: 5,      # ricochet
           5: 6,      # power missile
           6: 7,      # health 30% -> health (7 / 8: which is partial vs full unverified)
           7: 9,      # environment attack -> slot 8 (unverified)
           8: 3,      # remote bomb (not in Black) -> skill weapon pickup
-          9: 8,      # full health
-          10: 1}     # mega gun -> fire missile
+          9: 7,      # full health -> health
+          10: None}  # mega gun: dropped
 
 def convert(pkp, scale=1.15):
     n = struct.unpack_from('<I', pkp, 4)[0]
-    out = bytearray(struct.pack('<II', 0x08152000, n))
+    out = bytearray(); kept = 0
     seen = collections.Counter()
     for i in range(n):
         o = 16 + 64 * i
         x, y, z = struct.unpack_from('<3f', pkp, o)
         t = struct.unpack_from('<I', pkp, o + 0x2C)[0]
-        tt = HO2TMB.get(t, 1); seen[(t, tt)] += 1
-        out += struct.pack('<I4f', tt, x * scale, y * scale, z * scale, 0.0)
-    return bytes(out) + b'\0' * 15, seen
+        tt = HO2TMB.get(t); seen[(t, tt)] += 1
+        if tt is None: continue
+        out += struct.pack('<I4f', tt, x * scale, y * scale, z * scale, 0.0); kept += 1
+    return struct.pack('<II', 0x08152000, kept) + bytes(out) + b'\0' * 15, seen
 
 if __name__ == '__main__':
     b = bdd(sys.argv[1]); sc = float(sys.argv[3]) if len(sys.argv) > 3 else 1.15
