@@ -166,7 +166,7 @@ def full_walk(n, root):
         st += k
     return seen
 
-def donor_prepare(car, drop=None):
+def donor_prepare(car, drop=None, drop_c=None):
     """TMB level used as the base: its shared assets (weapons, pickup models, effects: callback ids >= 3000)
     stay; its arena (callback id 1 = render + collision, id 14 = extra collision) goes. Returns the id-1 node,
     the id-14 nodes, the op15 grid node, texture records / CLUT records to keep, next free texture id / CLUT block."""
@@ -193,14 +193,14 @@ def donor_prepare(car, drop=None):
     for a, g in car.pairs: cbp_of[struct.unpack_from('<H', n, a)[0]] = (struct.unpack_from('<Q', n, g)[0] >> 37) & 0x3fff
     keep_t = [bytes(car.tex[o:o + b]) for o, b, gs, k in tr if (gs & 0xffff) not in drop]
     used_cbp = {c for t, c in cbp_of.items() if t not in drop}
-    drop_c = {cbp_of[t] for t in drop} - used_cbp
+    if drop_c is None: drop_c = {cbp_of[t] for t in drop if t in cbp_of} - used_cbp
     keep_r = [bytes(car.rtx[o:o + b]) for o, b, gs, k in rr if ((gs >> 16) & 0xffff) not in drop_c]
     next_id = max(gs & 0xffff for o, b, gs, k in tr) + 1
     next_cbp = max(((gs >> 16) & 0xffff) + clut_blocks((gs >> 40) & 15, (gs >> 44) & 15) for o, b, gs, k in rr
                    if ((gs >> 48) & 0xff) == 8)          # CLUT records (the others are VRAM-resident textures)
     op15 = next(u(4 + 4 * i) - BASE for i in range(u(0)) if (u(u(4 + 4 * i) - BASE) & 0x3f) == 15)
     arena_meshes = sorted(o for o in arena - asset if (u(o) & 0x3f) == 0)
-    return dict(drop=drop, arena_meshes=arena_meshes, id1=id1, id14=id14, op15=op15, keep_t=keep_t, keep_r=keep_r, next_id=next_id, next_cbp=next_cbp,
+    return dict(drop=drop, drop_c=drop_c, arena_meshes=arena_meshes, id1=id1, id14=id14, op15=op15, keep_t=keep_t, keep_r=keep_r, next_id=next_id, next_cbp=next_cbp,
                 kept_bytes=sum(len(r) for r in keep_t), dropped=len(drop))
 
 def build(path, outdir, name, scale=1.15, donor=None):
@@ -217,7 +217,7 @@ def build(path, outdir, name, scale=1.15, donor=None):
         dead = sorted(mesh_extent(car.n, o) for o in dn['arena_meshes'])
         dead = [(a, (b + 15) & ~15) for a, b in dead]
         donor_size = len(car.n); car.compact(dead)
-        dn = donor_prepare(car, dn['drop']); dn['compacted'] = donor_size - len(car.n)
+        dn = donor_prepare(car, dn['drop'], dn['drop_c']); dn['compacted'] = donor_size - len(car.n)
         LT = LevelTex(T, dn['next_id'], dn['next_cbp'], TEX_BUDGET - dn['kept_bytes'], CLUT_BUDGET - dn['next_cbp'])
     else:
         dn = None

@@ -75,3 +75,27 @@ need downsizing.
 TMB levels have 3 entry points: op1 (render), **op15** (grid: cell 100, bounds - the counterpart of Head-On's
 op12) and **op7** (object list). Need: Head-On op26 pieces decoded -> TMB op18 BSP trees (+ op13 terrain?),
 op15 grid + op7 list built, spawn points found, then a test disc (swap into a level slot) and route maps.
+
+## Stage 2 (2026-10-23): collision, donor assets, spawns, test disc (first in-game test pending)
+- Head-On collision = op12 grid entry's object table: records {aabb, 0, 0xffff tt nn, nn node pointers root..leaf}
+  (hocol.collision_objects); the leaf is an op26 piece {verts s16 before hdr; hdr {vptr, u16 ntri, u16 nnode,
+  s32 origin xyz, f32 scale}; nnode x 14-byte BVH nodes; ntri x {u8 i0, i1, i2, flags}}, world = (v + origin) *
+  scale, placed by composing the path's transforms (op3 / op4 / op18 / op13). Includes the ground.
+- Winding is inconsistent: lvcol.orient makes it consistent per connected part; closed parts face out, open
+  parts face up, mostly-vertical open parts are 4-unit double-sided slabs. Solid = behind a face, 30 deep.
+- TMB collision = op18 nodes in the render tree under the callback-id-1 node: op18 {0x12, r^2, r, root, centre};
+  BSP node 0x20 {front, back, 0, u16 matF, u16 matB, plane}, null child = leaf, 0x200 empty, 9 solid. One op18
+  per piece, built from the piece's face planes + prism side / back planes, leaves labelled by sample points.
+  ~1 node per triangle (SU 70K nodes = 2.2 MB).
+- Level DB callback ids (online func_00127650): 1 = arena (render + collision, func_00242F30), 2 = 4 x
+  func_00242FE0, 5 = tdSetEpNode, 13 = g+0x97B40, 14 = extra collision groups (op18 only), 0x20-0x400 static
+  vehicles, 5000+ pickup models, 4000+ weapons, 7000-10620 effects / parts. op15 entry = runtime grid
+  (n cells, 100-unit, bounds; cell buffer zero on disc). op7 entry = op25 animated objects.
+- Donor: DEATH4. Its arena meshes are compacted out (1.08 MB), the id-1 node points at our tree, id-14 nodes'
+  ids cleared, op15 resized, arena-only textures dropped (28), ours appended (ids / CLUT blocks after the donor's;
+  identical palettes shared; textures halved / 16-colour if over budget).
+- Spawns: start / respawn points are the PTS attractor points (gameCheckStartPoint -> random linked neighbour).
+  ptsconv.py keeps the donor PTS links and moves every used point onto a Head-On AI path point; PUP likewise.
+- Disc: tools/mklost.sh -> TMBR_LOST.iso: Elevators = City of the Dead, Snowy Roads = Suburban Terror,
+  Power Plant = Carnival of Darkness, Dogpound = Death Port, Sewers = Stadium Slaughter. DEATH1-5 route maps moved
+  to 0x1524000 (NGP tail; all five merged NGP + PTR end below 0x1460000).
