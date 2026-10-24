@@ -209,6 +209,15 @@ def donor_prepare(car, drop=None, drop_c=None):
 def build(path, outdir, name, scale=1.15, donor=None):
     b = bdd(path); n = b['ngp']
     meshes, unk = placed_meshes(n, scale)
+    # prelit colours: Head-On's level colours run brighter than Black's (DEATH6 averages ~33 of 128); scale them
+    # to the same average (the car value, 0.32, left the maps far too dark)
+    import meshconv
+    cols = []
+    for m in meshes[:600]:
+        for s_ in m['strips']:
+            for c_ in s_['col'][:8]:
+                cols.append(((c_ & 31) << 3) + (((c_ >> 5) & 31) << 3) + (((c_ >> 10) & 31) << 3) if c_ <= 0xFFFF else (c_ & 255) + ((c_ >> 8) & 255) + ((c_ >> 16) & 255))
+    meshconv.COLOR_SCALE = min(1.0, 33.0 * 3 / max(1.0, float(np.mean(cols)))) if cols else 0.5
     T = textures(b['tex'])
     keys = sorted({k for m in meshes for k in m['texrefs']})
     missing = [k for k in keys if k not in T]
@@ -333,7 +342,8 @@ def build(path, outdir, name, scale=1.15, donor=None):
              'TEX': LT.tex_bytes(dn['keep_t'] if dn else ()), 'RTX': LT.rtx_bytes(dn['keep_r'] if dn else ())}
     pk, seen = pkp_convert(b['pkp'], scale); files['PKP'] = pk
     for ext, d in files.items(): open(f'{outdir}/{name}.{ext}', 'wb').write(d)
-    rep = dict(donor_compacted=dn.get('compacted', 0) if dn else 0, donor_dropped_tex=dn['dropped'] if dn else 0, to4=len(LT.to4), meshes=len(meshes), groups=len(groups), textures=len(LT.map), halved=len(LT.half), missing_tex=len(missing),
+    import meshconv as _mc
+    rep = dict(color_scale=round(_mc.COLOR_SCALE, 3), donor_compacted=dn.get('compacted', 0) if dn else 0, donor_dropped_tex=dn['dropped'] if dn else 0, to4=len(LT.to4), meshes=len(meshes), groups=len(groups), textures=len(LT.map), halved=len(LT.half), missing_tex=len(missing),
                tex_bytes=len(files['TEX']), tex_budget=TEX_BUDGET, clut_blocks=LT.next_cbp, clut_budget=CLUT_BUDGET,
                ngp=len(files['NGP']), ptr=len(files['PTR']), col_pieces=len(col), bsp_nodes=cn, grid=(cols, rows), grid_entries=sum(map(len, cells)), unhandled=dict(unk), pickups=dict(sorted(seen.items())))
     return rep

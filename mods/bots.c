@@ -981,12 +981,15 @@ extern u32 D_004EEF28[], D_004EEF48[], D_004EEF68[], D_004EEF88[], D_004EEFA8[],
 extern char D_004EEBC8[], D_004EEBD8[];
 static void settingsRows(void)
 {
-    u32* t[6];
+    u32* t[5];
     int k, c, d;
     char line[16];
-    t[0] = D_004EEF28; t[1] = D_004EEF48; t[2] = D_004EEF68; t[3] = D_004EEF88; t[4] = D_004EEFA8; t[5] = jtbl_004EEFC0;
+    /* the per-row tables (8 rows each): labels, step, max, value pointer, draw case. D_004EEFA8 is NOT one of
+     * them (the "DEATHMATCH" name strings): copying its [7] into [6] wrote jtbl_004EEFC0[0] = [1], so the game
+     * type row drew and behaved as the time-limit row and the game type could not be changed */
+    t[0] = D_004EEF28; t[1] = D_004EEF48; t[2] = D_004EEF68; t[3] = D_004EEF88; t[4] = jtbl_004EEFC0;
     if (D_004EEF88[6] != D_004EEF88[7])
-        for (k = 0; k < 6; k++) t[k][6] = t[k][7];
+        for (k = 0; k < 5; k++) t[k][6] = t[k][7];
     botsShown(&c, &d);
     sprintf(line, "BOTS : %d %s", c, d == 0 ? "EASY" : d == 1 ? "MED" : "HARD");   /* 13 chars max: fits both */
     for (k = 0; line[k]; k++) { D_004EEBC8[k] = line[k]; D_004EEBD8[k] = line[k]; }
