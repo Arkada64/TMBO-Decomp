@@ -37,7 +37,8 @@ for l in src_lines:
         n += 1; continue
     if re.match(r"^\s*build/asm/data/3F9600\.sdata\.s\.o\(\.sdata\);$", l):
         ind = re.match(r"^(\s*)", l).group(1)
-        out += [l, f"{ind}__nm_lit = .;", f"{ind}*(.lit4);", f"{ind}*(.lit8);"] + [ind + e for e in extra] + [
+        # each moved section starts 0x80-aligned, like the game's own data (DMA / 128-bit loads)
+        out += [l, f"{ind}__nm_lit = .;", f"{ind}*(.lit4);", f"{ind}*(.lit8);"] + [f"{ind}. = ALIGN(0x80); {e}" for e in extra] + [
                 f"{ind}. = __nm_lit + ALIGN(. - __nm_lit, 0x80);"]
         continue
     out.append(l)
