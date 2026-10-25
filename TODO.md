@@ -19,3 +19,14 @@
 - **Suburbs traffic** (mods/traffic.c): online Suburbs had traffic stripped; we use retail's models (ZSF pack) on the
   online map's leftover street points (280). Half the cars spawn at z ~280-313 vs ~70-130, and cars drive off the road.
   Next: dump the points from one run, drop the ones far above their neighbours / not in a lane; else traffic off there.
+- **Stress test: big maps, full bots, split screen** (Ark 2026-10-25; maybe after the decomp is complete). Find the load
+  ceiling and set a load-based bot cap. The slot cap already exists (bots.c `wanted`: bots <= 8 - connected humans,
+  rebalanced on join / leave); what is missing is a cap by local screens / traffic.
+  - Maps: Suburbs, Freeway, Prison Passage (big, traffic on). Runs: 1, 2, 3, 4 local views, every free slot a bot.
+  - The local players' cars driven by the bot AI too (patrol + fight like bots), so every view moves and renders
+    action: the test is unattended (qbrun, minimized) and the load is realistic.
+  - Measure with the TMBR perf counters (logic vs render per frame) at EE cycle rate 100 / 130 / 180 / 300 %; note
+    VU1 too (not covered by the EE cycle rate). Estimate before measuring: 2 views ~1.8x the EE (about 180 %),
+    4 views ~2.5-3x (300 % may still drop frames).
+  - Then: the cap table (views x traffic -> max bots) in the host settings, and a per-view pass for our HUD mods
+    (damage reports / team reminder only draw on screen 0 today).
