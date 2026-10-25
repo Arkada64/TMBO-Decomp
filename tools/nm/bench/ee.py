@@ -75,7 +75,10 @@ class EE:
         buf, o, k = self._where(a)
         if buf is None:
             if k == 'H' and not self.hw_ok: raise Hardware('read %08x' % (a & M32))
-            return 0
+            p = a & 0x1FFFFFFF
+            if p == 0x1000F000: return 0x7FFF        # INTC_STAT: every interrupt has happened (vsync waits end)
+            if p == 0x12001000: return 0x0008        # GS CSR: vsync
+            return 0                                 # (DMA CHCR: STR clear = transfer done)
         return int.from_bytes(buf[o:o + n], 'little')
 
     def write(self, a, n, v):
@@ -134,7 +137,11 @@ class EE:
         pc = self.pc
         ins = self.fetch(pc)
         self.steps += 1
-        nxt = self._exec(ins, pc)
+        try:
+            nxt = self._exec(ins, pc)
+        except Unsupported:
+            if not self.hw_ok: raise                 # in a test: never guess
+            nxt = None                               # driving the game between tests: skip it (VU0 microprograms etc.)
         if nxt is None:
             self.pc = pc + 4
         else:                                   # a branch: (taken target or None, likely)
@@ -172,7 +179,9 @@ class EE:
             elif fn == 12:                                          # syscall
                 if not self.hw_ok: raise Hardware('syscall %d at %08x' % (s32(r(3)), pc))
                 w(2, 0)
-            elif fn == 13: raise Fault('break at %08x' % pc)
+            elif fn == 13:                                          # break (asserts)
+                if not self.hw_ok: raise Fault('break at %08x' % pc)
+                # driving the game between tests: render packet buffers fill up (nothing sends them to the GS)
             elif fn == 15: pass                                     # sync
             elif fn == 16: w(rd, self.hi)
             elif fn == 17: self.hi = r(rs)

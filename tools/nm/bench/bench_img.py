@@ -15,6 +15,9 @@ objs, left = [], []
 for f in sorted(os.listdir(objdir)):
     if not f.endswith('.o'): continue
     p = os.path.join(objdir, f)
+    # SN's objects have a symbol table GNU ld rejects ("local symbol at index ... >= sh_info"); the real build
+    # runs them through objcopy (sn_cc.sh), which writes them out in order: do the same
+    subprocess.run(['mips-linux-gnu-objcopy', p], capture_output=True)
     miss = sorted(undefined(p) - have)
     if miss: left.append((f[:-2], miss[:3]))
     else: objs.append(p)
