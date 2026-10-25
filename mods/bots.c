@@ -260,6 +260,7 @@ static int fragile(char* v) { int c = charOf(v); return c == CH_SPECTRE || c == 
 static int rammer(char* v) { int c = charOf(v); return c == CH_DARKSIDE || c == CH_YELLOWJ; }
 static int hunted[8], crowd[8];
 static short ramT[8];              /* frames of turbo left for a special ram (Darkside, Yellow Jacket) */
+static short setupT[8];            /* frames after a freeze: the next weapon pick goes for a big hit */
 /* health in percent (vehicle+0x404 health, +0x3F0 max; floats, converted without float literals) */
 static int hpPct(char* v)
 {
@@ -1004,6 +1005,83 @@ static void turboUse(char* g, char* v, int evading)
     }
 }
 
+/* ---- Energy moves (2026-10-25: bots never used any). The vehicle update's energy handler (func_001E4690) takes
+ * the move from the player's combo for a human and from brain +0x418 for a bot (combo.hpp COMBO_TYPE_*: 1 freeze,
+ * 3 rear fire, 4 mine, 6 gas can, 7 shield, 8 cloak), with the game's own energy rules. The original AI only sets
+ * it in narrow cases (aiUpdateAttack, func_00107580); the AI frame clears it, so ours goes in after it.
+ *  - shield: a shot that hits within EN_SHIELD_T frames and is not being dodged; only then, and with energy
+ *    kept for later unless the hit could kill (a full bar is about two shields - Ark);
+ *  - freeze: a lined-up target in range, to set up the big hit (the next weapon pick favours special / power /
+ *    napalm / ricochet: setupT), more often on a target getting away or hurt; Darkside and Yellow Jacket freeze
+ *    before their special ram;
+ *  - mine: dropped on a chaser right behind (the evade code's chase).
+ * Energy: vehicle +0x420 (0..100). */
+#define EN_FREEZE 1
+#define EN_MINE 4
+#define EN_SHIELD 7
+#define EN_SHIELD_T 12
+static short enCd[8];
+static int incoming(char* g, char* v, int k)
+{
+    int i, best = 999;
+    for (i = 0; i < NW; i++) {
+        char* w = g + 0x6C3C0 + i * 0x210;
+        char* own;
+        int dx, dy, vx, vy, sp, dot, t, cx, cy;
+        if (wok[i] < 3 || !F(w, 0)) continue;
+        own = (char*)F(w, 0x130);
+        if (own == v || (own && tmbr_SameTeam(own, v))) continue;
+        dx = cpx[k] - wpx[i]; dy = cpy[k] - wpy[i];
+        if (iabs(dx) + iabs(dy) > 4 * 600) continue;
+        vx = wvx[i]; vy = wvy[i]; sp = vx * vx + vy * vy;
+        if (sp < 36) continue;
+        dot = dx * vx + dy * vy;
+        if (dot <= 0 || iabs(dx * vy - dy * vx) * 2 > dot) continue;   /* not coming at us (within ~27 deg) */
+        t = dot / sp;
+        if (wturn[i] < 3) {                                            /* straight: does it pass close? */
+            cx = dx - vx * t; cy = dy - vy * t;
+            if (iabs(cx) + iabs(cy) > 4 * 60) continue;
+        }
+        if (t < best) best = t;
+    }
+    return best;
+}
+static void energyUse(char* g, char* v, int evading)
+{
+    int k = (int)(v - g) / 0x31B0 & 7, en, hp, t;
+    char *br = (char*)F(v, 0x2014), *drv = (char*)F(v, 0x2018);
+    if (!br || !drv || *(signed char*)(v + 0x497) >= 4 || !cok[k]) return;
+    if (enCd[k] > 0) enCd[k]--;
+    if (setupT[k] > 0) setupT[k]--;
+    if (enCd[k]) return;
+    en = (int)*(float*)(v + 0x420); hp = hpPct(v);
+    t = incoming(g, v, k);
+    if (t <= EN_SHIELD_T && (!(dodgeT[k] || reactT[k] || hWait[k]) || t <= 5)) {
+        if ((hp < 30 && en >= 40) || (en >= 90 && (hp < 70 || mathfRandI(0, 99) < 50))) {
+            F(br, 0x418) = EN_SHIELD; enCd[k] = 90;
+            if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d shields (hit in %d, energy %d, hp %d)\n", k, t, en, hp);
+            return;
+        }
+    }
+    if (evading && en >= 60 && mathfRandI(0, 99) < 3) {           /* (~once a second while chased) */
+        F(br, 0x418) = EN_MINE; enCd[k] = 180;
+        if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d drops a mine on its chaser\n", k);
+        return;
+    }
+    if (F(drv, 4) == 5 && F(drv, 0xB4) && (thinkTick + k * 7) % 30 == 0 && en >= 60) {
+        char* tg = (char*)F(drv, 0xB4);
+        int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, d = (int)*(float*)(br + 0x20), chance = 15;
+        if (a < FIRE_ANG && d > 60 && d < 450) {
+            if (hpPct(tg) < 40 || d > tbLastD[k] + 2) chance = 50;                 /* hurt or getting away */
+            if (rammer(v) && d < 350) chance = 60;                                 /* before the special ram */
+            if (mathfRandI(0, 99) < chance) {
+                F(br, 0x418) = EN_FREEZE; enCd[k] = 240; setupT[k] = 150;
+                if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d freezes its target at %d\n", k, d);
+            }
+        }
+    }
+}
+
 static int aiUpdate(char* v);
 extern void padClear(char* v) __asm__("vehicleSaveAndClearPadFlags__7Vehicle");
 int tmbr_AiUpdate(char* v)
@@ -1017,6 +1095,7 @@ int tmbr_AiUpdate(char* v)
         dodge(D_004FA030, v);
         if (!dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]) ev = evade(D_004FA030, v);   /* (a dodge in progress wins) */
         turboUse(D_004FA030, v, ev || dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]);
+        energyUse(D_004FA030, v, ev);
         unstick(D_004FA030, v);
     }
     return r;
@@ -1127,7 +1206,7 @@ void tmbr_AiPickWeapon(char* v)
     if (tmbr_botCount < 0 || !br) { aiPickBest(v); return; }
     los = F(br, 0x598) || F(br, 0x4B0) < 10;  /* the game's own sight of the target (as the fire check above) */
     for (w = 1; w < 8; w++) {
-        ok[w] = wpnClock >= wpnReady[k][w] && aiGoodChoice(v, w);
+        ok[w] = (wpnClock >= wpnReady[k][w] || (setupT[k] > 0 && heavyW(w))) && aiGoodChoice(v, w);   /* (frozen target: big hit) */
         if (ok[w] && w == 1 && rammer(v)) {
             /* ram specials: only on a close, lined-up target (then always) - Yellow Jacket in a crowd just fires it */
             char* t = (char*)F(F(v, 0x2018), 0xB4);
@@ -1140,14 +1219,14 @@ void tmbr_AiPickWeapon(char* v)
         /* in a burst without sight of the target: no fire missiles (straight into the wall); homing missiles
          * may still go - they climb over terrain and keep the chase going. The burst waits, it is not lost. */
         if (ok[w] && w == 2 && burstLeft[k] > 0 && !los) ok[w] = 0;
-        if (ok[w]) total += weight[w];
+        if (ok[w]) total += weight[w] * (setupT[k] > 0 && heavyW(w) ? 5 : 1);
     }
     F(br, 0x47C) = 0;
     if (!total) return;
     r = mathfRandW(0, total - 1);
     for (w = 1; w < 8; w++) {
         if (!ok[w]) continue;
-        if ((r -= weight[w]) < 0) break;
+        if ((r -= weight[w] * (setupT[k] > 0 && heavyW(w) ? 5 : 1)) < 0) break;
     }
     if (w >= 8) return;
     F(br, 0x47C) = w;
