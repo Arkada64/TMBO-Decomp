@@ -34,6 +34,11 @@ def bytefix(code):
             res.append(out[i:m.start()]); res.append(f"(*({T}){v})"); i = m.end()
         res.append(out[i:]); out = "".join(res)
         changed.append(v)
+    # the same for addresses of variables: `(i << 5) + &D_002BD8C8` (an s32 / M2C_UNK global) is a byte offset in
+    # the asm (func_001435D0 / func_0010C520: the level name table, wrong name -> exit to the BIOS)
+    o2 = re.sub(r"(?<![\w)\]])&\s*([A-Za-z_]\w*)\b(?!\s*[\[.(]|\s*->)(?=\s*[+-](?![>=+-]))", r"(u8*)&\1", out)
+    o2 = re.sub(r"([+-]\s*)&\s*([A-Za-z_]\w*)\b(?!\s*[\[.(]|\s*->)", r"\1(u8*)&\2", o2)
+    if o2 != out: changed.append("&global"); out = o2
     return out, changed
 
 if __name__ == "__main__":
