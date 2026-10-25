@@ -38,6 +38,11 @@
   reader of `state` in the vehicle update (what fires the move, with its energy cost), then let bots call it:
   freeze on a car about to escape or before a Darkside special ram, shield when a big hit is incoming (the dodge
   code already sees missiles), mines when chased (the evade code), cloak to break off a chase.
+  Shield, used smart (Ark): energy covers about two shields back to back, then nothing, so never on cooldown or as
+  a reflex. Only against a big hit that will land: a heavy weapon (power missile, napalm, ricochet, special, gas can,
+  a special ram) closing in with a dodge that can't work (homing too close, boxed in, frozen), or when health is
+  low enough that the hit would kill. Keep one shield in reserve when possible; skip it for light hits (fire /
+  homing missiles, machine gun). Energy level: vehicle +0x420 (0..100, the HUD's energy bar).
   Freeze as a setup (Ark): freeze a target, then the big hit while it is stuck - skill weapon, gas can, special,
   power missile, a special ram; on teams, call a teammate's heavy weapon onto the frozen car.
   Freeze as a threat: the dodge code (bots.c `dodge`) treats every shot alike (rolls dodgeChance per difficulty); a
