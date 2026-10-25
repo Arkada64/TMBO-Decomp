@@ -1094,6 +1094,12 @@ static int incoming(char* g, char* v, int k)
         if (wok[i] < 3 || !F(w, 0)) continue;
         own = (char*)F(w, 0x130);
         if (own == v || (own && tmbr_SameTeam(own, v))) continue;
+        {   /* only hits worth a shield: not machine gun (0), fire (2) / homing (3) missiles, hit debris (14, 15) -
+             * weapon kinds from the TMBR wk log 2026-10-25 (napalm 4, power 6, rico 7, pickups 11-13, specials
+             * 17 Roadkill, 21 Spectre, 26 Grimm, 27 Axel, 28 Manslaughter; anything not seen yet counts as big) */
+            int kd = F(w, 0x14);
+            if (kd == 0 || kd == 2 || kd == 3 || kd == 14 || kd == 15) continue;
+        }
         dx = cpx[k] - wpx[i]; dy = cpy[k] - wpy[i];
         if (iabs(dx) + iabs(dy) > 4 * 600) continue;
         vx = wvx[i]; vy = wvy[i]; sp = vx * vx + vy * vy;
