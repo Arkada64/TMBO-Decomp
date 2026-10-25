@@ -261,26 +261,28 @@ static int fragile(char* v) { int c = charOf(v); return c == CH_SPECTRE || c == 
  * cruiser), mid (1: a mid-weight car, prefers smaller fights), and when the special is worth firing: alone on a
  * target solo_min..solo_max away, or at a group (2+ cars round the target) up to grp_max; aim 1 = only when
  * squarely lined up (charged / aimed specials); hp 1 = to weaken (target above half), 2 = to finish (below half).
- * Indexes = car +0x20F4 >> 5 (radar names); 0 = no entry (the old 50 % rule). Darkside / Yellow Jacket: rammer(). */
-typedef struct { unsigned char on, b, s, r, mid, aim, hp; short smin, smax, gmax; } CarAi;
+ * dmg = the special's typical full hit (online numbers, tmbosvr.com/infocharts.html): a target with no more health
+ * left than that gets the special. Indexes = car +0x20F4 >> 5 (radar names); 0 = no entry (the old 50 % rule).
+ * Darkside / Yellow Jacket: rammer(). */
+typedef struct { unsigned char on, b, s, r, mid, aim, hp; short smin, smax, gmax, dmg; } CarAi;
 static const CarAi carAi[32] = {
     /*  0 */ { 0 },
-    /*  1 Roadkill: snipes / moderate range, charged by confidence */  { 1, 35, 25, 25, 0, 1, 0, 150, 600, 0 },
-    /*  2 Yellow Jacket (rammer) */                                     { 1, 45, 0, 40, 0, 0, 0, 0, 0, 0 },
-    /*  3 Outlaw: high damage */                                        { 1, 40, 15, 30, 0, 0, 0, 0, 400, 400 },
-    /*  4 Spectre: homing through walls */                             { 1, 0, 45, 40, 0, 0, 0, 100, 700, 700 },
-    /*  5 Crazy 8: special to weaken */                                 { 1, 45, 10, 30, 0, 0, 1, 0, 450, 450 },
-    /*  6 Sweet Tooth: moderate range */                                { 1, 55, 5, 25, 0, 0, 0, 150, 450, 450 },
-    /*  7 Brimstone: mid, smaller fights */                             { 1, 25, 20, 40, 1, 0, 0, 0, 350, 350 },
-    /*  8 Junkyard Dog: groups, moderate snipes */                      { 1, 50, 10, 25, 0, 0, 0, 200, 450, 500 },
-    /*  9 Shadow: bomb for snipes and groups */                         { 1, 35, 20, 30, 0, 0, 0, 250, 600, 600 },
-    /* 10 Mr. Grimm: lines it up */                                     { 1, 0, 45, 40, 0, 1, 0, 150, 600, 600 },
-    /* 11 Axel: groups (War Wheel solo: later) */                       { 1, 40, 10, 35, 0, 0, 0, 0, 300, 350 },
-    /* 12 Warthog: weaken / finish */                                   { 1, 55, 5, 25, 0, 0, 2, 0, 300, 300 },
-    /* 13 Darkside (rammer) */                                          { 1, 60, 0, 25, 0, 0, 0, 0, 0, 0 },
-    /* 14 Manslaughter: dead on, into groups */                         { 1, 55, 5, 25, 0, 1, 0, 0, 400, 400 },
+    /*  1 Roadkill: snipes / moderate range, charged by confidence */  { 1, 35, 25, 25, 0, 1, 0, 150, 600, 0, 36 },
+    /*  2 Yellow Jacket (rammer) */                                     { 1, 45, 0, 40, 0, 0, 0, 0, 0, 0, 30 },
+    /*  3 Outlaw: high damage */                                        { 1, 40, 15, 30, 0, 0, 0, 0, 400, 400, 44 },
+    /*  4 Spectre: homing through walls */                             { 1, 0, 45, 40, 0, 0, 0, 100, 700, 700, 28 },
+    /*  5 Crazy 8: special to weaken */                                 { 1, 45, 10, 30, 0, 0, 1, 0, 450, 450, 40 },
+    /*  6 Sweet Tooth: moderate range */                                { 1, 55, 5, 25, 0, 0, 0, 150, 450, 450, 50 },
+    /*  7 Brimstone: mid, smaller fights */                             { 1, 25, 20, 40, 1, 0, 0, 0, 350, 350, 37 },
+    /*  8 Junkyard Dog: groups, moderate snipes */                      { 1, 50, 10, 25, 0, 0, 0, 200, 450, 500, 25 },
+    /*  9 Shadow: bomb for snipes and groups */                         { 1, 35, 20, 30, 0, 0, 0, 250, 600, 600, 33 },
+    /* 10 Mr. Grimm: lines it up */                                     { 1, 0, 45, 40, 0, 1, 0, 150, 600, 600, 42 },
+    /* 11 Axel: groups (War Wheel solo: later) */                       { 1, 40, 10, 35, 0, 0, 0, 0, 300, 350, 22 },
+    /* 12 Warthog: weaken / finish */                                   { 1, 55, 5, 25, 0, 0, 2, 0, 300, 300, 120 },
+    /* 13 Darkside (rammer) */                                          { 1, 60, 0, 25, 0, 0, 0, 0, 0, 0, 38 },
+    /* 14 Manslaughter: dead on, into groups */                         { 1, 55, 5, 25, 0, 1, 0, 0, 400, 400, 90 },
     { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-    /* 31 12 Pak (0x7E0): mid, sniper special */                        { 1, 25, 20, 40, 1, 1, 0, 250, 700, 700 },
+    /* 31 12 Pak (0x7E0): mid, sniper special */                        { 1, 25, 20, 40, 1, 1, 0, 250, 700, 700, 36 },
 };
 #define CAI(v) (&carAi[charOf(v)])
 static int rammer(char* v) { int c = charOf(v); return c == CH_DARKSIDE || c == CH_YELLOWJ; }
@@ -473,7 +475,12 @@ void tmbr_BotsThink(void)
             /* retreat: hurt (< 35 %) and two or more cars on it -> break away (25 % per check) */
             /* online has no health to recover, so a retreat is short (8-15 s) and once per life */
             if (hpPct(b) >= 90) retreated[k2] = 0;
-            retreat = !retreated[k2] && hpPct(b) < 35 && hunted[k2] >= 2 && mathfRandI(0, 99) < 25;
+            {   /* light cars break off earlier, heavy ones later (Spectre 95: 52 %, Darkside 150: 25 %) */
+                int mx = (int)*(float*)(b + 0x3F0), at = 35 + (130 - mx) / 2;
+                if (at < 20) at = 20;
+                if (at > 55) at = 55;
+                retreat = !retreated[k2] && hpPct(b) < at && hunted[k2] >= 2 && mathfRandI(0, 99) < 25;
+            }
             if (careful)                                 /* last life: back off earlier and more often */
                 retreat = !retreated[k2] && hpPct(b) < 50 && hunted[k2] >= 1 && mathfRandI(0, 99) < 40;
             if (retreat) retreated[k2] = 1;
@@ -1253,6 +1260,8 @@ void tmbr_AiPickWeapon(char* v)
             if (c->aim && a >= 0x3E19999A) good = 0;                      /* 0.15 rad: squarely lined up */
             if (c->hp == 1 && t && hpPct(t) < 50) good = 0;               /* to weaken */
             if (c->hp == 2 && t && hpPct(t) >= 50) good = 0;              /* to finish */
+            if (t && c->dmg && (int)*(float*)(t + 0x404) <= c->dmg && dist > 0 && dist <= (c->smax > 300 ? c->smax : 300) &&
+                !(c->aim && a >= 0x3F19999A)) good = 1;                   /* the special finishes it */
             if (!good && mathfRandW(0, 99) >= 10) ok[w] = 0;              /* (now and then anyway: unpredictable) */
             else if (good) spBoost = 1;
         } else if (ok[w] && w == 1 && mathfRandW(0, 99) >= SPECIAL_CHANCE) ok[w] = 0;

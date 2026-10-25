@@ -63,3 +63,13 @@
 - **Learning from Ark's play**: a logger in the mod build records his matches vs bots (positions, speed, target,
   distances, weapon / move used, health, energy, a few times a second); fit the bot numbers (engage / break-off
   ranges, weapon choice by range, turbo / shield timing) to it.
+- **Damage numbers for the AI** (tmbosvr.com/infocharts.html, online values): armour Minion 160, Manslaughter 155,
+  Darkside 150, Warthog / Sweet Tooth 145, Junkyard Dog 135, Axel 116, Outlaw / Yellow Jacket / Shadow 110,
+  Brimstone 105, Roadkill / Crazy 8 100, Spectre / Grimm 95. Weapons: machine gun 1 (upgraded 2), freeze 1, ram 10,
+  homing 5, fire 8, rico 9, blue mine 11, gas can 11 (21), red mine 22, power 20, zoomy 20, satellite 69, reticle 70.
+  Specials: Warthog 120 (42/s), Manslaughter up to 120 (dropped 90), Minion 75-100, Darkside ram 38 / T-slide 50 /
+  airborne 65, Sweet Tooth 50, Outlaw 44 (64 with the secondary), Grimm 42, Crazy 8 40 (65 max), Brimstone 37,
+  Roadkill 36 max, Shadow 33 (secondary 48), YJ turbo rams 30-110, Spectre 28, Junkyard Dog 25, Axel 22 (45 roller).
+  In bots.c: special damage per car (finishing blows) and the retreat point by armour. Still to use: the shield should
+  answer hits >= ~20 (power, red mine, specials, satellite, reticle) and ignore light ones (needs the shot's weapon
+  kind: weapon table +0x14); threat weighting (keep away from an Outlaw / Warthog / Manslaughter lined up on us).
