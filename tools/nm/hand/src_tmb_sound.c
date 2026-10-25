@@ -26,3 +26,45 @@ void func_00195DA8(int* s)
     } else if (s[1] != 0 && s[1] != -1)
         soundStopSound_h(&s[1]);
 }
+//@@ func_00193AC8 hand
+/* volume of a sound by distance (arg dist): inside the near radius (+0x184 -> +0x320) 0..90 %, beyond it 90 % + 10 %
+ * of the way to the far edge (+0x330 * 40.909); then 0..0x7FFF, with a random drift (+0xF4 on, +0xF8 current,
+ * +0x114 goal, +0x118 step). The m2c draft did the float math on the bit patterns (bench 10-25). */
+extern int rand_h(void) __asm__("rand");
+extern int D_004FA194_h __asm__("D_004FA194");
+static float K193AC8[4] = { 40.909092f, 10.0f, 90.0f, -1.0f };   /* (0x4223A2E9, 0x41200000, 0x42B40000, -1) */
+int func_00193AC8(char* s, int dist)
+{
+    char* p = *(char**)(s + 0x184);
+    float d = (float)dist, nearR = *(float*)(p + 0x320), far = *(float*)(p + 0x330) * K193AC8[0], pc;
+    int v, vol, r;
+    if (nearR < d) pc = (d - nearR) * K193AC8[1] / (far - nearR) + K193AC8[2];
+    else pc = (float)(dist * 90) / nearR;
+    v = (int)pc;
+    vol = v * 0x7FFF / 100;
+    if (D_004FA194_h == 0) *(float*)(s + 0x154) = K193AC8[3];
+    if ((float)v != *(float*)(s + 0x154)) {
+        *(int*)(s + 0xF4) = 0;
+        *(int*)(s + 0xF8) = vol;
+        return vol;
+    }
+    if (*(int*)(s + 0xF4)) {
+        int step = *(int*)(s + 0x118), cur = *(int*)(s + 0xF8) + step;
+        *(int*)(s + 0xF8) = cur;
+        if (step > 0 && cur >= *(int*)(s + 0x114)) *(int*)(s + 0xF8) = *(int*)(s + 0x114);
+        if (*(int*)(s + 0x118) < 0 && *(int*)(s + 0xF8) <= *(int*)(s + 0x114)) *(int*)(s + 0xF8) = *(int*)(s + 0x114);
+        if (*(int*)(s + 0xF8) > 0x7FFF) *(int*)(s + 0xF8) = 0x7FFF;
+        vol = *(int*)(s + 0xF8);
+        if (vol == *(int*)(s + 0x114)) *(int*)(s + 0xF4) = 0;
+        return vol;
+    }
+    *(int*)(s + 0x118) = rand_h() % *(int*)(s + 0x110) + 6;
+    if (*(int*)(s + 0xF8) < vol) *(int*)(s + 0x114) = vol + rand_h() % *(int*)(s + 0x10C);
+    else {
+        r = rand_h() % *(int*)(s + 0x10C);
+        *(int*)(s + 0x118) = -*(int*)(s + 0x118);
+        *(int*)(s + 0x114) = vol - r;
+    }
+    *(int*)(s + 0xF4) = 1;
+    return vol;
+}
