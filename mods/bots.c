@@ -950,6 +950,42 @@ static int evade(char* g, char* v)
     return 1;
 }
 
+/* ---- Turbo (2026-10-25): bots get a passive recharge on top of the game's (empty to full in TB_REFILL frames)
+ * and use it like players do: down a straight (driving straight TB_STRAIGHT frames, keeping TB_RESERVE % for
+ * escapes), on a ram run (lined up, 150-450 away) and after a target that pulls away. Turbo bar: vehicle +0x2288
+ * current, +0x228C max (ints, Hud::updateEnergyAndTurbo 0x144AA8; +0x420 is the energy bar). */
+#define TB_REFILL 360
+#define TB_STRAIGHT 45
+#define TB_RESERVE 35
+static int tbAcc[8], tbOx[8], tbOy[8], tbStraight[8], tbLastD[8];
+static void turboUse(char* g, char* v, int evading)
+{
+    int k = (int)(v - g) / 0x31B0 & 7, cur = F(v, 0x2288), max = F(v, 0x228C), pct, fx = cvx[k], fy = cvy[k];
+    char *br = (char*)F(v, 0x2014), *drv = (char*)F(v, 0x2018);
+    unsigned char* pad = PAD(v);
+    if (max <= 0 || !br || !drv) return;
+    if (cur < max) {                                       /* passive recharge */
+        tbAcc[k] += max;
+        while (tbAcc[k] >= TB_REFILL && cur < max) { cur++; tbAcc[k] -= TB_REFILL; }
+        F(v, 0x2288) = cur;
+    } else tbAcc[k] = 0;
+    pct = cur * 100 / max;
+    /* driving straight: the motion's direction now vs ~10 frames ago (within ~11 deg), at speed */
+    if ((thinkTick % 10) == 0) {
+        int dot = fx * tbOx[k] + fy * tbOy[k], crs = iabs(fx * tbOy[k] - fy * tbOx[k]);
+        if (iabs(fx) + iabs(fy) >= 4 * 4 && dot > 0 && crs * 5 < dot) tbStraight[k] += 10; else tbStraight[k] = 0;
+        tbOx[k] = fx; tbOy[k] = fy;
+    }
+    if (evading || pad[6] || pad[2] || *(signed char*)(v + 0x497) >= 4) return;   /* (evade does its own) */
+    if (tbStraight[k] >= TB_STRAIGHT && pct > TB_RESERVE) pad[7] = 1;           /* open road */
+    if (F(drv, 4) == 5 && F(drv, 0xB4)) {
+        int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, d = fbits(*(float*)(br + 0x20)), dist = (int)*(float*)(br + 0x20);
+        if (a < CS_AIM && d > STANDOFF && d < 0x43E10000 && pct > 20) pad[7] = 1;   /* ram run: 150..450 */
+        if (a < CS_HB && dist > 300 && dist > tbLastD[k] + 2 && pct > 25) pad[7] = 1;   /* it is getting away */
+        tbLastD[k] = dist;
+    }
+}
+
 static int aiUpdate(char* v);
 extern void padClear(char* v) __asm__("vehicleSaveAndClearPadFlags__7Vehicle");
 int tmbr_AiUpdate(char* v)
@@ -959,8 +995,10 @@ int tmbr_AiUpdate(char* v)
     r = aiUpdate(v);
     /* match over (game type 1): the game stops every car - no dodging / unsticking then (log 2026-10-24) */
     if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030 && !(GINFO() && ((F(GINFO(), 0) >> 1) & 0xF) == 1)) {
+        int ev = 0;
         dodge(D_004FA030, v);
-        if (!dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]) evade(D_004FA030, v);   /* (a dodge in progress wins) */
+        if (!dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]) ev = evade(D_004FA030, v);   /* (a dodge in progress wins) */
+        turboUse(D_004FA030, v, ev || dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]);
         unstick(D_004FA030, v);
     }
     return r;

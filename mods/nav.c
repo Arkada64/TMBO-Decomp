@@ -229,10 +229,12 @@ extern void tmbr_PerfAdd(int slot, unsigned int start);
 extern float tmbr_NavArrive(void);
 extern void tmbr_NavLateLoad(void);
 extern void tmbr_DodgeFrame(void);   /* bots.c */
+static int navFrame;
 void tmbr_NavFrame(void)
 {
     char* g = D_004FA030;
     int k, i;
+    navFrame++;
     if (tmbr_botCount < 0 || !g) return;
     tmbr_DodgeFrame();
     tmbr_NavLateLoad();
@@ -295,6 +297,9 @@ float tmbr_NavSteer(char* v, float dx, float dy, int gas)
     if (err > K[5]) pad[0xA] = 1;
     else if (err < -K[5]) pad[9] = 1;
     if (fabs_(err) > K[6]) pad[2] = 1;
+    /* a tight bend (0.7..1.6 rad, 40..92 deg): handbrake taps (3 frames in 10, staggered per car) to swing the
+     * tail round instead of a wide arc (2026-10-25) */
+    else if (fabs_(err) > K[9] && gas && (navFrame + (int)(v - D_004FA030) / 0x31B0 * 3) % 10 < 3) pad[2] = 1;
     return fabs_(err);
 }
 /* breakaway (bots.c): the next roam goal should be far from here */
