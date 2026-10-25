@@ -39,6 +39,30 @@ def bytefix(code):
     o2 = re.sub(r"(?<![\w)\]])&\s*([A-Za-z_]\w*)\b(?!\s*[\[.(]|\s*->)(?=\s*[+-](?![>=+-]))", r"(u8*)&\1", out)
     o2 = re.sub(r"([+-]\s*)&\s*([A-Za-z_]\w*)\b(?!\s*[\[.(]|\s*->)", r"\1(u8*)&\2", o2)
     if o2 != out: changed.append("&global"); out = o2
+    # ... and a load / store through such an address keeps the global's own type: `*(i + (u8*)&G)` would read one
+    # byte (before: a whole word at 4x the offset). Bench 10-25 (particleGetLensFlareInfo: a pointer table indexed
+    # by bytes) - and the level name table loads of func_001435D0 / func_0010C520.
+    if "(u8*)&" in out:
+        res, i = [], 0
+        while True:
+            m = re.compile(r"\*\s*\(").search(out, i)
+            if not m: break
+            j = m.start() - 1
+            while j >= 0 and out[j] in " \t": j -= 1
+            unary = j < 0 or not (out[j].isalnum() or out[j] in "_)]")
+            k, depth = m.end(), 1                      # the matching ')'
+            while k < len(out) and depth:
+                depth += {"(": 1, ")": -1}.get(out[k], 0); k += 1
+            inner = out[m.end():k - 1]
+            g = re.findall(r"\(u8\*\)&\s*([A-Za-z_]\w*)", inner)
+            if unary and depth == 0 and len(g) == 1 and not inner.lstrip().startswith(("u8", "s8", "s16", "u16", "s32", "u32", "f32", "M2C", "void", "__typeof__")):
+                arr = re.search(r"\bextern\b[^;\n]*\b" + re.escape(g[0]) + r"\s*\[", out)   # declared as an array: its element type
+                ty = f"__typeof__({g[0]}[0])" if arr else f"__typeof__({g[0]})"
+                res.append(out[i:m.start()]); res.append(f"*({ty}*)({inner})"); i = k
+                changed.append("deref " + g[0])
+            else:
+                res.append(out[i:m.end()]); i = m.end()
+        res.append(out[i:]); out = "".join(res)
     return out, changed
 
 if __name__ == "__main__":
