@@ -947,7 +947,7 @@ static void dodge(char* g, char* v)
             if (iabs(dx) + iabs(dy) > 4 * 700) continue;
             if (judged[k] == i + 1) return;
             judged[k] = i + 1;
-            if (mathfRandI(0, 99) >= dodgeChance[diff]) return;
+            if (F(w, 0x14) != 14 && mathfRandI(0, 99) >= dodgeChance[diff]) return;   /* a freeze (14): always */
             hWait[k] = i + 1;
             if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d tracks homing shot %d\n", k, i);
             return;
@@ -959,7 +959,7 @@ static void dodge(char* g, char* v)
         if (cx * cx + cy * cy > 16 * DODGE_MISS * DODGE_MISS) continue;
         if (judged[k] == i + 1) return;            /* rolled for this shot already */
         judged[k] = i + 1;
-        if (mathfRandI(0, 99) >= dodgeChance[diff]) return;
+        if (F(w, 0x14) != 14 && mathfRandI(0, 99) >= dodgeChance[diff]) return;       /* a freeze (14): always */
         dodgeStart(k, vx, vy, dx, dy);
         dodgeF[k] = 1; dodgeHb[k] = 0; pendT[k] = 25;
         reactT[k] = dodgeDelay[diff] + mathfRandI(0, dodgeDelay[diff] / 2);
@@ -1112,11 +1112,11 @@ static int incoming(char* g, char* v, int k)
         if (wok[i] < 3 || !F(w, 0)) continue;
         own = (char*)F(w, 0x130);
         if (own == v || (own && tmbr_SameTeam(own, v))) continue;
-        {   /* only hits worth a shield: not machine gun (0), fire (2) / homing (3) missiles, hit debris (14, 15) -
+        {   /* only hits worth a shield: not machine gun (0), fire (2) / homing (3) missiles, 15; the freeze (14) is -
              * weapon kinds from the TMBR wk log 2026-10-25 (napalm 4, power 6, rico 7, pickups 11-13, specials
              * 17 Roadkill, 21 Spectre, 26 Grimm, 27 Axel, 28 Manslaughter; anything not seen yet counts as big) */
             int kd = F(w, 0x14);
-            if (kd == 0 || kd == 2 || kd == 3 || kd == 14 || kd == 15) continue;
+            if (kd == 0 || kd == 2 || kd == 3 || kd == 15) continue;          /* (14 is the freeze: worth it) */
         }
         dx = cpx[k] - wpx[i]; dy = cpy[k] - wpy[i];
         if (iabs(dx) + iabs(dy) > 4 * 600) continue;
