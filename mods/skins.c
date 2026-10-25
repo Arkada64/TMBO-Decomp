@@ -141,6 +141,17 @@ void tmbr_CarSelectSound(void* snd, int car)
     D_004EFBF0[PAK_POS] = 0x20;                       /* the static list the shell copies its list from (was 0) */
     if (carSelPos == PAK_POS || car <= 0) car = 0x20;  /* first frame back from a match: the 16th slot still read 0
                                                          * (no car) -> engine-sound stream index -1, read past the disc */
+    {   /* Minion off (lobby option, bots.c OPT_NOMINION): the highlight hops over his spot, in the direction it came */
+        extern int tmbr_Opt(int bit);
+        static int lastSel = -1;
+        int k, mpos = -1;
+        for (k = 0; k < PAK_POS; k++) if (D_004EFBF0[k] == (15 << 5)) { mpos = k; break; }
+        if (tmbr_Opt(8) && mpos >= 0 && carSelPos == mpos) {
+            carSelPos = lastSel == (mpos + 1) % (PAK_POS + 1) ? (mpos + PAK_POS) % (PAK_POS + 1) : (mpos + 1) % (PAK_POS + 1);
+            car = D_004EFBF0[carSelPos] > 0 ? D_004EFBF0[carSelPos] : 0x20;
+        }
+        lastSel = carSelPos;
+    }
     playCarSound(snd, car);
     pak = carSelPos == PAK_POS;
     if (pak != tmbr_skin[1]) {

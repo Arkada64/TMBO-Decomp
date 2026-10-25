@@ -116,6 +116,8 @@ static int addBot(void)
         if (v >= 0 && v < 8 && F(F(g, 0x9E670 + v * 4), 0x20D0) == 0) break;
     }
     if (s == 8) return 0;
+    if (tmbr_Opt(OPT_NOMINION) && (F(D_003156C0 + s * 0x220, 0xB4) >> 5) == 15)   /* Minion off: another car */
+        F(D_003156C0 + s * 0x220, 0xB4) = mathfRandI(1, 14) << 5;
     veh = gameMakeAI(g, v, F(D_003156C0 + s * 0x220, 0xB4), v, -1, 1);
     if (!veh) return 0;
     netBotObjects(D_003156C0, veh);
@@ -357,6 +359,7 @@ static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v,
 #define OPT_TRAFFIC 1      /* traffic ON (off by default) */
 #define OPT_TEAMS 2
 #define OPT_TEAMS4 4      /* four teams */
+#define OPT_NOMINION 8    /* Minion off: car select skips him, no Minion bots (Ark 2026-10-25) */
 extern void netSendGameInfo(void* net, int to) __asm__("func_00174988");
 extern int tmbr_levelSerial;
 int tmbr_Opt(int bit)
@@ -797,6 +800,7 @@ static int wpx[NW], wpy[NW], wpz[NW], wvx[NW], wvy[NW], wvz[NW], wax[NW];
 static unsigned char wok[NW], wturn[NW], wfall[NW];
 static int bpx[8], bpy[8];
 static int cpx[8], cpy[8], cvx[8], cvy[8]; static unsigned char cok[8];   /* every car, per frame (x4 units) */
+static unsigned char wSeen[NW], wkCount[32][32];
 static short dodgeT[8], reactT[8], judged[8], hWait[8], dodgeHb[8], pendT[8];
 static int dodgeX[8], dodgeY[8], dodgeF[8];   /* dodgeF: blend in the car's heading */
 static const unsigned char dodgeDelay[3] = { 24, 14, 8 }, dodgeChance[3] = { 30, 55, 80 }, homingTurn[3] = { 18, 12, 8 };
@@ -827,6 +831,22 @@ void tmbr_DodgeFrame(void)
         }
         wpx[i] = x; wpy[i] = y; wpz[i] = z;
         if (wok[i] < 3) wok[i]++;
+    }
+    /* weapon kinds (2026-10-25): which kind each car's shots are, logged the first times each (kind, car, AI weapon)
+     * turns up - the map for the shield / freeze dodge and the Spectre balance. "TMBR wk: kind K car C aiw W" */
+    for (i = 0; i < NW; i++) {
+        char* w = g + 0x6C3C0 + i * 0x210;
+        char *own, *obr;
+        int kind, ch, aw;
+        if (!F(w, 0)) { wSeen[i] = 0; continue; }
+        if (wSeen[i]) continue;
+        wSeen[i] = 1;
+        kind = F(w, 0x14) & 31; own = (char*)F(w, 0x130);
+        if (!kind || (u32)own < 0x100000 || (u32)own >= 0x2000000) continue;
+        ch = (F(own, 0x20F4) >> 5) & 31;
+        obr = (char*)F(own, 0x2014);
+        aw = obr && (u32)obr >= 0x100000 && (u32)obr < 0x2000000 ? F(obr, 0x47C) & 7 : 7;
+        if (wkCount[kind][ch] < 2) { wkCount[kind][ch]++; scePrintf("TMBR wk: kind %d car %d aiw %d\n", kind, ch, aw); }
     }
     for (i = 0; i < 8; i++) {                       /* every car's position and motion (evade) */
         char* v = g + i * 0x31B0;
@@ -1385,10 +1405,11 @@ static void extraLines(int row)
     int teams = tmbr_Opt(OPT_TEAMS);
     lobbyLine(row + 1, -1, tmbr_Opt(OPT_TRAFFIC) ? "TRAFFIC : ON" : "TRAFFIC : OFF");
     lobbyLine(row + 2, -1, !teams ? "TEAMS : OFF" : tmbr_Opt(OPT_TEAMS4) ? "TEAMS : 4" : "TEAMS : 2");
+    lobbyLine(row + 3, -1, tmbr_Opt(OPT_NOMINION) ? "MINION : OFF" : "MINION : ON");
     if (teams) {
         if (tmbr_botTeamMode) sprintf(b, "HUMANS VS BOTS");
         else sprintf(b, "YOU : %s TEAM", tmbr_TeamName(tmbr_MyTeam()));
-        lobbyLine(row + 3, tmbr_MyTeam(), b);
+        lobbyLine(row + 4, tmbr_MyTeam(), b);
     }
     fontSetColor(0, 0x50, 0x44, 0x2C);
 }
@@ -1404,7 +1425,7 @@ void tmbr_LobbyFrame(void)
     teams = tmbr_Opt(OPT_TEAMS);
     tmbr_TeamsLobby(ra, rb);                 /* teams.c: team pick input (R3 + Left/Right, R3 + Select) + rosters */
     /* raw pad, active high: Select 0x1, R3 0x4, Up 0x10, Down 0x40, L2 0x100, R2 0x200, L1 0x400, R1 0x800 */
-    pad = inputGetPadButtons(0) & 0xF55;
+    pad = inputGetPadButtons(0) & 0x1F55;            /* (+ Triangle 0x1000: Minion on / off) */
     pressed = pad & ~prevPad;
     prevPad = pad;
     if (pad & 0x4) {
@@ -1413,7 +1434,7 @@ void tmbr_LobbyFrame(void)
             lobbyLine(11, -1, teams ? "SELECT : SHOW TEAMS" : "TRAFFIC AND TEAMS");
         } else {
             lobbyLine(10, -1, teams ? "L1/R1 BOTS  LEFT/RIGHT TEAM" : "L1/R1 BOTS  L2/R2 SKILL");
-            lobbyLine(11, -1, teams ? "UP TRAF DOWN TEAMS SEL BOTS" : "UP TRAFFIC  DOWN TEAMS");
+            lobbyLine(11, -1, teams ? "UP TRAF DOWN TEAMS TRI MIN" : "UP TRAF DOWN TEAMS TRI MIN");
         }
     } else if (teams && (pad & 0x1)) {
         lobbyLine(10, 0, ra);
@@ -1425,13 +1446,14 @@ void tmbr_LobbyFrame(void)
     }
     fontSetColor(0, 0x50, 0x44, 0x2C);
     if (!host) return;
-    if ((pad & 0x4) && (pressed & 0x50)) {
-        {   /* Down cycles: teams off -> 2 teams -> 4 teams -> off */
+    if ((pad & 0x4) && (pressed & 0x1050)) {
+        {   /* Down cycles: teams off -> 2 teams -> 4 teams -> off; Triangle: Minion on / off */
             int f = (pressed & 0x10) ? OPT_TRAFFIC : 0;
+            if (pressed & 0x1000) f |= OPT_NOMINION;
             if (pressed & 0x40) f |= !tmbr_Opt(OPT_TEAMS) ? OPT_TEAMS : !tmbr_Opt(OPT_TEAMS4) ? OPT_TEAMS4 : (OPT_TEAMS | OPT_TEAMS4);
             optSync(f);
         }
-        scePrintf("TMBR lobby: traffic %s, teams %s\n", tmbr_Opt(OPT_TRAFFIC) ? "on" : "off", !tmbr_Opt(OPT_TEAMS) ? "off" : tmbr_Opt(OPT_TEAMS4) ? "4" : "2");
+        scePrintf("TMBR lobby: traffic %s, teams %s, minion %s\n", tmbr_Opt(OPT_TRAFFIC) ? "on" : "off", !tmbr_Opt(OPT_TEAMS) ? "off" : tmbr_Opt(OPT_TEAMS4) ? "4" : "2", tmbr_Opt(OPT_NOMINION) ? "off" : "on");
     } else optSync(0);
     if ((pad & 0x4) && (pressed & 0xF00)) {
         if (pressed & 0x800) tmbr_botCount++;
