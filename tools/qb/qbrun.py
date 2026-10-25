@@ -52,7 +52,16 @@ def main():
     iso = WW + '\\' + a.iso.replace('/', '\\')
     t0 = time.time(); shots = []
     # normal window even when this runs from a minimized console (a minimized PCSX2 captures black)
-    ps(f"Start-Process -WindowStyle Normal -FilePath '{WP}\\pcsx2-qt.exe' -ArgumentList '-elf','\"{WW}\\test\\QUICK.ELF\"','--','\"{iso}\"'")
+    if os.environ.get('QB_MIN', '1') == '1':          # (screenshots of a minimized window come out black: QB_MIN=0 for those)
+        # minimized and without taking focus (the user can keep using the PC; the test only reads the log)
+        ps(f"Start-Process -WindowStyle Minimized -FilePath '{WP}\\pcsx2-qt.exe' -ArgumentList '-elf','\"{WW}\\test\\QUICK.ELF\"','--','\"{iso}\"'")
+        time.sleep(4)
+        ps("Add-Type -Name W -Namespace U -MemberDefinition '[DllImport(\"user32.dll\")] public static extern bool ShowWindow(System.IntPtr h, int c);'; "
+           "Get-Process pcsx2-qt -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | "
+           "ForEach-Object { if ((Get-CimInstance Win32_Process -Filter \"ProcessId=$($_.Id)\").CommandLine -match 'QUICK.ELF') { [U.W]::ShowWindow($_.MainWindowHandle, 7) | Out-Null } }")
+    else:
+        ps(f"Start-Process -WindowStyle Normal -FilePath '{WP}\\pcsx2-qt.exe' -ArgumentList '-elf','\"{WW}\\test\\QUICK.ELF\"','--','\"{iso}\"'")
+
     try:
         for t in sorted(script.get('shots', [])):
             time.sleep(max(0, t - (time.time() - t0)))

@@ -43,7 +43,7 @@ round=0
 while ! timeup; do
   playing && { echo "PCSX2 is open - stopping (someone is playing) $(date)" >> $L; break; }
   round=$((round + 1)); echo "round $round $(date +%H:%M): all files" >> $L
-  if [ -n "$START_FILE" ] && [ $round = 1 ]; then RES=hang; ALL=("$START_FILE"); echo "  starting at $START_FILE" >> $L
+  if [ -n "$START_FILE" ] && [ $round = 1 ]; then RES=hang; ALL=($START_FILE); echo "  starting at: $START_FILE" >> $L
   else
   run_test "" ; [ $RES = nobuild ] && break
   ALL=($(files_with_c));
@@ -60,13 +60,12 @@ while ! timeup; do
          fi ;;
     esac
   fi
-  # bisect the files (START_FILE=src/x.c: a file already known to break the test alone - first round only)
+  # bisect the files (START_FILE="src/a.c src/b.c": files known to break the test together - first round only)
   cand=("${ALL[@]}"); echo "  bisecting ${#cand[@]} files ($RES)" >> $L
   if [ -n "$START_FILE" ]; then
-    run_test "" "$START_FILE"; echo "  $START_FILE alone: $RES" >> $L
+    run_test "" $START_FILE; echo "  those files alone: $RES" >> $L
     START_FILE=""
-    [ $RES = clean ] && { echo "  it boots alone: back to the full search" >> $L; continue; }
-    cand=("${cand[0]}")
+    [ $RES = clean ] && { echo "  they boot alone: back to the full search" >> $L; continue; }
   fi
   while [ ${#cand[@]} -gt 1 ] && ! timeup && ! playing; do
     h=$(( ${#cand[@]} / 2 )); A=("${cand[@]:0:$h}"); B=("${cand[@]:$h}")
