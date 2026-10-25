@@ -743,6 +743,7 @@ static void unstick(char* g, char* v)
 static int wpx[NW], wpy[NW], wpz[NW], wvx[NW], wvy[NW], wvz[NW], wax[NW];
 static unsigned char wok[NW], wturn[NW], wfall[NW];
 static int bpx[8], bpy[8];
+static int cpx[8], cpy[8], cvx[8], cvy[8]; static unsigned char cok[8];   /* every car, per frame (x4 units) */
 static short dodgeT[8], reactT[8], judged[8], hWait[8], dodgeHb[8], pendT[8];
 static int dodgeX[8], dodgeY[8], dodgeF[8];   /* dodgeF: blend in the car's heading */
 static const unsigned char dodgeDelay[3] = { 24, 14, 8 }, dodgeChance[3] = { 30, 55, 80 }, homingTurn[3] = { 18, 12, 8 };
@@ -773,6 +774,14 @@ void tmbr_DodgeFrame(void)
         }
         wpx[i] = x; wpy[i] = y; wpz[i] = z;
         if (wok[i] < 3) wok[i]++;
+    }
+    for (i = 0; i < 8; i++) {                       /* every car's position and motion (evade) */
+        char* v = g + i * 0x31B0;
+        char* cs;
+        if (!live(v) || !(cs = (char*)F(v, 0x2028))) { cok[i] = 0; continue; }
+        x = (int)(*(float*)(cs + 0x10) * FX[0]); y = (int)(*(float*)(cs + 0x14) * FX[0]);
+        if (cok[i]) { cvx[i] = x - cpx[i]; cvy[i] = y - cpy[i]; }
+        cpx[i] = x; cpy[i] = y; cok[i] = cok[i] < 2 ? cok[i] + 1 : 2;
     }
 }
 static int iabs(int x) { return x < 0 ? -x : x; }
@@ -879,6 +888,68 @@ static void dodge(char* g, char* v)
     }
 }
 
+/* ---- Evading a chaser (2026-10-25: a low-health bot drove in a straight line and let a player pile on with
+ * machine guns). An enemy within EV_DIST, behind us (within 45 deg of straight back) and heading at us (within
+ * 45 deg), for EV_SEE frames = being chased: turbo and weave (steer side to side in 10-18 frame swings, gas on).
+ * Hurt (< 50 %) with the chaser close (< EV_TURN): sometimes a handbrake 180 to turn and fight instead.
+ * Not while lined up on our own target ahead (then we are the attacker). Easy: weave only; medium: + turbo;
+ * hard: + the 180 more often. */
+#define EV_DIST 350
+#define EV_SEE 20
+#define EV_TURN 160
+static short evSeen[8], evT[8], evSw[8], evHb[8]; static signed char evDir[8];
+static int evade(char* g, char* v)
+{
+    int k = (int)(v - g) / 0x31B0 & 7, j, fx = cvx[k], fy = cvy[k], best = -1, bd = 0x7FFFFFFF;
+    int diff = tmbr_botDiff < 0 ? 0 : tmbr_botDiff > 2 ? 2 : tmbr_botDiff;
+    char *br = (char*)F(v, 0x2014), *drv = (char*)F(v, 0x2018);
+    unsigned char* pad = PAD(v);
+    if (!br || !drv || !cok[k] || *(signed char*)(v + 0x497) >= 4 || F(v, 0x444) >= 30) { evSeen[k] = evT[k] = 0; return 0; }
+    if (evHb[k] > 0) {                                     /* the 180: full lock + handbrake, gas */
+        evHb[k]--; pad[2] = 1; pad[4] = 1; pad[6] = 0; pad[7] = 0;
+        if (evDir[k] > 0) { pad[9] = 1; pad[0xA] = 0; } else { pad[0xA] = 1; pad[9] = 0; }
+        return 1;
+    }
+    if (iabs(fx) + iabs(fy) < 4 * 2) { evSeen[k] = 0; evT[k] = 0; return 0; }   /* hardly moving */
+    for (j = 0; j < 8; j++) {
+        char* c = g + j * 0x31B0;
+        int dx, dy, dot, crs, mdot, mcrs, d;
+        if (j == k || !cok[j] || !live(c)) continue;
+        if (tmbr_Opt(OPT_TEAMS) && tmbr_TeamOf(c) == tmbr_TeamOf(v)) continue;
+        dx = cpx[j] - cpx[k]; dy = cpy[j] - cpy[k];
+        d = iabs(dx) + iabs(dy);
+        if (d > 4 * EV_DIST || d >= bd) continue;
+        dot = fx * dx + fy * dy; crs = iabs(fx * dy - fy * dx);
+        if (dot >= 0 || crs > -dot) continue;              /* not behind us */
+        mdot = -(cvx[j] * dx + cvy[j] * dy); mcrs = iabs(cvx[j] * dy - cvy[j] * dx);
+        if (mdot <= 0 || mcrs > mdot) continue;            /* not coming at us */
+        best = j; bd = d;
+    }
+    if (best < 0) { if (evSeen[k] > 0) evSeen[k]--; if (evT[k] > 0) evT[k]--; return 0; }
+    {   /* lined up on our own target in front, close: keep attacking */
+        int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, d = fbits(*(float*)(br + 0x20));
+        if (F(drv, 4) == 5 && a < CS_HB && d >= 0 && d < CS_DIST && hpPct(v) >= 50) { evSeen[k] = 0; return 0; }
+    }
+    if (evSeen[k] < EV_SEE) { evSeen[k]++; return 0; }
+    if (evT[k] == 0) {                                     /* a new chase: maybe turn the tables */
+        int chance = diff == 2 ? 45 : diff == 1 ? 25 : 0;
+        evT[k] = 90;
+        if (hpPct(v) < 50 && bd < 4 * EV_TURN && mathfRandI(0, 99) < chance) {
+            evHb[k] = 22; evDir[k] = mathfRandI(0, 1) ? 1 : -1; evSeen[k] = 0; evT[k] = 0;
+            if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d turns on its chaser %d\n", k, best);
+            return 1;
+        }
+        evSw[k] = 0; evDir[k] = mathfRandI(0, 1) ? 1 : -1;
+        if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d evades chaser %d\n", k, best);
+    }
+    evT[k] = 90;                                           /* refreshed while the chase goes on */
+    if (--evSw[k] <= 0) { evSw[k] = 10 + mathfRandI(0, 8); evDir[k] = -evDir[k]; }
+    pad[4] = 1; pad[6] = 0; pad[2] = 0;
+    if (diff >= 1) pad[7] = 1;                             /* turbo (the game stops it when the bar is empty) */
+    if (evDir[k] > 0) { pad[9] = 1; pad[0xA] = 0; } else { pad[0xA] = 1; pad[9] = 0; }
+    return 1;
+}
+
 static int aiUpdate(char* v);
 extern void padClear(char* v) __asm__("vehicleSaveAndClearPadFlags__7Vehicle");
 int tmbr_AiUpdate(char* v)
@@ -888,7 +959,9 @@ int tmbr_AiUpdate(char* v)
     r = aiUpdate(v);
     /* match over (game type 1): the game stops every car - no dodging / unsticking then (log 2026-10-24) */
     if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030 && !(GINFO() && ((F(GINFO(), 0) >> 1) & 0xF) == 1)) {
-        dodge(D_004FA030, v); unstick(D_004FA030, v);
+        dodge(D_004FA030, v);
+        if (!dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]) evade(D_004FA030, v);   /* (a dodge in progress wins) */
+        unstick(D_004FA030, v);
     }
     return r;
 }
