@@ -247,7 +247,19 @@ static int lastLife(char* v)
 /* sight range per role (manhattan units): beyond it a bot cruises instead of crossing the map to a fight */
 #define HUNT_SEE(rl) ((rl) == R_CRUISER ? CRUISE_SEE : (rl) == R_SNIPER ? 1000 : (rl) == R_ROAMER ? 1200 : 900)
 #define ROLE(v) (role[((int)((char*)(v) - D_004FA030) / 0x31B0) & 7])
+/* Per-car personality (Ark, 2026-10-25). Character = car +0x20F4 >> 5 (radar name table D_002C07F8):
+ *  Darkside / Yellow Jacket: brawlers - join big fights; their specials are rams, saved for a close lined-up target
+ *    (Yellow Jacket: in a pile-up it just fires its special; one on one it singles a car out and turbo-rams it);
+ *  Spectre / Mr. Grimm: fragile - one-on-one fighters (sniper / roamer roles), steer clear of brawls. */
+#define CH_YELLOWJ 2
+#define CH_SPECTRE 4
+#define CH_GRIMM 10
+#define CH_DARKSIDE 13
+static int charOf(char* v) { return (F(v, 0x20F4) >> 5) & 0x1F; }
+static int fragile(char* v) { int c = charOf(v); return c == CH_SPECTRE || c == CH_GRIMM; }
+static int rammer(char* v) { int c = charOf(v); return c == CH_DARKSIDE || c == CH_YELLOWJ; }
 static int hunted[8], crowd[8];
+static short ramT[8];              /* frames of turbo left for a special ram (Darkside, Yellow Jacket) */
 /* health in percent (vehicle+0x404 health, +0x3F0 max; floats, converted without float literals) */
 static int hpPct(char* v)
 {
@@ -281,6 +293,10 @@ static void rollRole(char* g, int k)
 {
     /* brawler 35 %, sniper 15 %, roamer 30 %, cruiser 20 % (cruiser was 35 %: bots spent too long not fighting) */
     int r = mathfRandI(0, 99), n = r < 35 ? R_BRAWLER : r < 50 ? R_SNIPER : r < 80 ? R_ROAMER : R_CRUISER, i, same = 0, bots = 0;
+    char* me = g + k * 0x31B0;
+    if (fragile(me)) n = r < 45 ? R_SNIPER : r < 85 ? R_ROAMER : R_CRUISER;                /* never a brawler */
+    else if (charOf(me) == CH_DARKSIDE) n = r < 60 ? R_BRAWLER : r < 85 ? R_ROAMER : R_CRUISER;
+    else if (charOf(me) == CH_YELLOWJ) n = r < 45 ? R_BRAWLER : r < 85 ? R_ROAMER : R_CRUISER;   /* roamer: singles cars out */
     for (i = 0; i < NAI(g); i++) {
         char* b = LIST(g)[i];
         int j;
@@ -288,7 +304,7 @@ static void rollRole(char* g, int k)
         bots++;
         if (role[j] == n) same++;
     }
-    if (bots && same == bots) n = (n + 1 + mathfRandI(0, 2)) % 4;
+    if (bots && same == bots && !fragile(me) && !rammer(me)) n = (n + 1 + mathfRandI(0, 2)) % 4;   /* (personalities keep theirs) */
     role[k] = n;
     roleT[k] = 30 + mathfRandI(0, 50);
     rushT[k] = 0;
@@ -417,7 +433,7 @@ void tmbr_BotsThink(void)
             /* Breakaway: like players leaving a brawl, a bot that has been fighting for a while, or is in a
              * pile-up (3+ other cars within 400), may drive off for 8-15 s (game cruise mode, ignores targets)
              * and come back fresh. Checked every 0.5 s: after 12 s of fighting 15 %, in a pile-up (after 3 s) 25 %. */
-            int k2 = (int)(b - g) / 0x31B0 & 7, pile = crowd[k2] >= 3, retreat;
+            int k2 = (int)(b - g) / 0x31B0 & 7, pile = crowd[k2] >= (fragile(b) ? 2 : 3), retreat;   /* fragile cars: 2 is a crowd */
             int endgame = lms && alive <= 3, careful = lastLife(b) && !endgame;
             if (endgame) leaveT[k2] = 0;                 /* Last Man Standing, 3 or fewer left: finish it */
             if (leaveT[k2] > 0) {
@@ -433,7 +449,7 @@ void tmbr_BotsThink(void)
             if (careful)                                 /* last life: back off earlier and more often */
                 retreat = !retreated[k2] && hpPct(b) < 50 && hunted[k2] >= 1 && mathfRandI(0, 99) < 40;
             if (retreat) retreated[k2] = 1;
-            if (!endgame && (retreat || (fightT[k2] > 24 && mathfRandI(0, 99) < 15) || (pile && fightT[k2] > 4 && mathfRandI(0, 99) < 35))) {
+            if (!endgame && (retreat || (fightT[k2] > 24 && mathfRandI(0, 99) < 15) || (pile && fightT[k2] > (fragile(b) ? 2 : 4) && mathfRandI(0, 99) < (fragile(b) ? 60 : 35)))) {
                 leaveT[k2] = 20 + mathfRandI(0, 16);       /* 10-18 s: far enough to start a fight elsewhere */
                 fightT[k2] = 0;
                 cruiseFar(g, b, drv);       /* to the far side of the map: spreads the bots out */
@@ -465,7 +481,8 @@ void tmbr_BotsThink(void)
                 if (giveUpT[k2] > 0 && giveUpK[k2] == k) continue;
                 d += others * 450;
             }
-            if (rl == R_CRUISER) sc = d + crowd[k] * 200;
+            if (fragile(b)) sc = (rl == R_SNIPER ? (d > 450 ? d - 450 : 450 - d) : d / 2) + others * 700 + crowd[k] * 900;   /* one on one */
+            else if (rl == R_CRUISER) sc = d + crowd[k] * 200;
             else if (rl == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
             else if (rl == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
             else sc = d + others * 200 + crowd[k] * 250;                                  /* brawler (avoids pile-ups) */
@@ -978,6 +995,7 @@ static void turboUse(char* g, char* v, int evading)
     }
     if (evading || pad[6] || pad[2] || *(signed char*)(v + 0x497) >= 4) return;   /* (evade does its own) */
     if (tbStraight[k] >= TB_STRAIGHT && pct > TB_RESERVE) pad[7] = 1;           /* open road */
+    if (ramT[k] > 0) { ramT[k]--; pad[7] = 1; }                                 /* special ram (Darkside, Yellow Jacket) */
     if (F(drv, 4) == 5 && F(drv, 0xB4)) {
         int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, d = fbits(*(float*)(br + 0x20)), dist = (int)*(float*)(br + 0x20);
         if (a < CS_AIM && d > STANDOFF && d < 0x43E10000 && pct > 20) pad[7] = 1;   /* ram run: 150..450 */
@@ -1110,7 +1128,15 @@ void tmbr_AiPickWeapon(char* v)
     los = F(br, 0x598) || F(br, 0x4B0) < 10;  /* the game's own sight of the target (as the fire check above) */
     for (w = 1; w < 8; w++) {
         ok[w] = wpnClock >= wpnReady[k][w] && aiGoodChoice(v, w);
-        if (ok[w] && w == 1 && mathfRandW(0, 99) >= SPECIAL_CHANCE) ok[w] = 0;
+        if (ok[w] && w == 1 && rammer(v)) {
+            /* ram specials: only on a close, lined-up target (then always) - Yellow Jacket in a crowd just fires it */
+            char* t = (char*)F(F(v, 0x2018), 0xB4);
+            int tk = t ? (int)(t - D_004FA030) / 0x31B0 & 7 : 0, dist = (int)*(float*)(br + 0x20);
+            int lined = (fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF) < CS_AIM;
+            if (charOf(v) == CH_YELLOWJ && t && crowd[tk] >= 2) { if (mathfRandW(0, 99) >= SPECIAL_CHANCE) ok[w] = 0; }
+            else if (!(t && lined && dist > 0 && dist < 300)) ok[w] = 0;
+            else ramT[k] = 90;                                /* 1.5 s of turbo into it (turboUse) */
+        } else if (ok[w] && w == 1 && mathfRandW(0, 99) >= SPECIAL_CHANCE) ok[w] = 0;
         /* in a burst without sight of the target: no fire missiles (straight into the wall); homing missiles
          * may still go - they climb over terrain and keep the chase going. The burst waits, it is not lost. */
         if (ok[w] && w == 2 && burstLeft[k] > 0 && !los) ok[w] = 0;
