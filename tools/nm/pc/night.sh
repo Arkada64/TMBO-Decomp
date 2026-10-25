@@ -15,11 +15,13 @@ touch cloud/in/nm_skip.txt
 skips() { grep -v '^#' cloud/in/nm_skip.txt | awk '{print $1}' | paste -sd, -; }
 playing() { tasklist.exe | grep -qi pcsx2; }
 timeup() { [ $(date +%s) -ge $END ]; }
+lowdisk() { [ "$(df --output=avail -BG /mnt/c | tail -1 | tr -dc 0-9)" -lt 20 ]; }   # under 20 GB free on C:
 
 # run_test EXTRA_SKIPS FILE... : build + boot. Sets RES (clean / fault / hang / nobuild) and PCS (fault pcs).
 run_test() {
   local extra=$1; shift
   RES=nobuild; PCS=""
+  lowdisk && { echo "less than 20 GB free on C: - stopping $(date)" >> $L; exit 1; }
   NM_SKIP="$(skips)${extra:+,$extra}" bash cloud/in/nm_test.sh "$@" > /dev/null 2>&1
   grep -q NM_DONE cloud/qb_out/nm.txt || { echo "    build failed: $(grep -vE '^\s*$' cloud/qb_out/nm.txt | tail -2 | tr '\n' ' ')" >> $L; return; }
   local d=$(grep OUT cloud/qb_out/nm_run.txt 2>/dev/null | awk '{print $2}' | xargs basename 2>/dev/null)

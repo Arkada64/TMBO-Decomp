@@ -35,10 +35,25 @@ def patch(elf, script):
 def ps(cmd):
     return subprocess.run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', cmd], capture_output=True, text=True).stdout
 
+KEEP_RUNS, KEEP_STATES, MIN_FREE_GB = 150, 3, 20
+def prune():
+    """disk safeguards for the automated runs (they are ours to manage): keep the newest KEEP_RUNS run folders
+    in cloud/qb_out (logs are small), and savestates only in the newest KEEP_STATES of them."""
+    runs = sorted(glob.glob(f'{W}/cloud/qb_out/2026*') + glob.glob(f'{W}/cloud/qb_out/boot_*'), key=os.path.getmtime)
+    for d in runs[:-KEEP_RUNS]: shutil.rmtree(d, ignore_errors=True)
+    states = sorted(glob.glob(f'{W}/cloud/qb_out/*/state.p2s'), key=os.path.getmtime)
+    for f in states[:-KEEP_STATES]: os.remove(f)
+
+def low_disk():
+    st = os.statvfs(W)
+    return st.f_bavail * st.f_frsize < MIN_FREE_GB * 2**30
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('script'); ap.add_argument('--iso', default='test/TMBR_LOST.iso')
     ap.add_argument('--elf', default='test/TMBR_TEST.ELF'); a = ap.parse_args()
     os.chdir(W)
+    if low_disk():
+        sys.exit(f'less than {MIN_FREE_GB} GB free on the drive: not starting a test run')
     if 'pcsx2-qt.exe' in subprocess.run(['tasklist.exe'], capture_output=True, text=True).stdout:
         sys.exit('PCSX2 is already running (someone is playing): not starting a test run')
     script = json.load(open(a.script))
@@ -62,8 +77,9 @@ def main():
     else:
         ps(f"Start-Process -WindowStyle Normal -FilePath '{WP}\\pcsx2-qt.exe' -ArgumentList '-elf','\"{WW}\\test\\QUICK.ELF\"','--','\"{iso}\"'")
 
+    minimized = os.environ.get('QB_MIN', '1') == '1'
     try:
-        for t in sorted(script.get('shots', [])):
+        for t in ([] if minimized else sorted(script.get('shots', []))):   # (a minimized window captures black)
             time.sleep(max(0, t - (time.time() - t0)))
             k = len(shots); shots.append(f'{WW}\\qb_tmp_{k}.png')
             print('shot at', round(time.time() - t0, 1), ps(f"& '{WW}\\tools\\qb\\winshot.ps1' '{shots[-1]}'").strip(), flush=True)
@@ -92,6 +108,7 @@ def main():
     bad = lg.count('TLB Miss') > 0 or lg.count('TMBR perf') <= 3
     st = sorted(glob.glob(f'{P}/sstates/*.09.p2s'), key=os.path.getmtime)
     if bad and st and os.path.getmtime(st[-1]) > t0: shutil.move(st[-1], f'{out}/state.p2s'); print('state saved')
+    prune()
     print('OUT', out, 'shots', n)
     log = open(f'{out}/emulog.txt', errors='replace').read().splitlines()
     for l in log:
