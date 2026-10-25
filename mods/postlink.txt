@@ -4,3 +4,8 @@
 # Respawn Shield length (pnach "TMA Ruleset/ Respawn Shield" 0x1DD0D8 + 0x1DD158; routine in mods/shield.s)
 001DD0D8  7FB10010  j tmbr_shield_timer
 001DD158  284200B5  0059102A      # slti $2, $2, 0xB5 -> slt $2, $2, $25
+# Spectre balance (Ark 2026-10-25): her special no longer goes through walls. Weapon kind 21's world-collision
+# handler (func_001EC7E8, from the kind switch in func_001E9D68) ignores a wall hit while the shot's pass-through
+# flag (+0x134) is set: beqzl $v0 (flag clear -> handle the hit) becomes an unconditional beql, so every wall hit
+# counts, like any missile's. Kind 21 = Spectre's special only (TMBR wk log, 2026-10-25).
+001EC85C  50400024  50000024
