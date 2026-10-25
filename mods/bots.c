@@ -243,7 +243,7 @@ static int lastLife(char* v)
 #define R_SNIPER 1
 #define R_ROAMER 2
 #define R_CRUISER 3    /* drives the map (game cruise mode 4) and fights whatever it runs into */
-#define CRUISE_SEE 350
+#define CRUISE_SEE 550     /* (was 350: cruisers drove past fights - 2026-10-25 low bot damage) */
 /* sight range per role (manhattan units): beyond it a bot cruises instead of crossing the map to a fight */
 #define HUNT_SEE(rl) ((rl) == R_CRUISER ? CRUISE_SEE : (rl) == R_SNIPER ? 1000 : (rl) == R_ROAMER ? 1200 : 900)
 #define ROLE(v) (role[((int)((char*)(v) - D_004FA030) / 0x31B0) & 7])
@@ -264,8 +264,8 @@ static short fightT[8], leaveT[8];  /* think ticks (0.5 s) in a fight / left of 
 static short chaseT[8], giveUpT[8]; static signed char giveUpK[8];  /* long chases of a human: give up for a while */
 #define HUMAN_MAX_BOTS 2   /* bots on one human at once (log 2026-10-24: down two lives first in a big fight) */
 
-/* Roles change during the match: every 15..40 s a bot rolls a new one (brawler 30 %, sniper 15 %, roamer
- * 20 %, cruiser 35 %, re-rolled once if every other bot already has it), and a sniper that keeps getting caught up close
+/* Roles change during the match: every 15..40 s a bot rolls a new one (brawler 35 %, sniper 15 %, roamer
+ * 30 %, cruiser 20 %, re-rolled once if every other bot already has it), and a sniper that keeps getting caught up close
  * (target < 150 for 3 s) turns brawler on the spot. */
 /* Cruise to an empty part of the map: gamePickCruiseZone picks the nearest candidate zone, or the farthest when
  * the driver is in flee mode (3); so pick with the mode set to 3 for that one call, then cruise (4). */
@@ -279,7 +279,8 @@ static void cruiseFar(char* g, char* b, char* drv)
 
 static void rollRole(char* g, int k)
 {
-    int r = mathfRandI(0, 99), n = r < 30 ? R_BRAWLER : r < 45 ? R_SNIPER : r < 65 ? R_ROAMER : R_CRUISER, i, same = 0, bots = 0;
+    /* brawler 35 %, sniper 15 %, roamer 30 %, cruiser 20 % (cruiser was 35 %: bots spent too long not fighting) */
+    int r = mathfRandI(0, 99), n = r < 35 ? R_BRAWLER : r < 50 ? R_SNIPER : r < 80 ? R_ROAMER : R_CRUISER, i, same = 0, bots = 0;
     for (i = 0; i < NAI(g); i++) {
         char* b = LIST(g)[i];
         int j;
@@ -432,8 +433,8 @@ void tmbr_BotsThink(void)
             if (careful)                                 /* last life: back off earlier and more often */
                 retreat = !retreated[k2] && hpPct(b) < 50 && hunted[k2] >= 1 && mathfRandI(0, 99) < 40;
             if (retreat) retreated[k2] = 1;
-            if (!endgame && (retreat || (fightT[k2] > 24 && mathfRandI(0, 99) < 15) || (pile && fightT[k2] > 6 && mathfRandI(0, 99) < 25))) {
-                leaveT[k2] = 16 + mathfRandI(0, 14);
+            if (!endgame && (retreat || (fightT[k2] > 24 && mathfRandI(0, 99) < 15) || (pile && fightT[k2] > 4 && mathfRandI(0, 99) < 35))) {
+                leaveT[k2] = 20 + mathfRandI(0, 16);       /* 10-18 s: far enough to start a fight elsewhere */
                 fightT[k2] = 0;
                 cruiseFar(g, b, drv);       /* to the far side of the map: spreads the bots out */
 #if TMBR_NAV
@@ -464,10 +465,10 @@ void tmbr_BotsThink(void)
                 if (giveUpT[k2] > 0 && giveUpK[k2] == k) continue;
                 d += others * 450;
             }
-            if (rl == R_CRUISER) sc = d;
+            if (rl == R_CRUISER) sc = d + crowd[k] * 200;
             else if (rl == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
             else if (rl == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
-            else sc = d + others * 200 + crowd[k] * 150;                                  /* brawler (avoids pile-ups) */
+            else sc = d + others * 200 + crowd[k] * 250;                                  /* brawler (avoids pile-ups) */
             sc -= (100 - hpPct(v)) * (rl == R_CRUISER ? 1 : 3);   /* finish off damaged cars (up to -300) */
             if (k == leader) sc -= 250;                                /* deathmatch: someone pulling away */
             if (k == prey && others < PREY_CHASERS) sc -= 900;         /* Man Hunt: a couple of bots on the prey */
@@ -484,10 +485,7 @@ void tmbr_BotsThink(void)
             int chase = prey >= 0 && best == g + prey * 0x31B0;   /* the prey's chasers cross the map for it */
             int keep = F(best, 0x590) == 1 ? see : rl == R_CRUISER ? see * 2 : see * 3 / 2;   /* humans: easier to lose */
             if (!(lms && alive <= 3) && !chase && (bd > keep || (F(drv, 4) == 4 && bd > see))) {
-                if (F(drv, 4) != 4) {
-                    if (mathfRandI(0, 1)) cruiseFar(g, b, drv);
-                    else driverSetMode(drv, 4);
-                }
+                if (F(drv, 4) != 4) cruiseFar(g, b, drv);   /* far zone: the nearest one was usually the brawl just left */
                 continue;
             }
         }
@@ -964,7 +962,7 @@ static int wpnPicked[8];           /* frame the current weapon was picked */
 static int heavyW(int w) { return w == 1 || w >= 4; }
 static int cooldown(int w)
 {
-    static const int heavy[3] = { 700, 450, 320 }, light[3] = { 90, 60, 40 };   /* frames: easy, medium, hard */
+    static const int heavy[3] = { 520, 300, 210 }, light[3] = { 60, 35, 25 };    /* frames: easy, medium, hard (2026-10-25: was 700/450/320, 90/60/40 - bots did little damage) */
     int d = tmbr_botDiff < 0 ? 0 : tmbr_botDiff > 2 ? 2 : tmbr_botDiff;
     if (w == 1) return heavy[d] * 3 / 2;
     return heavyW(w) ? heavy[d] : light[d];
@@ -1014,6 +1012,13 @@ int tmbr_AiMayShoot(char* v)
     char* drv = (char*)F(v, 0x2018);
     char* t = drv ? (char*)F(drv, 0xB4) : 0;
     if (tmbr_botCount >= 0 && t && F(t, 0x590) == 2) return 1;
+    /* a human target: the game only lets a bot fire when the human faces it, so bots barely hurt players
+     * (2026-10-25: a whole match of bots doing 100-500 to the player's 1072). One second in three (staggered
+     * per bot) a bot may shoot regardless - on medium; easy never, hard two in three. */
+    if (tmbr_botCount >= 0 && t && F(t, 0x590) == 1) {
+        int k = (int)(v - D_004FA030) / 0x31B0 & 7, ph = (thinkTick / 60 + k) % 3;
+        if (tmbr_botDiff >= 2 ? ph != 0 : tmbr_botDiff == 1 ? ph == 0 : 0) return 1;
+    }
     return aiFairToShoot(v);
 }
 
