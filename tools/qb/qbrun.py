@@ -86,8 +86,12 @@ def main():
     for i in range(len(shots)):
         f = f'{W}/qb_tmp_{i}.png'
         if os.path.exists(f): shutil.move(f, f'{out}/shot{i}.png'); n += 1
+    # keep the savestate (~45 MB) only for a run that went wrong: it is for looking at a hang / fault, and the
+    # night runs filled 2.4 GB with clean ones. (Slot 9 in sstates is simply overwritten by the next run.)
+    lg = open(f'{out}/emulog.txt', errors='replace').read()
+    bad = lg.count('TLB Miss') > 0 or lg.count('TMBR perf') <= 3
     st = sorted(glob.glob(f'{P}/sstates/*.09.p2s'), key=os.path.getmtime)
-    if st and os.path.getmtime(st[-1]) > t0: shutil.move(st[-1], f'{out}/state.p2s'); print('state saved')
+    if bad and st and os.path.getmtime(st[-1]) > t0: shutil.move(st[-1], f'{out}/state.p2s'); print('state saved')
     print('OUT', out, 'shots', n)
     log = open(f'{out}/emulog.txt', errors='replace').read().splitlines()
     for l in log:
