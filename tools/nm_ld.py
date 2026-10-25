@@ -18,6 +18,7 @@ sm = json.load(open(os.path.join(os.path.dirname(os.path.abspath(ld)), "../../lo
 used = {'build/' + f + '.o' for f, st in sm["files"].items() if st.get("used")}
 asked = {'build/' + re.sub(r'^.*?/(src/)', r'\1', f) + '.o' for f in sys.argv[3:]}
 only = (asked & used) if asked else used
+if os.environ.get("NM_GUARD_ALL") and asked: only = asked      # test: guard the asked files even without C
 orig = {}        # (object, section) -> size in the matching build
 for m in re.finditer(r"^ (\.text|\.rodata|\.data)\s+0x([0-9a-f]+)\s+0x([0-9a-f]+)\s+(build/src/\S+\.c\.o)", open(mp).read(), re.M):
     orig[(m.group(4), m.group(1))] = int(m.group(3), 16)
