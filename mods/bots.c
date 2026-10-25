@@ -1053,6 +1053,13 @@ static void turboUse(char* g, char* v, int evading)
     if (evading || pad[6] || pad[2] || *(signed char*)(v + 0x497) >= 4) return;   /* (evade does its own) */
     if (tbStraight[k] >= TB_STRAIGHT && pct > TB_RESERVE) pad[7] = 1;           /* open road */
     if (ramT[k] > 0) { ramT[k]--; pad[7] = 1; }                                 /* special ram (Darkside, Yellow Jacket) */
+    /* on fire (SetCarOnFire 0x1E4FF0: +0x20E0 == 1 burning, +0x470 burn timer): turbo to shake the flames off, as
+     * players do (Ark 2026-10-25) - not while lined up close on a target with the upper hand */
+    if (F(v, 0x20E0) == 1 && pct > 5) {
+        int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, d = (int)*(float*)(br + 0x20);
+        char* tg = (char*)F(drv, 0xB4);
+        if (!(tg && a < CS_AIM && d > 0 && d < 200 && hpPct(v) > hpPct(tg))) pad[7] = 1;
+    }
     if (F(drv, 4) == 5 && F(drv, 0xB4)) {
         int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, d = fbits(*(float*)(br + 0x20)), dist = (int)*(float*)(br + 0x20);
         if (a < CS_AIM && d > STANDOFF && d < 0x43E10000 && pct > 20) pad[7] = 1;   /* ram run: 150..450 */
@@ -1294,8 +1301,11 @@ void tmbr_AiPickWeapon(char* v)
             if (c->aim && a >= 0x3E19999A) good = 0;                      /* 0.15 rad: squarely lined up */
             if (c->hp == 1 && t && hpPct(t) < 50) good = 0;               /* to weaken */
             if (c->hp == 2 && t && hpPct(t) >= 50) good = 0;              /* to finish */
-            if (t && c->dmg && (int)*(float*)(t + 0x404) <= c->dmg && dist > 0 && dist <= (c->smax > 300 ? c->smax : 300) &&
-                !(c->aim && a >= 0x3F19999A)) good = 1;                   /* the special finishes it */
+            {   /* the special would finish it: sometimes (a third of the time) - not when anything finishes it */
+                int th = t ? (int)*(float*)(t + 0x404) : 999;
+                if (t && c->dmg && th > 10 && th <= c->dmg && dist > 0 && dist <= (c->smax > 300 ? c->smax : 300) &&
+                    !(c->aim && a >= 0x3F19999A) && mathfRandW(0, 99) < 33) good = 1;
+            }
             if (!good && mathfRandW(0, 99) >= 10) ok[w] = 0;              /* (now and then anyway: unpredictable) */
             else if (good) spBoost = 1;
         } else if (ok[w] && w == 1 && mathfRandW(0, 99) >= SPECIAL_CHANCE) ok[w] = 0;
