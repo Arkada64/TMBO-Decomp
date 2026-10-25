@@ -50,3 +50,16 @@
   everything above. Needs the weapon kind of a shot (weapon table +0x14, not mapped yet: find the freeze's value,
   e.g. by logging the kind of shots a freeze creates).
   Darkside's personality (mods/bots.c `rammer`) then freezes before its special ram.
+- **Per-car AI, the rest** (Ark 2026-10-25; the table is in mods/bots.c `carAi`: role odds, smaller-fight cars,
+  when each special is worth it). Still to do, each needs the mechanic found first:
+  - alternate specials: Shadow's turret (small fights) vs the bomb, Axel's War Wheel (solo targets), Outlaw's turret
+    secondary, Manslaughter dropping his special behind as a defence. Likely the spec up/down/left/right combos
+    (COMBO_TYPE_SPEC_* 9..12) - a bot can request them through brain +0x418 like the energy moves; map which car
+    does what with each.
+  - Roadkill: charge the special by confidence (how lined up / how close) before releasing.
+  - Darkside: the T-slide (side-on ram) for bonus damage, sometimes.
+  - Warthog / anyone on fire: turbo away to shake off the flames (find the burning state on the car).
+  - 12 Pak: the AI can't drive him yet (he only exists as a player's Roadkill skin).
+- **Learning from Ark's play**: a logger in the mod build records his matches vs bots (positions, speed, target,
+  distances, weapon / move used, health, energy, a few times a second); fit the bot numbers (engage / break-off
+  ranges, weapon choice by range, turbo / shield timing) to it.

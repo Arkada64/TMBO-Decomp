@@ -257,6 +257,32 @@ static int lastLife(char* v)
 #define CH_DARKSIDE 13
 static int charOf(char* v) { return (F(v, 0x20F4) >> 5) & 0x1F; }
 static int fragile(char* v) { int c = charOf(v); return c == CH_SPECTRE || c == CH_GRIMM; }
+/* Per-car guidelines (Ark, 2026-10-25) - tendencies, not scripts: role odds (brawler / sniper / roamer %, the rest
+ * cruiser), mid (1: a mid-weight car, prefers smaller fights), and when the special is worth firing: alone on a
+ * target solo_min..solo_max away, or at a group (2+ cars round the target) up to grp_max; aim 1 = only when
+ * squarely lined up (charged / aimed specials); hp 1 = to weaken (target above half), 2 = to finish (below half).
+ * Indexes = car +0x20F4 >> 5 (radar names); 0 = no entry (the old 50 % rule). Darkside / Yellow Jacket: rammer(). */
+typedef struct { unsigned char on, b, s, r, mid, aim, hp; short smin, smax, gmax; } CarAi;
+static const CarAi carAi[32] = {
+    /*  0 */ { 0 },
+    /*  1 Roadkill: snipes / moderate range, charged by confidence */  { 1, 35, 25, 25, 0, 1, 0, 150, 600, 0 },
+    /*  2 Yellow Jacket (rammer) */                                     { 1, 45, 0, 40, 0, 0, 0, 0, 0, 0 },
+    /*  3 Outlaw: high damage */                                        { 1, 40, 15, 30, 0, 0, 0, 0, 400, 400 },
+    /*  4 Spectre: homing through walls */                             { 1, 0, 45, 40, 0, 0, 0, 100, 700, 700 },
+    /*  5 Crazy 8: special to weaken */                                 { 1, 45, 10, 30, 0, 0, 1, 0, 450, 450 },
+    /*  6 Sweet Tooth: moderate range */                                { 1, 55, 5, 25, 0, 0, 0, 150, 450, 450 },
+    /*  7 Brimstone: mid, smaller fights */                             { 1, 25, 20, 40, 1, 0, 0, 0, 350, 350 },
+    /*  8 Junkyard Dog: groups, moderate snipes */                      { 1, 50, 10, 25, 0, 0, 0, 200, 450, 500 },
+    /*  9 Shadow: bomb for snipes and groups */                         { 1, 35, 20, 30, 0, 0, 0, 250, 600, 600 },
+    /* 10 Mr. Grimm: lines it up */                                     { 1, 0, 45, 40, 0, 1, 0, 150, 600, 600 },
+    /* 11 Axel: groups (War Wheel solo: later) */                       { 1, 40, 10, 35, 0, 0, 0, 0, 300, 350 },
+    /* 12 Warthog: weaken / finish */                                   { 1, 55, 5, 25, 0, 0, 2, 0, 300, 300 },
+    /* 13 Darkside (rammer) */                                          { 1, 60, 0, 25, 0, 0, 0, 0, 0, 0 },
+    /* 14 Manslaughter: dead on, into groups */                         { 1, 55, 5, 25, 0, 1, 0, 0, 400, 400 },
+    { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
+    /* 31 12 Pak (0x7E0): mid, sniper special */                        { 1, 25, 20, 40, 1, 1, 0, 250, 700, 700 },
+};
+#define CAI(v) (&carAi[charOf(v)])
 static int rammer(char* v) { int c = charOf(v); return c == CH_DARKSIDE || c == CH_YELLOWJ; }
 static int hunted[8], crowd[8];
 static short ramT[8];              /* frames of turbo left for a special ram (Darkside, Yellow Jacket) */
@@ -295,9 +321,10 @@ static void rollRole(char* g, int k)
     /* brawler 35 %, sniper 15 %, roamer 30 %, cruiser 20 % (cruiser was 35 %: bots spent too long not fighting) */
     int r = mathfRandI(0, 99), n = r < 35 ? R_BRAWLER : r < 50 ? R_SNIPER : r < 80 ? R_ROAMER : R_CRUISER, i, same = 0, bots = 0;
     char* me = g + k * 0x31B0;
-    if (fragile(me)) n = r < 45 ? R_SNIPER : r < 85 ? R_ROAMER : R_CRUISER;                /* never a brawler */
-    else if (charOf(me) == CH_DARKSIDE) n = r < 60 ? R_BRAWLER : r < 85 ? R_ROAMER : R_CRUISER;
-    else if (charOf(me) == CH_YELLOWJ) n = r < 45 ? R_BRAWLER : r < 85 ? R_ROAMER : R_CRUISER;   /* roamer: singles cars out */
+    if (CAI(me)->on) {                                        /* the car's own role odds */
+        const CarAi* c = CAI(me);
+        n = r < c->b ? R_BRAWLER : r < c->b + c->s ? R_SNIPER : r < c->b + c->s + c->r ? R_ROAMER : R_CRUISER;
+    }
     for (i = 0; i < NAI(g); i++) {
         char* b = LIST(g)[i];
         int j;
@@ -305,7 +332,7 @@ static void rollRole(char* g, int k)
         bots++;
         if (role[j] == n) same++;
     }
-    if (bots && same == bots && !fragile(me) && !rammer(me)) n = (n + 1 + mathfRandI(0, 2)) % 4;   /* (personalities keep theirs) */
+    if (bots && same == bots && !CAI(me)->on) n = (n + 1 + mathfRandI(0, 2)) % 4;   /* (personalities keep theirs) */
     role[k] = n;
     roleT[k] = 30 + mathfRandI(0, 50);
     rushT[k] = 0;
@@ -487,6 +514,7 @@ void tmbr_BotsThink(void)
             else if (rl == R_SNIPER) sc = (d > 450 ? d - 450 : 450 - d) + others * 250;    /* likes 450 away */
             else if (rl == R_ROAMER) sc = d / 2 + others * 600 + crowd[k] * 500;      /* lone targets */
             else sc = d + others * 200 + crowd[k] * 250;                                  /* brawler (avoids pile-ups) */
+            if (CAI(b)->mid) sc += crowd[k] * 300 + others * 200;                    /* mid cars: smaller fights */
             sc -= (100 - hpPct(v)) * (rl == R_CRUISER ? 1 : 3);   /* finish off damaged cars (up to -300) */
             if (k == leader) sc -= 250;                                /* deathmatch: someone pulling away */
             if (k == prey && others < PREY_CHASERS) sc -= 900;         /* Man Hunt: a couple of bots on the prey */
@@ -1201,7 +1229,7 @@ void tmbr_AiPickWeapon(char* v)
 {
     static const int weight[8] = { 0, 1, 6, 6, 2, 1, 2, 2 };
     char* br = (char*)F(v, 0x2014);
-    int k = (int)(v - D_004FA030) / 0x31B0 & 7, w, total = 0, r, ok[8], los;
+    int k = (int)(v - D_004FA030) / 0x31B0 & 7, w, total = 0, r, ok[8], los, spBoost = 0;
     wpnClock = thinkTick;                     /* frames (tmbr_BotsThink counts every frame) */
     if (tmbr_botCount < 0 || !br) { aiPickBest(v); return; }
     los = F(br, 0x598) || F(br, 0x4B0) < 10;  /* the game's own sight of the target (as the fire check above) */
@@ -1215,18 +1243,30 @@ void tmbr_AiPickWeapon(char* v)
             if (charOf(v) == CH_YELLOWJ && t && crowd[tk] >= 2) { if (mathfRandW(0, 99) >= SPECIAL_CHANCE) ok[w] = 0; }
             else if (!(t && lined && dist > 0 && dist < 300)) ok[w] = 0;
             else ramT[k] = 90;                                /* 1.5 s of turbo into it (turboUse) */
+        } else if (ok[w] && w == 1 && CAI(v)->on) {
+            /* the car's special: alone in its range band, or at a group within gmax; some must be lined up */
+            const CarAi* c = CAI(v);
+            char* t = (char*)F(F(v, 0x2018), 0xB4);
+            int tk = t ? (int)(t - D_004FA030) / 0x31B0 & 7 : 0, dist = (int)*(float*)(br + 0x20);
+            int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, good;
+            good = t && dist > 0 && ((dist >= c->smin && dist <= c->smax) || (crowd[tk] >= 2 && dist <= c->gmax));
+            if (c->aim && a >= 0x3E19999A) good = 0;                      /* 0.15 rad: squarely lined up */
+            if (c->hp == 1 && t && hpPct(t) < 50) good = 0;               /* to weaken */
+            if (c->hp == 2 && t && hpPct(t) >= 50) good = 0;              /* to finish */
+            if (!good && mathfRandW(0, 99) >= 10) ok[w] = 0;              /* (now and then anyway: unpredictable) */
+            else if (good) spBoost = 1;
         } else if (ok[w] && w == 1 && mathfRandW(0, 99) >= SPECIAL_CHANCE) ok[w] = 0;
         /* in a burst without sight of the target: no fire missiles (straight into the wall); homing missiles
          * may still go - they climb over terrain and keep the chase going. The burst waits, it is not lost. */
         if (ok[w] && w == 2 && burstLeft[k] > 0 && !los) ok[w] = 0;
-        if (ok[w]) total += weight[w] * (setupT[k] > 0 && heavyW(w) ? 5 : 1);
+        if (ok[w]) total += weight[w] * (setupT[k] > 0 && heavyW(w) ? 5 : 1) * (w == 1 && spBoost ? 4 : 1);
     }
     F(br, 0x47C) = 0;
     if (!total) return;
     r = mathfRandW(0, total - 1);
     for (w = 1; w < 8; w++) {
         if (!ok[w]) continue;
-        if ((r -= weight[w] * (setupT[k] > 0 && heavyW(w) ? 5 : 1)) < 0) break;
+        if ((r -= weight[w] * (setupT[k] > 0 && heavyW(w) ? 5 : 1) * (w == 1 && spBoost ? 4 : 1)) < 0) break;
     }
     if (w >= 8) return;
     F(br, 0x47C) = w;
