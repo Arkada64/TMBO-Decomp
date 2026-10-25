@@ -77,8 +77,9 @@ void func_0021D258(float* m, float* v, float* out)
 {
     float x = v[0], y = v[1], z = v[2], w = v[3];
     float r0 = (m[0] * x + m[1] * y) + m[2] * z;
-    float r1 = (m[6] * z + m[4] * x) + m[5] * y;
-    float r2 = (m[8] * x + m[9] * y) + m[10] * z;
+    /* (the VU0 sums in this order - ACC = a + b, then + c - and near-zero results depend on it: bench 10-25) */
+    float r1 = (m[5] * y + m[6] * z) + m[4] * x;
+    float r2 = (m[10] * z + m[8] * x) + m[9] * y;
     out[0] = r0; out[1] = r1; out[2] = r2; out[3] = w;
 }
 //@@ mathfDist3__FP8_fvectorT0 hand
@@ -312,4 +313,21 @@ void func_0021ED78(float* m)
     nm_crossNorm(m, m + 4, m + 8, m[7]);
     nm_crossNorm(m + 4, m + 8, m, m[11]);
     nm_crossNorm(m + 8, m, m + 4, m[3]);
+}
+//@@ func_0021E968 hand
+/* heading of a direction: rotation from the vector, its matrix applied to the vector, pitch = -(pi/2 - atan2(x, z))
+ * (the m2c draft passed atan2f one argument: it takes two floats, $f12 x and $f13 z - bench 10-25) */
+extern void mathfRotFromVec_h(void* rot, void* v) __asm__("mathfRotationFromVector__FP8_fvectorT0");
+extern void mathfRotRPH_h(void* m, void* rot) __asm__("mathfRotMatrixRPH__FPA3_fP8_fvector");
+extern void mathfMul33v_h(void* m, void* v, void* out) __asm__("func_0021D258");
+extern float atan2f_h(float y, float x) __asm__("atan2f");
+extern void boundFAngle_h(float* a) __asm__("boundFAngle__FPf");
+void func_0021E968(char* v, char* rot)
+{
+    float m[16], out[4];
+    mathfRotFromVec_h(rot, v + 0x10);
+    mathfRotRPH_h(m, rot);
+    mathfMul33v_h(m, v, out);
+    *(float*)(rot + 4) = -(1.5707964f - atan2f_h(out[0], out[2]));
+    boundFAngle_h((float*)(rot + 4));
 }

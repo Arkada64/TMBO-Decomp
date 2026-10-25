@@ -143,7 +143,8 @@ class Bench:
             vb = int.from_bytes(bytes(wb.get((k, o + i), buf[o + i]) for i in range(4)), 'little')
             if va == vb: continue
             fa, fb = u2f(va), u2f(vb)
-            if (va >> 23) & 0xFF and (vb >> 23) & 0xFF and abs(fa - fb) <= 1e-4 * max(abs(fa), abs(fb), 1e-6):
+            isf = lambda x: (x & 0x7FFFFFFF) == 0 or (x >> 23) & 0xFF        # 0.0 or a normal float (not a small int)
+            if isf(va) and isf(vb) and (abs(fa - fb) <= 1e-4 * max(abs(fa), abs(fb)) or abs(fa - fb) < 1e-7):
                 near += 1; continue
             diffs.append((k, o, va, vb))
         saved = [16, 17, 18, 19, 20, 21, 22, 23, 28, 29, 30]

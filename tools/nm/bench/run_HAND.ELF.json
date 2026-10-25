@@ -1,0 +1,100 @@
+{
+ "func_00195DA8": {
+  "calls": 6,
+  "ok": 6,
+  "near": 0,
+  "fail": 0,
+  "ret": 0,
+  "skip": 0,
+  "first": null,
+  "why": {},
+  "verdict": "pass"
+ },
+ "func_0021D258": {
+  "calls": 6,
+  "ok": 4,
+  "near": 0,
+  "fail": 0,
+  "ret": 2,
+  "skip": 0,
+  "first": "ret ret?: f0 asm 1 C -0.00558277 (or not a float function)",
+  "why": {
+   "ret?": 2
+  },
+  "verdict": "pass"
+ },
+ "func_0021D810": {
+  "calls": 6,
+  "ok": 0,
+  "near": 0,
+  "fail": 0,
+  "ret": 6,
+  "skip": 0,
+  "first": "ret ret?: v0 asm ffffffffffffffff C 1fefdbc (or a void function)",
+  "why": {
+   "ret?": 6
+  },
+  "verdict": "ret?"
+ },
+ "func_0021E968": {
+  "calls": 6,
+  "ok": 6,
+  "near": 0,
+  "fail": 0,
+  "ret": 0,
+  "skip": 0,
+  "first": null,
+  "why": {},
+  "verdict": "pass"
+ },
+ "mathfMulMatrix__FPA3_fT0T0": {
+  "calls": 6,
+  "ok": 0,
+  "near": 0,
+  "fail": 0,
+  "ret": 6,
+  "skip": 0,
+  "first": "ret ret?: v0 asm c2a84715426d05d6 C 1fefd50 (or a void function)",
+  "why": {
+   "ret?": 6
+  },
+  "verdict": "ret?"
+ },
+ "mathfMulVec4x4__FPA3_fP8_fvectorT1": {
+  "calls": 6,
+  "ok": 0,
+  "near": 0,
+  "fail": 0,
+  "ret": 6,
+  "skip": 0,
+  "first": "ret ret?: v0 asm 40 C 1fefdf0 (or a void function)",
+  "why": {
+   "ret?": 6
+  },
+  "verdict": "ret?"
+ },
+ "mathfRotationFromVector__FP8_fvectorT0": {
+  "calls": 6,
+  "ok": 6,
+  "near": 0,
+  "fail": 0,
+  "ret": 0,
+  "skip": 0,
+  "first": null,
+  "why": {},
+  "verdict": "pass"
+ },
+ "mathfUnitMatrixAsm__FPA3_f": {
+  "calls": 6,
+  "ok": 0,
+  "near": 0,
+  "fail": 0,
+  "ret": 6,
+  "skip": 0,
+  "first": "ret ret?: f0 asm 0 C 1 (or not a float function)",
+  "why": {
+   "ret?": 6
+  },
+  "verdict": "ret?"
+ }
+}
