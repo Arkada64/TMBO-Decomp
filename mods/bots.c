@@ -11,6 +11,8 @@
  * owner as -2/-3); bot-vs-bot targeting. */
 typedef unsigned int u32;
 #define F(p, off) (*(int*)((char*)(p) + (off)))
+#define OPT_NOMINION 8    /* lobby option (game info +0xC6): Minion off - car select skips him, no Minion bots */
+extern int tmbr_Opt(int bit);
 #define MAXBOTS 7       /* 1 player + 7 bots = the 8 car slots */
 #define TMBR_BOTDBG 0
 #ifndef TMBR_NAV
@@ -359,7 +361,6 @@ static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v,
 #define OPT_TRAFFIC 1      /* traffic ON (off by default) */
 #define OPT_TEAMS 2
 #define OPT_TEAMS4 4      /* four teams */
-#define OPT_NOMINION 8    /* Minion off: car select skips him, no Minion bots (Ark 2026-10-25) */
 extern void netSendGameInfo(void* net, int to) __asm__("func_00174988");
 extern int tmbr_levelSerial;
 int tmbr_Opt(int bit)
