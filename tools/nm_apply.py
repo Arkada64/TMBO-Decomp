@@ -17,6 +17,12 @@ Writes logs/nm/summary.json (per file: used / no draft / no compiling draft / dr
 """
 import json, os, re, subprocess, sys
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent)); sys.path.insert(0, str(Path(__file__).resolve().parent / "nm"))
+try:
+    from bytefix import bytefix            # m2c's byte-offset pointer arithmetic on typed pointers (tools/nm/bytefix.py)
+except ImportError:
+    bytefix = None
+from pathlib import Path
 R = Path.home() / "tmbo_decomp"
 SN = "tools/compilers/ee-gcc2.95.3-114"
 W = R / "logs/nm"; W.mkdir(parents=True, exist_ok=True)
@@ -68,7 +74,12 @@ def apply(src):
     handb = re.split(r"^//@@ (\S+)[^\n]*\n", hand.read_text(), flags=re.M)[1:] if hand.exists() else []
     handn = set(handb[0::2]); blocks = handb + blocks
     variants = {}
-    for n, c in zip(blocks[0::2], blocks[1::2]): variants.setdefault(n, []).append(c.rstrip() + "\n")
+    for n, c in zip(blocks[0::2], blocks[1::2]):
+        c = c.rstrip() + "\n"
+        if bytefix and n not in handn:                 # (hand-written C is already right)
+            c2, ch = bytefix(c)
+            if ch: st["bytefix"] = st.get("bytefix", 0) + 1; c = c2
+        variants.setdefault(n, []).append(c)
     hdr = header_for(rel); chosen = {}
     for n in names:
         if n in hooked or n in SKIP or ((n.endswith("Asm") or "Asm__" in n) and n not in handn): st["kept_asm"] += 1; continue

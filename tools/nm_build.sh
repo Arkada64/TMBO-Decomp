@@ -17,6 +17,7 @@ rm -f mods/*.c; cp "$W"/mods/*.s "$W"/mods/*.c "$W"/mods/*.pnach "$W"/mods/*_sec
 cp "$W/mods/apply_mods.py" "$W/mods/apply_pnach.py" "$W/mods/bps.py" tools/mods/
 cp "$W/build_shiftable.sh" tools/
 cp "$W/cloud/in/nm_apply.py" tools/
+cp "$W/cloud/in/bytefix.py" tools/ 2>/dev/null || true   # pointer-arithmetic fix for the drafts (tools/nm/bytefix.py)
 mkdir -p logs/hand; cp "$W"/cloud/in/hand/*.c logs/hand/ 2>/dev/null || true   # hand-written C (tools/nm/hand)
 source .venv/bin/activate
 HOME=$NH python3 tools/nm_apply.py "$@" | tail -3
