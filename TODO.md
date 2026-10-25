@@ -30,3 +30,7 @@
     4 views ~2.5-3x (300 % may still drop frames).
   - Then: the cap table (views x traffic -> max bots) in the host settings, and a per-view pass for our HUD mods
     (damage reports / team reminder only draw on screen 0 today).
+- **Darkside: freeze, then the special ram** (Ark 2026-10-25). The personalities are in (mods/bots.c `fragile` /
+  `rammer`), but bots can't freeze yet: the freeze is a player button combo (`Combo::CheckFreezeCombo` 0x125258
+  sets the combo's triggered flag and calls func_00127118); find what fires the freeze from that flag and call it for
+  a bot (energy permitting) when its ram target is in range.
