@@ -53,15 +53,14 @@
 - **Per-car AI, the rest** (Ark 2026-10-25; done: the per-car table, alternate specials for Shadow / Axel via the
   special-up combo (energy handler case 9), turbo off flames (+0x20E0), weapon-aware shield, Spectre's wall-pass
   removed (postlink 0x1EC85C), Minion off option). Weapon kinds (TMBR wk log): MG 0, fire 2, homing 3, napalm 4,
-  power 6, rico 7, pickups 11-13, debris 14 / 15, specials 17 Roadkill, 21 Spectre, 26 Grimm, 27 Axel, 28
+  power 6, rico 7, pickups 11-13, freeze 14 (tagged in the log 2026-10-25), 15 ?, specials 17 Roadkill, 21 Spectre, 26 Grimm, 27 Axel, 28
   Manslaughter; freeze / mines / the other specials not seen yet (bots never used them in the logged match).
   Still to do:
   - Outlaw's turret secondary, Manslaughter dropping his special behind: not in the energy handler's switch -
     find how the player triggers them (launcher update, func_0015CD80 UpdateSpecial) and drive it for bots.
-  - Darkside's T-slide (side-on ram) for bonus damage.
+  - Darkside's T-slide: a first try is in (handbrake flick at ~90 on a special ram, 40 %) - check it lands side-on.
   - Roadkill's charge by confidence: the original AI has per-car special firing (aiCheckSpecialWeaponFiring
     0x1095F0: Crazy 8, Roadkill, Sweet Tooth, Darkside) - tune that rather than replace it.
-  - The freeze dodge: the freeze's weapon kind (log one), then full dodge + shield fallback for it.
   - 12 Pak as a bot (he only exists as a player's Roadkill skin).
   - Minion toggle on the game mods page itself (it's a host hotkey R3 + Triangle in the waiting room for now).
 - **Learning from Ark's play**: a logger in the mod build records his matches vs bots (positions, speed, target,
