@@ -30,7 +30,12 @@
     4 views ~2.5-3x (300 % may still drop frames).
   - Then: the cap table (views x traffic -> max bots) in the host settings, and a per-view pass for our HUD mods
     (damage reports / team reminder only draw on screen 0 today).
-- **Darkside: freeze, then the special ram** (Ark 2026-10-25). The personalities are in (mods/bots.c `fragile` /
-  `rammer`), but bots can't freeze yet: the freeze is a player button combo (`Combo::CheckFreezeCombo` 0x125258
-  sets the combo's triggered flag and calls func_00127118); find what fires the freeze from that flag and call it for
-  a bot (energy permitting) when its ram target is in range.
+- **Bots and energy moves** (Ark 2026-10-25: bots use none). Every energy move is a player combo: `Combo::Check*Combo`
+  (0x1245F8.. shield, cloak, freeze, minion, rear fire, drop mine, gas can, spec up/down/left/right) set the combo's
+  `state` to the move (include/tmb/combo.hpp COMBO_TYPE_*: 1 freeze, 3 rear fire, 4 mine, 6 gas can, 7 shield,
+  8 cloak); Combo::Update only runs in the human input update (func_0017BE80, our tmbr_ComboUpdate hook at 0x17BF00 -
+  mods/quickmoves.s sets `state` the same way). Bots have no combo / pad, so nothing ever sets it. Next: find the
+  reader of `state` in the vehicle update (what fires the move, with its energy cost), then let bots call it:
+  freeze on a car about to escape or before a Darkside special ram, shield when a big hit is incoming (the dodge
+  code already sees missiles), mines when chased (the evade code), cloak to break off a chase.
+  Darkside's personality (mods/bots.c `rammer`) then freezes before its special ram.
