@@ -38,4 +38,10 @@
   reader of `state` in the vehicle update (what fires the move, with its energy cost), then let bots call it:
   freeze on a car about to escape or before a Darkside special ram, shield when a big hit is incoming (the dodge
   code already sees missiles), mines when chased (the evade code), cloak to break off a chase.
+  Freeze as a setup (Ark): freeze a target, then the big hit while it is stuck - skill weapon, gas can, special,
+  power missile, a special ram; on teams, call a teammate's heavy weapon onto the frozen car.
+  Freeze as a threat: the dodge code (bots.c `dodge`) treats every shot alike (rolls dodgeChance per difficulty); a
+  freeze shot should always get the full dodge (and the shield if it can't be dodged), since being frozen sets up
+  everything above. Needs the weapon kind of a shot (weapon table +0x14, not mapped yet: find the freeze's value,
+  e.g. by logging the kind of shots a freeze creates).
   Darkside's personality (mods/bots.c `rammer`) then freezes before its special ram.
