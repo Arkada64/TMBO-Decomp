@@ -43,8 +43,12 @@ round=0
 while ! timeup; do
   playing && { echo "PCSX2 is open - stopping (someone is playing) $(date)" >> $L; break; }
   round=$((round + 1)); echo "round $round $(date +%H:%M): all files" >> $L
+  if [ -n "$START_FILE" ] && [ $round = 1 ]; then RES=hang; ALL=("$START_FILE"); echo "  starting at $START_FILE" >> $L
+  else
   run_test "" ; [ $RES = nobuild ] && break
-  ALL=($(files_with_c)); echo "    files with C: ${#ALL[@]}, skipped drafts: $(skips | tr ',' '\n' | grep -c .)" >> $L
+  ALL=($(files_with_c));
+  fi
+  [ -n "$ALL" ] || ALL=($(files_with_c)); echo "    files with C: ${#ALL[@]}, skipped drafts: $(skips | tr ',' '\n' | grep -c .)" >> $L
   [ $RES = clean ] && { echo "CLEAN: the all-files C build boots to a match $(date)" >> $L; break; }
   if [ $RES = fault ] && [ -n "$PCS" ]; then
     fn=$(python3 cloud/in/symnm.py $PCS | awk '{print $3}' | head -1)
@@ -56,8 +60,12 @@ while ! timeup; do
          fi ;;
     esac
   fi
-  # bisect the files
+  # bisect the files (START_FILE=src/x.c: a file already known to break the test alone - first round only)
   cand=("${ALL[@]}"); echo "  bisecting ${#cand[@]} files ($RES)" >> $L
+  if [ -n "$START_FILE" ]; then
+    run_test "" "$START_FILE"; echo "  $START_FILE alone: $RES" >> $L
+    [ $RES != clean ] && cand=("$START_FILE"); START_FILE=""
+  fi
   while [ ${#cand[@]} -gt 1 ] && ! timeup && ! playing; do
     h=$(( ${#cand[@]} / 2 )); A=("${cand[@]:0:$h}"); B=("${cand[@]:$h}")
     echo "  files ${#A[@]} of ${#cand[@]}: ${A[0]} .. ${A[$((h-1))]}" >> $L
