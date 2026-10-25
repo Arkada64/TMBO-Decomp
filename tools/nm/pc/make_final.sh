@@ -14,6 +14,7 @@ cp test/TMBR_TEST.iso "$O/TMB Reloaded.iso"
 python3 cloud/in/iso_setelf.py "$O/TMB Reloaded.iso" test/TMBR_TEST.ELF TMB_RELOADED
 python3 cloud/in/isopad.py "$O/TMB Reloaded.iso"
 cp test/TMBR_TEST.ELF "$O/TMB Reloaded.ELF"
+python3 cloud/in/gamesettings.py "$O/TMB Reloaded.ELF"   # PCSX2: EE cycle rate 130 % for this build
 python3 cloud/in/isolist.py "$O/TMB Reloaded.iso" | grep -E "SCUS|image" | head -3
 ls -la "$O"
 echo "FINAL_ISO_DONE $(date)"
