@@ -982,12 +982,16 @@ void tmbr_AiPickWeapon(char* v)
 {
     static const int weight[8] = { 0, 1, 6, 6, 2, 1, 2, 2 };
     char* br = (char*)F(v, 0x2014);
-    int k = (int)(v - D_004FA030) / 0x31B0 & 7, w, total = 0, r, ok[8];
+    int k = (int)(v - D_004FA030) / 0x31B0 & 7, w, total = 0, r, ok[8], los;
     wpnClock = thinkTick;                     /* frames (tmbr_BotsThink counts every frame) */
     if (tmbr_botCount < 0 || !br) { aiPickBest(v); return; }
+    los = F(br, 0x598) || F(br, 0x4B0) < 10;  /* the game's own sight of the target (as the fire check above) */
     for (w = 1; w < 8; w++) {
         ok[w] = wpnClock >= wpnReady[k][w] && aiGoodChoice(v, w);
         if (ok[w] && w == 1 && mathfRandW(0, 99) >= SPECIAL_CHANCE) ok[w] = 0;
+        /* in a burst without sight of the target: no fire missiles (straight into the wall); homing missiles
+         * may still go - they climb over terrain and keep the chase going. The burst waits, it is not lost. */
+        if (ok[w] && w == 2 && burstLeft[k] > 0 && !los) ok[w] = 0;
         if (ok[w]) total += weight[w];
     }
     F(br, 0x47C) = 0;
@@ -1004,7 +1008,7 @@ void tmbr_AiPickWeapon(char* v)
         /* fire / homing missiles: sometimes a burst of 2-4 back to back, then a longer rest (both light
          * missiles share the timer, so a burst can mix them) */
         int cd;
-        if (burstLeft[k] <= 0 && mathfRandW(0, 99) < BURST_CHANCE) burstLeft[k] = mathfRandW(2, 4);
+        if (burstLeft[k] <= 0 && los && mathfRandW(0, 99) < BURST_CHANCE) burstLeft[k] = mathfRandW(2, 4);   /* only in sight */
         if (burstLeft[k] > 0)
             cd = --burstLeft[k] > 0 ? BURST_GAP + mathfRandW(0, 6)                    /* next missile of the burst */
                                     : cooldown(w) * 3 + mathfRandW(0, cooldown(w));    /* burst over: rest ~2 s (medium) */
