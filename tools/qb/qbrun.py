@@ -106,6 +106,7 @@ def main():
     # night runs filled 2.4 GB with clean ones. (Slot 9 in sstates is simply overwritten by the next run.)
     lg = open(f'{out}/emulog.txt', errors='replace').read()
     bad = lg.count('TLB Miss') > 0 or lg.count('TMBR perf') <= 3
+    bad = bad or os.environ.get('QB_KEEP_STATE') == '1'   # the function test bench's snapshot (tools/nm/bench)
     st = sorted(glob.glob(f'{P}/sstates/*.09.p2s'), key=os.path.getmtime)
     if bad and st and os.path.getmtime(st[-1]) > t0: shutil.move(st[-1], f'{out}/state.p2s'); print('state saved')
     prune()

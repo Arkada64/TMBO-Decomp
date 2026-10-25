@@ -108,12 +108,20 @@ def apply(src):
         if "dlabel" not in body: continue
         (sf.parent / f"{n}_nmro.s").write_text(body + "\n.section .text\n")
         ro[n] = f'INCLUDE_ASM("{m.group(1)}", {n}_nmro);\n'
+    # NM_BENCH=1 (function test bench, tools/nm/bench): the asm keeps the name, so every caller still runs the
+    # original; the draft is linked beside it as <name>__c. That build boots like the asm one, and its snapshot
+    # holds both versions for the bench to run side by side.
+    bench = os.environ.get("NM_BENCH") == "1"
+    def block(n, c, inc):
+        if bench:
+            return f"#ifdef NON_MATCHING\n{inc}\n#define {n} {n}__c\n/* NM:{n} */\n{c}#undef {n}\n#else\n{inc}\n#endif\n"
+        return f"#ifdef NON_MATCHING\n/* NM:{n} */\n{ro.get(n, '')}{c}#else\n{inc}\n#endif\n"
     # in context: compile the whole file with NON_MATCHING, drop blocks the compiler names, repeat
     for _ in range(40):
         new = text
         for n, c in chosen.items():
             new = re.sub(rf'^(INCLUDE_ASM\("[^"]*", {re.escape(n)}\);)\n',
-                         lambda m: f"#ifdef NON_MATCHING\n/* NM:{n} */\n{ro.get(n, '')}{c}#else\n{m.group(1)}\n#endif\n", new, count=1, flags=re.M)
+                         lambda m: block(n, c, m.group(1)), new, count=1, flags=re.M)
         src.write_text(new)
         ok, err = cc(src, ["-DNON_MATCHING"], whole=True)
         if ok: break
