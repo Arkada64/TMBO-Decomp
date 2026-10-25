@@ -19,9 +19,18 @@ used = {'build/' + f + '.o' for f, st in sm["files"].items() if st.get("used")}
 asked = {'build/' + re.sub(r'^.*?/(src/)', r'\1', f) + '.o' for f in sys.argv[3:]}
 only = (asked & used) if asked else used
 if os.environ.get("NM_GUARD_ALL") and asked: only = asked      # test: guard the asked files even without C
-orig = {}        # (object, section) -> size in the matching build
-for m in re.finditer(r"^ (\.text|\.rodata|\.data)\s+0x([0-9a-f]+)\s+0x([0-9a-f]+)\s+(build/src/\S+\.c\.o)", open(mp).read(), re.M):
-    orig[(m.group(4), m.group(1))] = int(m.group(3), 16)
+orig = {}        # (object, section) -> span in the matching build: from the end of whatever came before it to its
+                 # own end. Not just its size: an input section can start after an alignment gap, and the guard symbol
+                 # sits before that gap (after_audiodec_81.c: gap 4, size 0x28 -> the guard saw 0x2C, "grew", and
+                 # padded by 0x7C - everything after moved by 0x7C: exit to the BIOS at the lobby settings screen)
+prev_end = {}
+for m in re.finditer(r"^ (\.text|\.rodata|\.data)\s+0x([0-9a-f]+)\s+0x([0-9a-f]+)\s+(\S+)", open(mp).read(), re.M):
+    sec, a_, sz, ob = m.group(1), int(m.group(2), 16), int(m.group(3), 16), m.group(4)
+    if a_ == 0: continue                                   # discarded / not placed
+    pe = prev_end.get(sec, a_)
+    if ob.startswith("build/src/") and ob.endswith(".c.o"):
+        orig[(ob, sec)] = a_ + sz - pe if 0 <= a_ - pe < 0x80 else sz
+    prev_end[sec] = a_ + sz
 src_lines = open(ld).read().splitlines()
 # C objects whose original had no .rodata / .data in the link script (their C has some now): those sections
 # go into the padded block after .sdata with the literals
