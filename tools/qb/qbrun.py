@@ -62,6 +62,9 @@ def main():
     s = open(ini).read().replace('StandardVolume = 100', 'StandardVolume = 0').replace('FastForwardVolume = 100', 'FastForwardVolume = 0')
     # PINE on (savestates on request, for the EE registers of a hang) and uncompressed savestates
     s = s.replace('EnablePINE = false', 'EnablePINE = true').replace('SavestateCompressionType = 2', 'SavestateCompressionType = 0')
+    if os.environ.get('QB_EECYCLE') is not None:      # stress tests: EE cycle rate for this run (-3..3; 1 = 130 %, 2 = 180 %, 3 = 300 %)
+        import re
+        s = re.sub(r'(?m)^EECycleRate = -?\d+', 'EECycleRate = ' + os.environ['QB_EECYCLE'], s)
     open(ini, 'w').write(s)
     snaps = f'{P}/snaps'; before = set(glob.glob(f'{snaps}/**/*.png', recursive=True))
     iso = WW + '\\' + a.iso.replace('/', '\\')
@@ -78,16 +81,32 @@ def main():
         ps(f"Start-Process -WindowStyle Normal -FilePath '{WP}\\pcsx2-qt.exe' -ArgumentList '-elf','\"{WW}\\test\\QUICK.ELF\"','--','\"{iso}\"'")
 
     minimized = os.environ.get('QB_MIN', '1') == '1'
+    pics = []
+    def pine_save(slot):
+        # PINE MsgSaveState (opcode 9): u32 size, u8 op, u8 slot
+        return ps("$c=New-Object Net.Sockets.TcpClient('127.0.0.1',28011); $s=$c.GetStream(); "
+                  f"$m=[byte[]](6,0,0,0,9,{slot}); $s.Write($m,0,6); Start-Sleep 3; $c.Close(); 'sent'").strip()
     try:
-        for t in ([] if minimized else sorted(script.get('shots', []))):   # (a minimized window captures black)
+        # "pics": screenshots that work minimized - a savestate (slot 8) carries a Screenshot.png; keep only that
+        events = [(t, 'shot') for t in ([] if minimized else script.get('shots', []))] + [(t, 'pic') for t in script.get('pics', [])]
+        for t, kind in sorted(events):
             time.sleep(max(0, t - (time.time() - t0)))
-            k = len(shots); shots.append(f'{WW}\\qb_tmp_{k}.png')
-            print('shot at', round(time.time() - t0, 1), ps(f"& '{WW}\\tools\\qb\\winshot.ps1' '{shots[-1]}'").strip(), flush=True)
+            if kind == 'shot':                                       # (a minimized window captures black)
+                k = len(shots); shots.append(f'{WW}\\qb_tmp_{k}.png')
+                print('shot at', round(time.time() - t0, 1), ps(f"& '{WW}\\tools\\qb\\winshot.ps1' '{shots[-1]}'").strip(), flush=True)
+            else:
+                pine_save(8); time.sleep(2)
+                st = sorted(glob.glob(f'{P}/sstates/*.08.p2s'), key=os.path.getmtime)
+                if st and os.path.getmtime(st[-1]) > t0:
+                    try:
+                        import zipfile
+                        pics.append(zipfile.ZipFile(st[-1]).read('Screenshot.png'))
+                    except Exception as e: print('pic failed', e)
+                    os.remove(st[-1])                                  # (45 MB: never kept)
+                print('pic at', round(time.time() - t0, 1), flush=True)
         if 'state_at' in script:
             time.sleep(max(0, script['state_at'] - (time.time() - t0)))
-            # PINE MsgSaveState (opcode 9) slot 9: u32 size, u8 op, u8 slot
-            print('savestate', ps("$c=New-Object Net.Sockets.TcpClient('127.0.0.1',28011); $s=$c.GetStream(); "
-                                  "$m=[byte[]](6,0,0,0,9,9); $s.Write($m,0,6); Start-Sleep 3; $c.Close(); 'sent'").strip(), flush=True)
+            print('savestate', pine_save(9), flush=True)
             time.sleep(5)
         time.sleep(max(0, script.get('stop', 60) - (time.time() - t0)))
     finally:
@@ -98,6 +117,7 @@ def main():
         shutil.copy(ini + '.qbbak', ini)
     out = time.strftime('cloud/qb_out/%Y%m%d_%H%M%S'); os.makedirs(out, exist_ok=True)
     shutil.copy(f'{P}/logs/emulog.txt', f'{out}/emulog.txt')
+    for i, png in enumerate(pics): open(f'{out}/pic{i}.png', 'wb').write(png)
     n = 0
     for i in range(len(shots)):
         f = f'{W}/qb_tmp_{i}.png'
