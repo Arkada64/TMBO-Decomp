@@ -959,6 +959,9 @@ extern int mathfRandW(int lo, int hi) __asm__("mathfRand__Fii");
 static int wpnClock;               /* = thinkTick */
 static int wpnReady[8][8];         /* per car, per AI weapon: frame it can be picked again */
 static int wpnPicked[8];           /* frame the current weapon was picked */
+static signed char burstLeft[8];   /* missiles left in the current burst (fire / homing) */
+#define BURST_CHANCE 45            /* % of fire / homing picks that start a burst (2026-10-25: chip damage like players) */
+#define BURST_GAP 14               /* frames between missiles in a burst (~0.25 s) */
 static int heavyW(int w) { return w == 1 || w >= 4; }
 static int cooldown(int w)
 {
@@ -997,7 +1000,18 @@ void tmbr_AiPickWeapon(char* v)
     if (w >= 8) return;
     F(br, 0x47C) = w;
     wpnPicked[k] = wpnClock;
-    wpnReady[k][w] = wpnClock + cooldown(w) + mathfRandW(0, cooldown(w) / 3);
+    if (w == 2 || w == 3) {
+        /* fire / homing missiles: sometimes a burst of 2-4 back to back, then a longer rest (both light
+         * missiles share the timer, so a burst can mix them) */
+        int cd;
+        if (burstLeft[k] <= 0 && mathfRandW(0, 99) < BURST_CHANCE) burstLeft[k] = mathfRandW(2, 4);
+        if (burstLeft[k] > 0)
+            cd = --burstLeft[k] > 0 ? BURST_GAP + mathfRandW(0, 6)                    /* next missile of the burst */
+                                    : cooldown(w) * 3 + mathfRandW(0, cooldown(w));    /* burst over: rest ~2 s (medium) */
+        else cd = cooldown(w) + mathfRandW(0, cooldown(w) / 3);                       /* a single */
+        wpnReady[k][2] = wpnReady[k][3] = wpnClock + cd;
+    } else
+        wpnReady[k][w] = wpnClock + cooldown(w) + mathfRandW(0, cooldown(w) / 3);
     if (w == 5) F(v, 0x22C0) = mathfRandW(11, 13);            /* as the original: pickup slot type */
     if (F(v, 0x2338 + w * 4) <= 0) F(v, 0x2338 + w * 4) = 1;  /* as the original: AI ammo topped up */
 }
