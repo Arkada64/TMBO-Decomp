@@ -1005,20 +1005,15 @@ void tmbr_AiPickWeapon(char* v)
 /* Fairness gate (aiLineUpShot, func_00106D50, func_00107048): a bot only fires a normal weapon when its target
  * "looks at it" (angle of the target's heading toward the bot, scaled by the bot's state). Fine against humans;
  * two bots circling each other almost never both qualify, so after the opening head-on pass they only fire
- * specials. With a chosen count, a bot target is always fair game. */
+ * specials. With a chosen count, every target is fair game. */
 extern int aiFairToShoot(char* v) __asm__("aiIsPlayerLookingAtAIEnoughForAIToShoot__7Vehicle");
 int tmbr_AiMayShoot(char* v)
 {
     char* drv = (char*)F(v, 0x2018);
     char* t = drv ? (char*)F(drv, 0xB4) : 0;
-    if (tmbr_botCount >= 0 && t && F(t, 0x590) == 2) return 1;
-    /* a human target: the game only lets a bot fire when the human faces it, so bots barely hurt players
-     * (2026-10-25: a whole match of bots doing 100-500 to the player's 1072). One second in three (staggered
-     * per bot) a bot may shoot regardless - on medium; easy never, hard two in three. */
-    if (tmbr_botCount >= 0 && t && F(t, 0x590) == 1) {
-        int k = (int)(v - D_004FA030) / 0x31B0 & 7, ph = (thinkTick / 60 + k) % 3;
-        if (tmbr_botDiff >= 2 ? ph != 0 : tmbr_botDiff == 1 ? ph == 0 : 0) return 1;
-    }
+    /* No fairness gate with our bots (2026-10-25): the game only let a bot fire a normal weapon when its target
+     * faced it. Bots play like players, and players have no such rule: any target is fair game. */
+    if (tmbr_botCount >= 0 && t) return 1;
     return aiFairToShoot(v);
 }
 
