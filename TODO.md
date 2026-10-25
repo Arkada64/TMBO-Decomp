@@ -50,16 +50,20 @@
   everything above. Needs the weapon kind of a shot (weapon table +0x14, not mapped yet: find the freeze's value,
   e.g. by logging the kind of shots a freeze creates).
   Darkside's personality (mods/bots.c `rammer`) then freezes before its special ram.
-- **Per-car AI, the rest** (Ark 2026-10-25; the table is in mods/bots.c `carAi`: role odds, smaller-fight cars,
-  when each special is worth it). Still to do, each needs the mechanic found first:
-  - alternate specials: Shadow's turret (small fights) vs the bomb, Axel's War Wheel (solo targets), Outlaw's turret
-    secondary, Manslaughter dropping his special behind as a defence. Likely the spec up/down/left/right combos
-    (COMBO_TYPE_SPEC_* 9..12) - a bot can request them through brain +0x418 like the energy moves; map which car
-    does what with each.
-  - Roadkill: charge the special by confidence (how lined up / how close) before releasing.
-  - Darkside: the T-slide (side-on ram) for bonus damage, sometimes.
-  - Warthog / anyone on fire: turbo away to shake off the flames (find the burning state on the car).
-  - 12 Pak: the AI can't drive him yet (he only exists as a player's Roadkill skin).
+- **Per-car AI, the rest** (Ark 2026-10-25; done: the per-car table, alternate specials for Shadow / Axel via the
+  special-up combo (energy handler case 9), turbo off flames (+0x20E0), weapon-aware shield, Spectre's wall-pass
+  removed (postlink 0x1EC85C), Minion off option). Weapon kinds (TMBR wk log): MG 0, fire 2, homing 3, napalm 4,
+  power 6, rico 7, pickups 11-13, debris 14 / 15, specials 17 Roadkill, 21 Spectre, 26 Grimm, 27 Axel, 28
+  Manslaughter; freeze / mines / the other specials not seen yet (bots never used them in the logged match).
+  Still to do:
+  - Outlaw's turret secondary, Manslaughter dropping his special behind: not in the energy handler's switch -
+    find how the player triggers them (launcher update, func_0015CD80 UpdateSpecial) and drive it for bots.
+  - Darkside's T-slide (side-on ram) for bonus damage.
+  - Roadkill's charge by confidence: the original AI has per-car special firing (aiCheckSpecialWeaponFiring
+    0x1095F0: Crazy 8, Roadkill, Sweet Tooth, Darkside) - tune that rather than replace it.
+  - The freeze dodge: the freeze's weapon kind (log one), then full dodge + shield fallback for it.
+  - 12 Pak as a bot (he only exists as a player's Roadkill skin).
+  - Minion toggle on the game mods page itself (it's a host hotkey R3 + Triangle in the waiting room for now).
 - **Learning from Ark's play**: a logger in the mod build records his matches vs bots (positions, speed, target,
   distances, weapon / move used, health, energy, a few times a second); fit the bot numbers (engage / break-off
   ranges, weapon choice by range, turbo / shield timing) to it.
