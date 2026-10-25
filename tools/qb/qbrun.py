@@ -57,11 +57,17 @@ def main():
     if 'pcsx2-qt.exe' in subprocess.run(['tasklist.exe'], capture_output=True, text=True).stdout:
         sys.exit('PCSX2 is already running (someone is playing): not starting a test run')
     script = json.load(open(a.script))
-    open('test/QUICK.ELF', 'wb').write(patch(a.elf, script))
+    # "prepatched": the ELF already carries its script (retail harness, tools/qb/retail): copy as is
+    open('test/QUICK.ELF', 'wb').write(open(a.elf, 'rb').read() if script.get('prepatched') else patch(a.elf, script))
     ini = f'{P}/inis/PCSX2.ini'; shutil.copy(ini, ini + '.qbbak')
     s = open(ini).read().replace('StandardVolume = 100', 'StandardVolume = 0').replace('FastForwardVolume = 100', 'FastForwardVolume = 0')
     # PINE on (savestates on request, for the EE registers of a hang) and uncompressed savestates
     s = s.replace('EnablePINE = false', 'EnablePINE = true').replace('SavestateCompressionType = 2', 'SavestateCompressionType = 0')
+    if os.environ.get('QB_PADS'):                     # retail split screen: multitap on port 1 + controllers 2-5 present
+        import re
+        s = s.replace('MultitapPort1 = false', 'MultitapPort1 = true')
+        for k in range(2, 2 + int(os.environ['QB_PADS'])):
+            s = re.sub(r'(\[Pad%d\]\s*\nType = )None' % k, r'\1DualShock2', s)
     if os.environ.get('QB_EECYCLE') is not None:      # stress tests: EE cycle rate for this run (-3..3; 1 = 130 %, 2 = 180 %, 3 = 300 %)
         import re
         s = re.sub(r'(?m)^EECycleRate = -?\d+', 'EECycleRate = ' + os.environ['QB_EECYCLE'], s)
