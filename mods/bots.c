@@ -563,6 +563,8 @@ static void shieldOff(char* v)
 static signed char ph[8];
 static short phT[8];
 static signed char hbTimer[8];
+static short standT[8];            /* frames coasting in a standoff */
+#define STAND_MAX 40               /* then back on the gas: deep in a fight bots braked and sat (2026-10-25) */
 static int fbits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 extern void aiSetAttackState(char* v, int st) __asm__("aiSetAttackState__7Vehicle12_attackState");
 
@@ -592,10 +594,19 @@ static void aggressiveTurn(char* g, char* v, char* t)
     pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* in a fight: stay on the gas */
     /* standoff: nose-on and close, a bot coasts (< 150) or brakes (< 90) instead of driving into its target;
      * the original and the old pass rammed and fired point blank */
-    if (ROLE(v) != R_SNIPER && a < CS_HB && ph[idx] == 0) {
-        if (d < STANDOFF_BRAKE) { pad[4] = 0; pad[6] = 1; dbgWhy[idx] = 40; }
-        else if (d < STANDOFF) { pad[4] = 0; dbgWhy[idx] = 41; }
-    }
+    /* (2026-10-25: never a full stop any more - in a crowd there is always a car close ahead, and bots braked to
+     * a halt and sat. Coast at most STAND_MAX frames; inside STANDOFF_BRAKE veer past it on the gas instead of
+     * braking, like a player's strafing pass; the dogfight logic swings back round once it is off the nose.) */
+    if (ROLE(v) != R_SNIPER && a < CS_HB && ph[idx] == 0 && d < STANDOFF) {
+        if (d < STANDOFF_BRAKE) {
+            pad[4] = 1; pad[6] = 0; standT[idx] = 0;
+            if (b > 0) { pad[9] = 1; pad[0xA] = 0; } else { pad[0xA] = 1; pad[9] = 0; }   /* steer away: pass it */
+            dbgWhy[idx] = 40;
+            return;
+        }
+        if (++standT[idx] < STAND_MAX) { pad[4] = 0; dbgWhy[idx] = 41; }
+        else if (standT[idx] > STAND_MAX + 60) standT[idx] = 0;                 /* 1 s on the gas, then may coast again */
+    } else standT[idx] = 0;
     if (ph[idx] == 1 || ph[idx] == 4 || (a < CS_AIM && d > TURBO_FAR)) pad[7] = 1;   /* turbo: extend, run, close in */
     if (ROLE(v) == R_SNIPER) {
         /* sniper: rushed (< SN_MIN) -> run (target behind us) until SN_FAR, then swing round; in the band,
