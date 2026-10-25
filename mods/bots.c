@@ -1123,6 +1123,19 @@ static void energyUse(char* g, char* v, int evading)
         if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d drops a mine on its chaser\n", k);
         return;
     }
+    /* alternate specials (special-up combo, 9: the energy handler's per-car case - Shadow 288 and Axel 352 switch to
+     * their second special; it checks the special is ready, +0x22B0 == 1): Shadow in a small fight, Axel's War Wheel
+     * on a lone car up close (Ark 2026-10-25) */
+    if (F(drv, 4) == 5 && F(drv, 0xB4) && (thinkTick + k * 11) % 45 == 0 && F(v, 0x22B0) == 1) {
+        char* tg = (char*)F(drv, 0xB4);
+        int tk = (int)(tg - g) / 0x31B0 & 7, d = (int)*(float*)(br + 0x20), c = charOf(v);
+        if ((c == 9 && crowd[tk] < 2 && d > 0 && d < 300 && mathfRandI(0, 99) < 40) ||
+            (c == 11 && crowd[tk] == 0 && d > 0 && d < 250 && mathfRandI(0, 99) < 50)) {
+            F(br, 0x418) = 9;
+            if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d alternate special\n", k);
+            return;
+        }
+    }
     if (F(drv, 4) == 5 && F(drv, 0xB4) && (thinkTick + k * 7) % 30 == 0 && en >= 60) {
         char* tg = (char*)F(drv, 0xB4);
         int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, d = (int)*(float*)(br + 0x20), chance = 15;
