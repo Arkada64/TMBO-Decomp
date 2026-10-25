@@ -31,6 +31,11 @@ for q in range(sp, min(sp + 0x800, len(ram) - 4), 4):
     if is_ret(v) and v not in chain: chain.append(v)
 names = ['%x %s' % (v, sym(v)) for v in chain[:12]]
 print('TMBR exit chain (%s): %s' % (sym(pc), ' <- '.join(names)))
-c = [v for v in chain if not sym(v).endswith('.NON_MATCHING') and not sym(v).startswith(('_exit', 'abort', 'exit', '_Error'))]
+# only C drafts (their /* NM:name */ markers in the build's sources) can be blamed; matched C and labels cannot
+import glob, re, os
+drafts = set()
+for f in glob.glob(os.path.expanduser('/home/ark/nmhome/tmbo_decomp/src/**/*.c'), recursive=True):
+    drafts |= set(re.findall(r'/\* NM:(\S+) \*/', open(f, errors='replace').read()))
+c = [v for v in chain if sym(v) in drafts]
 pick = c[0] if c else gpr[31]
 print('TMBR exit trap: TLB Miss (not a real one) pc=0x%x' % pick)

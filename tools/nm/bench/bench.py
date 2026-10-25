@@ -2,8 +2,9 @@
 """
 Function test bench: run each C draft against the original asm, side by side, on real game state.
 
-Input: a "bench" build (NM_BENCH=1 nm_apply.py: every caller still calls the asm F; the draft is linked beside it
-as F__c) and a PCSX2 savestate taken mid-match with that build (qbrun.py with QB_KEEP_STATE=1).
+Input: the plain build (no C) and a PCSX2 savestate taken mid-match with it (qbrun.py with QB_KEEP_STATE=1), plus
+the draft image (bench_img.py: every draft compiled on its own as F__c, linked at 0x02000000 against the plain
+build). The image sits above the PS2's 32 MB, in the interpreter only, so the game's layout never changes.
 
 The bench runs a few of the game's own per-frame functions (roots) out of the snapshot in the EE interpreter
 (ee.py). Every time the original code calls a function F that has an F__c, it stops, runs F and then F__c from
@@ -14,7 +15,7 @@ Compared: memory written outside the callee's own stack frame, the callee-saved 
 return value; for a void function these are leftovers, so a v0-only difference is reported as "ret?").
 Floats that differ only in the last bits (PS2 FPU vs IEEE rounding, reordered math) count as equal.
 
-Usage: bench.py BENCH.ELF state.p2s [--roots name,name] [--per 8] [--limit 3000000] [--json out.json]
+Usage: bench.py BASE.ELF DRAFTS.ELF state.p2s [--roots name,name] [--per 8] [--limit 3000000] [--json out.json]
 """
 import argparse, bisect, json, struct, sys, time, zipfile
 from collections import defaultdict
@@ -37,15 +38,29 @@ def elf_symbols(path):
             out[d[strs[4] + nm:e].decode(errors='replace')] = (val, size, info & 15)
     return out
 
+def load_segments(path, ram):
+    d = open(path, 'rb').read()
+    phoff, = struct.unpack_from('<I', d, 0x1C); phnum, = struct.unpack_from('<H', d, 0x2C)
+    for i in range(phnum):
+        t, off, va, pa, fs, ms = struct.unpack_from('<IIIIII', d, phoff + 32 * i)
+        if t != 1 or not ms: continue
+        p = va & 0x1FFFFFFF
+        ram[p:p + ms] = d[off:off + fs] + bytes(ms - fs)
+
 def load_state(path):
     z = zipfile.ZipFile(path)
     return z.read('eeMemory.bin'), z.read('Scratchpad.bin')
 
 # ---------------------------------------------------------------- the bench
 class Bench:
-    def __init__(self, elf, state, per=8, limit=3_000_000, fn_limit=400_000):
+    def __init__(self, elf, img, state, per=8, limit=3_000_000, fn_limit=400_000):
         self.syms = elf_symbols(elf)
+        isyms = elf_symbols(img)
         ram, spr = load_state(state)
+        ram = bytearray(ram) + bytearray(0x800000)          # + 8 MB above the PS2's RAM for the draft image
+        load_segments(img, ram)
+        for n, v in isyms.items():
+            if n.endswith('__c'): self.syms[n] = v
         self.ee = EE(ram, spr)
         self.base = self.ee.ram[:]; self.base_spr = self.ee.spr[:]
         funcs = sorted((v, n) for n, (v, sz, t) in self.syms.items() if t == 2 and not n.endswith('.NON_MATCHING'))
@@ -186,13 +201,13 @@ class Bench:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('elf'); ap.add_argument('state')
+    ap.add_argument('elf'); ap.add_argument('img'); ap.add_argument('state')
     ap.add_argument('--roots', default='')
     ap.add_argument('--per', type=int, default=8)
     ap.add_argument('--limit', type=int, default=3_000_000)
     ap.add_argument('--json')
     a = ap.parse_args()
-    b = Bench(a.elf, a.state, a.per, a.limit)
+    b = Bench(a.elf, a.img, a.state, a.per, a.limit)
     print('bench: %d drafts in the build, gp %08x' % (len(b.pairs), b.gp))
     for spec in filter(None, a.roots.split(',')):
         name, *args = spec.split(':')

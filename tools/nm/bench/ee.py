@@ -64,7 +64,7 @@ class EE:
             return self.spr, a & 0x3FFF, 'S'
         if top in (0, 2, 3, 8, 9, 0xA, 0xB):
             p = a & 0x0FFFFFFF
-            if p < 0x2000000: return self.ram, p, 'R'
+            if p < len(self.ram): return self.ram, p, 'R'      # (the bench adds its draft image above 32 MB)
             if 0x1FC00000 <= p < 0x20000000: return None, 0, 'B'
         if top in (1, 0xB) or (a & 0x1FFFFFFF) >= 0x10000000:
             return None, 0, 'H'

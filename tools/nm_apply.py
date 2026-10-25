@@ -90,6 +90,16 @@ def apply(src):
             (W / "one.c").write_text(f'#include "{hdr}"\n{c}')
             if cc(W / "one.c")[0]: chosen[n] = c; break
         else: st["no_compile"] += 1
+    # NM_BENCH_OUT=dir (function test bench, tools/nm/bench): leave the source alone (this build is the plain asm
+    # one, so the game's layout does not change) and compile every chosen draft on its own as <name>__c into
+    # dir/<name>.o; bench_img.py links them into a separate image above the PS2's 32 MB, for the bench only.
+    bout = os.environ.get("NM_BENCH_OUT")
+    if bout:
+        Path(bout).mkdir(parents=True, exist_ok=True)
+        for n, c in chosen.items():
+            (W / "one.c").write_text(f'#include "{hdr}"\n#define {n} {n}__c\n{c}')
+            if cc(W / "one.c")[0]: (W / "t.o").replace(Path(bout) / f"{n}.o"); st["bench"] = st.get("bench", 0) + 1   # (not "used": nm_ld must not guard)
+        return st
     # a function's .s can carry its own rodata (strings, constants, jump tables) ahead of the code; other code
     # and the data pointer tables use those symbols, so the C version keeps that rodata: <name>_nmro.s (jump
     # tables dropped - they point at labels inside the asm being replaced)
