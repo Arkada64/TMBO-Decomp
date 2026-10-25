@@ -293,6 +293,8 @@ static int rammer(char* v) { int c = charOf(v); return c == CH_DARKSIDE || c == 
 static int hunted[8], crowd[8];
 static short ramT[8];              /* frames of turbo left for a special ram (Darkside, Yellow Jacket) */
 static short setupT[8];            /* frames after a freeze: the next weapon pick goes for a big hit */
+static signed char tslT[8], tslDir[8];    /* Darkside's T-slide in progress */
+static int frzAt[8] = { -100, -100, -100, -100, -100, -100, -100, -100 };   /* thinkTick of each bot's last freeze request */
 /* health in percent (vehicle+0x404 health, +0x3F0 max; floats, converted without float literals) */
 static int hpPct(char* v)
 {
@@ -847,6 +849,10 @@ void tmbr_DodgeFrame(void)
         ch = (F(own, 0x20F4) >> 5) & 31;
         obr = (char*)F(own, 0x2014);
         aw = obr && (u32)obr >= 0x100000 && (u32)obr < 0x2000000 ? F(obr, 0x47C) & 7 : 7;
+        {   /* shots made within 4 frames of a bot's freeze request: the freeze's kind */
+            int oi = (int)(own - g) / 0x31B0 & 7, fz = thinkTick - frzAt[oi] >= 0 && thinkTick - frzAt[oi] < 4;
+            if (fz) scePrintf("TMBR wk: FREEZE kind %d car %d\n", kind, ch);
+        }
         if (wkCount[kind][ch] < 2) { wkCount[kind][ch]++; scePrintf("TMBR wk: kind %d car %d aiw %d\n", kind, ch, aw); }
     }
     for (i = 0; i < 8; i++) {                       /* every car's position and motion (evade) */
@@ -1052,7 +1058,19 @@ static void turboUse(char* g, char* v, int evading)
     }
     if (evading || pad[6] || pad[2] || *(signed char*)(v + 0x497) >= 4) return;   /* (evade does its own) */
     if (tbStraight[k] >= TB_STRAIGHT && pct > TB_RESERVE) pad[7] = 1;           /* open road */
-    if (ramT[k] > 0) { ramT[k]--; pad[7] = 1; }                                 /* special ram (Darkside, Yellow Jacket) */
+    if (ramT[k] > 0) {                                                          /* special ram (Darkside, Yellow Jacket) */
+        int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, d = (int)*(float*)(br + 0x20);
+        ramT[k]--; pad[7] = 1;
+        /* Darkside's T-slide (side-on hit, 50 vs 38 for a ram - Ark 2026-10-25; experimental): at ~90 out and lined
+         * up, 40 % of rams flick the handbrake with full lock for 10 frames so the side lands on the target */
+        if (charOf(v) == CH_DARKSIDE && tslT[k] == 0 && d > 50 && d < 100 && a < CS_AIM && mathfRandI(0, 99) < 40) {
+            tslT[k] = 10; tslDir[k] = (fbits(*(float*)(br + 0x24)) >> 31) ? -1 : 1;
+        }
+    }
+    if (tslT[k] > 0) {
+        tslT[k]--; pad[2] = 1; pad[4] = 1; pad[6] = 0;
+        if (tslDir[k] > 0) { pad[0xA] = 1; pad[9] = 0; } else { pad[9] = 1; pad[0xA] = 0; }
+    }
     /* on fire (SetCarOnFire 0x1E4FF0: +0x20E0 == 1 burning, +0x470 burn timer): turbo to shake the flames off, as
      * players do (Ark 2026-10-25) - not while lined up close on a target with the upper hand */
     if (F(v, 0x20E0) == 1 && pct > 5) {
@@ -1157,7 +1175,7 @@ static void energyUse(char* g, char* v, int evading)
             if (hpPct(tg) < 40 || d > tbLastD[k] + 2) chance = 50;                 /* hurt or getting away */
             if (rammer(v) && d < 350) chance = 60;                                 /* before the special ram */
             if (mathfRandI(0, 99) < chance) {
-                F(br, 0x418) = EN_FREEZE; enCd[k] = 240; setupT[k] = 150;
+                F(br, 0x418) = EN_FREEZE; enCd[k] = 240; setupT[k] = 150; frzAt[k] = thinkTick;
                 if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d freezes its target at %d\n", k, d);
             }
         }
