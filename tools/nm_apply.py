@@ -70,7 +70,8 @@ def apply(src):
     if not names: return st
     blocks = re.split(r"^//@@ (\S+)[^\n]*\n", drafts.read_text(), flags=re.M)[1:] if drafts.exists() else []
     # hand-written C (tools/nm/hand/<slug>.c, same //@@ format) goes first: tried before the m2c drafts
-    hand = R / f"logs/hand/{slug}.c"
+    hand = R / f"logs/hand/{slug}"                # src/tmb/mathf.c -> logs/hand/src_tmb_mathf.c (as tools/nm/hand)
+    if not hand.exists(): hand = R / f"logs/hand/{slug}.c"
     handb = re.split(r"^//@@ (\S+)[^\n]*\n", hand.read_text(), flags=re.M)[1:] if hand.exists() else []
     handn = set(handb[0::2]); blocks = handb + blocks
     variants = {}
