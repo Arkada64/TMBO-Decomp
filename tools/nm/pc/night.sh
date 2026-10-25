@@ -64,7 +64,9 @@ while ! timeup; do
   cand=("${ALL[@]}"); echo "  bisecting ${#cand[@]} files ($RES)" >> $L
   if [ -n "$START_FILE" ]; then
     run_test "" "$START_FILE"; echo "  $START_FILE alone: $RES" >> $L
-    [ $RES != clean ] && cand=("$START_FILE"); START_FILE=""
+    START_FILE=""
+    [ $RES = clean ] && { echo "  it boots alone: back to the full search" >> $L; continue; }
+    cand=("${cand[0]}")
   fi
   while [ ${#cand[@]} -gt 1 ] && ! timeup && ! playing; do
     h=$(( ${#cand[@]} / 2 )); A=("${cand[@]:0:$h}"); B=("${cand[@]:$h}")
@@ -86,6 +88,9 @@ while ! timeup; do
     if [ $RES = clean ]; then fn=("${B[@]}"); else fn=("${A[@]}"); fi
   done
   [ ${#fn[@]} -ne 1 ] && { echo "  stopped before one function was left" >> $L; break; }
+  # confirm: the file with only that function as asm must boot (else the fault needed several of them)
+  run_test "${fn[0]}" "$F"
+  [ $RES = clean ] || { echo "  ${fn[0]} alone is not the cause (still $RES without it) - not skipped, stopping" >> $L; break; }
   echo "${fn[0]}  # night $(date +%m-%d): bisect in $F" >> cloud/in/nm_skip.txt
   echo "    skip ${fn[0]} (bisect)" >> $L
 done
