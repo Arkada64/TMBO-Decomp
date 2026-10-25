@@ -11,11 +11,13 @@ Original sizes come from the matching build's map. Only the objects of the given
 change other objects on purpose, e.g. the level loader's hook block).  Usage: nm_ld.py MAP LDSCRIPT SRC.c ..."""
 import re, sys
 mp, ld = sys.argv[1], sys.argv[2]
-only = {'build/' + re.sub(r'^.*?/(src/)', r'\1', f) + '.o' for f in sys.argv[3:]}
-if not only:      # all files: the ones nm_apply.py gave C (logs/nm/summary.json)
-    import json, os
-    sm = json.load(open(os.path.join(os.path.dirname(os.path.abspath(ld)), "../../logs/nm/summary.json")))
-    only = {'build/' + f + '.o' for f, st in sm["files"].items() if st.get("used")}
+import json, os
+# only the files that really got C in this build (logs/nm/summary.json): a file whose drafts were all skipped is
+# the matching file, and moving its sections broke a boot (after_audiodec_81.c, 2026-10-25)
+sm = json.load(open(os.path.join(os.path.dirname(os.path.abspath(ld)), "../../logs/nm/summary.json")))
+used = {'build/' + f + '.o' for f, st in sm["files"].items() if st.get("used")}
+asked = {'build/' + re.sub(r'^.*?/(src/)', r'\1', f) + '.o' for f in sys.argv[3:]}
+only = (asked & used) if asked else used
 orig = {}        # (object, section) -> size in the matching build
 for m in re.finditer(r"^ (\.text|\.rodata|\.data)\s+0x([0-9a-f]+)\s+0x([0-9a-f]+)\s+(build/src/\S+\.c\.o)", open(mp).read(), re.M):
     orig[(m.group(4), m.group(1))] = int(m.group(3), 16)
