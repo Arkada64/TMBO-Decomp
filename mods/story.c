@@ -207,6 +207,7 @@ int tmbr_StoryCars(void)
         used |= 1 << c;
         first = 0;
         F(D_003156C0 + s * 0x220, 0xB4) = c << 5;
+        if (level == 20) scePrintf("TMBR story: roof bot slot %d car %x\n", s, c << 5);
     }
     return 1;
 }

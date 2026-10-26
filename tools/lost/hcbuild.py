@@ -59,10 +59,26 @@ class HoCar:
         self.n, self.tex = s['ngp'], s['tex']
         n = self.n
         self.hd = {}
+        from hotex import textures as ho_textures
+        tkeys = set(ho_textures(self.tex))
+        self.texfixed = []
         for o in find_packets(n):
             m = decode(n, o)
             if m['hdr'] is not None:
-                self.hd[m['hdr']] = m
+                h = m['hdr']
+                ks = []
+                for i in range(4):
+                    k = u32(n, h + 0x10 + 4 * i)
+                    if k not in tkeys:
+                        break
+                    ks.append(k)
+                need = max([(st['tag'][3] - 1) // 3 + 1 for st in m['strips'] if st['tag'][3]] or [0])
+                if ks and len(m['texrefs']) < max(need, 1) <= len(ks):
+                    # the fan-build cars' GS context for these is tagged 0x20000006 (homesh counts only
+                    # 0x20000005), so their texture key was missed: Old Pickup / Pit Viper looked untextured
+                    m = dict(m, texrefs=ks)
+                    self.texfixed.append(h)
+                self.hd[h] = m
         best = None
         for o in range(0, len(n) - 0x40, 16):
             if u32(n, o) & 0x3f != 2 or struct.unpack_from('<i', n, o + 4)[0] != 2:
@@ -102,6 +118,15 @@ class HoCar:
         else:
             extra_w = []
         assert wh, 'no wheels found in car space'
+        self.wheel_q = {(c[0] > 0, c[1] > (max(w[1][1] for w in wh) + min(w[1][1] for w in wh)) / 2): (h, c, r)
+                        for h, c, r in wh}            # (right, front) -> (mesh, car-space centre, radius)
+        # parts sitting inside a wheel's box (Gold Tooth's gold hubcaps): they ride on the same tire node
+        self.wheel_parts = {}
+        allw = {h for h, _, _ in wh} | set(extra_w)
+        for h, c, r in wh:
+            lo, hi = box(self.hd[h]['pos'])
+            self.wheel_parts[h] = [k for k, m in sorted(self.hd.items()) if k not in allw and m['pos'] and
+                                   (box(m['pos'])[0] >= lo - 0.2).all() and (box(m['pos'])[1] <= hi + 0.2).all()]
         ys = [c[1] for _, c, _ in wh]
         self.wheel = dict(front=max(ys), rear=min(ys), z=float(np.mean([c[2] for _, c, _ in wh])),
                           r=float(np.mean([r for _, _, r in wh])), x=float(np.mean([abs(c[0]) for _, c, _ in wh])),
@@ -140,9 +165,15 @@ class HoCar:
                     return True
         return False
 
-    def skip_reason(self, h, wheel_ground, far=False, env='skip'):
+    def skip_reason(self, h, wheel_ground, far=False, env='skip', own=False):
         m = self.hd[h]
         lo, hi = box(m['pos'])
+        if far and own:              # --own-wheels: the far LOD keeps its wheels (the donor's far wheels go)
+            if not m['nrm'] and h not in self.brake:
+                return 'no normals (light cone / flame / sprite)'
+            if m['hflags'] & 0x0E and (env == 'skip' or self.env_overlay(h)):
+                return 'env-map shine shell'
+            return None
         if h in self.wheel['meshes']:
             return "wheel (the donor's are kept)"
         if not m['nrm'] and h not in self.brake:
@@ -317,6 +348,8 @@ def main():
     ap.add_argument('--reuse', default='', help="Head-On texture key:donor CLUT block, quantized onto the donor's "
                     "palette instead of a new CLUT (Gold Tooth on STP: b0448:45,a91b8:49,8dc74:45,9e768:5; STA 53,57,53,5)")
     ap.add_argument('--half-keys', default='', help='Head-On texture keys stored at half size (hex, comma separated)')
+    ap.add_argument('--own-wheels', action='store_true', help="the new car's own wheels on the donor's tire nodes "
+                    '(spin / steer / suspension stay the donor\'s), scale 1, own proportions')
     ap.add_argument('--hide-node', default='', help='donor node offsets (hex, comma separated) whose meshes get empty '
                     "packets too, e.g. Outlaw's roof light bar op31 (SUP 0x67ae0, SUA 0x5d6a0)")
     ap.add_argument('--keep-part', default='', help="donor node ids kept with their subtree, ';'-separated, each "
@@ -421,9 +454,14 @@ def build(a, rd, own16):
                                   [hex(x) for x in shadow], len(mounts), [hex(x) for x in brake_sw], [hex(x) for x in wreck]))
 
     # ---- placement
-    s = a.scale or (dw['front'] - dw['rear']) / (ho.wheel['front'] - ho.wheel['rear'])
-    dy = (dw['front'] + dw['rear']) / 2 - s * (ho.wheel['front'] + ho.wheel['rear']) / 2
-    dz = dw['z'] - s * ho.wheel['z'] + a.lift
+    if a.own_wheels:                   # own wheels: own proportions (scale 1, Head-On units = TMB units), own origin
+        s = a.scale or 1.0             # in y; only z moves so its wheels stand on the donor's ground plane
+        dy = 0.0
+        dz = (dw['z'] - dw['r']) - s * (ho.wheel['z'] - ho.wheel['r'])
+    else:
+        s = a.scale or (dw['front'] - dw['rear']) / (ho.wheel['front'] - ho.wheel['rear'])
+        dy = (dw['front'] + dw['rear']) / 2 - s * (ho.wheel['front'] + ho.wheel['rear']) / 2
+        dz = dw['z'] - s * ho.wheel['z'] + a.lift
     xform = (s, np.array([0.0, dy, dz]))
     print('placement: scale %.3f offset y %.3f z %.3f | wheels new (scaled) x %.2f r %.2f vs donor x %.2f r %.2f | '
           'body (scaled) x %.2f..%.2f y %.2f..%.2f z %.2f..%.2f, donor ground z %.2f' % (
@@ -445,24 +483,43 @@ def build(a, rd, own16):
     skip_tex = {int(x, 16) for x in a.skip_tex.split(',') if x}
     built, skipped, fixed = {}, {}, [0, 0]
 
-    def node(h, cols=None):
-        key = (h, cols)
+    def node(h, cols=None, local=None):
+        """local = (car-space centre, inverse rotation, mirror): a wheel mesh in its tire node's space"""
+        key = (h, cols, None if local is None else (tuple(np.round(local[0], 4)), tuple(np.round(local[1], 4).ravel()), local[2]))
         if key not in built:
             m = ho.hd[h]
+            xf = xform
+            if local is not None:
+                c0, Rinv, mir = local
+                P = np.asarray(m['pos'], float) - c0
+                N = np.asarray(m['nrm'], float) if m['nrm'] else np.zeros((0, 3))
+                if mir:
+                    P[:, 0] *= -1
+                    if len(N): N = N * np.array([-1, 1, 1])
+                m = dict(m, pos=[tuple(p) for p in P], nrm=[tuple(q) for q in N])
+                xf = (s, np.zeros(3))
             if a.no_relight:
-                m = dict(m, pos=[tuple(np.asarray(p) * s + xform[1]) for p in m['pos']])
+                m = dict(m, pos=[tuple(np.asarray(p) * s + xf[1]) for p in m['pos']])
             else:
-                m, nb, nv = relight(m, xform, ho.c5norm)
+                m, nb, nv = relight(m, xf, ho.c5norm)
                 fixed[0] += nb; fixed[1] += nv
             if cols is not None:      # brake lights: fixed brightness (off dim, on glowing)
                 m = dict(m, strips=[dict(st, col=[cols | (0x80 << 24)] * len(st['idx']), noscale=True) for st in m['strips']])
+            if local is not None:
+                m = dict(m, pos=[tuple(np.asarray(p) @ local[1]) for p in m['pos']],
+                         nrm=[tuple(np.asarray(q) @ local[1]) for q in m['nrm']])
+            if m['texrefs'] and m['strips'] and not m['strips'][0]['tag'][3]:     # texture select on the 1st strip
+                st0 = [dict(st) for st in m['strips']]
+                t = list(st0[0]['tag']); t[3] = 1; st0[0]['tag'] = tuple(t)
+                m = dict(m, strips=st0)
             if not m['texrefs']:
                 st0 = [dict(st) for st in m['strips']]
                 if st0:
                     t = list(st0[0]['tag']); t[3] = 1; st0[0]['tag'] = tuple(t)
                 m = dict(m, texrefs=[WHITE], strips=st0)
             # --env bake: an env-mapped part (Gold Tooth's gold body) gets its reflection-map lookup baked into UVs
-            m = dict(m, twosided=False, bake=a.env == 'bake' and bool(ho.hd[h]['hflags'] & 0x0E),
+            m = dict(m, twosided=bool(local is not None and local[2]),        # mirrored wheel: both faces
+                     bake=a.env == 'bake' and bool(ho.hd[h]['hflags'] & 0x0E),
                      hflags=m.get('hflags', 0) & ~0x0E)
             blob, slots, pairs, sph = hierobject(m, 1.0, [tb.gs_ctx(k) for k in m['texrefs']])
             built[key] = car.append(blob, slots, pairs)
@@ -475,7 +532,7 @@ def build(a, rd, own16):
             if m is None or not m['strips']:
                 continue
             why = 'listed' if h in extra else 'skipped texture' if set(m['texrefs']) & skip_tex else \
-                ho.skip_reason(h, ground, far, a.env)
+                ho.skip_reason(h, ground, far, a.env, a.own_wheels)
             if why:
                 skipped[h] = why; continue
             out.append(h)
@@ -499,7 +556,7 @@ def build(a, rd, own16):
     k = u32(car.n, lo + 8) & 0xffff
     lokids = [car.P(lo + 0x20 + 4 * i) for i in range(k)]
     lokeep = [t for t in lokids if t is not None and (u32(car.n, t) & 0x3f == 4 or (
-        u32(car.n, t) & 0x3f in (0, 1) and f32(car.n, t + 0x18) <= dw['z'] + 0.3))]
+        not a.own_wheels and u32(car.n, t) & 0x3f in (0, 1) and f32(car.n, t + 0x18) <= dw['z'] + 0.3))]
     lokept = {m for t in lokeep for m in meshes_under(car, t)}
     lomesh = [t for t in meshes_under(car, lo) if t not in lokept]
     dead += [mesh_range(car, t) for t in lomesh]
@@ -515,6 +572,45 @@ def build(a, rd, own16):
         car.setp(lo + 0x20 + 4 * i, t)
     print('far LOD: donor meshes %s -> new car %d meshes + kept donor wheels %s' % (
         [hex(t) for t in lomesh], len(hs), [hex(t) for t in lokeep]))
+    # --own-wheels: the donor's tire nodes (op4 id R+1..R+4: the game spins / steers / bounces them, and keeps the
+    # node's +0x48, its translation z, as the tire's rest height) get the new car's wheel meshes, centred on the
+    # node, and the node moves to the new wheel's centre. A missing wheel (Thumper's front left) is the other
+    # side's, mirrored (drawn two-sided).
+    wheel_report = []
+    if a.own_wheels:
+        ymid = (dw['front'] + dw['rear']) / 2
+        for w in wheels4:
+            M = np.array(struct.unpack_from('<16f', car.n, w + 0x10)).reshape(4, 4)
+            R3, t = M[:3, :3], M[3, :3]
+            q = (bool(t[0] > 0), bool(t[1] > ymid))
+            mir = q not in ho.wheel_q
+            h, c, r = ho.wheel_q[(not q[0], q[1]) if mir else q]
+            cw = c * np.array([-1.0, 1, 1]) if mir else c
+            cn = cw * s + np.array([0.0, dy, dz])
+            dead += [mesh_range(car, t_) for t_ in meshes_under(car, w)]
+            k = struct.unpack_from('<i', car.n, w + 8)[0]
+            for i in range(1, max(k, 1)):
+                struct.pack_into('<I', car.n, w + 0x50 + 4 * i, 0)
+            struct.pack_into('<i', car.n, w + 8, 1)
+            loc = (np.asarray(c, float), np.linalg.inv(R3), mir)
+            parts = [k for k in ho.wheel_parts.get(h, []) if not ho.skip_reason(k, ground, False, a.env)
+                     and not set(ho.hd[k]['texrefs']) & skip_tex]
+            if parts:
+                kid = car.group([node(h, local=loc)] + [node(k, local=loc) for k in parts],
+                                sphere=(0, 0, 0, r * s * 1.5))
+            else:
+                kid = node(h, local=loc)
+            car.setp(w + 0x50, kid)
+            struct.pack_into('<3f', car.n, w + 0x40, *cn)
+            wheel_report.append((u32(car.n, w) >> 18, cn, r * s, hex(h) + (' mirrored' if mir else '') +
+                                 (' + parts %s' % [hex(k) for k in parts] if parts else '')))
+        for wid, cn, r, src in sorted(wheel_report):
+            print('tire node id %d: centre (%.2f %.2f %.2f) radius %.2f  <- %s' % (wid, cn[0], cn[1], cn[2], r, src))
+        xs = [abs(c[0]) for _, c, _, _ in wheel_report]; ys = [c[1] for _, c, _, _ in wheel_report]
+        print('own wheels (donor model space): half track %.2f, front axle y %.2f, rear axle y %.2f, centre z %.2f, '
+              'radius %.2f (donor: %.2f / %.2f / %.2f / %.2f / %.2f)' % (
+                  np.mean(xs), max(ys), min(ys), np.mean([c[2] for _, c, _, _ in wheel_report]),
+                  np.mean([r for _, _, r, _ in wheel_report]), dw['x'], dw['front'], dw['rear'], dw['z'], dw['r']))
     # brake lights
     brake_old, brake_hide = set(), set()
     if brake_sw and len(ho.brake) == 3:

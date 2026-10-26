@@ -327,18 +327,37 @@ static void keepRange(char* v, char* save, int a, int b, int put)
     int o;
     for (o = a; o < b; o += 4) { if (put) *(int*)(v + o) = *(int*)(save + o - a); else *(int*)(save + o - a) = *(int*)(v + o); }
 }
+/* Own wheels (tools/lost/hcbuild.py --own-wheels, Ark 2026-10-26): the extras draw their own wheels on the donor's
+ * tire nodes, bottoms on the donor's ground plane (ride height 0x3A4 unchanged); the contact geometry follows them:
+ * half track 0x3B4 (front / rear average), front / rear axle y 0x3B8 / 0x3BC (from the conversion logs). 0 = keep. */
+static float GEO[NSKIN][3] = {
+    { 3.515f, 5.60f, -4.77f },      /* Gold Tooth */
+    { 0, 0, 0 },                    /* 12 Pak (Roadkill's wheels) */
+    { 4.10f, 7.36f, -6.01f },       /* Old Pickup */
+    { 2.85f, 5.72f, -3.06f },       /* Pit Viper */
+    { 2.92f, 6.16f, -3.90f },       /* Outlaw 2 */
+    { 2.565f, 6.11f, -3.72f },      /* Thumper */
+    { 3.045f, 4.00f, -6.59f } };    /* Twister */
+static void ownWheels(char* v, int k)
+{
+    if (k < 0 || GEO[k][0] == 0) return;
+    *(float*)(v + 0x3B4) = GEO[k][0]; *(float*)(v + 0x3B8) = GEO[k][1]; *(float*)(v + 0x3BC) = GEO[k][2];
+}
+
 void tmbr_VehInitDynamics(char* v, int a1, int a2, char* a3)
 {
     static char s1[0x18], s2[0x4C], s3[4], s4[0xD0];
-    int id;
+    int id, k;
     vehInitDynamics(v, a1, a2, a3);              /* (the caller's $7 passes through, as before the hook) */
-    if (vehSkin(v) != SK_TWISTER) return;
+    k = vehSkin(v);
+    if (k != SK_TWISTER) { ownWheels(v, k); return; }
     id = *(int*)(v + 0x20F4);
     keepRange(v, s1, 0x380, 0x398, 0); keepRange(v, s2, 0x3A4, 0x3F0, 0); keepRange(v, s3, 0x478, 0x47C, 0); keepRange(v, s4, 0x1F40, 0x2010, 0);
     *(int*)(v + 0x20F4) = 10 << 5;
     vehInitDynamics(v, a1, a2, v + 0x484);   /* (test g110: a3 left over from the copy loop -> shield hook TLB) */
     *(int*)(v + 0x20F4) = id;
     keepRange(v, s1, 0x380, 0x398, 1); keepRange(v, s2, 0x3A4, 0x3F0, 1); keepRange(v, s3, 0x478, 0x47C, 1); keepRange(v, s4, 0x1F40, 0x2010, 1);
+    ownWheels(v, k);
     {   /* the shockwave's model (EP 0xFB0) comes from the level files for slots 0..4 only (the extra copies all carry
          * index 4): a higher slot borrows slot 4's node and animation (every console runs this) */
         extern void* shockNode[] __asm__("D_0045FFD8");
