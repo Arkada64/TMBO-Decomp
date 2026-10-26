@@ -85,7 +85,11 @@
       SCUS-97196. Checked 2026-10-26 (QB_TEXDUMP run, 2P match): 467 textures dumped, 369 share texture + CLUT hash
       with the pack but TMBO draws them with TEX0 TCC 0 (name bits 0x4000; 11 also T8H 0x1B vs T8 0x13).
       Textures/SCUS-97196/replacements = hard links renamed (cloud/in/g3/tx_map.py): 369 exact hits, loads
-      (QB_TEXLOAD run). Left: goes into the 4d package (toggle); unseen maps / menus may hold more misses.
+      (QB_TEXLOAD run). Second pass: direct-colour names (2 fields) renamed too, 9 near-palette aliases
+      (tools/hdpack/aliases.txt, mean RGB diff < 20): 379 of 523 seen textures covered. The rest (cloud/hd_miss,
+      contact sheet): TMBO's own menu / lobby text and logo pieces, effects TMBO recoloured (palette diff 30-250),
+      and a handful of world textures (dirt, stone, planks) the pack never had - they need upscaling of their own.
+      Unseen maps / menus may hold more misses.
   4d. TMBR player package (Ark 2026-10-26) - first build 2026-10-26: TMB Decomp/release/TMBR_Player
       (tools/package/pk_build.sh + TMBR.cs launcher: PLAY, HD / 16:9 / fullscreen / potato, PCSX2 settings; 492 MB
       of which 430 MB the HD pack as hard links). Left: TMBR.iso into game/, zip without bios, untested by Ark.
