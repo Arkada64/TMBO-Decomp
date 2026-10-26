@@ -30,7 +30,9 @@ extern int tmbr_TeamsWinner(void);                 /* teams.c: 0 = humans' team,
 #endif
 /* Warhawk's boss cars (0x200 / 0x220) as AI: TMBO's gameMakeAI turns both into Roadkill (test g116: vehicle id 0x20),
  * so the roof keeps 6 ordinary bots until the boss code is wired (phase 4) */
+#ifndef ROOF_BOSS
 #define ROOF_BOSS 0
+#endif
 #define OPT_STORY 0x20
 #define OPT_TEAMS 2
 #define OPT_TEAMS4 4
