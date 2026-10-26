@@ -44,6 +44,11 @@
      the Lost body pieces dropped in tools/lost/pakbuild.py (the 'side door left hanging open', 0x2bd70) are
      likely panels in their open pose; hook them to the weapon-mount animation. His mount points differ from
      Roadkill's: read them from the Lost file and move the mounts on his model copy (Roadkill untouched).
+  6b. Gold Tooth back as his own car (Ark 2026-10-26), after 12 Pak's own-car work: the 2026-10-23 version was a skin
+      inside Sweet Tooth's file (Sweet Tooth's wheels / mounts / collision / robot special, model and palettes
+      squeezed under Sweet Tooth's size), removed as janky. As a separate car slot like 12 Pak: Head-On model
+      (tools/lost/gtbuild.py), his own wheels, Lost's mount points, Sweet Tooth only as the stats / special donor.
+      Needs a second free car-select slot and stays under the per-car texture / palette budget.
   7. Outlaw turret secondary / Manslaughter drop-behind (Launcher::UpdateSpecial 0x15CD80).
   8. Minion toggle on the native game mods page.
   9. HEALTH lobby option: ON = health pickups spawn and can be picked up (overrides the TMA ruleset's no-health);
