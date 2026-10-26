@@ -26,10 +26,13 @@ def patch(elf, script):
     steps = script['steps']
     assert len(steps) <= QB_STEPS
     struct.pack_into('<III', d, o + 4, 1, len(steps), script.get('loop_from', 0xFFFF))
-    for i, (b, n) in enumerate(steps):
+    for i, st in enumerate(steps):
+        b, n = st[0], st[1]
+        ctl = st[2] if len(st) > 2 else 1          # optional 3rd field: controller 1..4 (multitap) gets the buttons
+        assert n < 0x4000 and 1 <= ctl <= 4
         m = 0
         for k in filter(None, b.upper().split('+')): m |= BTN[k]
-        struct.pack_into('<HH', d, o + 16 + 4 * i, m, n)
+        struct.pack_into('<HH', d, o + 16 + 4 * i, m, n | (ctl - 1) << 14)
     return bytes(d)
 
 def ps(cmd):

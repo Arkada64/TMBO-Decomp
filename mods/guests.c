@@ -14,8 +14,15 @@
  * Made by the host 5 s into the match (with the extra views, freecam.c splitFrame); bots leave room for them
  * (bots.c wanted: guests count as humans). Guests on a console that joined someone else's match: not yet.
  *
- * Test config (this stage): tmbr_guests = { tag "GSTS", count, car 2, car 3, car 4 } (car = character << 5, 0 =
- * random), set in the ELF by tools/qb/split/splitpatch.py. Car choice on the car select screen comes next. */
+ * Joining (host, waiting room = UI state 0x21): START on controller 2..4 opens the real car select (UI state 0x27)
+ * for that controller - its pad drives the UI (tmbr_UiPadButtons, the UI input's inputGetPadButtons call), a title
+ * says "PLAYER n" (tmbr_GuestPickTitle from skins.c's car select hook). The confirm / back net calls in car select
+ * (func_00173570 at 0x1CB944 / 0x1CB9C4) go through tmbr_CarSelNet: for a guest pick the chosen car goes to the
+ * guest (and to the net slot reserved for it, so the level load loads that car's model), the host's own car and
+ * highlight are put back, nothing is sent; car select returns to the waiting room as usual. SELECT on a guest's
+ * controller in the waiting room drops the guest.
+ * Test config: tmbr_guests = { tag "GSTS", count, car 2, car 3, car 4 } (car = character << 5, 0 = random) joins
+ * guests without the pick (set in the ELF by tools/qb/split/splitpatch.py). */
 #define F(p, off) (*(int*)((char*)(p) + (off)))
 extern char* D_004FA030;              /* game */
 extern char D_003156C0[];             /* net: 8 player slots x 0x220 */
@@ -29,9 +36,19 @@ int tmbr_guests[5] = { 0x53545347, 0, 0, 0, 0 };   /* "GSTS", count, cars */
 static signed char padOf[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };   /* car slot -> controller pad index */
 static char* guestCar[4];
 static int guestN;
+static int joinCar[4], joinSlot[4] = { -1, -1, -1, -1 };   /* per controller 2..4 (index 1..3): car, net slot */
+static int picking, pickSavedCar, pickSavedPos, prevBtn[4];
 
 int tmbr_GuestCount(void) { return guestN; }
-int tmbr_GuestsWanted(void) { int n = tmbr_guests[1]; return n < 0 ? 0 : n > 3 ? 3 : n; }
+int tmbr_GuestPicking(void) { return picking; }
+static int joined(void) { int k, n = 0; for (k = 1; k <= 3; k++) if (joinCar[k]) n++; return n; }
+int tmbr_GuestsWanted(void)
+{
+    int n = joined();
+    if (!n) n = tmbr_guests[1];
+    return n < 0 ? 0 : n > 3 ? 3 : n;
+}
+int tmbr_GuestSlot(int s) { int k; for (k = 1; k <= 3; k++) if (joinCar[k] && joinSlot[k] == s) return 1; return 0; }
 int tmbr_IsGuest(char* v)
 {
     int i;
@@ -74,16 +91,29 @@ void tmbr_GuestsMake(int views)
     char* g = D_004FA030;
     int i, n = tmbr_GuestsWanted();
     static const int pads[4] = { 0, 2, 4, 6 };
+    int order[4];
     guestN = 0;
     for (i = 0; i < 8; i++) padOf[i] = -1;
     if (!g) return;
+    {   /* guests from the waiting room joins (controller k, its reserved slot and car) or the test config */
+        int k, m = 0;
+        for (k = 1; k <= 3; k++) if (joinCar[k]) { m++; order[m] = k; }
+        if (!m) for (k = 1; k <= n; k++) order[k] = -k;
+    }
     for (i = 1; i <= n && i < views; i++) {
-        int v = freeSlot(g), car = tmbr_guests[1 + i];
+        int k = order[i], v = -1, car;
         char* veh;
+        if (k > 0) {
+            car = joinCar[k];
+            if (joinSlot[k] >= 0) v = netSlotVehicle(D_003156C0, joinSlot[k]) - 1;
+            if (v >= 0 && v < 8 && F(g + v * 0x31B0, 0x590) != 0) v = -1;    /* (taken after all) */
+            if (v < 0) v = freeSlot(g);
+            if (joinSlot[k] >= 0) scePrintf("TMBR guests: controller %d slot %d car %d (slot says %d)\n", k + 1, joinSlot[k], car >> 5, F(D_003156C0 + joinSlot[k] * 0x220, 0xB4) >> 5);
+        } else { k = -k; car = tmbr_guests[1 + k]; v = freeSlot(g); }
         if (v < 0) { scePrintf("TMBR guests: no free car slot for player %d\n", i + 1); break; }
         if (car <= 0) car = mathfRandI(1, 14) << 5;
         if ((car >> 5) == 15 && tmbr_Opt(8)) car = mathfRandI(1, 14) << 5;   /* Minion off */
-        padOf[v] = pads[i];
+        padOf[v] = pads[k];
         veh = gameMakeAI(g, v, car, v, i, 0);
         if (!veh) {             /* (the human branch does not return the car: find the one it set up) */
             int k;
@@ -94,7 +124,7 @@ void tmbr_GuestsMake(int views)
         F(veh, 0x210C) = i;
         guestCar[i] = veh;
         guestN = i;
-        scePrintf("TMBR guests: player %d = car slot %d, char %d, pad %d, view %d, kind %d\n", i + 1, v, car >> 5, pads[i], i, F(veh, 0x590));
+        scePrintf("TMBR guests: player %d (controller %d) = car slot %d, char %d, pad %d, view %d, kind %d\n", i + 1, k + 1, v, car >> 5, pads[k], i, F(veh, 0x590));
     }
 }
 /* level change / match end */
@@ -104,4 +134,94 @@ void tmbr_GuestsReset(void)
     guestN = 0;
     for (i = 0; i < 8; i++) padOf[i] = -1;
     for (i = 0; i < 4; i++) guestCar[i] = 0;
+}
+
+/* ---- waiting room: join / pick / leave ---- */
+extern int inputGetPadButtons(int pad) __asm__("inputGetPadButtons__Fi");
+extern int netIsHost(void* net) __asm__("func_001734B8");
+extern void netSetState(void* net, int st) __asm__("func_00173570");
+extern int carSelPos __asm__("D_004FA7D8");
+extern char* shellPtr __asm__("D_004FA03C");
+extern int D_004FA684, D_004FA688, D_004FA6E4, D_004FA910, D_004FA914;   /* UI state, next state, go, hold, back */
+extern char* D_0041BF00[];          /* waiting-room car names by car code >> 5 */
+#define UI_ROOM 0x21
+#define UI_CARSEL 0x27
+#define B_SELECT 0x1
+#define B_START 0x8
+static char* myClient(void) { return *(char**)(D_003156C0 + 4); }   /* this console's client struct (car at +0xA4) */
+static int reserveSlot(void)
+{
+    int s, k;
+    for (s = 7; s >= 0; s--) {
+        if (F(D_003156C0 + s * 0x220, 0x214) != 0) continue;
+        for (k = 1; k <= 3; k++) if (joinCar[k] && joinSlot[k] == s) break;
+        if (k <= 3) continue;
+        return s;
+    }
+    return -1;
+}
+void tmbr_GuestsLobby(void)
+{
+    int k;
+    if (D_004FA684 != UI_ROOM || picking) return;
+    for (k = 1; k <= 3; k++) {
+        int b = inputGetPadButtons(2 * k), pr = b & ~prevBtn[k];
+        prevBtn[k] = b;
+        if ((pr & B_START) && !joinCar[k]) {
+            if (!netIsHost(D_003156C0)) { scePrintf("TMBR guests: joining on a client console is not done yet\n"); continue; }
+            if (!myClient()) continue;
+            picking = k;
+            pickSavedCar = F(myClient(), 0xA4); pickSavedPos = carSelPos;
+            D_004FA688 = UI_CARSEL; D_004FA910 = 0; D_004FA6E4 = 1;      /* to car select */
+            scePrintf("TMBR guests: controller %d picks a car\n", k + 1);
+            return;
+        }
+        if ((pr & B_SELECT) && joinCar[k]) {
+            joinCar[k] = 0; joinSlot[k] = -1;
+            scePrintf("TMBR guests: controller %d left\n", k + 1);
+        }
+    }
+}
+/* car select's confirm / back (net state 1 + the car in this console's client struct): a guest pick stays local */
+void tmbr_CarSelNet(void* net, int st)
+{
+    int k = picking;
+    if (!k) { netSetState(net, st); return; }
+    picking = 0;
+    if (!D_004FA914 && shellPtr) {                       /* confirm (0) - back (1) cancels the join */
+        int car = F(shellPtr + 0x1A2F0, carSelPos * 4), s = reserveSlot();
+        if (car <= 0) car = 0x20;
+        if (s >= 0) {
+            joinCar[k] = car; joinSlot[k] = s;
+            F(D_003156C0 + s * 0x220, 0xB4) = car;           /* so the level load loads this car for that slot */
+            scePrintf("TMBR guests: controller %d joins with %s (net slot %d)\n", k + 1, D_0041BF00[car >> 5], s);
+        } else scePrintf("TMBR guests: no free slot for controller %d\n", k + 1);
+    }
+    if (myClient()) F(myClient(), 0xA4) = pickSavedCar;   /* the host's own car back */
+    carSelPos = pickSavedPos;
+    D_004FA910 = 0;                                       /* (nothing to wait for from the net) */
+}
+/* the UI's pad (func_001CE258): the picking guest's controller while it picks */
+int tmbr_UiPadButtons(int pad)
+{
+    return inputGetPadButtons(picking ? 2 * picking : pad);
+}
+/* car select frame (skins.c): title for a guest's pick */
+extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
+extern void fontPrint(int font, const char* s) __asm__("func_00203150");
+void tmbr_GuestPickTitle(void)
+{
+    static const char* const t[4] = { "", "PLAYER 2", "PLAYER 3", "PLAYER 4" };
+    if (!picking) return;
+    fontSetCursorAtSubPixel(0, 0x1400, 0x500);
+    fontPrint(0, t[picking]);
+}
+/* waiting room settings box line (bots.c extraLines) */
+extern int sprintf(char* d, const char* f, ...);
+void tmbr_GuestsLine(char* b)
+{
+    int k, n = 0;
+    b[0] = 0;
+    for (k = 1; k <= 3; k++)
+        if (joinCar[k]) n += sprintf(b + n, "%sP%d %s", n ? " " : "", k + 1, D_0041BF00[joinCar[k] >> 5]);
 }

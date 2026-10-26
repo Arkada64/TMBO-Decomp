@@ -153,7 +153,9 @@ void tmbr_CarSelectSound(void* snd, int car)
         lastSel = carSelPos;
     }
     playCarSound(snd, car);
+    { extern void tmbr_GuestPickTitle(void); tmbr_GuestPickTitle(); }   /* guests.c: "PLAYER n" while a guest picks */
     pak = carSelPos == PAK_POS;
+    { extern int tmbr_GuestPicking(void); if (tmbr_GuestPicking()) return; }   /* a guest's pick: not the host's skin */
     if (pak != tmbr_skin[1]) {
         tmbr_skin[1] = pak;
         scePrintf("TMBR skins: 12 PAK %s\n", pak ? "on" : "off");

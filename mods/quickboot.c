@@ -29,21 +29,27 @@ static unsigned int qbFrame;
 int tmbr_PadRead(int port, int slot, unsigned char* data)
 {
     int r = scePadRead(port, slot, data);
-    unsigned int b;
+    unsigned int b, target;
     if (!tmbr_qb.enabled || port != 0) return r;
-    qbFrame++;
-    while (qbLeft <= 0) {
-        qbStep++;
-        if (qbStep >= (int)tmbr_qb.nsteps) {
-            if (tmbr_qb.loop_from < tmbr_qb.nsteps) qbStep = tmbr_qb.loop_from;
-            else { qbStep = tmbr_qb.nsteps; qbLeft = 0x7FFFFFFF; break; }
+    if (slot == 0) {                       /* controller 1's read: once a frame, advances the script */
+        qbFrame++;
+        while (qbLeft <= 0) {
+            qbStep++;
+            if (qbStep >= (int)tmbr_qb.nsteps) {
+                if (tmbr_qb.loop_from < tmbr_qb.nsteps) qbStep = tmbr_qb.loop_from;
+                else { qbStep = tmbr_qb.nsteps; qbLeft = 0x7FFFFFFF; break; }
+            }
+            qbLeft = tmbr_qb.step[qbStep][1] & 0x3FFF;
+            if (tmbr_qb.step[qbStep][0])
+                scePrintf("TMBR qb: step %d buttons %04x for %d (frame %d)\n", qbStep, tmbr_qb.step[qbStep][0], tmbr_qb.step[qbStep][1], qbFrame);
         }
-        qbLeft = tmbr_qb.step[qbStep][1];
-        if (tmbr_qb.step[qbStep][0])
-            scePrintf("TMBR qb: step %d buttons %04x for %d (frame %d)\n", qbStep, tmbr_qb.step[qbStep][0], qbLeft, qbFrame);
+        qbLeft--;
     }
-    qbLeft--;
-    if (qbStep >= (int)tmbr_qb.nsteps) return r;
+    if (qbStep < 0 || qbStep >= (int)tmbr_qb.nsteps) return r;
+    /* frames bits 14-15: which controller gets the buttons (0 = 1, 1..3 = multitap 1B..1D = controllers 2..4,
+     * for the split-screen guest tests) */
+    target = tmbr_qb.step[qbStep][1] >> 14;
+    if ((int)target != slot) return r;
     b = tmbr_qb.step[qbStep][0];
     if (r && data[0] == 0 && b) {          /* status ok: buttons are active low in bytes 2-3 */
         data[2] &= ~(b & 0xFF);

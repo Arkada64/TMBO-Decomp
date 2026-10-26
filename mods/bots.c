@@ -59,7 +59,7 @@ static int humans(void)
 }
 
 extern int tmbr_GuestsWanted(void);   /* guests.c: local split-screen players (count as humans) */
-extern int tmbr_IsGuest(char* v);
+extern int tmbr_IsGuest(char* v), tmbr_GuestSlot(int s);
 static int wanted(int mid)
 {
     u32 cfg = *(u32*)F(D_003156C0, 0x3148);
@@ -116,6 +116,7 @@ static int addBot(void)
     if (NAI(g) >= MAXBOTS) return 0;
     for (s = 0; s < 8; s++) {
         if (F(D_003156C0 + s * 0x220, 0x214) != 0) continue;
+        if (tmbr_GuestSlot(s)) continue;                 /* reserved for a split-screen guest */
         v = netSlotVehicle(D_003156C0, s) - 1;
         if (v >= 0 && v < 8 && tmbr_IsGuest(g + v * 0x31B0)) continue;
         if (v >= 0 && v < 8 && F(F(g, 0x9E670 + v * 4), 0x20D0) == 0) break;
@@ -294,6 +295,8 @@ static const CarAi carAi[32] = {
 };
 #define CAI(v) (&carAi[charOf(v)])
 static int rammer(char* v) { int c = charOf(v); return c == CH_DARKSIDE || c == CH_YELLOWJ; }
+static int cpx[8], cpy[8], cvx[8], cvy[8]; static unsigned char cok[8];   /* every car, per frame (x4 units) */
+static int iabs(int x) { return x < 0 ? -x : x; }
 static int hunted[8], crowd[8];
 static short ramT[8];              /* frames of turbo left for a special ram (Darkside, Yellow Jacket) */
 static short setupT[8];            /* frames after a freeze: the next weapon pick goes for a big hit */
@@ -696,6 +699,43 @@ static int flank(char* g, char* v, char* t, int idx, int b, int a, int d, int tf
     return 1;
 }
 
+
+/* ---- charging the reticle (Ark 2026-10-26: bots fired the charge-up reticle at once). The slot-5 pickup type 0xB
+ * (launcher v+0x21B0: +0 slot, +0x110 slot-5 type, +0x218 armed) arms on one fire press and releases on the next;
+ * the longer it is held on the target, the harder it hits (up to ~5 s). Once armed, a bot holds it CH_MIN..CH_MAX
+ * frames (longer on a target that is barely moving), keeping the target near the middle; it lets go early when the
+ * target has been out of sight / far off the nose for CH_LOST frames. While holding, its fire requests (attack
+ * state 7) go back to aiming (5) and the trigger code below leaves it alone. */
+#define CH_MIN 90
+#define CH_MAX 270
+#define CH_LOST 45
+static short chT[8], chWant[8], chLost[8];
+static int charging(char* g, char* v, int idx)
+{
+    char* l = v + 0x21B0;
+    char* br = (char*)F(v, 0x2014);
+    int a, d, seen;
+    if (!br || F(l, 0) != 5 || F(l, 0x110) != 0xB || !F(l, 0x218)) { if (chT[idx]) scePrintf("TMBR charge: car %d let go after %d\n", idx, chT[idx]); chT[idx] = 0; return 0; }
+    a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF; d = fbits(*(float*)(br + 0x20));
+    seen = (F(br, 0x598) || F(br, 0x4B0) < 10) && a < LOCK_ANG && d >= 0;
+    if (!chT[idx]) {
+        chWant[idx] = mathfRandI(CH_MIN, CH_MAX);
+        {   /* target hardly moving: full charge */
+            char* drv = (char*)F(v, 0x2018);
+            char* t = drv ? (char*)F(drv, 0xB4) : 0;
+            int tk = t ? (int)(t - g) / 0x31B0 & 7 : 0;
+            if (t && cok[tk] && iabs(cvx[tk]) + iabs(cvy[tk]) < 8) chWant[idx] = CH_MAX;
+        }
+        chLost[idx] = 0;
+        scePrintf("TMBR charge: car %d armed, holding %d\n", idx, chWant[idx]);
+    }
+    chT[idx]++;
+    chLost[idx] = seen ? 0 : chLost[idx] + 1;
+    if (chT[idx] >= chWant[idx] || chLost[idx] >= CH_LOST) return 0;   /* release: the normal fire may go */
+    if (F(br, 0x414) == 7) aiSetAttackState(v, 5);
+    return 1;
+}
+
 static void aggressiveTurn(char* g, char* v, char* t)
 {
     char* br = (char*)F(v, 0x2014);
@@ -721,7 +761,8 @@ static void aggressiveTurn(char* g, char* v, char* t)
      * for LOCK_T frames before a homing missile goes - like a player waiting for the red reticle */
     if (d >= 0 && d < FIRE_DIST && a < LOCK_ANG && (F(br, 0x598) || F(br, 0x4B0) < 10)) { if (lockT[idx] < 100) lockT[idx]++; }
     else lockT[idx] = 0;
-    if ((st == 5 || st == 6) && d >= 0 && (F(br, 0x598) || F(br, 0x4B0) < 10) && F(br, 0x47C) != 1 &&
+    if (charging(g, v, idx)) { /* holding the reticle charge: no trigger */ }
+    else if ((st == 5 || st == 6) && d >= 0 && (F(br, 0x598) || F(br, 0x4B0) < 10) && F(br, 0x47C) != 1 &&
         (F(br, 0x47C) == 3 ? (lockT[idx] >= LOCK_T && d < FIRE_DIST) : (a < FIRE_TIGHT && d < FIRE_NEAR))) {
         aiSetAttackState(v, 7); dbgShots[idx]++;
     }
@@ -890,7 +931,6 @@ static void unstick(char* g, char* v)
 static int wpx[NW], wpy[NW], wpz[NW], wvx[NW], wvy[NW], wvz[NW], wax[NW];
 static unsigned char wok[NW], wturn[NW], wfall[NW];
 static int bpx[8], bpy[8];
-static int cpx[8], cpy[8], cvx[8], cvy[8]; static unsigned char cok[8];   /* every car, per frame (x4 units) */
 static unsigned char wSeen[NW], wkCount[32][32];
 static short dodgeT[8], reactT[8], judged[8], hWait[8], dodgeHb[8], pendT[8];
 static int dodgeX[8], dodgeY[8], dodgeF[8];   /* dodgeF: blend in the car's heading */
@@ -952,7 +992,6 @@ void tmbr_DodgeFrame(void)
         cpx[i] = x; cpy[i] = y; cok[i] = cok[i] < 2 ? cok[i] + 1 : 2;
     }
 }
-static int iabs(int x) { return x < 0 ? -x : x; }
 extern int tmbr_SameTeam(char* a, char* b);
 extern float tmbr_NavSteer(char* v, float dx, float dy, int gas);
 static void dodgeStart(int k, int vx, int vy, int dx, int dy)
@@ -1591,6 +1630,12 @@ static void extraLines(int row)
         else sprintf(b, "YOU : %s TEAM", tmbr_TeamName(tmbr_MyTeam()));
         lobbyLine(row + 4, tmbr_MyTeam(), b);
     }
+    {   /* split-screen guests (guests.c): "P2 SPECTRE P3 ..." */
+        extern void tmbr_GuestsLine(char* b);
+        char gb[64];
+        tmbr_GuestsLine(gb);
+        if (gb[0]) lobbyLine(row + (teams ? 5 : 4), -1, gb);
+    }
     fontSetColor(0, 0x50, 0x44, 0x2C);
 }
 void tmbr_LobbyFrame(void)
@@ -1599,6 +1644,7 @@ void tmbr_LobbyFrame(void)
     char ra[40], rb[40];
     settingsRows();
     lobbyFrame();
+    { extern void tmbr_GuestsLobby(void); tmbr_GuestsLobby(); }   /* guests.c: START on controller 2-4 joins */
     tmbr_SkinsLobby();
     tmbr_PedNamesInit();
     host = netIsHost(D_003156C0);

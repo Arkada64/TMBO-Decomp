@@ -102,6 +102,11 @@ PATCHES = [
     # split-screen guests (mods/guests.c): inputGetPlayerPad -> tmbr_InputGetPlayerPad (a guest's car slot reads its
     # controller; the delay slot "addiu $2, $0, 1" is harmless)
     (A("nonmatchings/tmb/input/inputGetPlayerPad__Fi.s"), "00217B30", "daddu", "j          tmbr_InputGetPlayerPad"),
+    # ... guests pick their car on the real car select: its confirm / back net calls (guests.c tmbr_CarSelNet) and the
+    # UI's pad read (the picking guest's controller drives the UI)
+    (A("tmb/ui.s"), "001CB944", "jal", "jal        tmbr_CarSelNet"),
+    (A("tmb/ui.s"), "001CB9C4", "jal", "jal        tmbr_CarSelNet"),
+    (A("tmb/ui.s"), "001CE2E8", "jal", "jal        tmbr_UiPadButtons"),
     (
         A("nonmatchings/tmb/player/func_0017BE80.s"),
         "0017BF00",
