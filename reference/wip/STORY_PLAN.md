@@ -4,6 +4,14 @@ Ark: story mode (single player) with retail's cutscenes; the online menus host i
 bosses checked against retail; health pads back where retail had them; retail's story map versions as separate
 files picked only in story mode. Later: local co-op story (split-screen guests), online co-op.
 
+## Menu layout Ark wants (2026-10-26)
+- Main menu: two lines, SINGLE PLAYER and ONLINE.
+  - SINGLE PLAYER -> SOLO or SPLIT-SCREEN CO-OP: the story run offline (alone, or with guests on controllers 2-4).
+  - ONLINE -> the game's online / LAN choice as today; co-op STORY becomes a game mode there (next to Deathmatch,
+    Last Man Standing, ...), so the R3 + Square lobby toggle of phase 1 is a stopgap.
+- Single player must not need a network setup: it runs the same host path offline (alone in a LAN room or a
+  local session), with the room screens skipped / hidden.
+
 ## What TMBO still has / lost (checked 2026-10-26)
 - Kept: the MPEG movie player (TMBO plays mov/*.pss shell transitions: title, gm, cs1, eye, tv, wait, score ...),
   the boss code (tmb/boss: FinalBoss UpdateTrans / GetClosestPlayer / AddEpNode ...), ROOFBOSS level files, the
