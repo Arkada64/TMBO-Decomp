@@ -67,11 +67,21 @@ def main(rkdir, bddpath, outdir, scale=1.0):
             built[h] = car.append(blob, slots, pairs)
         return built[h]
 
-    def meshes(root, state):
+    # 12 Pak's rear hatches / trunk lid ride on Roadkill's animated panels (PAK_HATCH=0 turns it off): Roadkill's
+    # left / right rear panels and trunk lid are bones of his animation characters (the launcher comes out under
+    # them); their damage-state op31 gets 12 Pak's hatch of that state instead, and the hatch leaves the body.
+    # Ark 2026-10-26: back left = homing / fire, back right = power, trunk = gas cans (napalm).
+    HATCH = [('L', 0x2bcd0), ('R', 0x34fc0), ('T', 0x58b50)] if os.environ.get('PAK_HATCH', '1') == '1' else []
+    excl = set()
+    for _, r in HATCH:
+        for st in range(3):
+            excl |= set(collect(n, r, st, lod=0))
+
+    def meshes(root, state, skip=excl):
         out = []
         for h in collect(n, root, state, lod=0):
             m = hd.get(h)
-            if m is None or h in SKIP_MESH or not m['strips'] or not (set(m['texrefs']) - SKIP_TEX):
+            if m is None or h in SKIP_MESH or h in skip or not m['strips'] or not (set(m['texrefs']) - SKIP_TEX):
                 continue
             out.append(h)
         return out
@@ -90,6 +100,41 @@ def main(rkdir, bddpath, outdir, scale=1.0):
         for i in range(1, k):
             struct.pack_into('<I', car.n, g + 0x20 + 4 * i, 0)
         print('state', st, len(hs), 'meshes')
+    if HATCH:
+        from tmbtree_walk import kid_slots
+        f32 = lambda o: struct.unpack_from('<f', car.n, o)[0]
+        op7 = next(u32(car.n, 4 + 4 * i) - 0x980000 for i in range(u32(car.n, 0)) if (u32(car.n, u32(car.n, 4 + 4 * i) - 0x980000) & 0x3f) == 7)
+        done = set()
+        for i in range(u32(car.n, op7 + 4)):
+            c = u32(car.n, op7 + 8 + 4 * i) - 0x980000
+            b = car.P(c + 0x2c)
+            if b is None or (u32(car.n, b) & 0x3f) != 17:
+                continue
+            for sl in kid_slots(car.n, b):
+                d = car.P(sl)
+                if d is None or (u32(car.n, d) & 0x3f) != 31:
+                    continue
+                ms = []
+                for k in kid_slots(car.n, d):
+                    t = car.P(k)
+                    while t is not None and (u32(car.n, t) & 0x3f) == 3:      # translate wrapper (trunk states)
+                        t = car.P(t + 0x1c)
+                    if t is not None and (u32(car.n, t) & 0x3f) == 0:
+                        ms.append((k, t))
+                if len(ms) < 2:
+                    continue
+                x, y = f32(ms[0][1] + 0x10), f32(ms[0][1] + 0x14)
+                side = 'L' if x < -1.5 and -7 < y < -5 else 'R' if x > 1.5 and -7 < y < -5 else 'T' if abs(x) < 0.5 and -7.6 < y < -6.6 else None
+                if side is None or side in done:
+                    continue
+                done.add(side)
+                root = dict(HATCH)[side]
+                for st, (k, t) in enumerate(ms):
+                    hs = meshes(root, min(st, 2), skip=set())
+                    dead.append(mesh_extent(car.n, t))
+                    car.setp(k, car.group([node(h) for h in hs], sphere=(f32(t + 0x10), f32(t + 0x14), f32(t + 0x18), f32(t + 0x1c) + 1.0)))
+                print('hatch', side, 'char', hex(c), 'states', len(ms), 'meshes', len(meshes(root, 0, skip=set())))
+                break
     # far LOD: its body mesh -> 12 Pak's low LOD
     for i in range(u32(car.n, LOD1 + 8) & 0xffff):
         if car.P(LOD1 + 0x20 + 4 * i) == LOD1_BODY:
