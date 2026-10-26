@@ -17,9 +17,12 @@
   11. Story mode (single player) with retail's cutscenes: ~2.9 GB of retail movies onto the disc (fine for PCSX2), the
       story flow rebuilt in online's menus, each level's story events / bosses checked (retail decomp to compare).
       Health pads back on the maps that had them in retail (single player had them).
+      Retail's story versions of the maps go on the disc as separate files (e.g. \LVL\SP_SUBURB.*) and the level
+      loader picks them only in story mode (a story flag on the file names, like the content packs): online matches
+      keep loading the online maps untouched.
   12. Local co-op story (split-screen guests = retail's 2P co-op path).
       + Bot ally option: you pick its car, it plays alongside you (a teammate bot: team code already keeps it off you),
-        with the story enemies' damage reduction so it isn't killed at once; enemy AI prefers human targets but can
+        taking 20 % of normal damage (story enemy bots take 10 %), 3 lives like the player; enemy AI prefers human targets but can
         still go for it; it sometimes stays near the player; in the Warhawk boss fight it leaves the tankers alone so
         players can position them.
   13. Online co-op story: story enemies / bosses are AI cars (synced like bots), cutscenes and scripted events
