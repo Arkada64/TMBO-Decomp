@@ -1638,15 +1638,19 @@ static void extraLines(int row)
     }
     fontSetColor(0, 0x50, 0x44, 0x2C);
 }
+extern void tmbr_GuestsName(void);
 void tmbr_LobbyFrame(void)
 {
     int pad = 0, pressed, host, teams;
     char ra[40], rb[40];
     settingsRows();
+    { extern int tmbr_GuestNaming(void);   /* guests.c: while a guest types a name the keyboard has the screen
+                                            * (Ark 2026-10-26: the room's text showed through the keys) */
+      if (tmbr_GuestNaming()) { tmbr_GuestsName(); return; } }
     lobbyFrame();
     { extern void tmbr_GuestsLobby(void); tmbr_GuestsLobby(); }   /* guests.c: START on controller 2-4 joins */
     { extern void tmbr_GuestsRows(void); tmbr_GuestsRows(); }     /* guests.c: their rows in the player list */
-    { extern void tmbr_GuestsName(void); tmbr_GuestsName(); }     /* guests.c: a new guest types a name */
+    tmbr_GuestsName();     /* guests.c: a new guest types a name (opened by the car pick) */
     tmbr_SkinsLobby();
     tmbr_PedNamesInit();
     host = netIsHost(D_003156C0);

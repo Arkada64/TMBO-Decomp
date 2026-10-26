@@ -26,6 +26,9 @@
  * guests without the pick (set in the ELF by tools/qb/split/splitpatch.py). */
 #define F(p, off) (*(int*)((char*)(p) + (off)))
 extern int sprintf(char* d, const char* f, ...);
+extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
+extern void fontPrint(int font, const char* s) __asm__("func_00203150");
+extern void fontSetColor(int font, int r, int g, int b) __asm__("fontSetColor__Fiiii");
 extern char* D_004FA030;              /* game */
 extern char D_003156C0[];             /* net: 8 player slots x 0x220 */
 extern int scePrintf(const char* fmt, ...);
@@ -181,12 +184,35 @@ int tmbr_GuestsMake(int views)
          * (Ark 2026-10-26: guests took no damage) */
         scePrintf("TMBR guests: player %d owner type %d -> 1\n", i + 1, F(veh, 0x20B4));
         F(veh, 0x20B4) = 1;
-        *(char*)(veh + 0x497) = 4;                      /* respawn shield on the first spawn too (shield.s) */
+        /* a net object like the host's bots (bots.c addBot: func_001756A0): the leaderboard (func_00175AA0) only
+         * lists cars with one (+0x20D8) and names a human from its net slot (+0x20C0, the name set at join), and
+         * clients see the car (Ark 2026-10-26: guests missing from the scoreboard / bay panel) */
+        {
+            extern int netBotObjects(void* net, char* veh) __asm__("func_001756A0");
+            if (!F(veh, 0x20D8)) netBotObjects(D_003156C0, veh);
+            if (k > 0 && joinSlot[k] >= 0) F(veh, 0x20C0) = joinSlot[k];   /* its net slot (name: +0x18) */
+            F(veh, 0x20B4) = 1;                                 /* (netBotObjects makes it a bot, 4) */
+            scePrintf("TMBR guests: player %d net object %x, net slot %d\n", i + 1, F(veh, 0x20D8), F(veh, 0x20C0));
+        }
         guestCar[i] = veh;
         if (i > guestN) guestN = i;
         scePrintf("TMBR guests: player %d (controller %d) = car slot %d, char %d, pad %d, view %d, kind %d\n", i + 1, k + 1, v, car >> 5, pads[k], i, F(veh, 0x590));
     }
     return pending;
+}
+/* the HUD's "cars left" counter (func_00144460, from func_00145860 0x146D70): net players (settings +0x24) plus
+ * the game's AI count (game +0x98000 +0x7EE4); guests are neither (Ark 2026-10-26: the number was short by the
+ * guests). They are added to the AI count for that call only. */
+extern void hudCarsLeft(char* hud) __asm__("func_00144460");
+void tmbr_HudCarsLeft(char* hud)
+{
+    char* g = D_004FA030;
+    int n = 0, i;
+    for (i = 1; i < 4; i++) if (guestCar[i] && guestCar[i] != (char*)-1) n++;
+    if (!g || !n) { hudCarsLeft(hud); return; }
+    F(g, 0x98000 + 0x7EE4) += n;
+    hudCarsLeft(hud);
+    F(g, 0x98000 + 0x7EE4) -= n;
 }
 /* level change / match end */
 void tmbr_GuestsReset(void)
@@ -385,6 +411,7 @@ static void nameStart(int k)
     naming = k; nameT = 0;
     scePrintf("TMBR guests: controller %d types a name\n", k + 1);
 }
+int tmbr_GuestNaming(void) { return naming && D_004FA684 == UI_ROOM; }
 /* the keyboard's own pad reads */
 int tmbr_KbPad(int pad)
 {
@@ -400,7 +427,13 @@ void tmbr_GuestsName(void)
     int r, k = naming, s, q;
     if (!k) return;
     if (D_004FA684 != UI_ROOM) return;
-    boxDraw(nameBox, 0x145, 0x3F);
+    {   /* the text being typed, above the keyboard */
+        static const char* const t[4] = { "", "PLAYER 2 NAME", "PLAYER 3 NAME", "PLAYER 4 NAME" };
+        fontSetColor(0, 0x50, 0x44, 0x2C);
+        fontSetCursorAtSubPixel(0, 0x600, 0x8C0);
+        fontPrint(0, t[k]);
+        boxDraw(nameBox, 0x145, 0x96);
+    }
     r = kbRun(D_004B3C00);
     {   /* START on the guest's controller = done (the keyboard's own way is its ENTER key) */
         static int prevS;
@@ -424,8 +457,6 @@ void tmbr_GuestsName(void)
     naming = 0;
 }
 /* car select frame (skins.c): title for a guest's pick */
-extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
-extern void fontPrint(int font, const char* s) __asm__("func_00203150");
 void tmbr_GuestPickTitle(void)
 {
     static const char* const t[4] = { "", "PLAYER 2", "PLAYER 3", "PLAYER 4" };
@@ -439,7 +470,6 @@ void tmbr_GuestsLine(char* b) { b[0] = 0; }
 /* the waiting room's player list (func_001C5768 0x1C5C48..): a row per player slot in use (+0x10 != -1) from
  * y 0x500, 0x100 apart; name x 0x1E0, ping 0x1090, car 0x14A0, status 0x1F40. The guests are local only (their
  * slots stay empty for the network), so their rows are drawn after the list, in the same font. */
-extern void fontSetColor(int font, int r, int g, int b) __asm__("fontSetColor__Fiiii");
 void tmbr_GuestsRows(void)
 {
     int s, k, row = 0;

@@ -106,7 +106,7 @@ extern int tmbr_GuestsMake(int views);
 extern char* tmbr_GuestCar(int i);
 extern void tmbr_GuestsReset(void);
 extern int tmbr_levelSerial;
-static int splitSerial = -1, splitWait, splitN;
+static int splitSerial = -1, splitWait, splitN, splitBlank;
 static char* splitCar[4];
 
 /* ---- widescreen (Ark 2026-10-25: the 4:3 picture leaves black bars on a 16:9 screen; PCSX2 only, see TODO) ----
@@ -164,18 +164,47 @@ void tmbr_SbCall(int a)
     if (splitN < 2) { scoreboard(a); return; }
     sbArg = a;
 }
-static int sbX(int x) { return sbScale && splitN == 4 ? x / 2 : x; }   /* (2 views: full width - 0.6 x overlapped the columns, Ark 2026-10-26; 4 views: half) */
+static int sbX(int x) { return sbScale && splitN >= 3 ? x / 2 : x; }   /* (2 views: full width - 0.6 x overlapped the columns, Ark 2026-10-26; 4 views: half) */
 static int sbY(int y) { return sbScale ? 12 + y / 2 : y; }
-void tmbr_SbPrint(int f, int x, int y, const char* t) { fontPrintXY(f, sbX(x), sbY(y), t); }
-void tmbr_SbPrintC(int f, int x, int y, const char* t) { fontPrintCXY(f, sbX(x), sbY(y), t); }
-void tmbr_SbSize(int f, int sz) { fontSize(f, sbScale ? (sz + 1) / 2 : sz); }   /* (letters half size with the rows) */
+/* scaled: the column titles short like the weapon bay panel's (Ark 2026-10-26: the long ones ran together) */
+static const char* sbShort(const char* t)
+{
+    static const char* const L[5] = { "PLAYER", "KILLS", "DEATHS", "SUICIDES", "POINTS" };
+    static const char* const S[5] = { "PLR", "KLS", "DTS", "SUI", "PTS" };
+    int i, j;
+    if (!sbScale || !t) return t;
+    for (i = 0; i < 5; i++) {
+        for (j = 0; L[i][j] && t[j] == L[i][j]; j++) ;
+        if (!L[i][j] && !t[j]) return S[i];
+    }
+    return t;
+}
+void tmbr_SbPrint(int f, int x, int y, const char* t) { fontPrintXY(f, sbX(x), sbY(y), sbShort(t)); }
+void tmbr_SbPrintC(int f, int x, int y, const char* t) { fontPrintCXY(f, sbX(x), sbY(y), sbShort(t)); }
+/* letters half size with the rows; the spacing again after it (fontSetSpacing keeps width + spacing from the
+ * size before: the old wide advance spread the letters) */
+extern void fontSpacing(int f, int sp) __asm__("fontSetSpacing__Fii");
+void tmbr_SbSize(int f, int sz) { fontSize(f, sbScale ? (sz + 1) / 2 : sz); if (sbScale) fontSpacing(f, 1); }
 extern void fontDefSize(int f) __asm__("fontSetDefaultSize__Fi");
-void tmbr_SbDefSize(int f) { fontDefSize(f); if (sbScale) fontSize(f, f == 0 ? 8 : 6); }   /* (defaults 16 / 12) */
+void tmbr_SbDefSize(int f) { fontDefSize(f); if (sbScale) { fontSize(f, f == 0 ? 8 : 6); fontSpacing(f, 1); } }   /* (defaults 16 / 12) */
 /* split screen, the HUD's 2D text (func_001475F8's prints, apply_mods.py): the game type / score in the top right
  * (x 535) is left out (Ark 2026-10-26: more room), the scoring lines beside the weapon bay (x 412, y 180-210 of the
  * 224-line view) move up into the half-height view, next to the bay. */
 void tmbr_HudPrintTR(int f, int x, int y, const char* t) { if (splitN < 2) fontPrintXY(f, x, y, t); }
-void tmbr_HudPrintBay(int f, int x, int y, const char* t) { if (splitN == 4) return; fontPrintXY(f, x, splitN == 2 ? y - 112 : y, t); }   /* (4 views: not yet) */
+void tmbr_HudPrintBay(int f, int x, int y, const char* t)
+{
+    /* (the leader / your place lines, "Ldr:name" at 412,180 and on; font x is in the view's own pixels: a quarter
+     * is 320 wide, its weapon bay from about 275) */
+    if (splitN < 2) { fontPrintXY(f, x, y, t); return; }
+    if (splitN >= 3) {                /* quarters: smaller (Ark 2026-10-26), lines closer together */
+        fontSize(f, 6);
+        fontSpacing(f, 0);
+        fontPrintXY(f, x - 230, 78 + (y - 180) / 2, t);
+        fontDefSize(f);
+        return;
+    }
+    fontPrintXY(f, x, y - 112, t);
+}
 extern void hudBuild(char* hud, int view) __asm__("func_001475F8");
 /* the HUD's 3D clusters are placed by func_00145860(hud) per view (0x1838B4); the anchors are set right before
  * (in tests PCSX2 applies the community pnach to the original ELF every frame, which puts hud 0's x back) */
@@ -185,11 +214,32 @@ void tmbr_HudPlace(char* hud)
 {
     extern char* D_004FA030;
     if (splitN >= 2 && D_004FA030) splitAnchors(D_004FA030);
+    if (splitBlank && D_004FA030 && hud == D_004FA030 + 0x97B50 + 3 * 0xA20) return;
     hudPlace(hud);
 }
 int tmbr_SplitViews(void) { return splitN; }
+/* 3 players (Ark 2026-10-26: three squares and a black one): the 4th view is cleared but draws no scene and no
+ * HUD (func_00211D80, the view's scene, at 0x1838BC) */
+extern void viewScene(int view) __asm__("func_00211D80");
+extern char* viewGetDb(int i) __asm__("viewGetDb__Fi");
+void tmbr_ViewScene(int view)
+{
+    if (splitBlank && view == 3) {
+        char* db = viewGetDb(3);       /* its clear colour (draw env +0x1B0 / +0x320, low word = RGBA): black,
+                                        * not the fog grey (Ark 2026-10-26) */
+        *(unsigned*)(db + 0x1B0) = 0; *(unsigned*)(db + 0x320) = 0;
+        return;
+    }
+    viewScene(view);
+}
+/* the view's effects (sparks, fire: func_0022BE88(view, cs, 1) and func_0022CD00(view) at 0x18397C / 0x183984) */
+extern void viewFx1(int view, void* cs, int a) __asm__("func_0022BE88");
+extern void viewFx2(int view) __asm__("func_0022CD00");
+void tmbr_ViewFx1(int view, void* cs, int a) { if (splitBlank && view == 3) return; viewFx1(view, cs, a); }
+void tmbr_ViewFx2(int view) { if (splitBlank && view == 3) return; viewFx2(view); }
 void tmbr_HudView(char* hud, int view)
 {
+    if (splitBlank && view == 3) return;
     hudBuild(hud, view);
     if (splitN < 2) return;
     { extern void tmbr_DamageDraw(int sc); tmbr_DamageDraw(view); }   /* dmgreport.c: this screen's damage report */
@@ -214,7 +264,7 @@ static float ancLim[2] = { 4.0f, 0.0f };   /* (arrays: float literals overflowed
 static void splitAnchors(char* g)
 {
     char* h0 = g + 0x97B50;
-    int i, c, k, L = splitN == 4;
+    int i, c, k, L = splitN >= 3;
     if (!ancSet) {                        /* the single-view values, once (the game's own, before we touch them) */
         float* f = (float*)(h0 + 0x800);
         if (!*(int*)h0 || f[1] <= ancLim[1] || f[1] > ancLim[0]) return;
@@ -296,7 +346,8 @@ static void splitFrame(char* cam)
         }
         if (k == 8) return;
         if (--splitWait) return;
-        splitN = n == 2 ? 2 : 4;
+        splitN = n == 2 ? 2 : 4;           /* 2: halves; 3, 4: quarters (3 players: the 4th stays blank) */
+        splitBlank = n == 3;
         viewSetNumViews(splitN);
         {
             int pov0 = *(int*)cam;
@@ -347,6 +398,12 @@ static void splitFrame(char* cam)
     if (splitN >= 2) splitAnchors(g);
     for (i = 1; i < splitN && i < 4; i++) {     /* a guest stays this console's player (owner type 1: damage) */
         char* v = tmbr_GuestCar(i);
+        {   static int dbgT[4];
+            if (v && (++dbgT[i] % 600 == 1 || (*(char*)(v + 0x497) && dbgT[i] % 30 == 1)))
+                scePrintf("TMBR split: guest %d hp %d shield %d t %d step %d look %d owner %d | host shield %d t %d step %d look %d\n", i + 1,
+                (int)*(float*)(v + 0x404), *(char*)(v + 0x497), *(int*)(v + 0x464), *(int*)(v + 0x2114), *(int*)(v + 0x24B4),
+                *(int*)(v + 0x20B4), *(char*)(g + 0x497), *(int*)(g + 0x464), *(int*)(g + 0x2114), *(int*)(g + 0x24B4));
+        }
         if (v && *(int*)(v + 0x20B4) != 1) { scePrintf("TMBR split: guest %d owner %d -> 1\n", i + 1, *(int*)(v + 0x20B4)); *(int*)(v + 0x20B4) = 1; }
     }
     for (i = 1; i < splitN && i < 4; i++)       /* a guest's camera: the player's view (gameInitCamera leaves the

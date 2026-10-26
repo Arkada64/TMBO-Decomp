@@ -1,5 +1,28 @@
 # TODO (later)
 
+- **Split screen - status and open items (2026-10-26 night, Ark asleep; work top to bottom):**
+  Done: join on controllers 2-4 (START), real car select (camera flies to the cars), car change (START again),
+  leave (SELECT), name entry on the game's keyboard (START = done), rows in the player list, the guest's own car
+  loaded with the level, split from the first frame, 2 views (halves) / 3 (quarters + blank) / 4 (quarters), 16:9
+  view widths, HUD per view (radar + weapon bay at the edges, sized per layout), top-right game type / score hidden,
+  bay panel (Ldr/Rnk/Pts/...) placed per layout, death scoreboard shrunk per view with short titles, damage reports
+  per screen, guests take damage, respawn shield (same 10 s timer as P1), guests on the leaderboard by name
+  (net object like the bots), "cars left" counter counts guests.
+  Open, in order:
+  1. 3/4-player bay panel: more compact but readable (testing g38: size 6, half line spacing).
+  2. Death scoreboard: check the title spacing fix + short titles (PLR KLS DTS SUI PTS) in 2/3/4 views.
+  3. Bay panel per player: each view shows its own player's line (now the host's for all) - the leaderboard
+     (func_00175AA0) now has the guests; the panel reads the local player's net record (net +0x3010/+0x3014).
+  4. Guests' spawn shield animation (timer/state match P1's - the effect itself differs; screenshot both).
+  5. 3-player 4th quarter: pure black (now very dark grey).
+  6. Sound listener in split (likely P1's camera only) - check how retail TMB split did it.
+  7. Guests joining on a client console (host makes the car over chat) - feature, lower priority.
+  8. Remove debug prints (guest hp / shield every 30 frames) before an ISO.
+  Then the rest of the queue: 4b real widescreen HUD layout, 4c HD texture pack, 4d TMBR player package,
+  4e retail loading screen, 5-14 (bots reticle, 12 Pak bot + his weapon panels / own mount points, Outlaw /
+  Manslaughter, minion toggle page, HEALTH option, environment pickups gone, story mode, co-op + ally, online
+  co-op, roguelike).
+
 - **Work queue (Ark 2026-10-26, top to bottom):**
   1. Split-screen guests: car select (the real screen repeats "PLAYER n CHOOSE A VEHICLE" on that controller).
   1b. Guest names (Ark 2026-10-26): on joining, the game's own keyboard + text box asks for a name (default
