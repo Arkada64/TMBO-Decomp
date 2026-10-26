@@ -132,6 +132,7 @@ static int addBot(void)
     if (tmbr_MinionOff() && !tmbr_Opt(0x20) && (F(D_003156C0 + s * 0x220, 0xB4) >> 5) == 15)   /* Minion off: another car */
         F(D_003156C0 + s * 0x220, 0xB4) = mathfRandI(1, 14) << 5;
     veh = gameMakeAI(g, v, F(D_003156C0 + s * 0x220, 0xB4), v, -1, 1);
+    scePrintf("TMBR bots: slot %d car %x -> vehicle id %x\n", s, F(D_003156C0 + s * 0x220, 0xB4), veh ? F(veh, 0x20F4) : -1);
     if (!veh) return 0;
     netBotObjects(D_003156C0, veh);
     {   /* a 12 Pak bot: his name on the marker / leaderboard (the slot name, +0x18, was the car's: ROADKILL) */

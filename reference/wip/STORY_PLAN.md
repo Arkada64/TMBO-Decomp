@@ -120,3 +120,9 @@ REMOVALS are tiny: PRISON id 6050 (2 nodes) gone, JUNKYARD 6003 (one of 4) and 6
 differences. So story levels mostly work on the online files. Ids 6000-6999 are destructibles (retail destruct.s:
 6003 / 6666 handled there; 6050 likely a Prison Passage destructible, e.g. a gate). Next: identify 6050 / 4030 / 8018
 (retail dbProcInteractive callbacks) and the story-only pickups (health pads: PKP files, not in this survey).
+
+## Ark 2026-10-26 (story maps)
+- Large health pickups stay gone (story uses the online maps as they are).
+- Prison Passage in retail story: the player starts locked on the ship travelling to the prison, AI spread out,
+  timed events; online Prison Passage has none of it (likely the removed id 6050 nodes + story-only level code:
+  retail's prison scripted sequence to find in the retail decomp) - phase 3/4 item.
