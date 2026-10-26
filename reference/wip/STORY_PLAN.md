@@ -103,5 +103,7 @@ ever asks for a file that does not exist.
   loading-screen state: stream starts ("Stream Buffer ...") and the game freezes when we wait for it to end. (2) The
   blocking player func_00222048: same freeze. (3) The game's own request (nextMovie -1 = the incog slot with our name
   written into its 16-byte string, movieEnable 1; guards finished 1 / key 0 / okToPlay 1 / requested 0) never starts
-  in state 0x29. Next idea: play them where TMBO plays its own level clips (LS<level>.PSS, nextMovie 0x46 + level,
-  set when PLAY GAME is pressed) - replace that clip's name instead of adding a new start.
+  in state 0x29. TMBO's own LS<level>.PSS clips are requested by the level select screen (func_001CA6D8, state
+  0x24: nextMovie = 0x46 + level, movieEnable 1) - the shell's movies play inside menu screens (probably into the
+  shell's video panel), not as a fullscreen cutscene. Next: find how a menu state lets playMovie run (the loop's
+  0x1B40D4 call path / which states), or give story movies their own UI state like retail's uiPlay*Movie screens.
