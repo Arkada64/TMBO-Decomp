@@ -12,8 +12,8 @@
   8. Minion toggle on the native game mods page.
   9. HEALTH lobby option: ON = health pickups spawn and can be picked up (overrides the TMA ruleset's no-health);
      OFF = no health on the map at all (replaces the TMA health rule; the respawn shield stays).
-  10. Environment pickups off, and the clouds on maps whose cloud is an environment pickup (Suburbs, Snowy Roads,
-      Mini Suburbs).
+  10. Environment pickups removed for good (no option), with the clouds on maps whose cloud is an environment pickup
+      (Suburbs, Snowy Roads, Mini Suburbs).
 
 - **Target: PCSX2 only** (Ark 2026-10-25): TMB Reloaded is unrestricted TMBO for the emulator; real PS2 hardware is
   not a goal. No view-distance / bot cuts for real-hardware limits: tune the EE cycle rate default instead (130 % now).
