@@ -28,6 +28,9 @@ extern int tmbr_TeamsWinner(void);                 /* teams.c: 0 = humans' team,
 #ifndef TMBR_STORYLEVEL
 #define TMBR_STORYLEVEL -1
 #endif
+/* Warhawk's boss cars (0x200 / 0x220) as AI: TMBO's gameMakeAI turns both into Roadkill (test g116: vehicle id 0x20),
+ * so the roof keeps 6 ordinary bots until the boss code is wired (phase 4) */
+#define ROOF_BOSS 0
 #define OPT_STORY 0x20
 #define OPT_TEAMS 2
 #define OPT_TEAMS4 4
@@ -166,7 +169,7 @@ void tmbr_StoryLobby(void)
         scePrintf("TMBR story: branch -> %s\n", NAME[level]);
     }
     /* the rules of a story level */
-    n = (level == 14 ? 1 : level == 20 ? 2 : AICOUNT[level]) + (tmbr_Opt(0x40) ? 1 : 0);   /* (roof: the boss pair) */   /* + the ally bot (GAME MODS ALLY BOT) */
+    n = (level == 14 ? 1 : level == 20 && ROOF_BOSS ? 2 : AICOUNT[level]) + (tmbr_Opt(0x40) ? 1 : 0);   /* + the ally bot (GAME MODS ALLY BOT) */
     tmbr_botCount = n > 7 ? 7 : n;
     tmbr_OptSet(OPT_TEAMS, 1);
     tmbr_OptSet(OPT_TEAMS4, 0);
@@ -196,7 +199,7 @@ int tmbr_StoryCars(void)
         int c = 0;
         if (F(D_003156C0 + s * 0x220, 0x10) != -1 || tmbr_GuestSlot(s)) continue;
         if (level == 14) c = 15;                          /* Minion's stadium: Minion in every free slot (one bot comes) */
-        if (level == 20) c = (used & 1 << 16) ? 17 : 16;  /* Warhawk's roof: retail's boss cars 0x200 / 0x220 only, in
+        if (level == 20 && ROOF_BOSS) c = (used & 1 << 16) ? 17 : 16;  /* Warhawk's roof: retail's boss cars 0x200 / 0x220 only, in
                                                            * every free slot (the bot spawner may take any of them) */
         for (k = 0; !c && k < 200; k++) {
             int r = mathfRandI(1, 14);
@@ -204,7 +207,7 @@ int tmbr_StoryCars(void)
         }
         if (!c) c = 1;
         used |= 1 << c;
-        if (level == 20 && c == 17) used &= ~(3 << 16);  /* (alternate 16, 17, 16, ...) */
+        if (level == 20 && ROOF_BOSS && c == 17) used &= ~(3 << 16);  /* (alternate 16, 17, 16, ...) */
         first = 0;
         F(D_003156C0 + s * 0x220, 0xB4) = c << 5;
         if (level == 20) scePrintf("TMBR story: roof bot slot %d car %x\n", s, c << 5);

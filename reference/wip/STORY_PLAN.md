@@ -126,3 +126,6 @@ differences. So story levels mostly work on the online files. Ids 6000-6999 are 
 - Prison Passage in retail story: the player starts locked on the ship travelling to the prison, AI spread out,
   timed events; online Prison Passage has none of it (likely the removed id 6050 nodes + story-only level code:
   retail's prison scripted sequence to find in the retail decomp) - phase 3/4 item.
+- Phase 4 (2026-10-26, test g116): bots made with car 0x200 / 0x220 (retail's roof boss pair) come out as Roadkill
+  (gameMakeAI maps unknown values to 0x20). Boss creation needs its own path (retail FinalBoss / ROOFBOSS objects).
+  story.c ROOF_BOSS 0 keeps the stand-in (6 ordinary bots) meanwhile.
