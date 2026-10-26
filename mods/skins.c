@@ -25,6 +25,7 @@ extern int inputGetPadButtons(int pad) __asm__("inputGetPadButtons__Fi");
 extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
 extern void fontPrint(int font, const char* s) __asm__("func_00203150");
 extern void scePrintf(const char* f, ...);
+extern int sprintf(char* d, const char* f, ...);
 
 extern void loadOwnCar(void* shell, int client) __asm__("func_00188A00");
 extern void loadCar268(void* shell, int client, int ai) __asm__("func_00189268");
@@ -34,12 +35,18 @@ extern void loadCar0F0(void* shell, int client) __asm__("func_001890F0");
 
 #define PAD_L1 0x400
 #define PAD_SQUARE 0x8000
-#define NSKIN 2
+#define NSKIN 7
 
-static const int skinType[NSKIN] = { 6, 1 };                       /* Sweet Tooth, Roadkill */
-static const char skinCode[NSKIN][2] = { { 'z', 'z' }, { 'z', 'y' } };
-static const char* const skinName[NSKIN] = { "GOLD TOOTH", "12 PAK" };
-static const char* const baseName[NSKIN] = { "SWEET TOOTH", "ROADKILL" };
+/* Extra characters (TODO 6b / 6d, Ark 2026-10-26): each one is a donor car type (stats, special, sounds, HUD) with
+ * its own car files \PCAR\<code>P.* / \ACAR\<code>A.*. One extra per donor type (the sync message is keyed by
+ * type). An extra other than 12 Pak only shows up on car select when its \PCAR\<code>P.NGP is on the disc
+ * (tmbr_SkinsAvail), so the list can name cars whose models are not built yet. */
+static const int skinType[NSKIN] = { 6, 1, 8, 4, 5, 7, 10 };   /* Sweet Tooth, Roadkill, Junkyard Dog, Spectre, Crazy 8, Brimstone, Mr. Grimm */
+static const char skinCode[NSKIN][2] = { { 'z', 'z' }, { 'z', 'y' }, { 'z', 'x' }, { 'z', 'w' }, { 'z', 'v' }, { 'z', 'u' }, { 'z', 't' } };
+static const char* const skinName[NSKIN] = { "GOLD TOOTH", "12 PAK", "OLD PICKUP", "PIT VIPER", "OUTLAW 2", "THUMPER", "TWISTER" };
+static char origCode[NSKIN][2];          /* the donors' own codes, read from the table before the first swap */
+static int origOk;
+static int avail[NSKIN] = { 0, 1 };     /* 12 Pak always; the others from the disc */
 
 int tmbr_skin[NSKIN];                  /* this console's choices (12 Pak = car select position 15) */
 #define PAK_POS 15
@@ -122,9 +129,26 @@ int tmbr_ChatHandler(int a0, int a1, int client, char* msg)
     return netMsgChatHandler(a0, a1, client, msg);
 }
 
+extern int fileSearch(void* f, const char* name) __asm__("func_00201910");   /* the game's disc file lookup */
+static void checkAvail(void)
+{
+    static int done;
+    int k, f[32];
+    char n[24];
+    if (done) return;
+    done = 1;
+    for (k = 0; k < NSKIN; k++) {
+        if (k == 1) continue;
+        sprintf(n, "%cPCAR%c%c%cP.NGP;1", 92, 92, skinCode[k][0] - 32, skinCode[k][1] - 32);   /* (backslash as a number) */
+        avail[k] = fileSearch(f, n) != 0;
+        if (avail[k]) scePrintf("TMBR skins: %s available\n", skinName[k]);
+    }
+}
+
 static int skinOn(int client, int k)
 {
-    if (k == 0) return 0;                            /* Gold Tooth removed */
+    checkAvail();
+    if (!avail[k]) return 0;                         /* no car files on this disc (Gold Tooth removed 2026-10-23) */
     if (k == 1 && client >= 0 && client < 8 && (botPak >> client & 1) && *(int*)(netState + client * 0x220 + 0x10) == -1 && !tmbr_GuestSlot(client)) return 1;
     if (client == netGetMyClientIndex(netState)) return tmbr_skin[k];
     return client >= 0 && client < 8 && remote[client][k];
@@ -133,24 +157,28 @@ static int skinOn(int client, int k)
 /* waiting room player list (func_001C5768 0x1C5E94 / 0x1C5ED4: sprintf(buf, "%s", carName[car >> 5])): the row's
  * client struct is in $s2 there; the stub passes it on, and a player with 12 Pak on shows "12 PAK". */
 extern char* D_0041BF00[];          /* waiting-room car names by car code >> 5 (1 = "ROADKILL") */
-extern int sprintf(char* d, const char* f, ...);
 __asm__(".section .text\n.set push\n.set noreorder\n.globl tmbr_LobbyCarNameS\ntmbr_LobbyCarNameS:\n"
         "    j       tmbr_LobbyCarName\n    move    $7, $18\n.set pop\n.previous\n");
 int tmbr_LobbyCarName(char* buf, const char* fmt, const char* name, char* row)
 {
     int i = (int)(row - netState) / 0x220;
-    if (name == D_0041BF00[1] && i >= 0 && i < 8 && skinOn(i, 1)) name = "12 PAK";
+    int k;
+    for (k = 0; k < NSKIN; k++)
+        if (name == D_0041BF00[skinType[k]] && i >= 0 && i < 8 && skinOn(i, k)) name = skinName[k];
     return sprintf(buf, fmt, name);
 }
 
 static void setCodes(int client)
 {
     int k;
+    if (!origOk) {
+        for (k = 0; k < NSKIN; k++) { origCode[k][0] = vehCodes[skinType[k] * 8]; origCode[k][1] = vehCodes[skinType[k] * 8 + 1]; }
+        origOk = 1;
+    }
     for (k = 0; k < NSKIN; k++) {
         char* c = vehCodes + skinType[k] * 8;
         if (client >= 0 && skinOn(client, k)) { c[0] = skinCode[k][0]; c[1] = skinCode[k][1]; }
-        else if (k == 0) { c[0] = 's'; c[1] = 't'; }
-        else { c[0] = 'r'; c[1] = 'k'; }
+        else { c[0] = origCode[k][0]; c[1] = origCode[k][1]; }
     }
 }
 
@@ -161,36 +189,81 @@ void tmbr_LoadCar680(void* s, int c, int ai) { setCodes(ai ? -1 : c); loadCar680
 void tmbr_LoadCar0F0(void* s, int c) { setCodes(c); loadCar0F0(s, c); setCodes(-1); }
 
 /* car select frame: highlighted car value (type << 5) */
-extern int D_004EFBF0[];                         /* static car select value list (rodata) */
+extern int D_004EFBF0[];                         /* static car name list (rodata, by type; not the select order) */
+extern int carClip[] __asm__("D_0045CBE0");      /* per position: the fly-to-stand clip id (5..0x13; 15 = none) */
+extern void uiStepSound(void) __asm__("func_001CE628");
+extern int D_004FA8B0;                           /* UI right flag */
+/* Position 15 holds every extra (reference/wip/CARSELECT_MORE.md, "virtual positions"): xsel picks which one.
+ * Stepping right from 15 goes to the next extra before wrapping, left from 15 to the previous one; the game's own
+ * position never leaves 0..15, so no table of 16 is read past its end. */
+static int xlist[NSKIN], xn, xsel;
+static void buildX(void)
+{
+    int k;
+    checkAvail();
+    xn = 0; xlist[xn++] = 1;
+    for (k = 0; k < NSKIN; k++) if (k != 1 && avail[k]) xlist[xn++] = k;
+    if (xsel >= xn) xsel = 0;
+}
+static void applyX(void)
+{
+    int k = xlist[xsel], p, dp = -1;
+    if (!shellPtr) return;
+    for (p = 0; p < PAK_POS; p++) if (*(int*)(shellPtr + 0x1A2F0 + p * 4) == skinType[k] << 5) dp = p;
+    *(int*)(shellPtr + 0x1A2F0 + PAK_POS * 4) = skinType[k] << 5;
+    carClip[PAK_POS] = k == 1 || dp < 0 ? 0 : 5 + dp;        /* an extra: its donor's stand (12 Pak: keeps the picture) */
+}
+/* the car select's move (0x1CB768: func_001CE628 runs once per step, before the game moves the position) */
+void tmbr_CarSelStep(void)
+{
+    int dir = D_004FA8B0 ? 1 : -1;
+    uiStepSound();
+    buildX();
+    if (dir > 0) {
+        if (carSelPos == PAK_POS - 1) xsel = 0;
+        else if (carSelPos == PAK_POS && xsel < xn - 1) { xsel++; carSelPos = PAK_POS - 1; }
+    } else {
+        if (carSelPos == 0) xsel = xn - 1;
+        else if (carSelPos == PAK_POS && xsel > 0) { xsel--; carSelPos = 0; }
+    }
+    applyX();
+}
+
 void tmbr_CarSelectSound(void* snd, int car)
 {
-    int pad, pressed, pak;
-    if (shellPtr) *(int*)(shellPtr + 0x1A2F0 + PAK_POS * 4) = 0x20;      /* 16th spot = a Roadkill */
-    D_004EFBF0[PAK_POS] = 0x20;                       /* the static list the shell copies its list from (was 0) */
-    if (carSelPos == PAK_POS || car <= 0) car = 0x20;  /* first frame back from a match: the 16th slot still read 0
-                                                         * (no car) -> engine-sound stream index -1, read past the disc */
+    int k, sel;
+    buildX();
+    applyX();                                         /* the 16th spot = the chosen extra's donor */
+    if (carSelPos == PAK_POS || car <= 0) car = skinType[xlist[xsel]] << 5;  /* (first frame back from a match: the 16th
+                                                         * slot still read 0 -> engine-sound stream index -1) */
     {   /* Minion off (lobby option, bots.c OPT_MINION clear): the highlight hops over his spot, in the direction it came */
         extern int tmbr_Opt(int bit);
         static int lastSel = -1;
-        int k, mpos = -1;
-        for (k = 0; k < PAK_POS; k++) if (D_004EFBF0[k] == (15 << 5)) { mpos = k; break; }
+        int mpos = -1;
+        for (k = 0; k < PAK_POS; k++) if (shellPtr && *(int*)(shellPtr + 0x1A2F0 + k * 4) == (15 << 5)) { mpos = k; break; }
         if (!tmbr_Opt(8) && mpos >= 0 && carSelPos == mpos) {
             carSelPos = lastSel == (mpos + 1) % (PAK_POS + 1) ? (mpos + PAK_POS) % (PAK_POS + 1) : (mpos + 1) % (PAK_POS + 1);
-            car = D_004EFBF0[carSelPos] > 0 ? D_004EFBF0[carSelPos] : 0x20;
+            car = *(int*)(shellPtr + 0x1A2F0 + carSelPos * 4);
+            if (car <= 0) car = 0x20;
         }
         lastSel = carSelPos;
     }
     playCarSound(snd, car);
     { extern void tmbr_GuestPickTitle(void); tmbr_GuestPickTitle(); }   /* guests.c: "PLAYER n" while a guest picks */
-    pak = carSelPos == PAK_POS;
-    { extern int tmbr_GuestPicking(void); if (tmbr_GuestPicking()) return; }   /* a guest's pick: not the host's skin */
-    if (pak != tmbr_skin[1]) {
-        tmbr_skin[1] = pak;
-        scePrintf("TMBR skins: 12 PAK %s\n", pak ? "on" : "off");
-        sendSkins();
+    sel = carSelPos == PAK_POS ? xlist[xsel] : -1;
+    if (sel >= 0 && sel != 1) {                       /* an extra's name (its plate would be the donor's) */
+        fontSetCursorAtSubPixel(0, 0x1400, 0x700);
+        fontPrint(0, skinName[sel]);
     }
-    (void)pad; (void)pressed;
-    /* Gold Tooth (skin 0) removed 2026-10-23: the toggle is gone and skin 0 is never on, here or from others */
+    { extern int tmbr_GuestPicking(void); if (tmbr_GuestPicking()) return; }   /* a guest's pick: not the host's skin */
+    for (k = 0; k < NSKIN; k++) {
+        int on = sel == k;
+        if (on != tmbr_skin[k]) {
+            tmbr_skin[k] = on;
+            scePrintf("TMBR skins: %s %s\n", skinName[k], on ? "on" : "off");
+            sendSkins();
+        }
+    }
 }
 
 /* car select name plate (shell+0xC3C switch, one child per position; SHELL1 ids 9033). Child 15 was the cut
@@ -198,6 +271,7 @@ void tmbr_CarSelectSound(void* snd, int car)
  * spot uses it as is. */
 void tmbr_PreviewSwitch(void* sw, int i)
 {
+    if (i == PAK_POS && xn && xlist[xsel] != 1) i = 18;   /* an extra: child 18 (a spare plate; its name is printed) */
     hierSetSwitch(sw, i);
 }
 

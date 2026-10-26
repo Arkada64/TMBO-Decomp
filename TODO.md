@@ -80,7 +80,13 @@
       fixed area high up (e.g. 64-128 MB) is free for us: extra cars, story data, bigger textures. Needs: the
       TMBR launcher turns the setting on; online, everyone must have it if content depends on it (check in the
       lobby); mods check GetMemorySize() and fall back when it is 32 MB.
-  6d. Harbor City cars (Ark 2026-10-26), each its own car slot built from its own Lost model (like 12 Pak's rebuild):
+  6d. Car select for them DONE 2026-10-26 (skins.c, tested g100 with a placeholder model): the extras sit behind
+      12 Pak's spot (right / left from there steps through them, name printed, donor's stand clip), each shows only
+      when its \PCAR\Z?P.NGP is on the disc; picked one loads its own files, synced like 12 Pak; story uses the
+      donor's movies. Codes: Gold Tooth zz, Old Pickup zx, Pit Viper zw, Outlaw 2 zv, Thumper zu, Twister zt.
+      Models: tools/lost/hcbuild.py (generalised pakbuild). Ark 2026-10-26: all HC cars have odd lighting (never
+      finished) - fix in the conversion (6e).
+      Harbor City cars (Ark 2026-10-26), each its own car slot built from its own Lost model (like 12 Pak's rebuild):
       - Old Pickup: Junkyard Dog's stats; special = a weaker Minion-style special that only tracks ahead and slightly to
         the side. Needs animating; weapon racks unknown.
       - Pit Viper: Spectre's stats and special. Needs animating; weapon racks unknown.
