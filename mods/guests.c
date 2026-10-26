@@ -198,7 +198,7 @@ static int padBtn(int pad)
 {
     int b = inputGetPadButtons(pad) & 0xFFFF;
     static int logT;
-    if (pad == 2 && ++logT % 120 == 0)            /* (debug: what controllers 2-4 read in the waiting room) */
+    if (pad == 2 && ++logT % 1200 == 0)            /* (debug: what controllers 2-4 read in the waiting room) */
         scePrintf("TMBR guests: pads %04x %04x %04x ui %x>%x go %d hold %d back %d scn %x busy %d\n", inputGetPadButtons(2) & 0xFFFF,
             inputGetPadButtons(4) & 0xFFFF, inputGetPadButtons(6) & 0xFFFF, D_004FA684, D_004FA688, D_004FA6E4, D_004FA910,
             D_004FA914, D_004FA718, D_004FA94C);

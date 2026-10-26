@@ -4,7 +4,11 @@
   1. Split-screen guests: car select (the real screen repeats "PLAYER n CHOOSE A VEHICLE" on that controller).
   2. Guests joining (START on controller 2-4 in the waiting room; on a client the host makes the car over chat).
   3. Guest camera pulled back (retail split distance) + HUD per view.
-  4. Letterbox off (the picture is 640x360 inside 448: give split screen the full height).
+  4. Letterbox off - NOT the game (2026-10-26): TMBO draws the full 640x448 (view layouts D_004CEE40, GS DISPLAY2 dh
+     447). The bars are PCSX2 AspectRatio = 16:9 (Ready2Play PCSX2.ini, and a leftover TMBR gamesettings ini) seen in a
+     4:3 frame. Fix = 4:3 / Auto in PCSX2, or real widescreen (4b). HUD anchors (hud +0x800 left cluster -2.47 3.36
+     1.11, +0x810 right cluster 2.11 3.5 -0.89; x right, y forward, z up). Retail TMB widescreen pnach (PCSX2
+     patches.zip SCUS-97101_073696DA) lists every view's FOV + HUD constant (1P, 2P horizontal/vertical, 4P).
   5. Bots charge the reticle weapon (satellite-style, hold up to 5 s; Launcher func_001549A0 charger code,
      GetSatelliteReticle; find the held-fire input first).
   6. 12 Pak as a bot.
