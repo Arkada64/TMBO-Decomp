@@ -1361,6 +1361,8 @@ static void turboUse(char* g, char* v, int evading)
 #define EN_SHIELD_T 12
 #define FRZ_CD 900      /* 15 s between a bot's freezes */
 static short enCd[8];
+static signed char altFire[8];
+static short altCd[8], altChk[8];      /* frames until the special goes after arming its second mode (TODO 7) */
 static int incoming(char* g, char* v, int k)
 {
     int i, best = 999;
@@ -1399,6 +1401,16 @@ static void energyUse(char* g, char* v, int evading)
     if (!br || !drv || *(signed char*)(v + 0x497) >= 4 || !cok[k]) return;
     if (enCd[k] > 0) enCd[k]--;
     if (setupT[k] > 0) setupT[k]--;
+    if (altCd[k] > 0) altCd[k]--;
+    if (altChk[k] > 0 && --altChk[k] == 0 && F(v, 0x21B4))   /* the special clears the flag when it goes (test
+                                                              * 2026-10-26: mostly within 0.5 s); if it did not
+                                                              * go, drop it so a later forward shot stays forward */
+        F(v, 0x21B4) = 0;
+    if (altFire[k] > 0 && --altFire[k] == 0) {   /* the second mode flag (launcher +4) and the special now - the
+                                                  * special-up combo (energy 9) did not set it for them (test) */
+        F(v, 0x21B4) = 1; altChk[k] = 30;
+        F(br, 0x47C) = 1; aiSetAttackState(v, 7);
+    }
     if (enCd[k]) return;
     en = (int)*(float*)(v + 0x420); hp = hpPct(v);
     t = incoming(g, v, k);
@@ -1417,6 +1429,22 @@ static void energyUse(char* g, char* v, int evading)
     /* alternate specials (special-up combo, 9: the energy handler's per-car case - Shadow 288 and Axel 352 switch to
      * their second special; it checks the special is ready, +0x22B0 == 1): Shadow in a small fight, Axel's War Wheel
      * on a lone car up close (Ark 2026-10-25) */
+    /* (TODO 7) Outlaw / Manslaughter: second special mode when the AI could fire the special (its own check:
+     * aiIsGoodWeaponChoice(v, 1) - +0x22B0 stays 0 for them) */
+    if ((charOf(v) == 3 || charOf(v) == CH_MANSLAUGHTER) && F(drv, 4) == 5 && F(drv, 0xB4) && !altFire[k] && !altCd[k] &&
+        (thinkTick + k * 11) % 45 == 0) {
+        extern int aiGoodChoice2(char* v, int w) __asm__("aiIsGoodWeaponChoice__7Vehiclei");
+        char* tg = (char*)F(drv, 0xB4);
+        int d = (int)*(float*)(br + 0x20), c = charOf(v), a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF;
+        (void)tg;
+        if (aiGoodChoice2(v, 1) &&
+            ((c == CH_MANSLAUGHTER && d > 0 && d < 200 && a > 0x401B0000 && mathfRandI(0, 99) < 60) ||
+             (c == 3 && d > 100 && d < 350 && mathfRandI(0, 99) < 35))) {
+            altFire[k] = 3; altCd[k] = 360;       /* (once per 6 s at most) */
+            scePrintf("TMBR bots: car %d (char %d) second special mode, d %d\n", k, c, d);
+            return;
+        }
+    }
     if (F(drv, 4) == 5 && F(drv, 0xB4) && (thinkTick + k * 11) % 45 == 0 && F(v, 0x22B0) == 1) {
         char* tg = (char*)F(drv, 0xB4);
         int tk = (int)(tg - g) / 0x31B0 & 7, d = (int)*(float*)(br + 0x20), c = charOf(v);

@@ -65,7 +65,9 @@
       files set aside in TMB Decomp/hc_cars (reference/wip/HEADON_ETE.md). Old Pickup / Pit Viper are near-static
       models (tiny pointer lists): animate them from Black's files (wheels / suspension / weapon parts of a donor).
       Each needs a car slot, so this follows the 12 Pak / Gold Tooth own-slot work.
-  7. Outlaw turret secondary / Manslaughter drop-behind (Launcher::UpdateSpecial 0x15CD80).
+  7. DONE 2026-10-26 (bots set launcher +4 = v +0x21B4 and fire the special at once: Manslaughter on a target close
+     behind, Outlaw at 100-350 now and then; the special consumes the flag - tested; the special-up energy combo did
+     not set it for them). Outlaw turret secondary / Manslaughter drop-behind (Launcher::UpdateSpecial 0x15CD80).
   8. Minion toggle on the native game mods page.
   9. DONE 2026-10-26 (lobby HEALTH : ON / OFF, host R3 + Circle; off hides health / full-health pickups and
      TakeHit ignores them - tested: 3-5 hidden on the test map). HEALTH lobby option: ON = health pickups spawn and can be picked up (overrides the TMA ruleset's no-health);
