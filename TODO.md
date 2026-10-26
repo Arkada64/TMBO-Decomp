@@ -86,7 +86,10 @@
       with the pack but TMBO draws them with TEX0 TCC 0 (name bits 0x4000; 11 also T8H 0x1B vs T8 0x13).
       Textures/SCUS-97196/replacements = hard links renamed (cloud/in/g3/tx_map.py): 369 exact hits, loads
       (QB_TEXLOAD run). Left: goes into the 4d package (toggle); unseen maps / menus may hold more misses.
-  4d. TMBR player package (Ark 2026-10-26): portable PCSX2 trimmed to what TMBR needs, settings preset (EE 130%,
+  4d. TMBR player package (Ark 2026-10-26) - first build 2026-10-26: TMB Decomp/release/TMBR_Player
+      (tools/package/pk_build.sh + TMBR.cs launcher: PLAY, HD / 16:9 / fullscreen / potato, PCSX2 settings; 492 MB
+      of which 430 MB the HD pack as hard links). Left: TMBR.iso into game/, zip without bios, untested by Ark.
+      Original note: portable PCSX2 trimmed to what TMBR needs, settings preset (EE 130%,
       multitap, renderer), a TMBR.exe launcher that boots the ISO straight in (-batch -fullscreen), and toggles
       (HD textures, potato preset, upscale, later widescreen). The user supplies the BIOS; a rebuilt PCSX2 means
       publishing its source (GPL).
