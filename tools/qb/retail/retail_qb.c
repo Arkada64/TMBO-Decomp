@@ -18,6 +18,9 @@ extern void timerWait(unsigned int* p) __asm__("timerWaitForMinUpdateRate__FPUi"
 extern int viewNumViews;
 
 static int st, left = -1;
+static void frameTick(void);
+extern int padReady[8], padPhase[8], padState[8];
+static char FMT_PAD[] = "TMBR rpad: ready %d%d%d%d%d%d%d%d phase %d %d %d %d %d %d %d %d state %d %d %d %d %d %d %d %d\n";
 static char FMT_STEP[] = "TMBR rqb: step %d for %d\n";
 static char FMT_PERF[] = "TMBR rperf: frame avg %d us max %d us | busy avg %d%% max %d%% | slow %d/300 | views %d\n";
 
@@ -78,6 +81,9 @@ static void frameTick(void)
         if (++fn == 300) {
             scePrintf(FMT_PERF, (int)(fSumK / fn * 1000 / 295), (int)(fMax / 295), (int)(bSumK / fn * 100 / 4915),
                       (int)(bMax / 1000 * 100 / 4915), (int)fSlow, viewNumViews);
+            scePrintf(FMT_PAD, padReady[0], padReady[1], padReady[2], padReady[3], padReady[4], padReady[5], padReady[6], padReady[7],
+                      padPhase[0], padPhase[1], padPhase[2], padPhase[3], padPhase[4], padPhase[5], padPhase[6], padPhase[7],
+                      padState[0], padState[1], padState[2], padState[3], padState[4], padState[5], padState[6], padState[7]);
             fn = 0; fSumK = 0; bSumK = 0; fMax = 0; bMax = 0; fSlow = 0;
         }
     }
