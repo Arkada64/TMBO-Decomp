@@ -30,6 +30,16 @@
     4 views ~2.5-3x (300 % may still drop frames).
   - Then: the cap table (views x traffic -> max bots) in the host settings, and a per-view pass for our HUD mods
     (damage reports / team reminder only draw on screen 0 today).
+  - Retail baseline done (2026-10-25, tools/qb/retail: harness patched into SCUS_971.01, scripted 4 controllers on a
+    PCSX2 multitap, frame time + EE busy = frame - sceGsSyncV wait). Everyone driving + firing, EE 100 %:
+    2P Suburbs 30 % busy (peak 36), 0 slow; 3P Snowy Roads (4 views) 25 % (peak 35), ~1 slow / 300;
+    4P Snowy Roads 34 % (peak 47), ~1 slow / 300; 2P Suburbs at 130 %: 25 %. Views cost the EE little (GS/VU work
+    runs in parallel): TMBR's lag is the bots / traffic / AI.
+    Retail only offers 3/4P on the small arenas (Elevators, Snowy Roads, Power Plant, Dogpound, Sewers, Minion's
+    Stadium, Prison Ship, Asylum, Warhawk; unlocked without a save: Snowy Roads, Dogpound, Asylum). Forcing a big map
+    there is open: patching initMapMenu2LevelNum's table did not change the level loaded (locks go by menu entry;
+    the level comes from elsewhere - start from selectNext34PlayLevel / getCurrentLevelMenuSelection 0x167CB0).
+    Next real step: the same harness on TMBR (bots + traffic) in 2/3/4P.
 - **Bots and energy moves** (Ark 2026-10-25: bots use none). Every energy move is a player combo: `Combo::Check*Combo`
   (0x1245F8.. shield, cloak, freeze, minion, rear fire, drop mine, gas can, spec up/down/left/right) set the combo's
   `state` to the move (include/tmb/combo.hpp COMBO_TYPE_*: 1 freeze, 3 rear fire, 4 mine, 6 gas can, 7 shield,

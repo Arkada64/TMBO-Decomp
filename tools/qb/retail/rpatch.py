@@ -31,6 +31,8 @@ blob[o + 12:o + 16] = bytes(sc.get('keys', [0, 1, 2, 3]))
 for i, s in enumerate(steps):
     btn = [mask(x) for x in (list(s[1:]) + [''] * 4)[:4]]
     struct.pack_into('<HHHHHH', blob, o + 16 + 12 * i, s[0], 0, *btn)
+# "level": force every multiplayer level-menu entry to this level number (1 = Suburbs; 0 = leave the menu alone)
+struct.pack_into('<i', blob, o + 16 + 12 * 150, sc.get('level', 0))
 # hooks: jal tmbr_rPadRead at 0x1D7810, jal tmbr_rFrameWait at 0x15B518 (retail is loaded at file offset 0x10000 + va - 0x100000)
 phoff, = struct.unpack_from('<I', d, 0x1C); phnum, = struct.unpack_from('<H', d, 0x2C)
 _, roff, rva, _, rfs, rms, _, _ = struct.unpack_from('<IIIIIIII', d, phoff)
@@ -42,6 +44,11 @@ put(0x1D7810, jal(syms['tmbr_rPadRead'])); put(0x1DF220, jal(syms['tmbr_rPadRead
 for a_ in (0x15B4C0, 0x163560, 0x18EAD0, 0x1C1A20, 0x1F68C0, 0x1F68D4, 0x1F69AC, 0x1F69C0, 0x1FC5EC):   # every sceGsSyncV call
     assert struct.unpack_from('<I', d, roff + a_ - rva)[0] == jal(0x203B80), hex(a_)
     put(a_, jal(syms['tmbr_rSyncV']))
+# "level": the 3/4-player level menu (retail: small arenas only) - its second entry (Snowy Roads, unlocked without a
+# save) starts this level instead (initMapMenu2LevelNum, 34P branch: li a2, 0xA -> li a2, level; menu locks go by entry)
+if sc.get('level'):
+    assert struct.unpack_from('<I', d, roff + 0x167A64 - rva)[0] == 0x2406000A
+    put(0x167A64, 0x24060000 | sc['level'])
 # the extra segment: data appended at a 0x10000-aligned file offset, a second program header after the first
 fo = (len(d) + 0xFFFF) & ~0xFFFF
 d += bytes(fo - len(d)) + blob

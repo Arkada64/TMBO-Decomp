@@ -9,8 +9,12 @@
  * Load: see frameTick (EE cycle counter, 294.912 MHz: 4,915,200 cycles = one 60 Hz frame). */
 #define RQ_STEPS 150
 typedef struct { unsigned short frames, pad_, btn[4]; } RStep;
-typedef struct { unsigned int magic, nsteps, loop_from; unsigned char key[4]; RStep step[RQ_STEPS]; } RScript;
-RScript tmbr_rq = { 0x52514D54, 0, 0xFFFF, { 0, 1, 2, 3 }, { { 0 } } };
+typedef struct { unsigned int magic, nsteps, loop_from; unsigned char key[4]; RStep step[RQ_STEPS]; int level; } RScript;
+RScript tmbr_rq = { 0x52514D54, 0, 0xFFFF, { 0, 1, 2, 3 }, { { 0 } }, 0 };
+/* level: every entry of the multiplayer level menu (mapMenu2LevelNum, rebuilt by initMapMenu2LevelNum on entering
+ * it) is overwritten with this level number every frame, so the 3/4-player menu - small arenas only in retail - starts a
+ * story map (1 = Suburbs) */
+extern int mapMenu2LevelNum[19];
 
 extern int scePadRead(int port, int slot, unsigned char* data);
 extern void scePrintf(const char* f, ...);
@@ -36,6 +40,7 @@ int tmbr_rPadRead(int port, int slot, unsigned char* d)
     int r = scePadRead(port, slot, d), p, key = port * 4 + slot, b;
     if (key == tmbr_rq.key[0]) {                       /* player 1's read: once a frame - advance the script */
         frameTick();
+        if (tmbr_rq.level > 0) for (p = 0; p < 19; p++) mapMenu2LevelNum[p] = tmbr_rq.level;
         if (left < 0) { st = 0; left = tmbr_rq.nsteps ? tmbr_rq.step[0].frames : 0; }
         else if (--left <= 0 && st < (int)tmbr_rq.nsteps) {
             st++;
