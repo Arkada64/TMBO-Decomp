@@ -57,6 +57,10 @@ static int trafDummy[16] __attribute__((aligned(16)));   /* stands in for the +0
 
 #define VSIZE 0x31B0
 #define TRAFFIC_DBG 1   /* setup progress + car state every 2 s (first 4 cars) */
+#ifndef TRAFFIC_TRACE
+#define TRAFFIC_TRACE 0 /* route maps (tools/traffic/trafmap.py): every car's position every 0.5 s, "TMBR tt" lines */
+#endif
+static int traceTick, nhwTrace;   /* (highway cars are the first nhwTrace) */
 #define MAXCARS 32       /* retail allows 33; traffic.s has a 32-entry cs pool (LOOP has 32 cars) */
 #define F(v, off) (*(int*)((v) + (off)))
 static int doneSerial = -1;
@@ -173,7 +177,7 @@ static void setup(void)
             if (id < 0xBB7 && sub > 0 && sub < 32) attachAdd(v, sub, (void*)nodes[i]);
         }
     }
-    ncars = ngroups;
+    ncars = ngroups; nhwTrace = nhw; traceTick = 0;
     scePrintf("TMBR traffic: models attached\n");
     /* InitializeFodderCars + SetFodderCar */
     /* FodderDriver::init is static: it only stores the street points every fodder driver reads its lanes from.
@@ -497,6 +501,25 @@ void tmbr_TrafficUpdate(void)
             vehicleSetCsMat(v);
         }
         tmbr_PerfAdd(5, tp);
+    }
+    if (TRAFFIC_TRACE && ncars && ++traceTick % 30 == 1) {
+        /* "TMBR tt <frame/30> <level>: car x y z alive ..." 5 cars a line, world units as ints */
+        for (j = 0; j < ncars; j += 5) {
+            int q;
+            char *v, *cs;
+            int c[5][4];
+            for (q = 0; q < 5; q++) {
+                c[q][0] = c[q][1] = c[q][2] = 0; c[q][3] = -1;
+                if (j + q >= ncars) continue;
+                v = cars + (j + q) * VSIZE; cs = (char*)F(v, 0x2028);
+                if (!cs) continue;
+                c[q][0] = (int)*(float*)(cs + 0x10); c[q][1] = (int)*(float*)(cs + 0x14); c[q][2] = (int)*(float*)(cs + 0x18);
+                c[q][3] = F(v, 0x590) ? (j + q < nhwTrace ? 2 : 1) : 0;
+            }
+            scePrintf("TMBR tt %d %d %d: %d %d %d %d | %d %d %d %d | %d %d %d %d | %d %d %d %d | %d %d %d %d\n", traceTick / 30,
+                tmbr_levelIndex, j, c[0][0], c[0][1], c[0][2], c[0][3], c[1][0], c[1][1], c[1][2], c[1][3], c[2][0], c[2][1],
+                c[2][2], c[2][3], c[3][0], c[3][1], c[3][2], c[3][3], c[4][0], c[4][1], c[4][2], c[4][3]);
+        }
     }
     if (TRAFFIC_DBG && ncars && dbgTick % 600 == 599)
         scePrintf("TMBR traffic sync: host %d, sent %d, received %d\n", netIsHost(D_003156C0), syncSent, syncRecv);
