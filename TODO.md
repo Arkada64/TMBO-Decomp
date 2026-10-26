@@ -82,7 +82,10 @@
       projection moved inward and the online score text sat on the weapon list / health. Lay the HUD out for 16:9
       (elements to the edges, sprites x 3/4 so they aren't stretched); widescreen stays off by default until then.
   4c. HD texture pack (Ark 2026-10-26): Textures/SCUS-97101 (2275 .dds, 431 MB, made for retail TMB). TMBO/TMBR is
-      SCUS-97196, so junction it in as textures/SCUS-97196 and check how much of it hits (hash match).
+      SCUS-97196. Checked 2026-10-26 (QB_TEXDUMP run, 2P match): 467 textures dumped, 369 share texture + CLUT hash
+      with the pack but TMBO draws them with TEX0 TCC 0 (name bits 0x4000; 11 also T8H 0x1B vs T8 0x13).
+      Textures/SCUS-97196/replacements = hard links renamed (cloud/in/g3/tx_map.py): 369 exact hits, loads
+      (QB_TEXLOAD run). Left: goes into the 4d package (toggle); unseen maps / menus may hold more misses.
   4d. TMBR player package (Ark 2026-10-26): portable PCSX2 trimmed to what TMBR needs, settings preset (EE 130%,
       multitap, renderer), a TMBR.exe launcher that boots the ISO straight in (-batch -fullscreen), and toggles
       (HD textures, potato preset, upscale, later widescreen). The user supplies the BIOS; a rebuilt PCSX2 means
