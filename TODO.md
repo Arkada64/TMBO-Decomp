@@ -39,9 +39,10 @@
      4:3 frame. Fix = 4:3 / Auto in PCSX2, or real widescreen (4b). HUD anchors (hud +0x800 left cluster -2.47 3.36
      1.11, +0x810 right cluster 2.11 3.5 -0.89; x right, y forward, z up). Retail TMB widescreen pnach (PCSX2
      patches.zip SCUS-97101_073696DA) lists every view's FOV + HUD constant (1P, 2P horizontal/vertical, 4P).
-  5. Bots charge the reticle weapon (satellite-style, hold up to 5 s; Launcher func_001549A0 charger code,
+  5. DONE (002db01: bots hold the reticle 1.5-4.5 s, longer on a still target). Bots charge the reticle weapon (satellite-style, hold up to 5 s; Launcher func_001549A0 charger code,
      GetSatelliteReticle; find the held-fire input first).
-  5b. Bots aim the big shots (Ark 2026-10-26): they fire power missiles / zoomys (and other slow, straight shots)
+  5b. IN TEST (bots.c aimShot: power missile / zoomy type 0xD assumed - logged; stop, brake, fine aim, fire within
+      3.4 deg, leave on turbo; chance 30/55/75 % by difficulty). Bots aim the big shots (Ark 2026-10-26): they fire power missiles / zoomys (and other slow, straight shots)
       on the move and mostly miss. For those weapons let a bot slow down / stop, line up the shot, fire its load,
       then get back up to speed - sometimes, not every time.
   6. 12 Pak as a bot. Also his weapon panels (Ark 2026-10-26: the hatches that open as the weapons come out):

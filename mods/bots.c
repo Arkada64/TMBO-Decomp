@@ -736,6 +736,67 @@ static int charging(char* g, char* v, int idx)
     return 1;
 }
 
+/* ---- lining up the big straight shots (Ark 2026-10-26: bots fired power missiles / zoomys on the move and mostly
+ * missed - they have to be aimed). When the AI weapon is the power missile (6) or the pickup slot holding zoomys
+ * (launcher +0x110 type 0xD), in sight and within AS_RANGE, a bot sometimes (AS_CHANCE by difficulty) stops to aim:
+ * off the gas, braking while still fast, small steering corrections (more often the further off), and fires when
+ * the target is within AS_TIGHT of the nose; it keeps the pose for the rest of the load (AS_GAP between shots),
+ * then leaves on turbo (AS_TURBO frames) to get back up to speed. At most AS_MAX frames; a target that gets too
+ * close (< AS_MIN) or out of sight for AS_LOST frames ends it. Decided once per pick (the weapon pick time). */
+#define AS_RANGE 0x43C80000   /* 400.0 */
+#define AS_MIN   0x42C80000   /* 100.0 */
+#define AS_TIGHT 0x3D75C28F   /* 0.06 rad, ~3.4 deg */
+#define AS_START 0x3EB33333   /* 0.35 rad: only from roughly facing it */
+#define AS_MAX 110
+#define AS_GAP 24
+#define AS_LOST 30
+#define AS_TURBO 60
+static short asT[8], asLost[8], asGap[8], asTurbo[8], asShots[8];
+static int asDecided[8];          /* wpnPicked[] value the decision was made for */
+static signed char asOn[8];
+static int wpnPicked[8];          /* (defined with the weapon pick below) */
+static int bigShot(char* v, char* br)
+{
+    int w = F(br, 0x47C);
+    char* l = v + 0x21B0;
+    return w == 6 || (w == 5 && F(l, 0x110) == 0xD);
+}
+static int aimShot(char* g, char* v, int idx, int b, int a, int d)
+{
+    static const int chance[3] = { 30, 55, 75 };
+    char* br = (char*)F(v, 0x2014);
+    unsigned char* pad = PAD(v);
+    int seen = F(br, 0x598) || F(br, 0x4B0) < 10, sp, duty;
+    if (asTurbo[idx] > 0) { asTurbo[idx]--; pad[4] = 1; pad[6] = 0; pad[7] = 1; }
+    if (!asOn[idx]) {
+        if (!bigShot(v, br) || asDecided[idx] == wpnPicked[idx]) return 0;
+        if (d < AS_MIN || d > AS_RANGE || a > AS_START || !seen || (ROLE(v) == R_SNIPER && ph[idx] == 4)) return 0;
+        asDecided[idx] = wpnPicked[idx];
+        if (mathfRandI(0, 99) >= chance[tmbr_botDiff < 0 ? 0 : tmbr_botDiff > 2 ? 2 : tmbr_botDiff]) return 0;
+        asOn[idx] = 1; asT[idx] = asLost[idx] = asGap[idx] = asShots[idx] = 0;
+        scePrintf("TMBR aim: car %d lines up (w %d, d %d)\n", idx, F(br, 0x47C), (int)*(float*)(br + 0x20));
+    }
+    asLost[idx] = seen ? 0 : asLost[idx] + 1;
+    if (!bigShot(v, br) || ++asT[idx] > AS_MAX || asLost[idx] > AS_LOST || d < AS_MIN || d < 0) {
+        scePrintf("TMBR aim: car %d done after %d, %d shots\n", idx, asT[idx], asShots[idx]);
+        asOn[idx] = 0; asTurbo[idx] = AS_TURBO;
+        if (bigShot(v, br)) F(br, 0x47C) = 0;          /* (gave up with it still up: pick again) */
+        return 0;
+    }
+    sp = cok[idx] ? iabs(cvx[idx]) + iabs(cvy[idx]) : 0;
+    pad[4] = 0; pad[7] = 0; pad[2] = 0;
+    pad[6] = sp > 6;                                   /* brake while still moving (x4 units per frame) */
+    pad[9] = 0; pad[0xA] = 0;
+    duty = a < AS_TIGHT ? 0 : a < AIM_1 ? 1 : a < AIM_2 ? 2 : 4;
+    if (duty && ((asT[idx] + idx) & 3) < duty) { if (b > 0) pad[0xA] = 1; else pad[9] = 1; }
+    if (sp <= 6 && a > AIM_3) pad[4] = 1;              /* stopped and far off: creep round on the gas */
+    if (asGap[idx] > 0) asGap[idx]--;
+    if (a < AS_TIGHT && asGap[idx] == 0 && seen) { aiSetAttackState(v, 7); asShots[idx]++; asGap[idx] = AS_GAP; dbgShots[idx]++; }
+    else if (F(br, 0x414) == 7) aiSetAttackState(v, 5);   /* the AI's own fire request waits for the line-up */
+    dbgWhy[idx] = 60;
+    return 1;
+}
+
 static void aggressiveTurn(char* g, char* v, char* t)
 {
     char* br = (char*)F(v, 0x2014);
@@ -761,6 +822,7 @@ static void aggressiveTurn(char* g, char* v, char* t)
      * for LOCK_T frames before a homing missile goes - like a player waiting for the red reticle */
     if (d >= 0 && d < FIRE_DIST && a < LOCK_ANG && (F(br, 0x598) || F(br, 0x4B0) < 10)) { if (lockT[idx] < 100) lockT[idx]++; }
     else lockT[idx] = 0;
+    if (aimShot(g, v, idx, b, a, d)) return;                  /* stopped, lining up a big straight shot */
     if (charging(g, v, idx)) { /* holding the reticle charge: no trigger */ }
     else if ((st == 5 || st == 6) && d >= 0 && (F(br, 0x598) || F(br, 0x4B0) < 10) && F(br, 0x47C) != 1 &&
         (F(br, 0x47C) == 3 ? (lockT[idx] >= LOCK_T && d < FIRE_DIST) : (a < FIRE_TIGHT && d < FIRE_NEAR))) {
@@ -1448,7 +1510,7 @@ extern void aiPickBest(char* v) __asm__("aiPickBestWeaponToFireNow__7Vehicle");
 extern int mathfRandW(int lo, int hi) __asm__("mathfRand__Fii");
 static int wpnClock;               /* = thinkTick */
 static int wpnReady[8][8];         /* per car, per AI weapon: frame it can be picked again */
-static int wpnPicked[8];           /* frame the current weapon was picked */
+/* (wpnPicked[]: frame the current weapon was picked - declared with aimShot above) */
 static signed char burstLeft[8];   /* missiles left in the current burst (fire / homing) */
 #define BURST_CHANCE 45            /* % of fire / homing picks that start a burst (2026-10-25: chip damage like players) */
 #define BURST_GAP 14               /* frames between missiles in a burst (~0.25 s) */
@@ -1519,6 +1581,11 @@ void tmbr_AiPickWeapon(char* v)
     if (w >= 8) return;
     F(br, 0x47C) = w;
     wpnPicked[k] = wpnClock;
+    if (w == 5) {   /* (which pickup types bots fire - zoomys assumed type 0xD for the line-up, 2026-10-26) */
+        static unsigned int seen5;
+        int ty = F(v + 0x21B0, 0x110) & 31;
+        if (!(seen5 >> ty & 1)) { seen5 |= 1u << ty; scePrintf("TMBR aim: pickup slot type %d\n", ty); }
+    }
     if (w == 2 || w == 3) {
         /* fire / homing missiles: sometimes a burst of 2-4 back to back, then a longer rest (both light
          * missiles share the timer, so a burst can mix them) */
