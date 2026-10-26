@@ -107,30 +107,40 @@ extern int tmbr_levelSerial;
 static int splitSerial = -1, splitWait, splitN;
 static char* splitCar[4];
 
-/* ---- widescreen (experimental, Ark 2026-10-25: the 4:3 picture leaves black bars on a 16:9 screen) ----
- * tmbr_wide[1]: 0 off; 9 = test: view i of a 4-view split gets variant i (0 as is, 1 first fov value x 4/3,
- * 2 second x 3/4, 3 second x 4/3) to find which one widens the picture (viewSetFov(view, a, b), func_00243B78
- * passes the global fov and the viewport's +0x20). */
-int tmbr_wide[2] = { 0x45444957, 0 };   /* "WIDE" */
+/* ---- widescreen (Ark 2026-10-25: the 4:3 picture leaves black bars on a 16:9 screen; PCSX2 only, see TODO) ----
+ * Every view gets a 4/3 wider horizontal field of view with the same vertical one, and PCSX2 shows the picture at
+ * 16:9 (gamesettings.py: AspectRatio). viewSetFov(view, a, b): a is the projection distance (the function does
+ * atan(x / a)), b the vertical scale - a x 3/4 and b x 4/3 (test 2026-10-26: same view of the same car, the
+ * picture 4/3 wider, the height the same). Checked 0.5 s after the level starts, then every second, and when
+ * the split-screen views are made; a view that already has our value is left alone (no stacking).
+ * tmbr_wide[1]: 1 on (default), 0 off; tests: 8 = 2 views both on the player, view 1 widened. */
+int tmbr_wide[2] = { 0x45444957, 1 };   /* "WIDE" */
 extern void viewSetFov(int i, float a, float b) __asm__("viewSetFov__Fiff");
 extern void viewGetFov(int i, float* a, float* b) __asm__("viewGetFov__FiPfT1");
+extern int viewGetNumViews(void) __asm__("viewGetNumViews__Fv");
 static float KW[2] = { 1.3333333f, 0.75f };
+static float wideSet[4];
 static void wideApply(int views)
 {
     int i;
-    for (i = 0; i < views; i++) {
+    for (i = 0; i < views && i < 4; i++) {
         float a, b;
-        int var = tmbr_wide[1] == 9 ? i : tmbr_wide[1];
+        if (tmbr_wide[1] == 8 && i == 0) continue;
         viewGetFov(i, &a, &b);
-        if (var == 1) a = a * KW[0];
-        else if (var == 2) b = b * KW[1];
-        else if (var == 3) b = b * KW[0];
-        else continue;
+        if (a == wideSet[i]) continue;          /* ours already */
+        a = a * KW[1]; b = b * KW[0];
         viewSetFov(i, a, b);
-        scePrintf("TMBR wide: view %d variant %d\n", i, var);
+        wideSet[i] = a;
+        scePrintf("TMBR wide: view %d\n", i);
     }
 }
-
+static int wideSerial = -1, wideWait;
+static void wideFrame(void)
+{
+    if (!tmbr_wide[1]) return;
+    if (wideSerial != tmbr_levelSerial) { wideSerial = tmbr_levelSerial; wideWait = 30; return; }
+    if (--wideWait <= 0) { wideWait = 60; wideApply(viewGetNumViews()); }   /* then every second (a view the game resets gets it back) */
+}
 static void splitFrame(char* cam)
 {
     extern char* D_004FA030;
@@ -166,6 +176,13 @@ static void splitFrame(char* cam)
             *(int*)(cam + 0x42A8), *(int*)(cam + 0x42AC));
     }
     if (!splitN) return;
+    if (tmbr_wide[1] == 8 && !splitCar[1]) {             /* widescreen test: view 1 on the player too */
+        for (k = 0; k < 8; k++) {
+            char* c = g + k * 0x31B0;
+            if (*(int*)(c + 0x590) == 1 && *(int*)(c + 0x2028)) { splitCar[1] = c; camFollow(cam, 1, c, *(void**)(c + 0x2028)); camPov(cam, 1, *(int*)cam); break; }
+        }
+        return;
+    }
     for (i = 1 + tmbr_GuestCount(); i < splitN; i++) {     /* (views 1..guests are the guests') */
         char* v = splitCar[i];
         if (v && *(int*)(v + 0x590) && *(int*)(v + 0x2028)) continue;
@@ -234,6 +251,7 @@ void tmbr_CameraUpdate(char *cam)
 #endif
 #ifndef TMBR_PNACH
     splitFrame(cam);
+    wideFrame();
 #endif
     cameraUpdate(cam);
 #ifdef TMBR_PNACH
