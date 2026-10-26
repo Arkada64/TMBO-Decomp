@@ -122,7 +122,10 @@
       bar - the halves look present, only static. Retail screens: 6 x 0x30 structs at shell +0x17140, cs at +0x20,
       y at cs +0x18 (uiInitScreens zeroes / places them); the cs pointers are not written in retail shell.s (set by
       a table-driven loader?). TMBO's main UI loop is func_001B2B68 (calls func_001B44E0 = uiInitScreens).
-      Next: find the two halves' cs in TMBO (PINE memory read during a load, or the shell object loader), then a
+      Checked in the lobby (2026-10-26): TMBO's shell +0x17140 screens are all empty (cs 0) - the shell offsets
+      below 0x19BE4 match retail (above: +0x28) and shell +0x2110's cs exists, so TMBO never makes the screens.
+      Next: find the halves' hier nodes in SHELL1.NGP (retail's screen cs come from a table-driven loader), make
+      their cs, then a
       mod step that starts them off screen and slides them in (200 / 400 per frame as retail) before the load.
   13b. Garage / car colour (Ark 2026-10-26, idea): recolour a car's body textures (palette / CLUT tint at load, or
       a texture swap like the 12 Pak skin), choice synced to other players like the skin byte.
