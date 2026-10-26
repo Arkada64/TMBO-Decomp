@@ -98,10 +98,39 @@ extern void menuMain(void) __asm__("func_001B8C10");
 extern int inputGetPadButtons(int pad) __asm__("inputGetPadButtons__Fi");
 extern void shellSfx(void* snd, int id) __asm__("playShellSFXSound__10ShellSoundi");
 int tmbr_MenuPad(int b) { return b; }
+/* 128 MB EE (PCSX2 "Enable 128MB RAM (Dev Console)", ini ExtraMemory): is memory past 32 MB there? (test 2026-10-26).
+ * Writes a pattern at 48 MB and 120 MB (uncached kseg1) and reads it back; 32 MB machines mirror / fault there, so
+ * it only runs when the kernel's memory size says more than 32 MB. */
+extern int GetMemorySize(void) __asm__("GetMemorySize");
+int tmbr_bigRam;
+static void ramProbe(void)
+{
+    static int done;
+    volatile unsigned* a = (volatile unsigned*)0xA3000000;   /* 48 MB */
+    volatile unsigned* b = (volatile unsigned*)0xA7800000;   /* 120 MB */
+    volatile unsigned* z = (volatile unsigned*)0xA1000000;   /* 16 MB (mirror check) */
+    unsigned keep;
+    int sz;
+    if (done) return;
+    done = 1;
+    sz = GetMemorySize();
+    scePrintf("TMBR ram: kernel memory size %x\n", sz);
+    if (sz <= 0x2000000) return;
+    {
+        unsigned oa = *a, ob = *b, ra, rb;
+        keep = *z;
+        *a = 0x12345678; *b = 0x9ABCDEF0;
+        ra = *a; rb = *b;
+        tmbr_bigRam = ra == 0x12345678 && rb == 0x9ABCDEF0 && *z == keep;
+        *a = oa; *b = ob;                                    /* (the heap may reach up there now) */
+        scePrintf("TMBR ram: 48 MB %08x 120 MB %08x 16 MB %s -> extra memory %s\n", ra, rb, *z == keep ? "kept" : "CHANGED", tmbr_bigRam ? "OK" : "no");
+    }
+}
 void tmbr_MainMenu(void)
 {
     static int prev = -1, hold;
     int b = inputGetPadButtons(0) & 0xFFFF, pr = prev < 0 ? 0 : b & ~prev;
+    ramProbe();
     prev = b;
     labels(tmbr_menuPage == 0);
     if (hold & b) return;                                            /* the page press: the menu waits until it is let go */

@@ -63,7 +63,10 @@ def main():
     # "prepatched": the ELF already carries its script (retail harness, tools/qb/retail): copy as is
     open('test/QUICK.ELF', 'wb').write(open(a.elf, 'rb').read() if script.get('prepatched') else patch(a.elf, script))
     ini = f'{P}/inis/PCSX2.ini'; shutil.copy(ini, ini + '.qbbak')
-    s = open(ini).read().replace('StandardVolume = 100', 'StandardVolume = 0').replace('FastForwardVolume = 100', 'FastForwardVolume = 0')
+    s = open(ini).read().replace('StandardVolume = 100', 'StandardVolume = 0').replace('FastForwardVolume = 100', 'FastForwardVolume = 0').replace('\nSDL = true', '\nSDL = false').replace('\nXInput = true', '\nXInput = false').replace('\nDInput = true', '\nDInput = false')   # no real controllers in tests (Ark 2026-10-26: his Xbox pad rumbled)
+    if os.environ.get('QB_EXTRAMEM') == '1': s = s.replace('ExtraMemory = false', 'ExtraMemory = true')   # 128 MB EE test
+    if os.environ.get('QB_TEXLOAD'): s = s.replace('LoadTextureReplacements = false', 'LoadTextureReplacements = true').replace('PrecacheTextureReplacements = false', 'PrecacheTextureReplacements = true')   # (HD pack test)
+    if os.environ.get('QB_TEXDUMP'): s = s.replace('DumpReplaceableTextures = false', 'DumpReplaceableTextures = true')   # (HD pack hit check)
     # PINE on (savestates on request, for the EE registers of a hang) and uncompressed savestates
     s = s.replace('EnablePINE = false', 'EnablePINE = true').replace('SavestateCompressionType = 2', 'SavestateCompressionType = 0')
     if os.environ.get('QB_PADS'):                     # retail split screen: multitap on port 1 + controllers 2-5 present
