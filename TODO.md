@@ -8,16 +8,17 @@
   bay panel (Ldr/Rnk/Pts/...) placed per layout, death scoreboard shrunk per view with short titles, damage reports
   per screen, guests take damage, respawn shield (same 10 s timer as P1), guests on the leaderboard by name
   (net object like the bots), "cars left" counter counts guests.
-  Open, in order:
-  1. 3/4-player bay panel: more compact but readable (testing g38: size 6, half line spacing).
-  2. Death scoreboard: check the title spacing fix + short titles (PLR KLS DTS SUI PTS) in 2/3/4 views.
-  3. Bay panel per player: each view shows its own player's line (now the host's for all) - the leaderboard
-     (func_00175AA0) now has the guests; the panel reads the local player's net record (net +0x3010/+0x3014).
-  4. Guests' spawn shield animation (timer/state match P1's - the effect itself differs; screenshot both).
-  5. 3-player 4th quarter: pure black (now very dark grey).
-  6. Sound listener in split (likely P1's camera only) - check how retail TMB split did it.
-  7. Guests joining on a client console (host makes the car over chat) - feature, lower priority.
-  8. Remove debug prints (guest hp / shield every 30 frames) before an ISO.
+  Done 2026-10-26 morning: bay panel per player (own car colour, own rank; nudged right off the car in 2P and 4P),
+  compact quarter panel (size 8), death scoreboard short titles, 3P empty quarter black (view 3's clear colour is
+  rewritten by the time of day during views 0-2; set again in view 2's HUD step), tests use no real controllers.
+  Open:
+  1. Guests' spawn shield is not animated (pixels identical 4 s apart; the timer / state match P1's). The shimmer is
+     a UV scroll from the car cs's animation channels (pktAddVu1Obj -> pktClipUVScroll, values via scratchpad
+     0x70000020); find what runs that animation for P1 (player spawn path?) and run it for guests. Check bots too.
+  2. Sound in split: the mixer (calcDualMonoMixVolPan, func_0019B5F8 ...) loops over every view's camera (count
+     game +0x2BB60 = the render loop's view count), so guests should be heard around their cars - Ark to listen.
+  3. Guests joining on a client console (host makes the car over chat) - feature, lower priority.
+  4. Remove debug prints (guest hp / shield every 30 frames) before an ISO.
   Then the rest of the queue: 4b real widescreen HUD layout, 4c HD texture pack, 4d TMBR player package,
   4e retail loading screen, 5-14 (bots reticle, 12 Pak bot + his weapon panels / own mount points, Outlaw /
   Manslaughter, minion toggle page, HEALTH option, environment pickups gone, story mode, co-op + ally, online
