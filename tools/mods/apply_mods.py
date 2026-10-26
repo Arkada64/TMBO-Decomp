@@ -243,6 +243,9 @@ PATCHES = [
     # ... bot weapons pass (bots.c): heavy-weapon cooldowns, weighted pick
     (A("nonmatchings/tmb/ai/aiUpdateAttack__7Vehicle.s"), "00105BA0", "jal", "jal        tmbr_AiKeepWeapon"),
     (A("nonmatchings/tmb/ai/aiUpdateAttack__7Vehicle.s"), "00105BB0", "jal", "jal        tmbr_AiPickWeapon"),
+    (A("tmb/collis.s"), "0011F0DC", "jal", "jal        tmbr_PickupHit"),                       # HEALTH : OFF (bots.c)
+    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167378", "jal", "jal        tmbr_PickupHit"),
+    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167454", "jal", "jal        tmbr_PickupHit"),
     # ... team play (teams.c): team colours for every car incl. bots on markers / radar, lock-on skips teammates
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCE2C", "addiu", "jal        tmbr_TeamColorS"),
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCE30", "bne", "daddu      $4, $17, $0"),
