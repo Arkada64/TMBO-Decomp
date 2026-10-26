@@ -38,6 +38,8 @@
       multitap, renderer), a TMBR.exe launcher that boots the ISO straight in (-batch -fullscreen), and toggles
       (HD textures, potato preset, upscale, later widescreen). The user supplies the BIOS; a rebuilt PCSX2 means
       publishing its source (GPL).
+  4e. Retail loading screen (Ark 2026-10-26): TMB's load screen where the top and bottom halves come crashing
+      down; TMBO skips it. Bring it back for TMBR's level loads.
   14. (Last, very experimental) Roguelike story option (no story: online's default loading screen instead of the
       story loading screens / dialogue, no cutscenes; synchronous entry by default so everyone starts together): each round a choice of two maps from any map, a visited map
       leaves the pool; character dialogue won't fit every stage. AI back to the human-hunting routine and doing far

@@ -86,6 +86,36 @@ static int freeSlot(char* g)
     return -1;
 }
 
+/* The level loads one car per player slot (what is loaded is in D_00313F00[slot]); a guest's slot is empty to
+ * the network, so it carries the bot car the host rolled for it (test 2026-10-26: Junkyard Dog picked, Yellow
+ * Jacket / Outlaw loaded). At level start, load the guest's car into that slot the way TMBO reloads a player
+ * who changed cars mid-session (func_001742B0: func_001FE0B8 + func_001890F0, needs slot +0x10 != -1 and
+ * +0xB8 set, both put back after). func_0018A480(vehicle) is 1 once nothing is queued for it. */
+extern int D_00313F00[];
+extern char* D_004FA03C;
+extern void shellLoadSlotCar(char* shell, int s) __asm__("func_001890F0");
+extern void carUnloadVeh(int v) __asm__("func_001FE0B8");
+extern int carLoadDone(int v) __asm__("func_0018A480");
+void tmbr_GuestsPreload(void)
+{
+    int k;
+    for (k = 1; k <= 3; k++) {
+        int s = joinSlot[k], was10, wasB8, vn;
+        char* sl;
+        if (!joinCar[k] || s < 0) continue;
+        sl = D_003156C0 + s * 0x220;
+        if (F(sl, 0xB4) != joinCar[k]) F(sl, 0xB4) = joinCar[k];
+        if (D_00313F00[s] == joinCar[k]) { scePrintf("TMBR guests: slot %d already has car %d\n", s, joinCar[k] >> 5); continue; }
+        scePrintf("TMBR guests: slot %d loaded car %d, loading %d\n", s, D_00313F00[s] >> 5, joinCar[k] >> 5);
+        was10 = F(sl, 0x10); wasB8 = F(sl, 0xB8);
+        F(sl, 0x10) = s; F(sl, 0xB8) = 1;
+        vn = netSlotVehicle(D_003156C0, s);
+        carUnloadVeh(vn);
+        shellLoadSlotCar(D_004FA03C, s);
+        F(sl, 0x10) = was10; F(sl, 0xB8) = wasB8;
+        scePrintf("TMBR guests: slot %d now %d, done %d\n", s, D_00313F00[s] >> 5, carLoadDone(vn));
+    }
+}
 /* make the guests (freecam.c splitFrame, right after the views are set up, cam = their view) */
 void tmbr_GuestsMake(int views)
 {
@@ -115,6 +145,7 @@ void tmbr_GuestsMake(int views)
         if (car <= 0) car = mathfRandI(1, 14) << 5;
         if ((car >> 5) == 15 && tmbr_Opt(8)) car = mathfRandI(1, 14) << 5;   /* Minion off */
         padOf[v] = pads[k];
+        if (k > 0 && joinSlot[k] >= 0) scePrintf("TMBR guests: load done %d, slot car %d\n", carLoadDone(netSlotVehicle(D_003156C0, joinSlot[k])), D_00313F00[joinSlot[k]] >> 5);
         veh = gameMakeAI(g, v, car, v, i, 0);
         if (!veh) {             /* (the human branch does not return the car: find the one it set up) */
             int k;
@@ -200,6 +231,21 @@ void tmbr_GuestsLobby(void)
         }
     }
 }
+/* func_00174598 (host: each empty player slot, +0x10 == -1, gets a random car at +0xB4 - the bots' cars) runs when
+ * the room is made and again in func_0016FA30; a guest's reserved slot is an empty slot, so its car must be put back
+ * after it (test 2026-10-26: P2 picked Junkyard Dog and came in as Yellow Jacket) */
+extern void netRandomBotCars(void* net) __asm__("func_00174598");
+void tmbr_BotCars(void* net)
+{
+    int k;
+    netRandomBotCars(net);
+    for (k = 1; k <= 3; k++) {
+        if (!joinCar[k] || joinSlot[k] < 0) continue;
+        scePrintf("TMBR guests: slot %d car %d -> %d (+0x10 %d)\n", joinSlot[k], F(D_003156C0 + joinSlot[k] * 0x220, 0xB4) >> 5,
+            joinCar[k] >> 5, F(D_003156C0 + joinSlot[k] * 0x220, 0x10));
+        F(D_003156C0 + joinSlot[k] * 0x220, 0xB4) = joinCar[k];
+    }
+}
 /* car select's confirm / back (net state 1 + the car in this console's client struct): a guest pick stays local */
 void tmbr_CarSelNet(void* net, int st)
 {
@@ -269,12 +315,28 @@ void tmbr_GuestPickTitle(void)
     fontSetCursorAtSubPixel(0, 0x1400, 0x500);
     fontPrint(0, t[picking]);
 }
-/* waiting room settings box line (bots.c extraLines) */
+/* waiting room settings box line (bots.c extraLines): retired - the guests are rows in the player list now
+ * (Ark 2026-10-26: a line per guest there would run P3 / P4 off the box) */
 extern int sprintf(char* d, const char* f, ...);
-void tmbr_GuestsLine(char* b)
+void tmbr_GuestsLine(char* b) { b[0] = 0; }
+/* the waiting room's player list (func_001C5768 0x1C5C48..): a row per player slot in use (+0x10 != -1) from
+ * y 0x500, 0x100 apart; name x 0x1E0, ping 0x1090, car 0x14A0, status 0x1F40. The guests are local only (their
+ * slots stay empty for the network), so their rows are drawn after the list, in the same font. */
+extern void fontSetColor(int font, int r, int g, int b) __asm__("fontSetColor__Fiiii");
+void tmbr_GuestsRows(void)
 {
-    int k, n = 0;
-    b[0] = 0;
-    for (k = 1; k <= 3; k++)
-        if (joinCar[k]) n += sprintf(b + n, "%sP%d %s", n ? " " : "", k + 1, D_0041BF00[joinCar[k] >> 5]);
+    int s, k, row = 0;
+    char b[40];
+    const char* me = myClient() ? myClient() + 8 : "";
+    for (s = 0; s < 8; s++) if (F(D_003156C0 + s * 0x220, 0x10) != -1) row++;
+    for (k = 1; k <= 3; k++) {
+        int y;
+        if (!joinCar[k] || row >= 8) continue;
+        y = 0x500 + row++ * 0x100;
+        fontSetColor(0, 0x44, 0x32, 0x20);
+        sprintf(b, "%.12s P%d", me, k + 1);
+        fontSetCursorAtSubPixel(0, 0x1E0, y); fontPrint(0, b);
+        fontSetCursorAtSubPixel(0, 0x14A0, y); fontPrint(0, D_0041BF00[joinCar[k] >> 5]);
+        fontSetCursorAtSubPixel(0, 0x1F40, y); fontPrint(0, "SPLIT");
+    }
 }

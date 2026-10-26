@@ -153,10 +153,14 @@ static void splitFrame(char* cam)
     if (tmbr_GuestsWanted() && n < tmbr_GuestsWanted() + 1) n = tmbr_GuestsWanted() + 1;
     if (n < 2 || !g) return;
     if (n > 4) n = 4;
-    if (splitSerial != tmbr_levelSerial) { splitSerial = tmbr_levelSerial; splitWait = 300; splitN = 0; tmbr_GuestsReset(); }
+    if (splitSerial != tmbr_levelSerial) { splitSerial = tmbr_levelSerial; splitWait = 300; splitN = 0; tmbr_GuestsReset(); { extern void tmbr_GuestsPreload(void); tmbr_GuestsPreload(); } }
     if (splitWait > 0) {
         if (--splitWait) return;
         splitN = n == 2 ? 2 : 4;
+        {   /* (debug: the views' projection before and after the split - the HUD's left parts end up off screen) */
+            float a0, b0; viewGetFov(0, &a0, &b0);
+            scePrintf("TMBR split: 1P fov %d %d\n", (int)(a0 * 1000), (int)(b0 * 1000));
+        }
         viewSetNumViews(splitN);
         {
             int pov0 = *(int*)cam;
@@ -173,9 +177,42 @@ static void splitFrame(char* cam)
             }
             camPov(cam, 0, pov0);
             tmbr_GuestsMake(splitN);           /* guests: their own camera + HUD through gameInitCamera */
-            if (tmbr_wide[1]) wideApply(splitN);
+            {   /* guest HUDs: hud[i] (game + 0x97B50 + i * 0xA20) is built for every view (func_00183580 ->
+                 * func_001475F8) but skipped while hud+0 is 0; only hud 0 is set up in online. Start the guests' as a
+                 * copy of the player's, on their own car (+0x5E4, set by gameInitCamera). */
+                char* h0 = g + 0x97B50;
+                int gc = tmbr_GuestCount(), q;
+                scePrintf("TMBR split: humans %d, hud0 %x %x %x, hud1 %x %x %x\n", *(int*)(g + 0x98000 + 0x7CAC),
+                    *(int*)h0, *(int*)(h0 + 4), *(int*)(h0 + 0x5E4), *(int*)(h0 + 0xA20), *(int*)(h0 + 0xA24), *(int*)(h0 + 0xA20 + 0x5E4));
+                for (i = 1; i <= gc && i < splitN; i++) {
+                    char* h = h0 + i * 0xA20;
+                    int car = *(int*)(h + 0x5E4);
+                    if (!car) continue;
+                    for (q = 0; q < 0xA20 / 4; q++) ((int*)h)[q] = ((int*)h0)[q];
+                    *(int*)(h + 0x5E4) = car;
+                }
+            }
+            if (splitN == 2) {
+                /* 2 views (test 2026-10-26): the half-height views get a 4/3 narrower horizontal field than the
+                 * single view (projection 608 vs 456, the single view is letterboxed wide): the camera looks pulled in
+                 * and the HUD parts placed through the projection slide off the left edge. Give them the single
+                 * view's horizontal field, same vertical (the widescreen transform: a x 3/4, b x 4/3). */
+                for (i = 0; i < 2; i++) {
+                    float a, b;
+                    viewGetFov(i, &a, &b);
+                    viewSetFov(i, a * KW[1], b * KW[0]);
+                    viewGetFov(i, &a, &b);
+                    wideSet[i] = a;          /* (so widescreen doesn't widen these again) */
+                }
+            }
+            else if (tmbr_wide[1]) wideApply(splitN);
         }
         for (i = 0; i < 4; i++) splitCar[i] = 0;
+        {
+            extern int D_004CFB98;
+            float a0, b0, a1, b1; viewGetFov(0, &a0, &b0); viewGetFov(1, &a1, &b1);
+            scePrintf("TMBR split: 2P fov %d %d / %d %d, display mode %d\n", (int)(a0 * 1000), (int)(b0 * 1000), (int)(a1 * 1000), (int)(b1 * 1000), D_004CFB98);
+        }
         scePrintf("TMBR split: %d views (asked %d), cs %x %x %x %x\n", splitN, n, *(int*)(cam + 0x42A0), *(int*)(cam + 0x42A4),
             *(int*)(cam + 0x42A8), *(int*)(cam + 0x42AC));
     }

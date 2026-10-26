@@ -107,6 +107,8 @@ PATCHES = [
     (A("tmb/ui.s"), "001CB944", "jal", "jal        tmbr_CarSelNet"),
     (A("tmb/ui.s"), "001CB9C4", "jal", "jal        tmbr_CarSelNet"),
     (A("tmb/ui.s"), "001CE2E8", "jal", "jal        tmbr_UiPadButtons"),
+    (A("tmb/ui.s"), "001CD4BC", "jal", "jal        tmbr_BotCars"),
+    (A("nonmatchings/online/net/func_0016FA30.s"), "0016FB58", "jal", "jal        tmbr_BotCars"),
     # ... and the controllers 2-4 are read at all: online's pad update (func_002165A0) only reads the pad whose map
     # entry is 0 (controller 1) and just marks the others ready, so their button buffers stayed empty (read as all
     # pressed, test 2026-10-26). Every port / multitap slot goes through the read now.
