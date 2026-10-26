@@ -490,6 +490,9 @@ static void healthFrame(void)
 #ifndef TMBR_WEAPTEST
 #define TMBR_WEAPTEST 0
 #endif
+#ifndef TMBR_STORYTEST
+#define TMBR_STORYTEST 0
+#endif
 #if TMBR_WEAPTEST
 /* test build only: the local car keeps ammo in fire / homing / napalm / power / rico; weapon changes logged */
 static void weapTest(char* g)
@@ -510,6 +513,17 @@ void tmbr_BotsThink(void)
     if (g) { tmbr_TeamsFrame(); healthFrame(); }
 #if TMBR_WEAPTEST
     if (g) weapTest(g);
+#endif
+#if TMBR_STORYTEST
+    {   /* test build only: the first story level is won 15 s into the match */
+        extern int tmbr_levelSerial; extern void tmbr_TeamsForceWin(int team);
+        static int ser = -1, tk, wins;
+        char* gi = GINFO();
+        if (g && gi && (F(gi, 0) & 1) && tmbr_Opt(0x20) && netIsHost(D_003156C0)) {
+            if (ser != tmbr_levelSerial) { ser = tmbr_levelSerial; tk = 0; }
+            if (++tk == 900 && wins++ == 0) tmbr_TeamsForceWin(0);
+        }
+    }
 #endif
     if (tmbr_botCount < 0 || !g || NAI(g) <= 0 || !netIsHost(D_003156C0)) return;
 #if TMBR_NAV

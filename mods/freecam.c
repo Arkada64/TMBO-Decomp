@@ -10,6 +10,9 @@
  *   cs+0x10 position, cs+0x20 4x4 rotation matrix (translation 0), cs+0x60 angles (pitch, roll, heading);
  *   the view (func_00242930, at render time) uses cs+0x10 and cs+0x20.
  *   the update copies cs+0x20 to cam+0x4060 + 0x40i (64 bytes). */
+#ifndef TMBR_WEAPTEST
+#define TMBR_WEAPTEST 0
+#endif
 typedef struct { float x, y, z, w; } fvec;
 extern int inputGetCtlPadAnalogAxis(int axis, int pad) __asm__("inputGetCtlPadAnalogAxis__Fii");
 /* raw pad bits, active high (SELECT 0x1, L3 0x2, L2 0x100, R2 0x200, R1 0x800). inputGetInput takes a
@@ -517,6 +520,20 @@ void tmbr_CameraUpdate(char *cam)
     wideFrame();
 #endif
     cameraUpdate(cam);
+#if TMBR_WEAPTEST
+    {   /* test build only: the chase camera pulled in to 40 % of its distance (12 Pak hatch pictures) */
+        extern char* D_004FA030;
+        static float WT[1] = { 0.4f };
+        char* cs0 = *(char**)(cam + 0x42A0);
+        char* v = D_004FA030;
+        if (cs0 && v && *(int*)(v + 0x2028)) {
+            float* p = (float*)(cs0 + 0x10);
+            float* c = (float*)(*(int*)(v + 0x2028) + 0x10);
+            int q;
+            for (q = 0; q < 3; q++) p[q] = c[q] + (p[q] - c[q]) * WT[0];
+        }
+    }
+#endif
 #ifdef TMBR_PNACH
     if (!tmbr_en[0]) return;
 #endif

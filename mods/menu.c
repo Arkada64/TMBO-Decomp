@@ -162,11 +162,27 @@ void tmbr_MainMenu(void)
 #ifndef TMBR_WEAPTEST
 #define TMBR_WEAPTEST 0
 #endif
+#ifndef TMBR_STORYTEST
+#define TMBR_STORYTEST 0
+#endif
 extern int tmbr_padInject;
 void tmbr_SingleFrame(void)
 {
     static int st = -1, t;
     tmbr_padInject = 0;
+#if TMBR_STORYTEST
+    {   /* test build only: every waiting room visit -> PLAY GAME (DOWN, CROSS); visit 2 first swaps the branch (L3) */
+        static int ws = -1, wt, visits;
+        if (tmbr_singlePlayer == 2) {
+            if (D_004FA684 != ws) { ws = D_004FA684; wt = 0; if (ws == 0x21) visits++; scePrintf("TMBR storytest: ui %x visit %d\n", ws, visits); }
+            wt++;
+            if (ws == 0x21 && visits == 2 && wt >= 120 && wt < 126) tmbr_padInject = 0x2;
+            if (ws == 0x21 && wt >= 200 && wt < 206) tmbr_padInject = 0x40;
+            if (ws == 0x21 && wt >= 240 && wt < 246) tmbr_padInject = B_CROSS;
+            return;
+        }
+    }
+#endif
 #if TMBR_WEAPTEST
     {   /* test build only: room -> SELECT CAR -> 12 Pak -> room -> PLAY GAME */
         extern int carSelPos __asm__("D_004FA7D8");
