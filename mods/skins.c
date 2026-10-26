@@ -297,6 +297,7 @@ static int isPak(char* v)
 
 int tmbr_IsPak(char* v) { return v && isPak(v); }
 
+static int vidx(char* v);
 /* which extra a player's vehicle is (-1 none): its car type is the extra's donor and its driver has the extra on */
 static int vehSkin(char* v)
 {
@@ -304,8 +305,11 @@ static int vehSkin(char* v)
     if (!v || !D_004FA030) return -1;
     id = *(int*)(v + 0x20F4);
     for (c = 0; c < 8; c++) {
+        char* t;
         s = netSlotVehicle(netState, c);
-        if (s <= 0 || s > 8 || *(char**)(D_004FA030 + 0x9E670 + 4 * (s - 1)) != v) continue;
+        if (s <= 0 || s > 8) continue;
+        t = *(char**)(D_004FA030 + 0x9E670 + 4 * (s - 1));
+        if (t ? t != v : vidx(v) != s - 1) continue;     /* (during vehicleInit the table may not be filled yet) */
         for (k = 0; k < NSKIN; k++)
             if ((id == skinType[k] << 5 || (k == 1 && id == PAK_ID)) && skinOn(c, k)) return k;
         return -1;
@@ -317,22 +321,22 @@ static int vehSkin(char* v)
  * (0x1D7020, func_001D72D8, a switch on +0x20F4 writing the per-type constants) is wrapped; for Twister it runs again
  * as Mr. Grimm (0x140) and the chassis fields (suspension, ride height / collision / axle geometry, tire count,
  * chase camera) are put back to the model's own (Outlaw's). Every console runs it (the skin state is synced). */
-extern void vehInitDynamics(char* v) __asm__("func_001D72D8");
+extern void vehInitDynamics(char* v, int a1, int a2, char* a3) __asm__("func_001D72D8");   /* (a3 = v + 0x484 from vehicleInit: shield.s's hook in its tail reads $7) */
 static void keepRange(char* v, char* save, int a, int b, int put)
 {
     int o;
     for (o = a; o < b; o += 4) { if (put) *(int*)(v + o) = *(int*)(save + o - a); else *(int*)(save + o - a) = *(int*)(v + o); }
 }
-void tmbr_VehInitDynamics(char* v)
+void tmbr_VehInitDynamics(char* v, int a1, int a2, char* a3)
 {
     static char s1[0x18], s2[0x4C], s3[4], s4[0xD0];
     int id;
-    vehInitDynamics(v);
+    vehInitDynamics(v, a1, a2, a3);              /* (the caller's $7 passes through, as before the hook) */
     if (vehSkin(v) != SK_TWISTER) return;
     id = *(int*)(v + 0x20F4);
     keepRange(v, s1, 0x380, 0x398, 0); keepRange(v, s2, 0x3A4, 0x3F0, 0); keepRange(v, s3, 0x478, 0x47C, 0); keepRange(v, s4, 0x1F40, 0x2010, 0);
     *(int*)(v + 0x20F4) = 10 << 5;
-    vehInitDynamics(v);
+    vehInitDynamics(v, a1, a2, v + 0x484);   /* (test g110: a3 left over from the copy loop -> shield hook TLB) */
     *(int*)(v + 0x20F4) = id;
     keepRange(v, s1, 0x380, 0x398, 1); keepRange(v, s2, 0x3A4, 0x3F0, 1); keepRange(v, s3, 0x478, 0x47C, 1); keepRange(v, s4, 0x1F40, 0x2010, 1);
     {   /* the shockwave's model (EP 0xFB0) comes from the level files for slots 0..4 only (the extra copies all carry
@@ -408,6 +412,7 @@ static void twisterSpecial(char* l, char* v)
 {
     int own = *(int*)(v + 0x20B4);
     if (*(int*)(l + 0x27C) || L_AMMO(l, 1) <= 0 || (own != 1 && own != 4)) return;
+    { extern void* shockNode[] __asm__("D_0045FFD8"); scePrintf("TMBR skins: Twister shockwave (slot %d node %x)\n", *(int*)(v + 0x20F0), (int)shockNode[*(int*)(v + 0x20F0) & 7]); }
     createWeapon2(D_004FA030 + 0x6C310, 0x1B, v, 0, 0);
     shockSound(v + 0x2AD0, v + 0x1D0);
     weaponUsedSpecial(D_004FA030 + 0x6C310, v, 1);
