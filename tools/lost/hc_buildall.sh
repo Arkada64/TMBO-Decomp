@@ -15,5 +15,5 @@ run pviper   $H SPP $H/PVIPER.BDD /tmp/claude-0/hc_pviper/out ZWP
 run pviper   $H SPA $H/PVIPER.BDD /tmp/claude-0/hc_pviper/out ZWA --half
 run twister  $H SUP $H/TWIST.BDD  /tmp/claude-0/hc_twister/out ZTP --hide-node 0x67ae0
 run twister  $H SUA $H/TWIST.BDD  /tmp/claude-0/hc_twister/out ZTA --half --hide-node 0x5d6a0
-run goldtooth $H STP $G /tmp/claude-0/hc_goldtooth/out ZZP $GT --keep-part @0x91c20 --reuse b0448:45,a91b8:49,8dc74:45,9e768:5 --half-keys b0448
-run goldtooth $H STA $G /tmp/claude-0/hc_goldtooth/out ZZA $GT --keep-part @0x8a210 --reuse b0448:53,a91b8:57,8dc74:53,9e768:5 --half
+run goldtooth $H STP $G /tmp/claude-0/hc_goldtooth/out ZZP $GT --robot 0x45a60:@0x91c20 --robot-far 0x2a820:@0x94160 --reuse b0448:45,a91b8:49,8dc74:45,9e768:5 --half-keys b0448
+run goldtooth $H STA $G /tmp/claude-0/hc_goldtooth/out ZZA $GT --robot 0x45a60:@0x8a210 --robot-far 0x2a820:@0x8c750 --reuse b0448:53,a91b8:57,8dc74:53,9e768:5 --half

@@ -350,6 +350,10 @@ def main():
     ap.add_argument('--half-keys', default='', help='Head-On texture keys stored at half size (hex, comma separated)')
     ap.add_argument('--own-wheels', action='store_true', help="the new car's own wheels on the donor's tire nodes "
                     '(spin / steer / suspension stay the donor\'s), scale 1, own proportions')
+    ap.add_argument('--robot', default='', help="new car's alternate-form root onto a donor character, 'SRC:@CHAR' "
+                    "(Gold Tooth on STP: 0x45a60:@0x91c20, STA: 0x45a60:@0x8a210)")
+    ap.add_argument('--robot-far', default='', help="new car's far alternate form onto a donor group, 'SRC:@GROUP' "
+                    "(Gold Tooth on STP: 0x2a820:@0x94160)")
     ap.add_argument('--hide-node', default='', help='donor node offsets (hex, comma separated) whose meshes get empty '
                     "packets too, e.g. Outlaw's roof light bar op31 (SUP 0x67ae0, SUA 0x5d6a0)")
     ap.add_argument('--keep-part', default='', help="donor node ids kept with their subtree, ';'-separated, each "
@@ -483,9 +487,10 @@ def build(a, rd, own16):
     skip_tex = {int(x, 16) for x in a.skip_tex.split(',') if x}
     built, skipped, fixed = {}, {}, [0, 0]
 
-    def node(h, cols=None, local=None):
+    def node(h, cols=None, local=None, frame=None):
         """local = (car-space centre, inverse rotation, mirror): a wheel mesh in its tire node's space"""
-        key = (h, cols, None if local is None else (tuple(np.round(local[0], 4)), tuple(np.round(local[1], 4).ravel()), local[2]))
+        key = (h, cols, None if local is None else (tuple(np.round(local[0], 4)), tuple(np.round(local[1], 4).ravel()), local[2]),
+               None if frame is None else (tuple(np.round(frame[0], 4).ravel()), tuple(np.round(frame[1], 4))))
         if key not in built:
             m = ho.hd[h]
             xf = xform
@@ -508,6 +513,10 @@ def build(a, rd, own16):
             if local is not None:
                 m = dict(m, pos=[tuple(np.asarray(p) @ local[1]) for p in m['pos']],
                          nrm=[tuple(np.asarray(q) @ local[1]) for q in m['nrm']])
+            if frame is not None:      # into a donor node's frame (row vectors: world = local @ M + t)
+                Mi = np.linalg.inv(frame[0])
+                m = dict(m, pos=[tuple((np.asarray(p) - frame[1]) @ Mi) for p in m['pos']],
+                         nrm=[tuple(np.asarray(q) @ Mi) for q in m['nrm']])
             if m['texrefs'] and m['strips'] and not m['strips'][0]['tag'][3]:     # texture select on the 1st strip
                 st0 = [dict(st) for st in m['strips']]
                 t = list(st0[0]['tag']); t[3] = 1; st0[0]['tag'] = tuple(t)
@@ -572,6 +581,87 @@ def build(a, rd, own16):
         car.setp(lo + 0x20 + 4 * i, t)
     print('far LOD: donor meshes %s -> new car %d meshes + kept donor wheels %s' % (
         [hex(t) for t in lomesh], len(hs), [hex(t) for t in lokeep]))
+    # --robot SRC:@CHAR: the new car's alternate (special) form onto a donor character (Gold Tooth's jointed robot
+    # 0x45a60 onto Sweet Tooth's robot 0x91c20). Both are rigged trucks in their rest pose (the robot animation
+    # unfolds them), and the donor's bone meshes are stored in model space. Every new part goes to the donor bone
+    # slot whose rest mesh is nearest in the two forms' normalized boxes, converted into that slot's frame
+    # (op3 / op4 above it); the donor's own meshes go. --robot-far SRC:@GROUP: a plain group (the far robot) gets
+    # the new car's meshes under SRC.
+    for spec in filter(None, a.robot.split(';')):
+        src, _, ch = spec.partition(':@')
+        src, ch = int(src, 16), int(ch, 16)
+        slots_ = []                    # (slot, mesh, M, t)
+        st_ = [(ch, np.eye(3), np.zeros(3))]
+        seen_ = set()
+        while st_:
+            o, M, t = st_.pop()
+            if o in seen_:
+                continue
+            seen_.add(o)
+            op = u32(car.n, o) & 0x3f
+            if op == 3:
+                t = t + np.array(struct.unpack_from('<3f', car.n, o + 0x10)) @ M
+            elif op == 4:
+                m4 = np.array(struct.unpack_from('<16f', car.n, o + 0x10)).reshape(4, 4)
+                t = t + m4[3, :3] @ M; M = m4[:3, :3] @ M
+            if op == 1 and (u32(car.n, o) >> 18) >= 4000:
+                continue               # weapon models stay
+            sl = sorted(set(kid_slots(car.n, o)) | set(trav_slots(car.n, o)))
+            if op in (17, 25):
+                sl = [o + 0x2c] + sl
+            for s_ in sl:
+                if s_ + 4 > len(car.n):
+                    continue
+                k_ = car.P(s_)
+                if k_ is None:
+                    continue
+                if u32(car.n, k_) & 0x3f == 0:
+                    slots_.append((s_, k_, M, t))
+                else:
+                    st_.append((k_, M, t))
+        from tmbmesh import decode as tdec
+        tm = []
+        for s_, k_, M, t in slots_:
+            try:
+                P = np.array(tdec(bytes(car.n), k_)['pos'])
+            except Exception:
+                continue
+            if len(P) and (u32(car.n, k_ + 0xc) >> 16):
+                tm.append((s_, k_, M, t, (P.min(0) + P.max(0)) / 2 @ M + t, P @ M + t))
+        hs = ho_meshes(src, 0) + [h for h in add_meshes if h not in ho_meshes(src, 0)]   # + head / eyes / arm
+        gc = {h: (box(ho.hd[h]['pos'])[0] + box(ho.hd[h]['pos'])[1]) / 2 * s + xform[1] for h in hs}
+        allg = np.array([np.asarray(p) * s + xform[1] for h in hs for p in ho.hd[h]['pos']])
+        allt = np.concatenate([x[5] for x in tm])
+        g0, g1, t0, t1 = allg.min(0), allg.max(0), allt.min(0), allt.max(0)
+        norm_g = lambda c: (c - g0) / np.maximum(g1 - g0, 1e-6)
+        norm_t = lambda c: (c - t0) / np.maximum(t1 - t0, 1e-6)
+        by_slot = {}
+        for h in hs:
+            j = min(range(len(tm)), key=lambda i: ((norm_g(gc[h]) - norm_t(tm[i][4])) ** 2).sum())
+            by_slot.setdefault(j, []).append(h)
+        for j, hl in by_slot.items():
+            s_, k_, M, t = tm[j][:4]
+            nodes_ = [node(h, frame=(M, t)) for h in hl]
+            car.setp(s_, nodes_[0] if len(nodes_) == 1 else car.group(nodes_, sphere=(0, 0, 0, 20.0)))
+        for j, (s_, k_, M, t, c, P) in enumerate(tm):
+            if j in by_slot:
+                r = mesh_range(car, k_)
+                if r: dead.append(r)
+        print('robot: %d new meshes onto %d of %d donor bone meshes of %#x (new box %s..%s, donor rest box %s..%s)' % (
+            len(hs), len(by_slot), len(tm), ch, g0.round(1), g1.round(1), t0.round(1), t1.round(1)))
+    for spec in filter(None, a.robot_far.split(';')):
+        src, _, grp = spec.partition(':@')
+        src, grp = int(src, 16), int(grp, 16)
+        old = meshes_under(car, grp)
+        hs = [h for h in collect(ho.n, src, 0, lod=0) if h in ho.hd and ho.hd[h]['strips']
+              and not ho.skip_reason(h, ground, True, a.env, True)]
+        k = u32(car.n, grp + 8) & 0xffff
+        for i in range(k):
+            struct.pack_into('<I', car.n, grp + 0x20 + 4 * i, 0)
+        car.setp(grp + 0x20, car.group([node(h) for h in hs], sphere=struct.unpack_from('<3ff', car.n, grp + 0x10)))
+        struct.pack_into('<H', car.n, grp + 8, 1)
+        dead += [r for r in (mesh_range(car, t_) for t_ in old) if r]
+        print('far robot: group %#x, %d donor meshes -> %d new' % (grp, len(old), len(hs)))
     # --own-wheels: the donor's tire nodes (op4 id R+1..R+4: the game spins / steers / bounces them, and keeps the
     # node's +0x48, its translation z, as the tire's rest height) get the new car's wheel meshes, centred on the
     # node, and the node moves to the new wheel's centre. A missing wheel (Thumper's front left) is the other

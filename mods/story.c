@@ -312,3 +312,82 @@ int tmbr_StoryMoviesDone(void)
     }
     return 1;
 }
+
+/* ---- Prison Passage, retail's story sequence (reference/wip/STORY_PRISON.md; Ark 2026-10-26: in retail you start
+ * locked on the ship to the prison, the AI spread out, timed events; online Prison Passage skips it) ----
+ * The Prison level object's state machine survives in TMBO; online skips it in three places, undone here in a story
+ * run on level 3 only (hooks in apply_mods.py):
+ *   init (0x1386C8 -> func_0017D4D0): net+0x1BB4 / D_00317274 cleared around it -> state 0, island 6000 out;
+ *   state 0 (0x17DAFC -> func_0017DB90): AI 2+ held (disabled) on the moored ship for 60 s, then the departure
+ *     (door anims, state 1, AI 2-3 placed on start points 2-3 and enabled, transition points);
+ *   state 2 (0x17DB24 -> func_0017DFE8): the dock; then AI 4+ placed on points 4.. and enabled. */
+extern char* D_004FA030;
+extern int D_00317274;
+extern void prisonInitAfter(char* p) __asm__("func_0017D4D0");
+extern void prisonState0(char* p) __asm__("func_0017DB90");
+extern void prisonState2(char* p) __asm__("func_0017DFE8");
+extern void vehDisable(char* v) __asm__("vehicleDisable__7Vehicle");
+extern void vehEnable(char* v, int t) __asm__("vehicleEnable__7Vehicle12VehicleTypes");
+extern void animStart(void* h, int b) __asm__("animationStart__FR11_animHandleb");
+extern int startInRange(void* pts, int lo, int hi) __asm__("func_0010BFD8");
+extern void placeAt(char* g, char* v, int idx) __asm__("func_0013D7B8");
+extern void prisonTransPts(char* p) __asm__("prisonUpdateTransitionPoints__6Prison");
+extern int fieldsLast(void) __asm__("timerGetFieldsLastFrame__Fv");
+#define PRISON_STORY() (tmbr_Opt(OPT_STORY) && D_004FA030 && F(D_004FA030, 0x9FCA0) == 3)
+#define NAI_ F(D_004FA030, 0x9FEE4)
+#define AIV(i) (*(char**)(D_004FA030 + 0x9E690 + 4 * (i)))
+#define PTS (D_004FA030 + 0x30970)
+static int prisonDocked;
+static void prisonPlace(int i, int lo, int hi)
+{
+    char* v = AIV(i);
+    int idx;
+    if (!v || hi <= lo) return;
+    idx = startInRange(PTS, lo, hi);
+    placeAt(D_004FA030, v, idx);
+    vehEnable(v, 2);
+    scePrintf("TMBR prison: AI %d out at start point %d\n", i, idx);
+}
+void tmbr_PrisonInitAfter(char* p)
+{
+    int a, b;
+    if (!PRISON_STORY()) { prisonInitAfter(p); return; }
+    a = F(D_003156C0, 0x1BB4); b = D_00317274;
+    F(D_003156C0, 0x1BB4) = 0; D_00317274 = 0;
+    prisonInitAfter(p);
+    F(D_003156C0, 0x1BB4) = a; D_00317274 = b;
+    prisonDocked = 0;
+    scePrintf("TMBR prison: story start, state %d, island %d, AI %d, mode %d\n", F(p, 0xF8), (int)*(float*)(*(char**)p + 0x14), NAI_, F(D_004FA030, 0x9A3D0));
+}
+void tmbr_PrisonState0(char* p)
+{
+    int i, n;
+    if (!PRISON_STORY()) { prisonState0(p); return; }
+    n = NAI_;
+    for (i = 2; i < n && i < 8; i++) {                      /* AI 2+ wait off the ship (bots made late too) */
+        char* v = AIV(i);
+        if (v && F(v, 0x590)) { vehDisable(v); scePrintf("TMBR prison: AI %d held\n", i); }
+    }
+    F(p, 0x100) += fieldsLast();
+    if (F(p, 0x100) <= 3600) return;                         /* about 60 s at the quay */
+    animStart((char*)p + 0x14, 1);
+    for (i = 0; i < 6; i++) animStart((char*)p + 0x80 + 0xC * i, 1);
+    F(p, 0xF8) = 1;
+    prisonPlace(2, 2, 4); prisonPlace(3, 2, 4);
+    prisonTransPts(p);
+    scePrintf("TMBR prison: the ship leaves\n");
+}
+void tmbr_PrisonState2(char* p)
+{
+    int n, i;
+    if (!PRISON_STORY()) { prisonState2(p); return; }
+    n = NAI_;
+    if (n > 4) NAI_ = 4;                                     /* (skips TMBO's bare enable loop) */
+    prisonState2(p);
+    NAI_ = n;
+    if (F(p, 0xF8) >= 3 && !prisonDocked) {
+        prisonDocked = 1;
+        scePrintf("TMBR prison: docked\n");
+        for (i = 4; i < n && i < 8; i++) prisonPlace(i, 4, F(PTS, 0x24C));
+    }
+}
