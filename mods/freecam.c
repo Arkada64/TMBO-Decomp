@@ -230,10 +230,6 @@ void tmbr_ViewScene(int view)
         *(unsigned*)(db + 0x1B0) = 0; *(unsigned*)(db + 0x320) = 0;
         return;
     }
-    if (splitBlank && view == 0) {     /* (test: the dark grey may be a whole-screen clear in view 0's colour) */
-        char* db = viewGetDb(0);
-        *(unsigned*)(db + 0x1B0) = 0; *(unsigned*)(db + 0x320) = 0;
-    }
     viewScene(view);
 }
 /* the view's effects (sparks, fire: func_0022BE88(view, cs, 1) and func_0022CD00(view) at 0x18397C / 0x183984) */
@@ -241,9 +237,27 @@ extern void viewFx1(int view, void* cs, int a) __asm__("func_0022BE88");
 extern void viewFx2(int view) __asm__("func_0022CD00");
 void tmbr_ViewFx1(int view, void* cs, int a) { if (splitBlank && view == 3) return; viewFx1(view, cs, a); }
 void tmbr_ViewFx2(int view) { if (splitBlank && view == 3) return; viewFx2(view); }
+/* the empty quarter's clear: each view's draw buffer is swapped and cleared in its background colour (db +0x1B0 /
+ * +0x320 RGBA, written into all 4 views by the time of day each frame, after the views are drawn) right before the
+ * view is drawn (0x1837EC / 0x183810) - writing view 3's colour later in the frame (tmbr_ViewScene) came too late:
+ * the empty quarter stayed fog grey. Written at the frame's start (0x183770, before the view loop) instead */
+extern void frameKick(char* pkt) __asm__("func_0023F4D8");
+void tmbr_FrameClear(char* pkt)
+{
+    if (splitBlank) {
+        char* db = viewGetDb(3);
+        *(unsigned*)(db + 0x1B0) = 0x80000000u; *(unsigned*)(db + 0x320) = 0x80000000u;   /* (RGBA: black, A 0x80) */
+    }
+    frameKick(pkt);
+}
 void tmbr_HudView(char* hud, int view)
 {
     if (splitBlank && view == 3) return;
+    if (splitBlank) {   /* (again here: each view's func_00242930 writes the time-of-day colour into all 4 views; view
+                         * 2's HUD is the last thing before view 3's clear) */
+        char* db = viewGetDb(3);
+        *(unsigned*)(db + 0x1B0) = 0x80000000u; *(unsigned*)(db + 0x320) = 0x80000000u;
+    }
     if (view > 0 && view < 4 && tmbr_GuestCar(view)) {
         /* a guest's HUD reads "my" car from this console's net client (+0xA0) for its leaderboard lines (the
          * bay panel: rank / points / kills ... of net client +0xA0's car, its +0x2104): the guest's car for

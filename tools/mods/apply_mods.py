@@ -142,6 +142,7 @@ PATCHES = [
     (A("tmb/hud.s"), "001488D4", "jal", "jal        tmbr_HudPrintBay"),
     (A("tmb/hud.s"), "00148914", "jal", "jal        tmbr_HudPrintBay"),
     (A("nonmatchings/tmb/rt/func_00183580.s"), "001838B4", "jal", "jal        tmbr_HudPlace"),
+    (A("nonmatchings/tmb/rt/func_00183580.s"), "00183770", "jal", "jal        tmbr_FrameClear"),
     (A("nonmatchings/tmb/rt/func_00183580.s"), "001838BC", "jal", "jal        tmbr_ViewScene"),
     (A("nonmatchings/tmb/rt/func_00183580.s"), "0018397C", "jal", "jal        tmbr_ViewFx1"),
     (A("nonmatchings/tmb/rt/func_00183580.s"), "00183984", "jal", "jal        tmbr_ViewFx2"),
