@@ -170,7 +170,7 @@ int tmbr_GuestsMake(int views)
         } else { k = -k; car = tmbr_guests[1 + k]; v = freeSlot(g); }
         if (v < 0) { scePrintf("TMBR guests: no free car slot for player %d\n", i + 1); guestCar[i] = (char*)-1; continue; }
         if (car <= 0) car = mathfRandI(1, 14) << 5;
-        if ((car >> 5) == 15 && tmbr_Opt(8)) car = mathfRandI(1, 14) << 5;   /* Minion off */
+        if ((car >> 5) == 15 && !tmbr_Opt(8)) car = mathfRandI(1, 14) << 5;   /* Minion off */
         padOf[v] = pads[k];
         veh = gameMakeAI(g, v, car, v, i, 0);
         if (!veh) {             /* (the human branch does not return the car: find the one it set up) */

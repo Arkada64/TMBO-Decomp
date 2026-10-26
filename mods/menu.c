@@ -159,11 +159,35 @@ void tmbr_MainMenu(void)
  * (0x21) opens with STORY on (story.c). Split-screen co-op = controllers 2-4 press START there (guests.c).
  * Called every UI frame (guests.c tmbr_UiPadButtons); the presses go in through quickboot.c's pad read. */
 #define B_SQUARE 0x8000
+#ifndef TMBR_WEAPTEST
+#define TMBR_WEAPTEST 0
+#endif
 extern int tmbr_padInject;
 void tmbr_SingleFrame(void)
 {
     static int st = -1, t;
     tmbr_padInject = 0;
+#if TMBR_WEAPTEST
+    {   /* test build only: room -> SELECT CAR -> 12 Pak -> room -> PLAY GAME */
+        extern int carSelPos __asm__("D_004FA7D8");
+        static int ws = -1, wt, visits;
+        if (tmbr_singlePlayer == 2) {
+            if (D_004FA684 != ws) { ws = D_004FA684; wt = 0; if (ws == 0x21) visits++; scePrintf("TMBR weaptest: ui %x visit %d\n", ws, visits); }
+            wt++;
+            if (ws == 0x21 && visits == 1 && wt == 30) {      /* no story, no bots: only our car on the map */
+                extern void tmbr_OptSet(int bits, int on); extern int tmbr_botCount;
+                tmbr_OptSet(0x20, 0); tmbr_OptSet(2, 0); tmbr_botCount = 0;
+            }
+            if (ws == 0x21 && visits == 2 && wt == 30) { extern int tmbr_botCount; tmbr_botCount = 0; }
+            if (ws == 0x21 && visits == 1 && wt >= 60 && wt < 66) tmbr_padInject = B_CROSS;
+            if (ws == 0x27 && wt == 40) carSelPos = 15;
+            if (ws == 0x27 && wt >= 70 && wt < 76) tmbr_padInject = B_CROSS;
+            if (ws == 0x21 && visits == 2 && wt >= 60 && wt < 66) tmbr_padInject = 0x40;
+            if (ws == 0x21 && visits == 2 && wt >= 90 && wt < 96) tmbr_padInject = B_CROSS;
+            return;
+        }
+    }
+#endif
     if (tmbr_singlePlayer != 1) { st = -1; return; }
     if (D_004FA684 != st) { st = D_004FA684; t = 0; scePrintf("TMBR single: ui %x\n", st); }
     t++;

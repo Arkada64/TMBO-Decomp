@@ -246,6 +246,7 @@ PATCHES = [
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B3CA4", "jal", "jal        tmbr_LoadScreen"),   # loading screen crash (guests.c)
     (A("nonmatchings/tmb/input/inputSetActuator__FiUcUci.s"), "002175E8", "addiu", "j          tmbr_Actuator"),   # no rumble with vibration off (rumble.s)
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B331C", "jal", "jal        tmbr_MainMenu"),   # main menu pages (menu.c)
+    (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B3BA8", "jal", "jal        tmbr_ModsPage"),   # MINION / HEALTH rows on GAME MODS (modspage.c)
     (A("tmb/collis.s"), "0011F0DC", "jal", "jal        tmbr_PickupHit"),                       # HEALTH : OFF (bots.c)
     (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167378", "jal", "jal        tmbr_PickupHit"),
     (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167454", "jal", "jal        tmbr_PickupHit"),

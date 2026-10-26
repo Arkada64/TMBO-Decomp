@@ -27,7 +27,6 @@ extern int tmbr_TeamsWinner(void);                 /* teams.c: 0 = humans' team,
 #define OPT_STORY 0x20
 #define OPT_TEAMS 2
 #define OPT_TEAMS4 4
-#define OPT_NOMINION 8
 #define END 21
 #define LIVES 3
 #define LEVEL() F(D_004FA03C + 0x18000, 0x23AC)
