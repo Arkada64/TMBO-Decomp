@@ -421,7 +421,7 @@ int tmbr_UiPadButtons(int pad)
     { static int lastUi = -1;                           /* UI state changes in the log (menu work) */
       if (D_004FA684 != lastUi) { lastUi = D_004FA684; scePrintf("TMBR ui: state %x\n", lastUi); } }
     if (naming) return 0;                              /* (the keyboard reads the guest's pad itself) */
-    if (!picking) { extern int tmbr_MenuPad(int b); held = 0; return tmbr_MenuPad(inputGetPadButtons(pad)); }   /* menu.c */
+    if (!picking) { extern int tmbr_MenuPad(int b); extern int tmbr_uiEat; held = 0; return tmbr_MenuPad(inputGetPadButtons(pad)) & ~(D_004FA684 == 0x25 ? tmbr_uiEat : 0); }   /* menu.c, modspage.c */
     if (D_004FA684 != UI_CARSEL) return 0;            /* still flying in */
     b = padBtn(2 * picking);
     if (b < 0) b = 0;

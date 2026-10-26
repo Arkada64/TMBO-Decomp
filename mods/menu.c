@@ -98,6 +98,19 @@ extern void menuMain(void) __asm__("func_001B8C10");
 extern int inputGetPadButtons(int pad) __asm__("inputGetPadButtons__Fi");
 extern void shellSfx(void* snd, int id) __asm__("playShellSFXSound__10ShellSoundi");
 int tmbr_MenuPad(int b) { return b; }
+/* waiting room input read (func_001C5768's func_001CE258 at 0x1C6BCC, wrapped in apply_mods.py): while R3 is held the
+ * host / team hotkeys own the pad (R3 + Square = STORY, R3 + L1 / R1 bots, R3 + Up traffic ...), so the room's own
+ * flags are cleared (test g94: R3 + Square also opened the room's Square screen, state 0x28) */
+extern void uiReadInput(void) __asm__("func_001CE258");
+extern int D_004FA8AC, D_004FA8B0, D_004FA8B4, D_004FA8B8, D_004FA8BC, D_004FA8C0, D_004FA8C4, D_004FA8C8;
+extern int D_004FA8CC, D_004FA8D0, D_004FA8D4, D_004FA8D8;
+void tmbr_RoomInput(void)
+{
+    uiReadInput();
+    if (inputGetPadButtons(0) & 0x4)
+        D_004FA8AC = D_004FA8B0 = D_004FA8B4 = D_004FA8B8 = D_004FA8BC = D_004FA8C0 = D_004FA8C4 = D_004FA8C8 =
+        D_004FA8CC = D_004FA8D0 = D_004FA8D4 = D_004FA8D8 = 0;
+}
 /* 128 MB EE (PCSX2 "Enable 128MB RAM (Dev Console)", ini ExtraMemory): is memory past 32 MB there? (test 2026-10-26).
  * Writes a pattern at 48 MB and 120 MB (uncached kseg1) and reads it back; 32 MB machines mirror / fault there, so
  * it only runs when the kernel's memory size says more than 32 MB. */
@@ -177,8 +190,10 @@ void tmbr_SingleFrame(void)
             if (D_004FA684 != ws) { ws = D_004FA684; wt = 0; if (ws == 0x21) visits++; scePrintf("TMBR storytest: ui %x visit %d\n", ws, visits); }
             wt++;
             if (ws == 0x21 && visits == 2 && wt >= 120 && wt < 126) tmbr_padInject = 0x2;
+            if (ws == 0x21 && visits == 2 && ((wt >= 150 && wt < 156) || (wt >= 170 && wt < 176))) tmbr_padInject = 0x8004;  /* STORY off / on: reads the save */
             if (ws == 0x21 && wt >= 200 && wt < 206) tmbr_padInject = 0x40;
             if (ws == 0x21 && wt >= 240 && wt < 246) tmbr_padInject = B_CROSS;
+            if (ws == 0x20 && wt >= 300 && wt < 306) tmbr_padInject = B_CROSS;     /* SCORE: continue */
             return;
         }
     }

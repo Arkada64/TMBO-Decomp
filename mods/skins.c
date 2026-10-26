@@ -345,6 +345,7 @@ void tmbr_SkinsFrame(void)
 
 /* vehicle update's launcher update call (0x1DCD90): 12 Pak runs it under PAK_ID (see above) */
 extern void launcherUpdate(void* l, char* v) __asm__("func_001549A0");
+extern char D_0045AC00[];                       /* Roadkill's animation sound events */
 /* weapon mounts: the launcher's per-weapon launch offsets (launcher+0x630, 16 bytes each, x/y/z in the car's
  * frame, +y forward, +z up; filled per car type by func_001518A0, Roadkill's for 12 Pak). Forward-firing ones
  * are moved to 12 Pak's hood gun (centre of the hood, measured from his model); rear drops stay. */
@@ -375,6 +376,10 @@ void tmbr_LauncherUpdate(void* l, char* v)
     if (isPak(v)) {
         int i = vidx(v);
         if (i >= 0) pakMounts((char*)l, i);
+        /* the animation sound (launcher +0xB38, AnimationSound) takes its event table by car id when an animation
+         * starts (startAnimationSound 0x18F660); PAK_ID has none, which left +0x50 null and its update read
+         * table[k] at address 0 (TLB misses 0x18FA58.., test wt92). Roadkill's table stays in place for him. */
+        *(int*)((char*)l + 0xB38 + 0x50) = (int)D_0045AC00;
         *(int*)(v + 0x20F4) = PAK_ID;
         launcherUpdate(l, v);
         *(int*)(v + 0x20F4) = 0x20;

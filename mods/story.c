@@ -6,7 +6,7 @@
  * Each level is Last Man Standing, humans vs bots (teams.c bot mode), 3 lives, with retail's AI count for that
  * level (retail SelectAICars: shell +0x19DDC table), distinct random drivers that are not a human's car, Minion
  * only on his stadium (alone there, like retail). Win (the bots' team is out) -> the next level; at a fork the
- * host picks with L3 in the waiting room. Lose -> the same level again. No movies / bosses / save yet
+ * host picks with L3 in the waiting room. Lose -> the same level again. No movies / bosses yet
  * (phases 2-4). Host only: the level goes to everyone in the game info (shell +0x23AC), bots are host-made. */
 #define F(p, off) (*(int*)((char*)(p) + (off)))
 extern int sprintf(char* d, const char* f, ...);
@@ -54,6 +54,7 @@ extern int coopList(void* tmc, void* d, unsigned* n) __asm__("coopGetGameListing
 #define SAVE_MAGIC 0x53424D54
 static StorySave saves[16];
 static unsigned runs;
+static int saveRetry;           /* the first save on a card without the file returns 0 (test g93); the next one works */
 static void saveRun(void)
 {
     StorySave* r = &saves[0];
@@ -61,6 +62,7 @@ static void saveRun(void)
     for (i = 0; i < (int)sizeof(StorySave); i++) ((char*)r)[i] = 0;
     r->magic = SAVE_MAGIC; r->level = level; r->stage = stage; r->fork = fork; r->runs = runs;
     ok = coopSave(TMC, 0, r);
+    saveRetry = ok ? 0 : saveRetry + 1;
     scePrintf("TMBR story: saved stage %d %s -> %d\n", stage, NAME[level], ok);
 }
 static int loadRun(void)
@@ -142,6 +144,8 @@ void tmbr_StoryLobby(void)
     wasOn = on;
     if (!on) return;
     result();
+    {   static int wait;
+        if (saveRetry && ++wait >= 30) { wait = 0; if (saveRetry < 5) saveRun(); else saveRetry = 0; } }
     if (!(pad & 0x4) && (pressed & 0x2) && fork >= 0 && NEXT[fork][0] != NEXT[fork][1]) {
         level = level == NEXT[fork][0] ? NEXT[fork][1] : NEXT[fork][0];
         msg[0] = 0;
