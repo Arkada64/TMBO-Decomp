@@ -74,6 +74,12 @@
       squeezed under Sweet Tooth's size), removed as janky. As a separate car slot like 12 Pak: Head-On model
       (tools/lost/gtbuild.py), his own wheels, Lost's mount points, Sweet Tooth only as the stats / special donor.
       Needs a second free car-select slot and stays under the per-car texture / palette budget.
+  6g. 128 MB EE (PCSX2 "Enable 128MB RAM (Dev Console)", ini [EmuCore] ExtraMemory = true; tested 2026-10-26,
+      PCSX2 2.7): kernel memory size 0x8000000, memory at 48 / 120 MB reads back, a full bot match runs the same
+      (60 fps, no exceptions) with it on or off. The game itself only uses its heap (grows up from .bss), so a
+      fixed area high up (e.g. 64-128 MB) is free for us: extra cars, story data, bigger textures. Needs: the
+      TMBR launcher turns the setting on; online, everyone must have it if content depends on it (check in the
+      lobby); mods check GetMemorySize() and fall back when it is 32 MB.
   6d. Harbor City cars (Ark 2026-10-26), each its own car slot built from its own Lost model (like 12 Pak's rebuild):
       - Old Pickup: Junkyard Dog's stats; special = a weaker Minion-style special that only tracks ahead and slightly to
         the side. Needs animating; weapon racks unknown.
