@@ -99,6 +99,7 @@ extern void carUnloadVeh(int v) __asm__("func_001FE0B8");
 extern int carLoadDone(int v) __asm__("func_0018A480");
 static void preload(int inGame);
 void tmbr_GuestsPreload(void) { preload(1); }
+
 static void preload(int inGame)
 {
     int k;
@@ -118,6 +119,21 @@ static void preload(int inGame)
         F(sl, 0x10) = was10; F(sl, 0xB8) = wasB8;
         scePrintf("TMBR guests: slot %d now %d, done %d\n", s, D_00313F00[s] >> 5, carLoadDone(vn));
     }
+}
+/* The level load (func_00188248, from func_00186730 0x186AF8) loads each player slot's car from D_00313F00[slot]
+ * (copied to D_003F6E08 at its start); for empty slots that holds the bot car the session rolled. Put the guests'
+ * cars there first, so their cars load with the level (Ark 2026-10-26: both halves showed P1 for a second while a
+ * guest's car loaded in the match). */
+extern void levelLoadCars(char* shell, int a) __asm__("func_00188248");
+void tmbr_LevelLoadCars(char* shell, int a)
+{
+    int k;
+    for (k = 1; k <= 3; k++)
+        if (joinCar[k] && joinSlot[k] >= 0) {
+            scePrintf("TMBR guests: level load, slot %d car %d -> %d\n", joinSlot[k], D_00313F00[joinSlot[k]] >> 5, joinCar[k] >> 5);
+            D_00313F00[joinSlot[k]] = joinCar[k];
+        }
+    levelLoadCars(shell, a);
 }
 /* make the guests (freecam.c splitFrame, right after the views are set up, cam = their view) */
 /* returns how many guests are still waiting for their car to load (call again next frame) */
@@ -157,6 +173,11 @@ int tmbr_GuestsMake(int views)
         }
         if (!veh) { padOf[v] = -1; scePrintf("TMBR guests: player %d not made\n", i + 1); guestCar[i] = (char*)-1; continue; }
         F(veh, 0x210C) = i;
+        /* owner type +0x20B4: hits only take health off 1 (this console's player) or 4 (the host's bots), a remote
+         * car's damage comes from its own console (func_001E1C40 0x1E22A4). A guest is this console's player
+         * (Ark 2026-10-26: guests took no damage) */
+        scePrintf("TMBR guests: player %d owner type %d -> 1\n", i + 1, F(veh, 0x20B4));
+        F(veh, 0x20B4) = 1;
         guestCar[i] = veh;
         if (i > guestN) guestN = i;
         scePrintf("TMBR guests: player %d (controller %d) = car slot %d, char %d, pad %d, view %d, kind %d\n", i + 1, k + 1, v, car >> 5, pads[k], i, F(veh, 0x590));
@@ -220,7 +241,8 @@ void tmbr_GuestsLobby(void)
         if (!(b & (B_START | B_SELECT))) { if (idleT[k] < 100) idleT[k]++; }
         pr = idleT[k] >= 30 ? b & ~prevBtn[k] : 0;
         prevBtn[k] = b;
-        if ((pr & B_START) && !joinCar[k]) {
+        /* START: join (car select), or for a guest already in, change car (Ark 2026-10-26); SELECT: leave */
+        if (pr & B_START) {
             if (!netIsHost(D_003156C0)) { scePrintf("TMBR guests: joining on a client console is not done yet\n"); continue; }
             if (!myClient()) continue;
             picking = k;
@@ -228,6 +250,10 @@ void tmbr_GuestsLobby(void)
             /* to car select, with the shell camera flown to the car display like the room's SELECT CAR does
              * (0x1C7134: D_004FA7D8 = position, D_004FA718 = camera spot = position + 5); without it the room stays
              * behind the car select (Ark 2026-10-26) */
+            if (joinCar[k] && shellPtr) {               /* a car change starts on the guest's own car */
+                int q;
+                for (q = 0; q < 16; q++) if (F(shellPtr + 0x1A2F0, q * 4) == joinCar[k]) { carSelPos = q; break; }
+            }
             D_004FA718 = carSelPos + 5;
             D_004FA688 = UI_CARSEL; D_004FA910 = 0; D_004FA6E4 = 1;
             scePrintf("TMBR guests: controller %d picks a car\n", k + 1);
@@ -288,16 +314,16 @@ void tmbr_GuestPickEnd(int accept)
     int k = picking;
     picking = 0;
     if (accept && shellPtr) {
-        int car = F(shellPtr + 0x1A2F0, carSelPos * 4), s = reserveSlot();
+        int car = F(shellPtr + 0x1A2F0, carSelPos * 4);
+        int s = joinCar[k] && joinSlot[k] >= 0 ? joinSlot[k] : reserveSlot();   /* (a car change keeps the slot) */
         if (car <= 0) car = 0x20;
         if (s >= 0) {
             joinCar[k] = car; joinSlot[k] = s;
             F(D_003156C0 + s * 0x220, 0xB4) = car;           /* so the level load loads this car for that slot */
             scePrintf("TMBR guests: controller %d joins with %s (net slot %d)\n", k + 1, D_0041BF00[car >> 5], s);
         } else scePrintf("TMBR guests: no free slot for controller %d\n", k + 1);
-    } else scePrintf("TMBR guests: controller %d backed out\n", k + 1);
-    preload(0);                     /* load the car now, in the room (the shell's own per-player car load), so it is
-                                     * there when the match starts (Ark 2026-10-26: both halves showed P1 for a second) */
+    } else scePrintf("TMBR guests: controller %d backed out\n", k + 1);   /* (a car change: the old car stays) */
+
     if (myClient()) F(myClient(), 0xA4) = pickSavedCar;
     carSelPos = pickSavedPos;
     D_004FA718 = 0x75;                                  /* camera back to the room (as car select's own confirm) */

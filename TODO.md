@@ -2,6 +2,9 @@
 
 - **Work queue (Ark 2026-10-26, top to bottom):**
   1. Split-screen guests: car select (the real screen repeats "PLAYER n CHOOSE A VEHICLE" on that controller).
+  1b. Guest names (Ark 2026-10-26): on joining, the game's own keyboard + text box asks for a name (default
+      PLAYER 2 / 3 / 4); shown in the player list, scoreboard and kill feed. Status: 1-3 work on the host
+      (join / car select / car change / leave, player list row, own car, view, HUD, scoreboard per half).
   2. Guests joining (START on controller 2-4 in the waiting room; on a client the host makes the car over chat).
   3. Guest camera pulled back (retail split distance) + HUD per view.
   4. Letterbox off - NOT the game (2026-10-26): TMBO draws the full 640x448 (view layouts D_004CEE40, GS DISPLAY2 dh

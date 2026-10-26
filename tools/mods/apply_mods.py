@@ -108,6 +108,7 @@ PATCHES = [
     (A("tmb/ui.s"), "001CB9C4", "jal", "jal        tmbr_CarSelNet"),
     (A("tmb/ui.s"), "001CE2E8", "jal", "jal        tmbr_UiPadButtons"),
     (A("tmb/ui.s"), "001CD4BC", "jal", "jal        tmbr_BotCars"),
+    (A("nonmatchings/online/after_shadow_43/func_00186730.s"), "00186AF8", "jal", "jal        tmbr_LevelLoadCars"),
     (A("nonmatchings/tmb/rt/func_00183580.s"), "00183AD4", "jal", "jal        tmbr_HudView"),
     (A("nonmatchings/tmb/rt/func_00183580.s"), "001838B4", "jal", "jal        tmbr_HudPlace"),
     (A("nonmatchings/tmb/game/func_00138C90.s"), "00139344", "jal", "jal        tmbr_SbCall"),
