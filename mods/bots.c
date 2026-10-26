@@ -752,8 +752,8 @@ static int charging(char* g, char* v, int idx)
 #define AS_LOST 30
 #define AS_TURBO 60
 static short asT[8], asLost[8], asGap[8], asTurbo[8], asShots[8];
-static int asDecided[8];          /* wpnPicked[] value the decision was made for */
-static signed char asOn[8];
+static int asLast[8];             /* thinkTick of the last aiming frame (the fight logic stopped running: drop it) */
+static signed char asOn[8], asPrevW[8], asTry[8];   /* asTry: a decision is pending for the weapon just raised */
 static int wpnPicked[8];          /* (defined with the weapon pick below) */
 static int bigShot(char* v, char* br)
 {
@@ -768,10 +768,23 @@ static int aimShot(char* g, char* v, int idx, int b, int a, int d)
     unsigned char* pad = PAD(v);
     int seen = F(br, 0x598) || F(br, 0x4B0) < 10, sp, duty;
     if (asTurbo[idx] > 0) { asTurbo[idx]--; pad[4] = 1; pad[6] = 0; pad[7] = 1; }
+    {   /* a big shot just came up (the AI's weapon changed to it, whoever picked it): one decision for it */
+        int w = F(br, 0x47C) & 7;
+        if (w != asPrevW[idx]) {
+            asPrevW[idx] = (signed char)w; asTry[idx] = bigShot(v, br);
+            if (w == 5) {
+                static unsigned int seen5;
+                int ty = F(v + 0x21B0, 0x110) & 31;
+                if (!(seen5 >> ty & 1)) { seen5 |= 1u << ty; scePrintf("TMBR aim: pickup slot type %d up\n", ty); }
+            }
+        }
+    }
+    if (asOn[idx] && thinkTick - asLast[idx] > 10) asOn[idx] = 0;   /* (left the fight meanwhile: start over) */
+    asLast[idx] = thinkTick;
     if (!asOn[idx]) {
-        if (!bigShot(v, br) || asDecided[idx] == wpnPicked[idx]) return 0;
+        if (!asTry[idx] || !bigShot(v, br)) return 0;
         if (d < AS_MIN || d > AS_RANGE || a > AS_START || !seen || (ROLE(v) == R_SNIPER && ph[idx] == 4)) return 0;
-        asDecided[idx] = wpnPicked[idx];
+        asTry[idx] = 0;
         if (mathfRandI(0, 99) >= chance[tmbr_botDiff < 0 ? 0 : tmbr_botDiff > 2 ? 2 : tmbr_botDiff]) return 0;
         asOn[idx] = 1; asT[idx] = asLost[idx] = asGap[idx] = asShots[idx] = 0;
         scePrintf("TMBR aim: car %d lines up (w %d, d %d)\n", idx, F(br, 0x47C), (int)*(float*)(br + 0x20));
