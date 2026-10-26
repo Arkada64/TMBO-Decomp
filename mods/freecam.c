@@ -101,6 +101,8 @@ extern void viewCreate(int vp, int idx) __asm__("func_00242658");
 extern void camFollow(char* cam, int i, char* v, void* cs) __asm__("SetCameraToFollowVehicle__6CameraiP7VehicleP3_cs");
 extern void camPov(char* cam, int i, int pov) __asm__("SetCameraPOV__6Camerai10_cameraPOV");
 extern void camInit(char* cam) __asm__("func_00116038");
+extern int tmbr_GuestsWanted(void), tmbr_GuestCount(void);   /* guests.c */
+extern void tmbr_GuestsMake(int views), tmbr_GuestsReset(void);
 extern int tmbr_levelSerial;
 static int splitSerial = -1, splitWait, splitN;
 static char* splitCar[4];
@@ -109,9 +111,10 @@ static void splitFrame(char* cam)
     extern char* D_004FA030;
     char* g = D_004FA030;
     int n = tmbr_split[1], i, k;
+    if (tmbr_GuestsWanted() && n < tmbr_GuestsWanted() + 1) n = tmbr_GuestsWanted() + 1;
     if (n < 2 || !g) return;
     if (n > 4) n = 4;
-    if (splitSerial != tmbr_levelSerial) { splitSerial = tmbr_levelSerial; splitWait = 300; splitN = 0; }
+    if (splitSerial != tmbr_levelSerial) { splitSerial = tmbr_levelSerial; splitWait = 300; splitN = 0; tmbr_GuestsReset(); }
     if (splitWait > 0) {
         if (--splitWait) return;
         splitN = n == 2 ? 2 : 4;
@@ -130,13 +133,14 @@ static void splitFrame(char* cam)
                 }
             }
             camPov(cam, 0, pov0);
+            tmbr_GuestsMake(splitN);           /* guests: their own camera + HUD through gameInitCamera */
         }
         for (i = 0; i < 4; i++) splitCar[i] = 0;
         scePrintf("TMBR split: %d views (asked %d), cs %x %x %x %x\n", splitN, n, *(int*)(cam + 0x42A0), *(int*)(cam + 0x42A4),
             *(int*)(cam + 0x42A8), *(int*)(cam + 0x42AC));
     }
     if (!splitN) return;
-    for (i = 1; i < splitN; i++) {
+    for (i = 1 + tmbr_GuestCount(); i < splitN; i++) {     /* (views 1..guests are the guests') */
         char* v = splitCar[i];
         if (v && *(int*)(v + 0x590) && *(int*)(v + 0x2028)) continue;
         for (k = 0; k < 8; k++) {     /* next live car not shown yet (not the local player: kind 1 is a human) */

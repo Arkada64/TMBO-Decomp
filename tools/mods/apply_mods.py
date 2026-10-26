@@ -99,6 +99,9 @@ PATCHES = [
         "beqz",
         "j          tmbr_ShoulderTap",
     ),  # L1/R1 weapon switch on tap only
+    # split-screen guests (mods/guests.c): inputGetPlayerPad -> tmbr_InputGetPlayerPad (a guest's car slot reads its
+    # controller; the delay slot "addiu $2, $0, 1" is harmless)
+    (A("nonmatchings/tmb/input/inputGetPlayerPad__Fi.s"), "00217B30", "daddu", "j          tmbr_InputGetPlayerPad"),
     (
         A("nonmatchings/tmb/player/func_0017BE80.s"),
         "0017BF00",

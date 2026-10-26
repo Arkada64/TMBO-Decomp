@@ -58,10 +58,12 @@ static int humans(void)
     return n;
 }
 
+extern int tmbr_GuestsWanted(void);   /* guests.c: local split-screen players (count as humans) */
+extern int tmbr_IsGuest(char* v);
 static int wanted(int mid)
 {
     u32 cfg = *(u32*)F(D_003156C0, 0x3148);
-    int h = humans(), n;
+    int h = humans() + tmbr_GuestsWanted(), n;
     if (tmbr_botCount < 0) {
         if (!(cfg >> 13 & 1)) return 0;
         if (mid && ((cfg >> 1) & 0xF) == 1) return -1;  /* original: no changes mid-match in that mode */
@@ -115,6 +117,7 @@ static int addBot(void)
     for (s = 0; s < 8; s++) {
         if (F(D_003156C0 + s * 0x220, 0x214) != 0) continue;
         v = netSlotVehicle(D_003156C0, s) - 1;
+        if (v >= 0 && v < 8 && tmbr_IsGuest(g + v * 0x31B0)) continue;
         if (v >= 0 && v < 8 && F(F(g, 0x9E670 + v * 4), 0x20D0) == 0) break;
     }
     if (s == 8) return 0;
