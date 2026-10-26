@@ -56,6 +56,11 @@
      the Lost body pieces dropped in tools/lost/pakbuild.py (the 'side door left hanging open', 0x2bd70) are
      likely panels in their open pose; hook them to the weapon-mount animation. His mount points differ from
      Roadkill's: read them from the Lost file and move the mounts on his model copy (Roadkill untouched).
+     2026-10-26: HC_STOCK has no animation data (Head-On drives its 8 jointed groups from code); its op19 nodes are
+     per-panel damage states and 0x50690 lists the pieces that fly off. Done: pakbuild.py puts 12 Pak's rear-left
+     hatch (homing / fire), rear-right hatch (power) and trunk lid (napalm) on Roadkill's animated rear panels /
+     trunk (animation characters, damage states kept), so they open with Roadkill's weapon animations. Needs a
+     look in game (hinges are Roadkill's, ~0.7 off 12 Pak's).
   6b. Gold Tooth back as his own car (Ark 2026-10-26), after 12 Pak's own-car work: the 2026-10-23 version was a skin
       inside Sweet Tooth's file (Sweet Tooth's wheels / mounts / collision / robot special, model and palettes
       squeezed under Sweet Tooth's size), removed as janky. As a separate car slot like 12 Pak: Head-On model

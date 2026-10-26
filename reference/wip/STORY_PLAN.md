@@ -11,6 +11,15 @@ files picked only in story mode. Later: local co-op story (split-screen guests),
     Last Man Standing, ...), so the R3 + Square lobby toggle of phase 1 is a stopgap.
 - Single player must not need a network setup: it runs the same host path offline (alone in a LAN room or a
   local session), with the room screens skipped / hidden.
+- Today's main menu (boot): INTERNET / LAN / OPTIONS, textured labels in the shell model (not font strings), UI
+  state 8 = func_001B91B8 (3-position cursor, select -> state 9 which branches on it). LAN goes through
+  "Initialize network hardware" -> CREATE GAME (name / password / max players) -> waiting room (state 0x21).
+- Plan: (1) state 8 shows SINGLE PLAYER / ONLINE / OPTIONS (new label textures in SHELL1.TEX, like the other shell
+  texture edits); ONLINE opens a second page INTERNET / LAN (same screen, labels swapped, back returns).
+  (2) SINGLE PLAYER -> SOLO / SPLIT-SCREEN CO-OP; both run the LAN host path with the network screens auto-
+  accepted (game name filled in, no password) and land in the waiting room with STORY on; CO-OP opens the guest
+  join (START on controllers 2-4) there. (3) Online: STORY as a game mode in the settings editor (type list
+  2..5 + story), replacing the R3 + Square toggle.
 
 ## What TMBO still has / lost (checked 2026-10-26)
 - Kept: the MPEG movie player (TMBO plays mov/*.pss shell transitions: title, gm, cs1, eye, tv, wait, score ...),
