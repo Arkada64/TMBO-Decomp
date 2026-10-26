@@ -197,13 +197,13 @@ void tmbr_HudPrintBay(int f, int x, int y, const char* t)
      * is 320 wide, its weapon bay from about 275) */
     if (splitN < 2) { fontPrintXY(f, x, y, t); return; }
     if (splitN >= 3) {                /* quarters: smaller (Ark 2026-10-26), lines closer together */
-        fontSize(f, 6);
+        fontSize(f, 8);
         fontSpacing(f, 0);
-        fontPrintXY(f, x - 230, 78 + (y - 180) / 2, t);
+        fontPrintXY(f, x - 204, 72 + (y - 180) * 5 / 6, t);   /* (size 6 was unreadable, 2026-10-26) */
         fontDefSize(f);
         return;
     }
-    fontPrintXY(f, x, y - 112, t);
+    fontPrintXY(f, x + 14, y - 112, t);   /* (a little right: it touched the car, Ark 2026-10-26) */
 }
 extern void hudBuild(char* hud, int view) __asm__("func_001475F8");
 /* the HUD's 3D clusters are placed by func_00145860(hud) per view (0x1838B4); the anchors are set right before
@@ -230,6 +230,10 @@ void tmbr_ViewScene(int view)
         *(unsigned*)(db + 0x1B0) = 0; *(unsigned*)(db + 0x320) = 0;
         return;
     }
+    if (splitBlank && view == 0) {     /* (test: the dark grey may be a whole-screen clear in view 0's colour) */
+        char* db = viewGetDb(0);
+        *(unsigned*)(db + 0x1B0) = 0; *(unsigned*)(db + 0x320) = 0;
+    }
     viewScene(view);
 }
 /* the view's effects (sparks, fire: func_0022BE88(view, cs, 1) and func_0022CD00(view) at 0x18397C / 0x183984) */
@@ -240,7 +244,19 @@ void tmbr_ViewFx2(int view) { if (splitBlank && view == 3) return; viewFx2(view)
 void tmbr_HudView(char* hud, int view)
 {
     if (splitBlank && view == 3) return;
-    hudBuild(hud, view);
+    if (view > 0 && view < 4 && tmbr_GuestCar(view)) {
+        /* a guest's HUD reads "my" car from this console's net client (+0xA0) for its leaderboard lines (the
+         * bay panel: rank / points / kills ... of net client +0xA0's car, its +0x2104): the guest's car for
+         * the build of its view (Ark 2026-10-26: each panel its own player) */
+        extern char D_003156C0[];
+        char* me = *(char**)(D_003156C0 + 4);
+        if (me) {
+            char* own = *(char**)(me + 0xA0);
+            *(char**)(me + 0xA0) = tmbr_GuestCar(view);   /* (the panel's colour follows: the car's +0x20F4) */
+            hudBuild(hud, view);
+            *(char**)(me + 0xA0) = own;
+        } else hudBuild(hud, view);
+    } else hudBuild(hud, view);
     if (splitN < 2) return;
     { extern void tmbr_DamageDraw(int sc); tmbr_DamageDraw(view); }   /* dmgreport.c: this screen's damage report */
     if (view == 0) {

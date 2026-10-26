@@ -49,6 +49,7 @@ static char guestName[4][16];
 int tmbr_GuestCount(void) { return guestN; }
 char* tmbr_GuestCar(int i) { return i > 0 && i < 4 && guestCar[i] != (char*)-1 ? guestCar[i] : 0; }   /* view i's guest car, 0 = none / not made yet */
 int tmbr_GuestPicking(void) { return picking; }
+int tmbr_GuestCarValue(int i) { return i > 0 && i < 4 ? joinCar[i] : 0; }   /* view i's picked car (car id << 5) */
 static int joined(void) { int k, n = 0; for (k = 1; k <= 3; k++) if (joinCar[k]) n++; return n; }
 int tmbr_GuestsWanted(void)
 {

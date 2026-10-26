@@ -73,6 +73,8 @@
       publishing its source (GPL).
   4e. Retail loading screen (Ark 2026-10-26): TMB's load screen where the top and bottom halves come crashing
       down; TMBO skips it. Bring it back for TMBR's level loads.
+  13b. Garage / car colour (Ark 2026-10-26, idea): recolour a car's body textures (palette / CLUT tint at load, or
+      a texture swap like the 12 Pak skin), choice synced to other players like the skin byte.
   14. (Last, very experimental) Roguelike story option (no story: online's default loading screen instead of the
       story loading screens / dialogue, no cutscenes; synchronous entry by default so everyone starts together): each round a choice of two maps from any map, a visited map
       leaves the pool; character dialogue won't fit every stage. AI back to the human-hunting routine and doing far
