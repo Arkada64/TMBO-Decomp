@@ -249,6 +249,7 @@ PATCHES = [
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B3BA8", "jal", "jal        tmbr_ModsPage"),   # MINION / HEALTH rows on GAME MODS (modspage.c)
     (A("tmb/ui.s"), "001C6BCC", "jal", "jal        tmbr_RoomInput"),                      # waiting room input: hidden while R3 is held (menu.c)
     (A("tmb/ui.s"), "001CB004", "jal", "jal        tmbr_ModsInput"),                     # GAME MODS input read: our rows hide it (modspage.c)
+    (A("nonmatchings/tmb/vehicle/func_001D6F78.s"), "001D7020", "jal", "jal        tmbr_VehInitDynamics"),            # Twister: Mr. Grimm's stats (skins.c)
     (A("tmb/ui.s"), "001CB768", "jal", "jal        tmbr_CarSelStep"),                    # car select step: extras behind spot 16 (skins.c)
     (A("tmb/collis.s"), "0011F0DC", "jal", "jal        tmbr_PickupHit"),                       # HEALTH : OFF (bots.c)
     (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167378", "jal", "jal        tmbr_PickupHit"),

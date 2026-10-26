@@ -41,7 +41,9 @@ extern void loadCar0F0(void* shell, int client) __asm__("func_001890F0");
  * its own car files \PCAR\<code>P.* / \ACAR\<code>A.*. One extra per donor type (the sync message is keyed by
  * type). An extra other than 12 Pak only shows up on car select when its \PCAR\<code>P.NGP is on the disc
  * (tmbr_SkinsAvail), so the list can name cars whose models are not built yet. */
-static const int skinType[NSKIN] = { 6, 1, 8, 4, 5, 7, 10 };   /* Sweet Tooth, Roadkill, Junkyard Dog, Spectre, Crazy 8, Brimstone, Mr. Grimm */
+static const int skinType[NSKIN] = { 6, 1, 8, 4, 5, 7, 3 };    /* Sweet Tooth, Roadkill, Junkyard Dog, Spectre, Crazy 8, Brimstone, Outlaw
+                                                                 * (Twister: Outlaw's chassis, Mr. Grimm's stats, Axel's shockwave - Ark 2026-10-26) */
+#define SK_TWISTER 6
 static const char skinCode[NSKIN][2] = { { 'z', 'z' }, { 'z', 'y' }, { 'z', 'x' }, { 'z', 'w' }, { 'z', 'v' }, { 'z', 'u' }, { 'z', 't' } };
 static const char* const skinName[NSKIN] = { "GOLD TOOTH", "12 PAK", "OLD PICKUP", "PIT VIPER", "OUTLAW 2", "THUMPER", "TWISTER" };
 static char origCode[NSKIN][2];          /* the donors' own codes, read from the table before the first swap */
@@ -295,6 +297,47 @@ static int isPak(char* v)
 
 int tmbr_IsPak(char* v) { return v && isPak(v); }
 
+/* which extra a player's vehicle is (-1 none): its car type is the extra's donor and its driver has the extra on */
+static int vehSkin(char* v)
+{
+    int c, s, k, id;
+    if (!v || !D_004FA030) return -1;
+    id = *(int*)(v + 0x20F4);
+    for (c = 0; c < 8; c++) {
+        s = netSlotVehicle(netState, c);
+        if (s <= 0 || s > 8 || *(char**)(D_004FA030 + 0x9E670 + 4 * (s - 1)) != v) continue;
+        for (k = 0; k < NSKIN; k++)
+            if ((id == skinType[k] << 5 || (k == 1 && id == PAK_ID)) && skinOn(c, k)) return k;
+        return -1;
+    }
+    return -1;
+}
+
+/* Stats from another type (reference/wip/CAR_STATS_SPECIALS.md): vehicleInit's call of vehicleInitDynamics
+ * (0x1D7020, func_001D72D8, a switch on +0x20F4 writing the per-type constants) is wrapped; for Twister it runs again
+ * as Mr. Grimm (0x140) and the chassis fields (suspension, ride height / collision / axle geometry, tire count,
+ * chase camera) are put back to the model's own (Outlaw's). Every console runs it (the skin state is synced). */
+extern void vehInitDynamics(char* v) __asm__("func_001D72D8");
+static void keepRange(char* v, char* save, int a, int b, int put)
+{
+    int o;
+    for (o = a; o < b; o += 4) { if (put) *(int*)(v + o) = *(int*)(save + o - a); else *(int*)(save + o - a) = *(int*)(v + o); }
+}
+void tmbr_VehInitDynamics(char* v)
+{
+    static char s1[0x18], s2[0x4C], s3[4], s4[0xD0];
+    int id;
+    vehInitDynamics(v);
+    if (vehSkin(v) != SK_TWISTER) return;
+    id = *(int*)(v + 0x20F4);
+    keepRange(v, s1, 0x380, 0x398, 0); keepRange(v, s2, 0x3A4, 0x3F0, 0); keepRange(v, s3, 0x478, 0x47C, 0); keepRange(v, s4, 0x1F40, 0x2010, 0);
+    *(int*)(v + 0x20F4) = 10 << 5;
+    vehInitDynamics(v);
+    *(int*)(v + 0x20F4) = id;
+    keepRange(v, s1, 0x380, 0x398, 1); keepRange(v, s2, 0x3A4, 0x3F0, 1); keepRange(v, s3, 0x478, 0x47C, 1); keepRange(v, s4, 0x1F40, 0x2010, 1);
+    scePrintf("TMBR skins: Twister stats (Mr. Grimm) for car %d, health %d\n", vidx(v), (int)*(float*)(v + 0x400));
+}
+
 /* 12 Pak's special IS the game's reticle (slot-5 pickup type 0xB at launcher+0x110), run from his special slot:
  * FireCurrentWeapon is re-entered with the slot temporarily reading 5 / type 0xB, so the game's own reticle code
  * arms it (launcher+0x218), releases it on the next special press, or times it out / cancels it on a weapon
@@ -345,9 +388,26 @@ static void pakMissileValues(int on)
  * reticle overlay and countdown (hud.s 0x14E19C: slot 5, type 0xB, ammo > 0) and the game arms / releases /
  * times it out itself. The round it uses is charged to his special instead (tmbr_ReticleUsed); afterwards his
  * own slot-5 pickup and his previous weapon come back (tmbr_SkinsFrame). */
+/* Axel's primary special, the shockwave (CAR_STATS_SPECIALS.md: online func_001599A0's plain-press branch): weapon
+ * 0x1B, its sound, one special used. Its model node (EP id 0xFB0) must be loaded for the slot (Twister's files carry
+ * a copy of Axel's), else the weapon does nothing. Only the owning console fires (+0x20B4 1 or 4), like Axel. */
+extern void createWeapon2(void* w, int type, char* v, int a, int b) __asm__("func_001ED8D0");
+extern void shockSound(void* snd, void* pos) __asm__("func_00194D78");
+extern void weaponUsedSpecial(void* w, char* v, int slot) __asm__("func_001F1AE0");
+static void twisterSpecial(char* l, char* v)
+{
+    int own = *(int*)(v + 0x20B4);
+    if (*(int*)(l + 0x27C) || L_AMMO(l, 1) <= 0 || (own != 1 && own != 4)) return;
+    createWeapon2(D_004FA030 + 0x6C310, 0x1B, v, 0, 0);
+    shockSound(v + 0x2AD0, v + 0x1D0);
+    weaponUsedSpecial(D_004FA030 + 0x6C310, v, 1);
+    *(int*)(l + 0x94) = 0; *(int*)(l + 4) = 0;
+}
+
 void tmbr_FireSpecial(void* l, char* v)
 {
     int i = vidx(v);
+    if (i >= 0 && vehSkin(v) == SK_TWISTER) { twisterSpecial((char*)l, v); return; }
     if (i < 0 || !isPak(v)) { fireSpecial(l, v); return; }
     if (L_ARMED(l) && !pakRet[i]) return;               /* a pickup reticle is up: leave it alone */
     if (!pakRet[i]) {
