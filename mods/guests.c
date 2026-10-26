@@ -25,6 +25,7 @@
  * Test config: tmbr_guests = { tag "GSTS", count, car 2, car 3, car 4 } (car = character << 5, 0 = random) joins
  * guests without the pick (set in the ELF by tools/qb/split/splitpatch.py). */
 #define F(p, off) (*(int*)((char*)(p) + (off)))
+extern int sprintf(char* d, const char* f, ...);
 extern char* D_004FA030;              /* game */
 extern char D_003156C0[];             /* net: 8 player slots x 0x220 */
 extern int scePrintf(const char* fmt, ...);
@@ -39,6 +40,8 @@ static char* guestCar[4];
 static int guestN;
 static int joinCar[4], joinSlot[4] = { -1, -1, -1, -1 };   /* per controller 2..4 (index 1..3): car, net slot */
 static int picking, pickSavedCar, pickSavedPos, prevBtn[4], idleT[4];
+static int naming;                                  /* controller (1..3) typing its name, 0 = none */
+static char guestName[4][16];
 
 int tmbr_GuestCount(void) { return guestN; }
 char* tmbr_GuestCar(int i) { return i > 0 && i < 4 && guestCar[i] != (char*)-1 ? guestCar[i] : 0; }   /* view i's guest car, 0 = none / not made yet */
@@ -178,6 +181,7 @@ int tmbr_GuestsMake(int views)
          * (Ark 2026-10-26: guests took no damage) */
         scePrintf("TMBR guests: player %d owner type %d -> 1\n", i + 1, F(veh, 0x20B4));
         F(veh, 0x20B4) = 1;
+        *(char*)(veh + 0x497) = 4;                      /* respawn shield on the first spawn too (shield.s) */
         guestCar[i] = veh;
         if (i > guestN) guestN = i;
         scePrintf("TMBR guests: player %d (controller %d) = car slot %d, char %d, pad %d, view %d, kind %d\n", i + 1, k + 1, v, car >> 5, pads[k], i, F(veh, 0x590));
@@ -232,7 +236,7 @@ static int padBtn(int pad)
 void tmbr_GuestsLobby(void)
 {
     int k;
-    if (D_004FA684 != UI_ROOM || picking) return;
+    if (D_004FA684 != UI_ROOM || picking || naming) return;
     for (k = 1; k <= 3; k++) {
         int b = padBtn(2 * k), pr;
         /* a press counts only after the controller has been seen answering with nothing pressed for a while
@@ -260,7 +264,7 @@ void tmbr_GuestsLobby(void)
             return;
         }
         if ((pr & B_SELECT) && joinCar[k]) {
-            joinCar[k] = 0; joinSlot[k] = -1;
+            joinCar[k] = 0; joinSlot[k] = -1; guestName[k][0] = 0;
             scePrintf("TMBR guests: controller %d left\n", k + 1);
         }
     }
@@ -290,9 +294,11 @@ void tmbr_CarSelNet(void* net, int st)
         int car = F(shellPtr + 0x1A2F0, carSelPos * 4), s = reserveSlot();
         if (car <= 0) car = 0x20;
         if (s >= 0) {
+            int isNew = !joinCar[k];
             joinCar[k] = car; joinSlot[k] = s;
             F(D_003156C0 + s * 0x220, 0xB4) = car;           /* so the level load loads this car for that slot */
             scePrintf("TMBR guests: controller %d joins with %s (net slot %d)\n", k + 1, D_0041BF00[car >> 5], s);
+            if (isNew) nameStart(k);
         } else scePrintf("TMBR guests: no free slot for controller %d\n", k + 1);
     }
     if (myClient()) F(myClient(), 0xA4) = pickSavedCar;   /* the host's own car back */
@@ -309,6 +315,7 @@ void tmbr_CarSelNet(void* net, int st)
 #define B_CIRCLE 0x2000
 #define B_CROSS 0x4000
 static void preload(int inGame);
+static void nameStart(int k);
 void tmbr_GuestPickEnd(int accept)
 {
     int k = picking;
@@ -318,9 +325,11 @@ void tmbr_GuestPickEnd(int accept)
         int s = joinCar[k] && joinSlot[k] >= 0 ? joinSlot[k] : reserveSlot();   /* (a car change keeps the slot) */
         if (car <= 0) car = 0x20;
         if (s >= 0) {
+            int isNew = !joinCar[k];
             joinCar[k] = car; joinSlot[k] = s;
             F(D_003156C0 + s * 0x220, 0xB4) = car;           /* so the level load loads this car for that slot */
             scePrintf("TMBR guests: controller %d joins with %s (net slot %d)\n", k + 1, D_0041BF00[car >> 5], s);
+            if (isNew) nameStart(k);
         } else scePrintf("TMBR guests: no free slot for controller %d\n", k + 1);
     } else scePrintf("TMBR guests: controller %d backed out\n", k + 1);   /* (a car change: the old car stays) */
 
@@ -333,6 +342,7 @@ int tmbr_UiPadButtons(int pad)
 {
     static int prev, held;
     int b, pr;
+    if (naming) return 0;                              /* (the keyboard reads the guest's pad itself) */
     if (!picking) { held = 0; return inputGetPadButtons(pad); }
     if (D_004FA684 != UI_CARSEL) return 0;            /* still flying in */
     b = padBtn(2 * picking);
@@ -342,6 +352,76 @@ int tmbr_UiPadButtons(int pad)
     if (pr & B_CROSS) { tmbr_GuestPickEnd(1); return 0; }
     if (pr & (B_TRI | B_CIRCLE)) { tmbr_GuestPickEnd(0); return 0; }
     return b & ~(B_CROSS | B_TRI | B_CIRCLE | B_START);
+}
+/* ---- guest names (Ark 2026-10-26): on joining, the game's own on-screen keyboard (the screen-name screen's,
+ * func_001C1B78: keyboard D_004B3C00, text box objects like D_0045BDB8 - 0x70 bytes with a vtable at +0x68, the
+ * text at +0) on the guest's controller, the name filled in as PLAYER n. Keyboard: func_0021A8F0(kb, box) opens,
+ * func_0021AC78(kb) runs it (0xD2 / 0xC8 = closed: confirm / back), func_0021B1F8(kb) shuts it, func_002198B8(box,
+ * x, y) draws the box. It reads controller 1 (inputGetPadButtons(0) at 0x21B8C4, the analog stick through
+ * inputFixAnalogValue): those calls come here while a guest is typing (apply_mods.py). The name goes to the
+ * guest's reserved net slot (+0x18, read by the scoreboard / kill feed) and its player list row. ---- */
+extern char D_0045BDB8[];
+extern char D_004B3C00[];
+extern void kbOpen(char* kb, char* box) __asm__("func_0021A8F0");
+extern int kbRun(char* kb) __asm__("func_0021AC78");
+extern void kbClose(char* kb) __asm__("func_0021B1F8");
+extern void boxSet(char* box, const char* t) __asm__("func_00219810");
+extern void boxTrim(char* box) __asm__("func_0021A018");
+extern void boxDraw(char* box, int x, int y) __asm__("func_002198B8");
+extern int inputFixAnalog(int a, int b) __asm__("inputFixAnalogValue__Fii");
+static char nameBox[0x80];
+static int nameT;
+static void nameStart(int k)
+{
+    int q;
+    if (naming || D_004B3C00[0] | D_004B3C00[1] | D_004B3C00[2] | D_004B3C00[3]) {      /* (keyboard busy) */
+        sprintf(guestName[k], "PLAYER %d", k + 1);
+        return;
+    }
+    for (q = 0; q < 0x70; q++) nameBox[q] = D_0045BDB8[q];   /* a constructed text box (vtable, size) */
+    sprintf(guestName[k], "PLAYER %d", k + 1);
+    boxSet(nameBox, guestName[k]);
+    kbOpen(D_004B3C00, nameBox);
+    naming = k; nameT = 0;
+    scePrintf("TMBR guests: controller %d types a name\n", k + 1);
+}
+/* the keyboard's own pad reads */
+int tmbr_KbPad(int pad)
+{
+    int b;
+    if (!naming) return inputGetPadButtons(pad);
+    b = padBtn(2 * naming);
+    return b < 0 ? 0 : b;
+}
+int tmbr_KbAnalog(int a, int b) { return naming ? 0 : inputFixAnalog(a, b); }
+/* waiting room frame (bots.c tmbr_LobbyFrame, after the room's own frame) */
+void tmbr_GuestsName(void)
+{
+    int r, k = naming, s, q;
+    if (!k) return;
+    if (D_004FA684 != UI_ROOM) return;
+    boxDraw(nameBox, 0x145, 0x3F);
+    r = kbRun(D_004B3C00);
+    {   /* START on the guest's controller = done (the keyboard's own way is its ENTER key) */
+        static int prevS;
+        int b = padBtn(2 * k), st = b > 0 && (b & B_START);
+        if (nameT > 20 && st && !prevS) r = 0xD2;
+        prevS = st;
+    }
+    if (++nameT < 20 || (r != 0xD2 && r != 0xC8)) return;
+    kbClose(D_004B3C00);
+    boxTrim(nameBox);
+    if (r == 0xD2 && nameBox[0]) {
+        for (q = 0; q < 15 && nameBox[q]; q++) guestName[k][q] = nameBox[q];
+        guestName[k][q] = 0;
+    }
+    if ((s = joinSlot[k]) >= 0) {
+        char* n = D_003156C0 + s * 0x220 + 0x18;
+        for (q = 0; q < 15 && guestName[k][q]; q++) n[q] = guestName[k][q];
+        n[q] = 0;
+    }
+    scePrintf("TMBR guests: controller %d is %s (%x)\n", k + 1, guestName[k], r);
+    naming = 0;
 }
 /* car select frame (skins.c): title for a guest's pick */
 extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
@@ -355,7 +435,6 @@ void tmbr_GuestPickTitle(void)
 }
 /* waiting room settings box line (bots.c extraLines): retired - the guests are rows in the player list now
  * (Ark 2026-10-26: a line per guest there would run P3 / P4 off the box) */
-extern int sprintf(char* d, const char* f, ...);
 void tmbr_GuestsLine(char* b) { b[0] = 0; }
 /* the waiting room's player list (func_001C5768 0x1C5C48..): a row per player slot in use (+0x10 != -1) from
  * y 0x500, 0x100 apart; name x 0x1E0, ping 0x1090, car 0x14A0, status 0x1F40. The guests are local only (their
@@ -372,7 +451,7 @@ void tmbr_GuestsRows(void)
         if (!joinCar[k] || row >= 8) continue;
         y = 0x500 + row++ * 0x100;
         fontSetColor(0, 0x44, 0x32, 0x20);
-        sprintf(b, "%.12s P%d", me, k + 1);
+        if (guestName[k][0]) sprintf(b, "%.15s", guestName[k]); else sprintf(b, "%.12s P%d", me, k + 1);
         fontSetCursorAtSubPixel(0, 0x1E0, y); fontPrint(0, b);
         fontSetCursorAtSubPixel(0, 0x14A0, y); fontPrint(0, D_0041BF00[joinCar[k] >> 5]);
         fontSetCursorAtSubPixel(0, 0x1F40, y); fontPrint(0, "SPLIT");

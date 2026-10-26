@@ -164,13 +164,18 @@ void tmbr_SbCall(int a)
     if (splitN < 2) { scoreboard(a); return; }
     sbArg = a;
 }
-static int sbX(int x) { return x; }            /* (full width: a half keeps it - 0.6 x overlapped the columns, Ark 2026-10-26) */
+static int sbX(int x) { return sbScale && splitN == 4 ? x / 2 : x; }   /* (2 views: full width - 0.6 x overlapped the columns, Ark 2026-10-26; 4 views: half) */
 static int sbY(int y) { return sbScale ? 12 + y / 2 : y; }
 void tmbr_SbPrint(int f, int x, int y, const char* t) { fontPrintXY(f, sbX(x), sbY(y), t); }
 void tmbr_SbPrintC(int f, int x, int y, const char* t) { fontPrintCXY(f, sbX(x), sbY(y), t); }
 void tmbr_SbSize(int f, int sz) { fontSize(f, sbScale ? (sz + 1) / 2 : sz); }   /* (letters half size with the rows) */
 extern void fontDefSize(int f) __asm__("fontSetDefaultSize__Fi");
 void tmbr_SbDefSize(int f) { fontDefSize(f); if (sbScale) fontSize(f, f == 0 ? 8 : 6); }   /* (defaults 16 / 12) */
+/* split screen, the HUD's 2D text (func_001475F8's prints, apply_mods.py): the game type / score in the top right
+ * (x 535) is left out (Ark 2026-10-26: more room), the scoring lines beside the weapon bay (x 412, y 180-210 of the
+ * 224-line view) move up into the half-height view, next to the bay. */
+void tmbr_HudPrintTR(int f, int x, int y, const char* t) { if (splitN < 2) fontPrintXY(f, x, y, t); }
+void tmbr_HudPrintBay(int f, int x, int y, const char* t) { if (splitN == 4) return; fontPrintXY(f, x, splitN == 2 ? y - 112 : y, t); }   /* (4 views: not yet) */
 extern void hudBuild(char* hud, int view) __asm__("func_001475F8");
 /* the HUD's 3D clusters are placed by func_00145860(hud) per view (0x1838B4); the anchors are set right before
  * (in tests PCSX2 applies the community pnach to the original ELF every frame, which puts hud 0's x back) */
@@ -179,13 +184,15 @@ static void splitAnchors(char* g);
 void tmbr_HudPlace(char* hud)
 {
     extern char* D_004FA030;
-    if (splitN == 2 && D_004FA030) splitAnchors(D_004FA030);
+    if (splitN >= 2 && D_004FA030) splitAnchors(D_004FA030);
     hudPlace(hud);
 }
+int tmbr_SplitViews(void) { return splitN; }
 void tmbr_HudView(char* hud, int view)
 {
     hudBuild(hud, view);
     if (splitN < 2) return;
+    { extern void tmbr_DamageDraw(int sc); tmbr_DamageDraw(view); }   /* dmgreport.c: this screen's damage report */
     if (view == 0) {
         if (sbArg >= 0) { sbScale = 1; scoreboard(sbArg); sbScale = 0; sbArg = -1; }
     } else {
@@ -200,24 +207,28 @@ void tmbr_HudView(char* hud, int view)
  * the game sets x again after the level starts (the 16:9 values of the baked community widescreen patch). */
 static float anc0[2][3];
 static int ancSet;
-static float ancK[8] = { 1.5f, 1.0f, 0.72f, 0.62f, 4.0f, 0.0f, 0, 0 };   /* (x 1.18 put P2's off the edges, 2026-10-26) */   /* (an array: float literals overflowed
-                                                                       * the small-data area at link time) */
+/* per layout: depth k (bigger = smaller HUD), x and z scale of the on-screen offset; 2 views: half height;
+ * 4 views: quarter screens (Ark 2026-10-26) */
+static float ancK[2][4] = { { 1.5f, 1.0f, 0.72f, 0.62f }, { 2.2f, 0.43f, 0.9f, 0.78f } };
+static float ancLim[2] = { 4.0f, 0.0f };   /* (arrays: float literals overflowed the small-data area at link time) */
 static void splitAnchors(char* g)
 {
     char* h0 = g + 0x97B50;
-    int i, c, k;
+    int i, c, k, L = splitN == 4;
     if (!ancSet) {                        /* the single-view values, once (the game's own, before we touch them) */
         float* f = (float*)(h0 + 0x800);
-        if (!*(int*)h0 || f[1] <= ancK[5] || f[1] > ancK[4]) return;
+        if (!*(int*)h0 || f[1] <= ancLim[1] || f[1] > ancLim[0]) return;
         for (c = 0; c < 2; c++) for (k = 0; k < 3; k++) anc0[c][k] = ((float*)(h0 + 0x800 + c * 0x10))[k];
         ancSet = 1;
     }
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < splitN && i < 4; i++) {
         char* h = h0 + i * 0xA20;
         if (!*(int*)h) continue;
         for (c = 0; c < 2; c++) {
             float* f = (float*)(h + 0x800 + c * 0x10);
-            f[0] = anc0[c][0] * ancK[0] * ancK[1]; f[1] = anc0[c][1] * ancK[0]; f[2] = anc0[c][2] * ancK[2 + c];
+            f[1] = anc0[c][1] * ancK[L][0];
+            f[0] = anc0[c][0] * ancK[L][0] * ancK[L][1];   /* (on-screen x offset x [1], z offset x [2+c] / [0]) */
+            f[2] = anc0[c][2] * ancK[L][2 + c];
         }
     }
 }
@@ -308,13 +319,13 @@ static void splitFrame(char* cam)
                                                          * loading: their view on the player meanwhile) */
                 if (splitCar[0]) { camFollow(cam, i, splitCar[0], *(void**)(splitCar[0] + 0x2028)); camPov(cam, i, pov0); }
             splitHuds(g);
-            if (splitN == 2) {
-                /* 2 views (test 2026-10-26): the half-height views get a 4/3 narrower horizontal field than the
+            if (splitN >= 2) {
+                /* 2 / 4 views (test 2026-10-26): the half-height views get a 4/3 narrower horizontal field than the
                  * single view (projection 608 vs 456: the single view is widened for 16:9 by the community widescreen patch
                  * baked into the build, the split layouts are not): the camera looks pulled in
                  * and the HUD parts placed through the projection slide off the left edge. Give them the single
                  * view's horizontal field, same vertical (the widescreen transform: a x 3/4, b x 4/3). */
-                for (i = 0; i < 2; i++) {
+                for (i = 0; i < splitN; i++) {
                     float a, b;
                     viewGetFov(i, &a, &b);
                     viewSetFov(i, a * KW[1], b * KW[0]);
@@ -333,7 +344,11 @@ static void splitFrame(char* cam)
         guestsPending = tmbr_GuestsMake(splitN);
         if (tmbr_GuestCount() != guestsMade) { guestsMade = tmbr_GuestCount(); splitHuds(g); }
     }
-    if (splitN == 2) splitAnchors(g);
+    if (splitN >= 2) splitAnchors(g);
+    for (i = 1; i < splitN && i < 4; i++) {     /* a guest stays this console's player (owner type 1: damage) */
+        char* v = tmbr_GuestCar(i);
+        if (v && *(int*)(v + 0x20B4) != 1) { scePrintf("TMBR split: guest %d owner %d -> 1\n", i + 1, *(int*)(v + 0x20B4)); *(int*)(v + 0x20B4) = 1; }
+    }
     for (i = 1; i < splitN && i < 4; i++)       /* a guest's camera: the player's view (gameInitCamera leaves the
                                                  * default, closer one - test 2026-10-26) */
         if (!povSet[i] && tmbr_GuestCar(i)) { camPov(cam, i, *(int*)cam); povSet[i] = 1; }

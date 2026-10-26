@@ -1646,6 +1646,7 @@ void tmbr_LobbyFrame(void)
     lobbyFrame();
     { extern void tmbr_GuestsLobby(void); tmbr_GuestsLobby(); }   /* guests.c: START on controller 2-4 joins */
     { extern void tmbr_GuestsRows(void); tmbr_GuestsRows(); }     /* guests.c: their rows in the player list */
+    { extern void tmbr_GuestsName(void); tmbr_GuestsName(); }     /* guests.c: a new guest types a name */
     tmbr_SkinsLobby();
     tmbr_PedNamesInit();
     host = netIsHost(D_003156C0);

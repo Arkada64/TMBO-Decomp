@@ -16,27 +16,30 @@ extern void* viewGetCurView(void) __asm__("viewGetCurView__Fv");
 extern void viewGetSize(void* view, int* w, int* h) __asm__("func_00243AA8");
 extern int sprintf(char* s, const char* f, ...);
 
-static char* dmgVictim;
-static float dmgSum;
-static int dmgTime, dmgClock, dmgLen;
-static char dmgText[32];
+/* per screen (split screen, Ark 2026-10-26: each player's own reports in their own view): the screen is the
+ * attacker's +0x210C (0 = this console's first player; guests 1..3, freecam.c / guests.c) */
+static char* dmgVictim[4];
+static float dmgSum[4];
+static int dmgTime[4], dmgClock, dmgLen[4];
+static char dmgText[4][32];
 static float DMG_K[2] = { 0.5f, 0.0f };   /* (no literal pool: .lit4 would be gp-relative) */
 static char DMG_FMT[] = "%d Pts Damage";
 #define NW 4
 #define WATCH 45                          /* frames a hit keeps watching the car's health */
 static char* wCar[NW];
 static float wHp[NW];
-static int wEnd[NW];
+static int wEnd[NW], wScr[NW];
 
-static void report(char* victim, float dmg)
+static void report(int sc, char* victim, float dmg)
 {
     int n;
-    if (dmgVictim == victim && dmgClock - dmgTime < 60) dmgSum += dmg;
-    else { dmgSum = dmg; dmgVictim = victim; }
-    dmgTime = dmgClock;
-    n = (int)(dmgSum + DMG_K[0]);
+    if (sc < 0 || sc > 3) return;
+    if (dmgVictim[sc] == victim && dmgClock - dmgTime[sc] < 60) dmgSum[sc] += dmg;
+    else { dmgSum[sc] = dmg; dmgVictim[sc] = victim; }
+    dmgTime[sc] = dmgClock;
+    n = (int)(dmgSum[sc] + DMG_K[0]);
     if (n < 1) n = 1;
-    dmgLen = sprintf(dmgText, DMG_FMT, n);
+    dmgLen[sc] = sprintf(dmgText[sc], DMG_FMT, n);
 #ifndef TMBR_PNACH
     /* a report of hundreds in one go (log 2026-10-24): log the big ones to find the source */
     if ((int)dmg >= 100 || n >= 200) {          /* (int compare: no float literal) */
@@ -60,9 +63,10 @@ extern int scePrintf(const char* fmt, ...);
 #if DMG_DBG
 static char DBG_HP[] = "TMBR dmg: watched car %x health %d -> %d\n";
 #endif
+void tmbr_DamageDraw(int sc);
 void tmbr_DamageReportTick(void)
 {
-    int wh[2], i;
+    int i;
     dmgClock++;
 #ifndef TMBR_PNACH
     { extern void tmbr_TeamsHud(void); tmbr_TeamsHud(); }   /* teams.c: team score under the report */
@@ -72,7 +76,7 @@ void tmbr_DamageReportTick(void)
         if (!wCar[i]) continue;
         hp = *(float*)(wCar[i] + 0x404);
         if (hp < wHp[i]) {
-            report(wCar[i], wHp[i] - hp);
+            report(wScr[i], wCar[i], wHp[i] - hp);
 #if DMG_DBG
             scePrintf(DBG_HP, (int)wCar[i], (int)wHp[i], (int)hp);
 #endif
@@ -80,10 +84,19 @@ void tmbr_DamageReportTick(void)
         wHp[i] = hp;                       /* also follows repairs / respawns upward */
         if (dmgClock - wEnd[i] > 0) wCar[i] = 0;
     }
-    if (!dmgLen || dmgClock - dmgTime > 90) return;
+#ifndef TMBR_PNACH
+    { extern int tmbr_SplitViews(void); if (tmbr_SplitViews() >= 2) return; }   /* (split: drawn per view) */
+#endif
+    tmbr_DamageDraw(0);
+}
+/* one screen's report, in the view being drawn (split screen: freecam.c tmbr_HudView for each view) */
+void tmbr_DamageDraw(int sc)
+{
+    int wh[2];
+    if (sc < 0 || sc > 3 || !dmgLen[sc] || dmgClock - dmgTime[sc] > 90) return;
     viewGetSize(viewGetCurView(), &wh[0], &wh[1]);
     fontSetColor(0, 0x7C, 0x78, 0x02);
-    fontSpritePrintCenteredXY(0, wh[0] / 2, 27, dmgText);
+    fontSpritePrintCenteredXY(0, wh[0] / 2, 27, dmgText[sc]);
     fontSpriteEnd(0);
 }
 
@@ -95,11 +108,11 @@ void tmbr_DmgSeen(char* victim, char* attacker, float dmg)
     int i, k = -1;
     if (!g || !attacker || !victim || attacker == victim || !(dmg > DMG_K[1])) return;
     if (attacker < g || attacker >= g + 8 * VSIZE || *(int*)(attacker + 0x20B4) != 1) return;
-    if (*(int*)(attacker + 0x210C) != 0) return;              /* first screen only */
+    if ((unsigned)*(int*)(attacker + 0x210C) > 3) return;       /* this console's screens 0..3 */
     /* cars this console owns (you, bots, traffic): tmbr_TakeHit reports their real health loss. (At this point
      * of func_001E1C40 $f22 is no longer the damage for them: it held the car's health, log 2026-10-24) */
     if (*(int*)(victim + 0x20B4) != 2) return;
-    for (i = 0; i < NW; i++) if (wCar[i] == victim) { wEnd[i] = dmgClock + WATCH; return; }
+    for (i = 0; i < NW; i++) if (wCar[i] == victim) { wEnd[i] = dmgClock + WATCH; wScr[i] = *(int*)(attacker + 0x210C); return; }
     for (i = 0; i < NW; i++) if (!wCar[i]) { k = i; break; }
     if (k < 0) {                                              /* all busy: the one ending first */
         k = 0;
@@ -108,6 +121,7 @@ void tmbr_DmgSeen(char* victim, char* attacker, float dmg)
     wCar[k] = victim;
     wHp[k] = *(float*)(victim + 0x404);                       /* health before the owner's verdict */
     wEnd[k] = dmgClock + WATCH;
+    wScr[k] = *(int*)(attacker + 0x210C);
 }
 
 /* Rams on a car another console owns never reach func_001E1C40 here: func_001214C0 (car-to-car collision) sends
@@ -164,8 +178,8 @@ int tmbr_TakeHit(char* v, void* pos, int dmg, int att, int x)
 #endif
     hp0 = *(float*)(v + 0x404);
     r = gameTakeHit(v, pos, dmg, att, x);
-    if (a && a != v && *(int*)(a + 0x20B4) == 1 && *(int*)(a + 0x210C) == 0 && *(int*)(v + 0x20B4) != 2 &&
+    if (a && a != v && *(int*)(a + 0x20B4) == 1 && (unsigned)*(int*)(a + 0x210C) <= 3 && *(int*)(v + 0x20B4) != 2 &&
         *(float*)(v + 0x404) < hp0)
-        report(v, hp0 - *(float*)(v + 0x404));
+        report(*(int*)(a + 0x210C), v, hp0 - *(float*)(v + 0x404));
     return r;
 }
