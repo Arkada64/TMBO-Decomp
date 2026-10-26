@@ -191,10 +191,47 @@ static void splitFrame(char* cam)
                     for (q = 0; q < 0xA20 / 4; q++) ((int*)h)[q] = ((int*)h0)[q];
                     *(int*)(h + 0x5E4) = car;
                 }
+                {   /* the HUD's 3D parts are drawn from per-view cs tables (ParseHudElements: D_002C0910[view] left
+                     * cluster, D_002C0920[view] right cluster; func_001475F8 / func_00145860 use [view]); online only
+                     * fills [0], so the guests' views had none. Give them their own cs on the same model. */
+                    extern char* D_002C0910[4];
+                    extern char* D_002C0920[4];
+                    extern char* csAlloc(void) __asm__("func_00213F80");
+                    extern void csAddToList(char* cs) __asm__("hierCsAddToCsList__FP3_cs");
+                    char** tb[2];
+                    int t;
+                    tb[0] = D_002C0910; tb[1] = D_002C0920;
+                    for (t = 0; t < 2; t++)
+                        for (i = 1; i <= gc && i < splitN && i < 4; i++) {
+                            char* c;
+                            if (!tb[t][0]) continue;            /* (always new: the cs pool starts over each level) */
+                            if (!(c = csAlloc())) break;
+                            *(char**)c = *(char**)tb[t][0];        /* its model (hierSetCsEpNode) */
+                            c[0xC] = 1;
+                            csAddToList(c);
+                            tb[t][i] = c;
+                        }
+                    scePrintf("TMBR split: hud cs %x %x / %x %x\n", (int)D_002C0910[0], (int)D_002C0910[1], (int)D_002C0920[0], (int)D_002C0920[1]);
+                }
+                /* 2 views: the HUD's two 3D clusters (hud +0x800 left/top: radar, +0x810 right/bottom: weapons; camera
+                 * space x right, y forward, z up) are placed for a full-height view and stick out of a half-height one.
+                 * 1.5x further away and 1.5x wider: same place across, half as far up/down, 2/3 the size. */
+                if (splitN == 2)
+                    for (i = 0; i < 2; i++) {
+                        char* h = h0 + i * 0xA20;
+                        int c;
+                        if (!*(int*)h) continue;
+                        for (c = 0x800; c <= 0x810; c += 0x10) {
+                            float* f = (float*)(h + c);
+                            if (f[1] > 4.0f) continue;          /* (done already: kept from the last match) */
+                            f[0] *= 1.5f; f[1] *= 1.5f; f[2] *= 0.75f;
+                        }
+                    }
             }
             if (splitN == 2) {
                 /* 2 views (test 2026-10-26): the half-height views get a 4/3 narrower horizontal field than the
-                 * single view (projection 608 vs 456, the single view is letterboxed wide): the camera looks pulled in
+                 * single view (projection 608 vs 456: the single view is widened for 16:9 by the community widescreen patch
+                 * baked into the build, the split layouts are not): the camera looks pulled in
                  * and the HUD parts placed through the projection slide off the left edge. Give them the single
                  * view's horizontal field, same vertical (the widescreen transform: a x 3/4, b x 4/3). */
                 for (i = 0; i < 2; i++) {

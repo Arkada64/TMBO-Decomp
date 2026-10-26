@@ -221,7 +221,11 @@ void tmbr_GuestsLobby(void)
             if (!myClient()) continue;
             picking = k;
             pickSavedCar = F(myClient(), 0xA4); pickSavedPos = carSelPos;
-            D_004FA688 = UI_CARSEL; D_004FA910 = 0; D_004FA6E4 = 1;      /* to car select */
+            /* to car select, with the shell camera flown to the car display like the room's SELECT CAR does
+             * (0x1C7134: D_004FA7D8 = position, D_004FA718 = camera spot = position + 5); without it the room stays
+             * behind the car select (Ark 2026-10-26) */
+            D_004FA718 = carSelPos + 5;
+            D_004FA688 = UI_CARSEL; D_004FA910 = 0; D_004FA6E4 = 1;
             scePrintf("TMBR guests: controller %d picks a car\n", k + 1);
             return;
         }
@@ -289,6 +293,7 @@ void tmbr_GuestPickEnd(int accept)
     } else scePrintf("TMBR guests: controller %d backed out\n", k + 1);
     if (myClient()) F(myClient(), 0xA4) = pickSavedCar;
     carSelPos = pickSavedPos;
+    D_004FA718 = 0x75;                                  /* camera back to the room (as car select's own confirm) */
     D_004FA688 = UI_ROOM; D_004FA910 = 0; D_004FA914 = 0; D_004FA6E4 = 1;
 }
 int tmbr_UiPadButtons(int pad)

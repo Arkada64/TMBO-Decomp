@@ -11,7 +11,10 @@
      patches.zip SCUS-97101_073696DA) lists every view's FOV + HUD constant (1P, 2P horizontal/vertical, 4P).
   5. Bots charge the reticle weapon (satellite-style, hold up to 5 s; Launcher func_001549A0 charger code,
      GetSatelliteReticle; find the held-fire input first).
-  6. 12 Pak as a bot.
+  6. 12 Pak as a bot. Also his weapon panels (Ark 2026-10-26: the hatches that open as the weapons come out):
+     the Lost body pieces dropped in tools/lost/pakbuild.py (the 'side door left hanging open', 0x2bd70) are
+     likely panels in their open pose; hook them to the weapon-mount animation. His mount points differ from
+     Roadkill's: read them from the Lost file and move the mounts on his model copy (Roadkill untouched).
   7. Outlaw turret secondary / Manslaughter drop-behind (Launcher::UpdateSpecial 0x15CD80).
   8. Minion toggle on the native game mods page.
   9. HEALTH lobby option: ON = health pickups spawn and can be picked up (overrides the TMA ruleset's no-health);
