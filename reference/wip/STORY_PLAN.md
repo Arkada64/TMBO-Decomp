@@ -14,6 +14,11 @@ files picked only in story mode. Later: local co-op story (split-screen guests),
 - Today's main menu (boot): INTERNET / LAN / OPTIONS, textured labels in the shell model (not font strings), UI
   state 8 = func_001B91B8 (3-position cursor, select -> state 9 which branches on it). LAN goes through
   "Initialize network hardware" -> CREATE GAME (name / password / max players) -> waiting room (state 0x21).
+- Correction: the main menu is UI state 6 (func_001B8C10, cursor 3 / 4 / 5 at shell +0x19BE4 + 6*4); state 8 is
+  another screen that shares the label meshes' neighbourhood.
+- DONE 2026-10-26 (mods/menu.c, tools/lost/menulabels.py -> packs/SHELL1.TEX): main page SINGLE PLAYER / ONLINE /
+  OPTIONS, ONLINE -> online page INTERNET / LAN / OPTIONS, TRIANGLE back. SINGLE PLAYER takes the LAN way and sets
+  tmbr_singlePlayer (its own SOLO / CO-OP flow next).
 - Plan: (1) state 8 shows SINGLE PLAYER / ONLINE / OPTIONS (new label textures in SHELL1.TEX, like the other shell
   texture edits); ONLINE opens a second page INTERNET / LAN (same screen, labels swapped, back returns).
   (2) SINGLE PLAYER -> SOLO / SPLIT-SCREEN CO-OP; both run the LAN host path with the network screens auto-
