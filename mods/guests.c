@@ -385,7 +385,9 @@ static int lsT, lsHold;
 static float lsY, lsV;
 /* (an array, not literals: mod code has no .lit4) start gap, gravity / frame, bounce, settle speed, crash speed */
 static float LS_F[5] = { 520.0f, 1.6f, 0.35f, 12.0f, 20.0f };
-void tmbr_LoadScreenReset(void) { lsT = 0; }
+extern void tmbr_StoryMoviesReset(void);
+extern int tmbr_StoryMoviesDone(void);                  /* story.c: retail's story movies before the load */
+void tmbr_LoadScreenReset(void) { lsT = 0; tmbr_StoryMoviesReset(); }
 void tmbr_LoadScreen(void)
 {
     char *top, *bot;
@@ -393,6 +395,7 @@ void tmbr_LoadScreen(void)
     bot = *(char**)(shellPtr + 0xB950 + 0x20);
     top = *(char**)(shellPtr + 0xB950 + 0x30 + 0x20);
     if (!top || !bot) { uiLoadLevel(); return; }
+    if (lsT == 0 && !tmbr_StoryMoviesDone()) return;
     if (lsT == 0) { lsY = LS_F[0]; lsV = 0; lsHold = 0; }
     lsT++;
     if (!lsHold) {

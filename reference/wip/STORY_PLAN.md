@@ -87,3 +87,14 @@ ever asks for a file that does not exist.
   team) -> next stage; else "TRY AGAIN". Warhawk's Roof is a stand-in (6 bots, no boss) until phase 4.
 - Tested (qb g71): toggle -> JUNKYARD, LMS, teams 2, humans vs bots, 6 bots + guest, level loads. Win / loss
   advance not yet seen in a test (needs a played match). No save yet.
+- Tested 2026-10-26 (qb g93-g95, STORYTEST build forces a win 40 s in): Junkyard won -> score -> room "won
+  JUNKYARD", stage 2 SUBURBS saved; L3 -> FREEWAY saved; STORY off / on reads the card back ("continue, stage 2
+  FREEWAY"); Freeway loads with 7 bots. The first save on a card without the file returns 0: retried every 30
+  frames (works on the 2nd). R3 + Square no longer opens the room's Square screen (menu.c tmbr_RoomInput).
+
+## Phase 2 status (2026-10-26, story.c tmbr_StoryMoviesDone, guests.c loading screen)
+- Movies per retail (reference/wip/STORY_MOVIES.md): intro X??A before the run's first Junkyard, ??ARENA before
+  Minion's stadium, X??B before Prison Passage, ??ROOF before the roof, then LLn; on the loading screen before
+  the halves fall, every console, this console's car picks the character (12 Pak = Roadkill). Missing files are
+  skipped (sceCdSearchFile). Test disc: packs/MOV/*.PSS go into \MOV\ (mktest.sh). Not yet: ending X??C +
+  credits after the roof (needs a screen in the room), story music streams.

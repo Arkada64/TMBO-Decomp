@@ -90,7 +90,8 @@
       - Twister: Mr. Grimm's stats; special = Axel's primary.
       - Gold Tooth: Sweet Tooth's stats; the size problem (model / texture budget) still needs a plan.
   6e. Some cars have oddly lit parts (Ark 2026-10-26): find and fix the lighting / normals on those parts.
-  6f. MINION and HEALTH toggles move into the native game mods menu (Ark 2026-10-26), both default OFF.
+  6f. DONE 2026-10-26 (modspage.c, tested g95: MINION / HEALTH / ALLY BOT rows under the native five, no TLB).
+      MINION and HEALTH toggles move into the native game mods menu (Ark 2026-10-26), both default OFF.
   6c. Five Harbor City cars as new characters (Ark 2026-10-26): Old Pickup, Outlaw 2, Thumper, Pit Viper, Twister -
       files set aside in TMB Decomp/hc_cars (reference/wip/HEADON_ETE.md). Old Pickup / Pit Viper are near-static
       models (tiny pointer lists): animate them from Black's files (wheels / suspension / weapon parts of a donor).
@@ -98,7 +99,7 @@
   7. DONE 2026-10-26 (bots set launcher +4 = v +0x21B4 and fire the special at once: Manslaughter on a target close
      behind, Outlaw at 100-350 now and then; the special consumes the flag - tested; the special-up energy combo did
      not set it for them). Outlaw turret secondary / Manslaughter drop-behind (Launcher::UpdateSpecial 0x15CD80).
-  8. Minion toggle on the native game mods page.
+  8. DONE (see 6f). Minion toggle on the native game mods page.
   9. DONE 2026-10-26 (lobby HEALTH : ON / OFF, host R3 + Circle, OFF by default = the baked TMA rule (mods/tmbr.pnach
      makes func_001E32D8, the add-health function, return at once); ON writes its first two instructions back. OFF
      also hides health / full-health pickups and TakeHit ignores them). HEALTH lobby option: ON = health pickups spawn and can be picked up (overrides the TMA ruleset's no-health);

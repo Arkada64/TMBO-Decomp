@@ -40,7 +40,7 @@ static const char* const NAME[21] = { "SUBURBS", "JUNKYARD", "FREEWAY", "PRISON 
     "DOWNTOWN", "HIGHWAY LOOP", "ELEVATORS", "SNOWY ROADS", "POWER PLANT", "DOGPOUND", "SEWERS", "DRIVE-IN",
     "MINI FREEWAY", "MINION STADIUM", "PRISON SHIP", "ASYLUM", "MINICITY", "MINIBURB", "JUNK2", "WARHAWK ROOF" };
 
-static int level = 1, stage = 1, fork = -1, playedSerial = -1, doneSerial = -1, wasOn, prevPad;
+static int level = 1, stage = 1, fork = -1, playedSerial = -1, doneSerial = -1, wasOn, prevPad, introDone;
 static char msg[32];
 
 /* Progress on the memory card (Ark: a story run is saved): retail's co-op save file (TwistedMemoryCard at shell
@@ -80,7 +80,7 @@ int tmbr_StoryLevel(void) { return level; }
 
 static void start(int fresh)
 {
-    level = 1; stage = 1; fork = -1; msg[0] = 0;
+    level = 1; stage = 1; fork = -1; msg[0] = 0; introDone = 0;
     playedSerial = doneSerial = tmbr_levelSerial;
     if (!fresh && loadRun()) { scePrintf("TMBR story: continue, stage %d %s\n", stage, NAME[level]); return; }
     if (fresh) { runs++; saveRun(); }
@@ -187,6 +187,70 @@ int tmbr_StoryCars(void)
         used |= 1 << c;
         first = 0;
         F(D_003156C0 + s * 0x220, 0xB4) = c << 5;
+    }
+    return 1;
+}
+
+/* ---- phase 2: retail's story movies (reference/wip/STORY_MOVIES.md) ----
+ * Played on the loading screen (guests.c: before uiLoadLevel, while tmbr_StoryMoviesDone() says 0), on every
+ * console, when the level being loaded is the story run's level: the character's intro (X??A) before the first
+ * Junkyard, ??ARENA before Minion's stadium, X??B before Prison Passage, ??ROOF before Warhawk's roof, then the
+ * level's LLn clip. The character is this console's car (12 Pak = a Roadkill: Roadkill's movies). A movie that is not
+ * on the disc is skipped (sceCdSearchFile first), so a disc without retail's \MOV\ files plays nothing.
+ * Player: TMBO's playMpegMovieWithDB (func_002220B8: path "mov/x.pss", audio, interruptible) - it does not block;
+ * the UI loop decodes every frame; movieIsPlaying (D_004FAE10) drops to 0 at the end. */
+extern int playMpegMovie(const char* path, int audio, int interrupt) __asm__("func_002220B8");
+extern int sceCdSearchFile(void* f, const char* name) __asm__("sceCdSearchFile");
+extern int movieIsPlaying __asm__("D_004FAE10");
+extern int bytesInMovie __asm__("D_004FA71C");
+extern int netGetMyClientIndex(void* net) __asm__("netGetMyClientIndex");
+static const signed char MOVSLOT[17] = { -1, 4, 9, 2, 6, 5, 13, 1, 0, 8, 3, 10, 11, 7, 12, -1, -1 };  /* car type -> slot */
+static const char* const ARENA[14] = { "BR", "PR", "SW", "GR", "JD", "NF", "BM", "DF", "SS", "TX", "AX", "WH", "BL", "ST" };
+static const signed char LLNUM[21] = { 1, 0, 2, 6, 7, 3, 4, -1, 8, -1, -1, -1, 9, -1, 5, -1, -1, -1, -1, -1, 10 };
+static char movQ[4][16];
+static int movFile[16];                            /* sceCdlFILE */
+static int movN, movI, movBuilt, movWait;
+static void movAdd(const char* name) { if (movN < 4) sprintf(movQ[movN++], "%s", name); }
+static void movBuild(void)
+{
+    int me, car, slot;
+    char nm[16];
+    movN = movI = movWait = 0;
+    if (!tmbr_Opt(OPT_STORY) || LEVEL() != level) return;
+    me = netGetMyClientIndex(D_003156C0);
+    car = me >= 0 && me < 8 ? F(D_003156C0 + me * 0x220, 0xB4) >> 5 : 1;
+    slot = car > 0 && car < 17 ? MOVSLOT[car] : -1;
+    if (slot >= 0) {
+        if (level == 1 && stage == 1 && !introDone && slot != 10 && slot != 11 && slot != 12) { sprintf(nm, "X%02dA", slot + 1); movAdd(nm); }
+        if (level == 14) { sprintf(nm, "%sARENA", ARENA[slot]); movAdd(nm); }
+        if (level == 3 && (slot < 9 || slot == 13)) { sprintf(nm, "X%02dB", slot + 1); movAdd(nm); }
+        if (level == 20) { sprintf(nm, "%sROOF", ARENA[slot]); movAdd(nm); }
+    }
+    if (LLNUM[level] >= 0) { sprintf(nm, "LL%d", LLNUM[level]); movAdd(nm); }
+    introDone = 1;
+    scePrintf("TMBR story: %d movies for %s (car %d)\n", movN, NAME[level], car);
+}
+void tmbr_StoryMoviesReset(void) { movBuilt = 0; }
+int tmbr_StoryMoviesDone(void)
+{
+    if (!movBuilt) { movBuilt = 1; movBuild(); }
+    if (movWait) {                                        /* one playing: a few frames to start, then until it ends */
+        if (++movWait < 12 || movieIsPlaying) return 0;
+        movWait = 0;
+        scePrintf("TMBR story: movie done\n");
+    }
+    while (movI < movN) {
+        char f[64], path[32];
+        int b;
+        const char* n = movQ[movI++];
+        sprintf(f, "\\MOV\\%s.PSS;1", n);
+        if (!sceCdSearchFile(movFile, f)) { scePrintf("TMBR story: no %s on the disc\n", f); continue; }
+        sprintf(path, "mov/%s.pss", n);
+        b = playMpegMovie(path, 1, 1);
+        bytesInMovie = b;
+        scePrintf("TMBR story: movie %s (%d bytes)\n", path, b);
+        movWait = 1;
+        return 0;
     }
     return 1;
 }
