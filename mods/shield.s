@@ -12,11 +12,15 @@
 .align 3
 
 .globl tmbr_shield_spawn                # from 0x1DC07C (spawn): give the respawned vehicle the shield
-tmbr_shield_spawn:                      # $7 = vehicle + 0x484: the local player (vehicle 0) and bots (kind 2)
+tmbr_shield_spawn:                      # $7 = vehicle + 0x484: the local player (vehicle 0), guests (owner 1) and bots (kind 2)
     ori     $4, $0, 0x4
     lui     $5, %hi(D_0033C460 + 0x484)
     addiu   $5, $5, %lo(D_0033C460 + 0x484)
     beq     $5, $7, 2f
+    nop
+    lw      $5, 0x1C30($7)              # owner type (vehicle + 0x20B4): 1 = this console's player, so the
+    addiu   $5, $5, -0x1                # split-screen guests too (guests.c; Ark 2026-10-26)
+    beqz    $5, 2f
     nop
     lw      $5, 0x10C($7)               # kind (vehicle + 0x590)
     addiu   $5, $5, -0x2
