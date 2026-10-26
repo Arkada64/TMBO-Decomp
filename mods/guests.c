@@ -19,7 +19,8 @@
  * says "PLAYER n" (tmbr_GuestPickTitle from skins.c's car select hook). The confirm / back net calls in car select
  * (func_00173570 at 0x1CB944 / 0x1CB9C4) go through tmbr_CarSelNet: for a guest pick the chosen car goes to the
  * guest (and to the net slot reserved for it, so the level load loads that car's model), the host's own car and
- * highlight are put back, nothing is sent; car select returns to the waiting room as usual. SELECT on a guest's
+ * highlight are put back and the net step goes out with the host's unchanged car; car select returns to the
+ * waiting room as usual. SELECT on a guest's
  * controller in the waiting room drops the guest.
  * Test config: tmbr_guests = { tag "GSTS", count, car 2, car 3, car 4 } (car = character << 5, 0 = random) joins
  * guests without the pick (set in the ELF by tools/qb/split/splitpatch.py). */
@@ -142,7 +143,7 @@ extern int netIsHost(void* net) __asm__("func_001734B8");
 extern void netSetState(void* net, int st) __asm__("func_00173570");
 extern int carSelPos __asm__("D_004FA7D8");
 extern char* shellPtr __asm__("D_004FA03C");
-extern int D_004FA684, D_004FA688, D_004FA6E4, D_004FA910, D_004FA914;   /* UI state, next state, go, hold, back */
+extern int D_004FA684, D_004FA688, D_004FA6E4, D_004FA910, D_004FA914, D_004FA718, D_004FA94C;   /* UI state, next state, go, hold, back */
 extern char* D_0041BF00[];          /* waiting-room car names by car code >> 5 */
 #define UI_ROOM 0x21
 #define UI_CARSEL 0x27
@@ -167,8 +168,9 @@ static int padBtn(int pad)
     int b = inputGetPadButtons(pad) & 0xFFFF;
     static int logT;
     if (pad == 2 && ++logT % 120 == 0)            /* (debug: what controllers 2-4 read in the waiting room) */
-        scePrintf("TMBR guests: pads 2 %04x %d 4 %04x %d 6 %04x %d\n", inputGetPadButtons(2) & 0xFFFF, inputIsCtlAvailable(2, 1),
-            inputGetPadButtons(4) & 0xFFFF, inputIsCtlAvailable(4, 1), inputGetPadButtons(6) & 0xFFFF, inputIsCtlAvailable(6, 1));
+        scePrintf("TMBR guests: pads %04x %04x %04x ui %x>%x go %d hold %d back %d scn %x busy %d\n", inputGetPadButtons(2) & 0xFFFF,
+            inputGetPadButtons(4) & 0xFFFF, inputGetPadButtons(6) & 0xFFFF, D_004FA684, D_004FA688, D_004FA6E4, D_004FA910,
+            D_004FA914, D_004FA718, D_004FA94C);
     return b == 0xFFFF ? -1 : b;
 }
 void tmbr_GuestsLobby(void)
@@ -215,15 +217,47 @@ void tmbr_CarSelNet(void* net, int st)
     }
     if (myClient()) F(myClient(), 0xA4) = pickSavedCar;   /* the host's own car back */
     carSelPos = pickSavedPos;
-    D_004FA910 = 0;                                       /* (nothing to wait for from the net) */
+    /* then the normal net step with the host's own (unchanged) car: the way back to the waiting room waits for its
+     * reply (D_004FA910); skipping it left car select on screen for good (test 2026-10-26) */
+    netSetState(net, st);
 }
-/* the UI's pad (func_001CE258): the picking guest's controller while it picks */
+/* the UI's pad (func_001CE258): the picking guest's controller while it picks. The guest's accept / back are
+ * handled here and never reach car select: its own confirm re-enters the room (func_001C5430 resends the session
+ * join) and left the car select picture up with the waiting room logic running underneath (test 2026-10-26).
+ * Instead go back the way we came in (the same transition as tmbr_GuestsLobby's). */
+#define B_TRI 0x1000
+#define B_CIRCLE 0x2000
+#define B_CROSS 0x4000
+void tmbr_GuestPickEnd(int accept)
+{
+    int k = picking;
+    picking = 0;
+    if (accept && shellPtr) {
+        int car = F(shellPtr + 0x1A2F0, carSelPos * 4), s = reserveSlot();
+        if (car <= 0) car = 0x20;
+        if (s >= 0) {
+            joinCar[k] = car; joinSlot[k] = s;
+            F(D_003156C0 + s * 0x220, 0xB4) = car;           /* so the level load loads this car for that slot */
+            scePrintf("TMBR guests: controller %d joins with %s (net slot %d)\n", k + 1, D_0041BF00[car >> 5], s);
+        } else scePrintf("TMBR guests: no free slot for controller %d\n", k + 1);
+    } else scePrintf("TMBR guests: controller %d backed out\n", k + 1);
+    if (myClient()) F(myClient(), 0xA4) = pickSavedCar;
+    carSelPos = pickSavedPos;
+    D_004FA688 = UI_ROOM; D_004FA910 = 0; D_004FA914 = 0; D_004FA6E4 = 1;
+}
 int tmbr_UiPadButtons(int pad)
 {
-    int b;
-    if (!picking) return inputGetPadButtons(pad);
+    static int prev, held;
+    int b, pr;
+    if (!picking) { held = 0; return inputGetPadButtons(pad); }
+    if (D_004FA684 != UI_CARSEL) return 0;            /* still flying in */
     b = padBtn(2 * picking);
-    return b < 0 ? 0 : b;
+    if (b < 0) b = 0;
+    if (held < 20) { held++; prev = b; return 0; }      /* the START that opened it */
+    pr = b & ~prev; prev = b;
+    if (pr & B_CROSS) { tmbr_GuestPickEnd(1); return 0; }
+    if (pr & (B_TRI | B_CIRCLE)) { tmbr_GuestPickEnd(0); return 0; }
+    return b & ~(B_CROSS | B_TRI | B_CIRCLE | B_START);
 }
 /* car select frame (skins.c): title for a guest's pick */
 extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");

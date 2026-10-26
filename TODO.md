@@ -32,6 +32,12 @@
   4b. Widescreen done properly (Ark 2026-10-26): the FOV change works, but the HUD parts placed through the 3D
       projection moved inward and the online score text sat on the weapon list / health. Lay the HUD out for 16:9
       (elements to the edges, sprites x 3/4 so they aren't stretched); widescreen stays off by default until then.
+  4c. HD texture pack (Ark 2026-10-26): Textures/SCUS-97101 (2275 .dds, 431 MB, made for retail TMB). TMBO/TMBR is
+      SCUS-97196, so junction it in as textures/SCUS-97196 and check how much of it hits (hash match).
+  4d. TMBR player package (Ark 2026-10-26): portable PCSX2 trimmed to what TMBR needs, settings preset (EE 130%,
+      multitap, renderer), a TMBR.exe launcher that boots the ISO straight in (-batch -fullscreen), and toggles
+      (HD textures, potato preset, upscale, later widescreen). The user supplies the BIOS; a rebuilt PCSX2 means
+      publishing its source (GPL).
   14. (Last, very experimental) Roguelike story option (no story: online's default loading screen instead of the
       story loading screens / dialogue, no cutscenes; synchronous entry by default so everyone starts together): each round a choice of two maps from any map, a visited map
       leaves the pool; character dialogue won't fit every stage. AI back to the human-hunting routine and doing far
