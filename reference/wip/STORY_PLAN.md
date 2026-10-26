@@ -117,5 +117,6 @@ Every level's node ids (TMB dbs traversal), retail vs online disc. Online adds t
 (weapon EPs 4002/4006/4028/4066-4069, 7701-7703, 8200s ...: online pickups / HUD / shockwave copies); story-relevant
 REMOVALS are tiny: PRISON id 6050 (2 nodes) gone, JUNKYARD 6003 (one of 4) and 6666 (one of 32), JUNK2 4030 and
 8018 (2 -> moved to op6), FREEWAY / PRISON peds (packs restore them). SHIP, STADIUM, ROOFBOSS: no level-specific
-differences. So story levels mostly work on the online files; next: identify ids 6050 / 6003 / 6666 / 4030 / 8018
+differences. So story levels mostly work on the online files. Ids 6000-6999 are destructibles (retail destruct.s:
+6003 / 6666 handled there; 6050 likely a Prison Passage destructible, e.g. a gate). Next: identify 6050 / 4030 / 8018
 (retail dbProcInteractive callbacks) and the story-only pickups (health pads: PKP files, not in this survey).
