@@ -93,7 +93,8 @@
       - Outlaw 2: Crazy 8's stats and special; move the special's effect so it fits (in Harbor City it sits above
         the siren).
       - Thumper: Brimstone's stats; special = Warthog's.
-      - Twister: Mr. Grimm's stats; special = Axel's primary.
+      - Twister: Mr. Grimm's stats; special = Axel's primary. Ark 2026-10-26 (Grimm is a bike): keep Grimm's stats, build
+        the model on a 4-wheel donor, Axel's primary as the special (stats copied onto the 4-wheel donor type in code).
       - Gold Tooth: Sweet Tooth's stats; the size problem (model / texture budget) still needs a plan.
   6e. Some cars have oddly lit parts (Ark 2026-10-26): find and fix the lighting / normals on those parts.
   6f. DONE 2026-10-26 (modspage.c, tested g95: MINION / HEALTH / ALLY BOT rows under the native five, no TLB).

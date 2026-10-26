@@ -98,3 +98,10 @@ ever asks for a file that does not exist.
   the halves fall, every console, this console's car picks the character (12 Pak = Roadkill). Missing files are
   skipped (sceCdSearchFile). Test disc: packs/MOV/*.PSS go into \MOV\ (mktest.sh). Not yet: ending X??C +
   credits after the roof (needs a screen in the room), story music streams.
+- Playback status (tests g100-g104, 2026-10-26): NOT WORKING YET. The files are found (the game's lookup
+  func_00201910(out, "\\MOV\\X.PSS;1") - note: out first). (1) Calling playMpegMovieWithDB (func_002220B8) from the
+  loading-screen state: stream starts ("Stream Buffer ...") and the game freezes when we wait for it to end. (2) The
+  blocking player func_00222048: same freeze. (3) The game's own request (nextMovie -1 = the incog slot with our name
+  written into its 16-byte string, movieEnable 1; guards finished 1 / key 0 / okToPlay 1 / requested 0) never starts
+  in state 0x29. Next idea: play them where TMBO plays its own level clips (LS<level>.PSS, nextMovie 0x46 + level,
+  set when PLAY GAME is pressed) - replace that clip's name instead of adding a new start.

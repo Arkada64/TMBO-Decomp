@@ -263,7 +263,8 @@ int tmbr_StoryMoviesDone(void)
         sprintf(incogName, "%s", f);
         nextMovie = -1; movieDelay = 0; movieEnable = 1;
         movPhase = 1; movT = 0;
-        scePrintf("TMBR story: movie %s requested\n", f);
+        {   extern int D_004FB06C, D_004FA778, D_004FA3A4;
+            scePrintf("TMBR story: movie %s requested (finished %d key %d ok %d req %d)\n", f, D_004FB06C, D_004FA778, D_004FA3A4, movieRequested); }
         return 0;
     }
     return 1;
