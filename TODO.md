@@ -92,6 +92,14 @@
       publishing its source (GPL).
   4e. Retail loading screen (Ark 2026-10-26): TMB's load screen where the top and bottom halves come crashing
       down; TMBO skips it. Bring it back for TMBR's level loads.
+      Findings 2026-10-26 (retail decomp ~/tmb_decomp on the PC, symbols): retail uiLoadLevel__Fv (0x194C60, a UI
+      state: setPov, smoothEasyIn, levelLoadCharBlurb) + LoadingBarBackground__Fv (0x1944B0: 63 hierSetSwitch,
+      a jump table on oldScreen; slides two shell "screen" objects - shell +0x17170 / +0x17230, cs +0x20, y at
+      cs +0x18 by 200 / 400 per frame until they meet - then exitUi). The 6 screens (0x30 apart from shell
+      +0x17140) are set up in uiInitScreens__FP3_cs (0x18F890). TMBO's uiInitScreens = func_001B44E0 (same float
+      constants) and has no screen / halves code; TMBO's shell struct offsets differ (0x19BE4 / 0x1A16C ...).
+      Next: are the halves' meshes still in TMBO's SHELL NGP (retail screen node ids vs TMBO's), then port the
+      two functions as a mod UI step before the level load.
   13b. Garage / car colour (Ark 2026-10-26, idea): recolour a car's body textures (palette / CLUT tint at load, or
       a texture swap like the 12 Pak skin), choice synced to other players like the skin byte.
   14. (Last, very experimental) Roguelike story option (no story: online's default loading screen instead of the
