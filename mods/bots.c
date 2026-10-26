@@ -103,7 +103,11 @@ static void reindex(char* g)
             if (F(v, 0x20D0)) *(char*)(F(v, 0x20D0) + 0x2F) = i;
             if (F(v, 0x20D4)) *(char*)(F(v, 0x20D4) + 0x11) = i;
         }
-        radarName(0xA + i, D_002C07F8[F(v, 0x20F4) >> 5]);
+        {   /* (a 12 Pak bot is a Roadkill inside: its marker says 12 PAK) */
+            extern int tmbr_IsPak(char* v);
+            static const char pakName[] = "12 PAK";
+            radarName(0xA + i, tmbr_IsPak(v) ? (int)pakName : D_002C07F8[F(v, 0x20F4) >> 5]);
+        }
     }
 }
 

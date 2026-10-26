@@ -46,7 +46,9 @@
       3.4 deg, leave on turbo; chance 30/55/75 % by difficulty). Bots aim the big shots (Ark 2026-10-26): they fire power missiles / zoomys (and other slow, straight shots)
       on the move and mostly miss. For those weapons let a bot slow down / stop, line up the shot, fire its load,
       then get back up to speed - sometimes, not every time.
-  6. 12 Pak as a bot. Also his weapon panels (Ark 2026-10-26: the hatches that open as the weapons come out):
+  6. 12 Pak as a bot: DONE 2026-10-26 (host gives a bot slot 12 Pak 1 in 16, guests.c tmbr_BotCars; mask synced
+     "\x01SB" in skins.c; marker says 12 PAK; tested with every bot 12 Pak: models, mounts, special).
+     Still open: Also his weapon panels (Ark 2026-10-26: the hatches that open as the weapons come out):
      the Lost body pieces dropped in tools/lost/pakbuild.py (the 'side door left hanging open', 0x2bd70) are
      likely panels in their open pose; hook them to the weapon-mount animation. His mount points differ from
      Roadkill's: read them from the Lost file and move the mounts on his model copy (Roadkill untouched).

@@ -300,10 +300,16 @@ void tmbr_GuestsLobby(void)
  * the room is made and again in func_0016FA30; a guest's reserved slot is an empty slot, so its car must be put back
  * after it (test 2026-10-26: P2 picked Junkyard Dog and came in as Yellow Jacket) */
 extern void netRandomBotCars(void* net) __asm__("func_00174598");
+extern void tmbr_BotPakSet(int mask);   /* skins.c */
 void tmbr_BotCars(void* net)
 {
-    int k;
+    int k, s, pak = 0;
     netRandomBotCars(net);
+    for (s = 0; s < 8; s++) {          /* bots' cars: 12 Pak as often as any other car (1 in 16; TODO 6, 2026-10-26) */
+        if (F(D_003156C0 + s * 0x220, 0x10) != -1 || tmbr_GuestSlot(s)) continue;
+        if (mathfRandI(0, 15) == 0) { F(D_003156C0 + s * 0x220, 0xB4) = 0x20; pak |= 1 << s; }
+    }
+    tmbr_BotPakSet(pak);
     for (k = 1; k <= 3; k++) {
         if (!joinCar[k] || joinSlot[k] < 0) continue;
         scePrintf("TMBR guests: slot %d car %d -> %d (+0x10 %d)\n", joinSlot[k], F(D_003156C0 + joinSlot[k] * 0x220, 0xB4) >> 5,

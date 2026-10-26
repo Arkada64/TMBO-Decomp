@@ -50,6 +50,11 @@ extern char* D_004FA030;
 extern int netSlotVehicle(void* net, int client) __asm__("func_00174268");
 extern void createWeapon(void* w, int type, char* v, void* t, void* tp) __asm__("func_001ED8D0");
 static unsigned char remote[8][NSKIN]; /* per client, from their chat messages */
+/* 12 Pak bots (TODO 6, 2026-10-26): the host gives some bot slots 12 Pak (tmbr_BotPakSet from tmbr_BotCars: car =
+ * Roadkill, bit set); the mask goes to everyone with the skins ("\x01SB<2 hex>"). A slot counts as a 12 Pak bot
+ * only while no human holds it (client +0x10 == -1). */
+static unsigned char botPak;
+extern int tmbr_GuestSlot(int s);   /* guests.c */
 static int prevPad, resendTick;
 
 static int skinOfType(int type)
@@ -59,10 +64,26 @@ static int skinOfType(int type)
     return -1;
 }
 
+static void sendBotPak(void)
+{
+    static const char hx[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
+    char m[8];
+    extern int netIsHost(void* net) __asm__("func_001734B8");
+    if (!netIsHost(netState)) return;
+    m[0] = 1; m[1] = 'S'; m[2] = 'B'; m[3] = hx[botPak >> 4]; m[4] = hx[botPak & 15]; m[5] = 0;
+    netChatSend(netState, m);
+}
+void tmbr_BotPakSet(int mask)
+{
+    if (botPak != (unsigned char)mask) scePrintf("TMBR skins: 12 Pak bots %02x\n", mask & 0xFF);
+    botPak = (unsigned char)mask;
+    sendBotPak();
+}
 static void sendSkins(void)
 {
     char m[8];
     int k;
+    sendBotPak();
     for (k = 0; k < NSKIN; k++) {
         m[0] = 1; m[1] = 'S'; m[2] = 'K'; m[3] = '0' + skinType[k]; m[4] = '0' + (tmbr_skin[k] != 0); m[5] = 0;
         netChatSend(netState, m);
@@ -83,6 +104,12 @@ int tmbr_ChatHandler(int a0, int a1, int client, char* msg)
         tmbr_TeamsRecv(client, msg + 1);
         return 0x44;
     }
+    if (msg && msg[0] == 1 && msg[1] == 'S' && msg[2] == 'B') {
+        int h = msg[3] >= 'A' ? msg[3] - 'A' + 10 : msg[3] - '0', l = msg[4] >= 'A' ? msg[4] - 'A' + 10 : msg[4] - '0';
+        if (botPak != (unsigned char)(h << 4 | l)) scePrintf("TMBR skins: 12 Pak bots %02x (from %d)\n", h << 4 | l, client);
+        botPak = (unsigned char)(h << 4 | l);
+        return 0x44;
+    }
     if (msg && msg[0] == 1 && msg[1] == 'S' && msg[2] == 'K') {
         int k = skinOfType(msg[3] - '0');
         if (k >= 0 && client >= 0 && client < 8) {
@@ -98,6 +125,7 @@ int tmbr_ChatHandler(int a0, int a1, int client, char* msg)
 static int skinOn(int client, int k)
 {
     if (k == 0) return 0;                            /* Gold Tooth removed */
+    if (k == 1 && client >= 0 && client < 8 && (botPak >> client & 1) && *(int*)(netState + client * 0x220 + 0x10) == -1 && !tmbr_GuestSlot(client)) return 1;
     if (client == netGetMyClientIndex(netState)) return tmbr_skin[k];
     return client >= 0 && client < 8 && remote[client][k];
 }
@@ -190,6 +218,8 @@ static int isPak(char* v)
     }
     return 0;
 }
+
+int tmbr_IsPak(char* v) { return v && isPak(v); }
 
 /* 12 Pak's special IS the game's reticle (slot-5 pickup type 0xB at launcher+0x110), run from his special slot:
  * FireCurrentWeapon is re-entered with the slot temporarily reading 5 / type 0xB, so the game's own reticle code
