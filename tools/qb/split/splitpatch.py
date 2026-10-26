@@ -12,5 +12,7 @@ put(0x54494C53, [int(sys.argv[3])])
 if len(sys.argv) > 4:
     cars = [int(x) << 5 for x in sys.argv[5:8]] + [0] * 3
     put(0x53545347, [int(sys.argv[4])] + cars[:3])
+import os
+if os.environ.get('WIDE'): put(0x45444957, [int(os.environ['WIDE'])])
 open(sys.argv[2], 'wb').write(d)
 print('split: %s views %s guests %s' % (sys.argv[2], sys.argv[3], ' '.join(sys.argv[4:]) or '0'))

@@ -106,6 +106,31 @@ extern void tmbr_GuestsMake(int views), tmbr_GuestsReset(void);
 extern int tmbr_levelSerial;
 static int splitSerial = -1, splitWait, splitN;
 static char* splitCar[4];
+
+/* ---- widescreen (experimental, Ark 2026-10-25: the 4:3 picture leaves black bars on a 16:9 screen) ----
+ * tmbr_wide[1]: 0 off; 9 = test: view i of a 4-view split gets variant i (0 as is, 1 first fov value x 4/3,
+ * 2 second x 3/4, 3 second x 4/3) to find which one widens the picture (viewSetFov(view, a, b), func_00243B78
+ * passes the global fov and the viewport's +0x20). */
+int tmbr_wide[2] = { 0x45444957, 0 };   /* "WIDE" */
+extern void viewSetFov(int i, float a, float b) __asm__("viewSetFov__Fiff");
+extern void viewGetFov(int i, float* a, float* b) __asm__("viewGetFov__FiPfT1");
+static float KW[2] = { 1.3333333f, 0.75f };
+static void wideApply(int views)
+{
+    int i;
+    for (i = 0; i < views; i++) {
+        float a, b;
+        int var = tmbr_wide[1] == 9 ? i : tmbr_wide[1];
+        viewGetFov(i, &a, &b);
+        if (var == 1) a = a * KW[0];
+        else if (var == 2) b = b * KW[1];
+        else if (var == 3) b = b * KW[0];
+        else continue;
+        viewSetFov(i, a, b);
+        scePrintf("TMBR wide: view %d variant %d\n", i, var);
+    }
+}
+
 static void splitFrame(char* cam)
 {
     extern char* D_004FA030;
@@ -134,6 +159,7 @@ static void splitFrame(char* cam)
             }
             camPov(cam, 0, pov0);
             tmbr_GuestsMake(splitN);           /* guests: their own camera + HUD through gameInitCamera */
+            if (tmbr_wide[1]) wideApply(splitN);
         }
         for (i = 0; i < 4; i++) splitCar[i] = 0;
         scePrintf("TMBR split: %d views (asked %d), cs %x %x %x %x\n", splitN, n, *(int*)(cam + 0x42A0), *(int*)(cam + 0x42A4),

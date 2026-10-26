@@ -85,6 +85,11 @@ void tmbr_GuestsMake(int views)
         if ((car >> 5) == 15 && tmbr_Opt(8)) car = mathfRandI(1, 14) << 5;   /* Minion off */
         padOf[v] = pads[i];
         veh = gameMakeAI(g, v, car, v, i, 0);
+        if (!veh) {             /* (the human branch does not return the car: find the one it set up) */
+            int k;
+            for (k = 0; k < 8; k++)
+                if (F(g + k * 0x31B0, 0x20F0) == v && F(g + k * 0x31B0, 0x590) == 1) veh = g + k * 0x31B0;
+        }
         if (!veh) { padOf[v] = -1; scePrintf("TMBR guests: player %d not made\n", i + 1); break; }
         F(veh, 0x210C) = i;
         guestCar[i] = veh;

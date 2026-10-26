@@ -352,7 +352,7 @@ static void rollRole(char* g, int k)
 }
 static int dbgCalls[8], dbgHb[8], dbgWhy[8], dbgShots[8];   /* TMBR_BOTDBG: AI frames seen by the hook, handbrake frames */
 static int dbgBits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
-#define SPECIAL_CHANCE 50 /* % of the time a bot may pick its special when it chooses a weapon (FFA) */
+#define SPECIAL_CHANCE 30 /* % of the time a bot may pick its special when it chooses a weapon (FFA) */
 
 #define POS(v) ((void*)(F(v, 0x2028) + 0x10))
 static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v, 0x2028); }
@@ -602,12 +602,21 @@ static void shieldOff(char* v)
 #define PAD(v) ((unsigned char*)(v) + 0x594)
 #define CS_AIM  0x3EB33333   /* 0.35 rad, ~20 deg */
 #define CS_HB   0x3F333333   /* 0.7 rad, ~40 deg */
+#define AIM_DEAD 0x3D4CCCCD  /* 0.05 rad, ~3 deg */
+#define AIM_1    0x3DCCCCCD  /* 0.10 */
+#define AIM_2    0x3E19999A  /* 0.15 */
+#define AIM_3    0x3E4CCCCD  /* 0.20 */
 #define CS_DIST 0x44160000   /* 600.0 */
 #define HB_HOLD 24
 #define HB_REST 20
 #define STALL 240
 #define TURBO_FAR 0x43C80000  /* 400.0: lined up and this far away -> turbo in */
-#define FIRE_ANG 0x3F19999A   /* 0.6 rad, ~34 deg */
+#define FIRE_ANG 0x3F19999A   /* 0.6 rad, ~34 deg (homing) */
+#define FIRE_TIGHT 0x3E851EB8 /* 0.26 rad, ~15 deg (straight weapons) */
+#define FIRE_NEAR 0x43C80000  /* 400.0 */
+#define LOCK_ANG 0x3EB33333   /* 0.35 rad, ~20 deg: inside the lock-on reticle */
+#define LOCK_T 24             /* frames held there before a homing missile (~0.4 s) */
+static unsigned char lockT[8];
 #define FIRE_DIST 0x43FA0000  /* 500.0 */
 #define CS_PIVOT 0x3F800000  /* 1.0 rad, ~57 deg */
 #define REVERSE 40
@@ -705,7 +714,15 @@ static void aggressiveTurn(char* g, char* v, char* t)
     /* Trigger-happy: the original only fires once aiLineUpShot is satisfied (aimed within 35 deg, per-weapon
      * bearing / pitch / range, fairness gate), so in a moving fight state 7 almost never comes (1 sample in
      * 600 in Ark's log). Most weapons home: fire when roughly lined up, in range, and in sight. */
-    if ((st == 5 || st == 6) && a < FIRE_ANG && d >= 0 && d < FIRE_DIST && (F(br, 0x598) || F(br, 0x4B0) < 10)) {
+    /* (2026-10-25 Ark: lots of wild shots with no chance. Straight weapons only when lined up (FIRE_TIGHT ~15 deg)
+     * and within FIRE_NEAR; homing (AI weapon 3) keeps the wider cone and range - it turns; the special keeps the
+     * game's own line-up rules.) */
+    /* lock-on (Ark: bots fired homing before the reticle locked): the target must stay inside LOCK_ANG, in sight,
+     * for LOCK_T frames before a homing missile goes - like a player waiting for the red reticle */
+    if (d >= 0 && d < FIRE_DIST && a < LOCK_ANG && (F(br, 0x598) || F(br, 0x4B0) < 10)) { if (lockT[idx] < 100) lockT[idx]++; }
+    else lockT[idx] = 0;
+    if ((st == 5 || st == 6) && d >= 0 && (F(br, 0x598) || F(br, 0x4B0) < 10) && F(br, 0x47C) != 1 &&
+        (F(br, 0x47C) == 3 ? (lockT[idx] >= LOCK_T && d < FIRE_DIST) : (a < FIRE_TIGHT && d < FIRE_NEAR))) {
         aiSetAttackState(v, 7); dbgShots[idx]++;
     }
     if (F(v, 0x444) >= 60) { dbgWhy[idx] = 3; return; }        /* stuck: the AI's own reverse/turn */
@@ -743,7 +760,17 @@ static void aggressiveTurn(char* g, char* v, char* t)
         else if (d < SN_MAX && a < CS_HB && (thinkTick & 3) == 0) pad[4] = 0;  /* in the band, roughly facing: ease off (gas 3 of 4 frames; full coasting crawled) */
     }
     if (flank(g, v, t, idx, b, a, d, tf)) return;
-    if (a < CS_AIM && ph[idx] != 1 && ph[idx] != 4) { dbgWhy[idx] = 6; ph[idx] = 0; return; }               /* nearly lined up: the AI aims */
+    if (a < CS_AIM && ph[idx] != 1 && ph[idx] != 4) {
+        /* nearly lined up: fine aim (2026-10-25 Ark: the AI's own aim sawed back and forth). No steering inside
+         * AIM_DEAD; outside it, steer toward the target only part of the frames, more the further off: 1 in 4 up
+         * to ~6 deg, 2 in 4 to ~9 deg, 3 in 4 to ~14 deg, every frame beyond - small corrections settle instead of
+         * overshooting at speed. */
+        int duty = a < AIM_DEAD ? 0 : a < AIM_1 ? 1 : a < AIM_2 ? 2 : a < AIM_3 ? 3 : 4;
+        dbgWhy[idx] = 6; ph[idx] = 0;
+        pad[9] = 0; pad[0xA] = 0; pad[2] = 0;
+        if (duty && ((thinkTick + idx) & 3) < duty) { if (b > 0) pad[0xA] = 1; else pad[9] = 1; }
+        return;
+    }
     /* ---- dogfight: like PvP, keep speed and fight for the angle ----
      * phase 0 attack: gas, steer at the target, handbrake bursts past CS_HB (as before).
      * Target far off the nose (> CS_PIVOT): if it is close (< DF_CLOSE) we overshot, so EXTEND: drive on,
@@ -1162,6 +1189,7 @@ static void turboUse(char* g, char* v, int evading)
 #define EN_MINE 4
 #define EN_SHIELD 7
 #define EN_SHIELD_T 12
+#define FRZ_CD 900      /* 15 s between a bot's freezes */
 static short enCd[8];
 static int incoming(char* g, char* v, int k)
 {
@@ -1229,14 +1257,17 @@ static void energyUse(char* g, char* v, int evading)
             return;
         }
     }
-    if (F(drv, 4) == 5 && F(drv, 0xB4) && (thinkTick + k * 7) % 30 == 0 && en >= 60) {
+    /* (2026-10-25 Ark: far too many freezes. Now: checked every 1 s, 5 % (hurt / escaping target 15 %, rammer
+     * before its ram 25 %), only with energy left for a shield afterwards (>= 80), only when a big hit is ready
+     * (special charged, or a rammer), and at most one per FRZ_CD frames.) */
+    if (F(drv, 4) == 5 && F(drv, 0xB4) && (thinkTick + k * 7) % 60 == 0 && en >= 80 && (F(v, 0x22B0) == 1 || rammer(v))) {
         char* tg = (char*)F(drv, 0xB4);
-        int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, d = (int)*(float*)(br + 0x20), chance = 15;
-        if (a < FIRE_ANG && d > 60 && d < 450) {
-            if (hpPct(tg) < 40 || d > tbLastD[k] + 2) chance = 50;                 /* hurt or getting away */
-            if (rammer(v) && d < 350) chance = 60;                                 /* before the special ram */
+        int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, d = (int)*(float*)(br + 0x20), chance = 5;
+        if (a < FIRE_TIGHT && d > 60 && d < 350) {
+            if (hpPct(tg) < 40 || d > tbLastD[k] + 2) chance = 15;                 /* hurt or getting away */
+            if (rammer(v) && d < 300) chance = 25;                                 /* before the special ram */
             if (mathfRandI(0, 99) < chance) {
-                F(br, 0x418) = EN_FREEZE; enCd[k] = 240; setupT[k] = 150; frzAt[k] = thinkTick;
+                F(br, 0x418) = EN_FREEZE; enCd[k] = FRZ_CD; setupT[k] = 150; frzAt[k] = thinkTick;
                 if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d freezes its target at %d\n", k, d);
             }
         }
@@ -1387,7 +1418,7 @@ static int cooldown(int w)
 {
     static const int heavy[3] = { 520, 300, 210 }, light[3] = { 60, 35, 25 };    /* frames: easy, medium, hard (2026-10-25: was 700/450/320, 90/60/40 - bots did little damage) */
     int d = tmbr_botDiff < 0 ? 0 : tmbr_botDiff > 2 ? 2 : tmbr_botDiff;
-    if (w == 1) return heavy[d] * 3 / 2;
+    if (w == 1) return heavy[d] * 3;                 /* special: ~15 s (medium) - players wait on the recharge (Ark: too many) */
     return heavyW(w) ? heavy[d] : light[d];
 }
 int tmbr_AiKeepWeapon(char* v, int w)
@@ -1429,22 +1460,22 @@ void tmbr_AiPickWeapon(char* v)
             {   /* the special would finish it: sometimes (a third of the time) - not when anything finishes it */
                 int th = t ? (int)*(float*)(t + 0x404) : 999;
                 if (t && c->dmg && th > 10 && th <= c->dmg && dist > 0 && dist <= (c->smax > 300 ? c->smax : 300) &&
-                    !(c->aim && a >= 0x3F19999A) && mathfRandW(0, 99) < 33) good = 1;
+                    !(c->aim && a >= 0x3F19999A) && mathfRandW(0, 99) < 20) good = 1;
             }
-            if (!good && mathfRandW(0, 99) >= 10) ok[w] = 0;              /* (now and then anyway: unpredictable) */
+            if (!good && mathfRandW(0, 99) >= 3) ok[w] = 0;               /* (now and then anyway: unpredictable) */
             else if (good) spBoost = 1;
         } else if (ok[w] && w == 1 && mathfRandW(0, 99) >= SPECIAL_CHANCE) ok[w] = 0;
         /* in a burst without sight of the target: no fire missiles (straight into the wall); homing missiles
          * may still go - they climb over terrain and keep the chase going. The burst waits, it is not lost. */
         if (ok[w] && w == 2 && burstLeft[k] > 0 && !los) ok[w] = 0;
-        if (ok[w]) total += weight[w] * (setupT[k] > 0 && heavyW(w) ? 5 : 1) * (w == 1 && spBoost ? 4 : 1);
+        if (ok[w]) total += weight[w] * (setupT[k] > 0 && heavyW(w) ? 5 : 1) * (w == 1 && spBoost ? 2 : 1);
     }
     F(br, 0x47C) = 0;
     if (!total) return;
     r = mathfRandW(0, total - 1);
     for (w = 1; w < 8; w++) {
         if (!ok[w]) continue;
-        if ((r -= weight[w] * (setupT[k] > 0 && heavyW(w) ? 5 : 1) * (w == 1 && spBoost ? 4 : 1)) < 0) break;
+        if ((r -= weight[w] * (setupT[k] > 0 && heavyW(w) ? 5 : 1) * (w == 1 && spBoost ? 2 : 1)) < 0) break;
     }
     if (w >= 8) return;
     F(br, 0x47C) = w;
