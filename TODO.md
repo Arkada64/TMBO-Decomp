@@ -22,7 +22,8 @@
       keep loading the online maps untouched.
   12. Local co-op story (split-screen guests = retail's 2P co-op path).
       + Bot ally option: you pick its car, it plays alongside you (a teammate bot: team code already keeps it off you),
-        taking 20 % of normal damage (story enemy bots take 10 %), 3 lives like the player; enemy AI prefers human targets but can
+        3 lives like the player. Bot-to-bot damage only (players hit everyone at full damage): enemy bots hitting each
+        other do 10 %, enemy bots hitting the ally do 20 % (so it isn't killed at once); enemy AI prefers human targets but can
         still go for it; it sometimes stays near the player; in the Warhawk boss fight it leaves the tankers alone so
         players can position them.
   13. Online co-op story: story enemies / bosses are AI cars (synced like bots), cutscenes and scripted events
