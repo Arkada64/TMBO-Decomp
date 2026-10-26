@@ -61,6 +61,14 @@
      hatch (homing / fire), rear-right hatch (power) and trunk lid (napalm) on Roadkill's animated rear panels /
      trunk (animation characters, damage states kept), so they open with Roadkill's weapon animations. Needs a
      look in game (hinges are Roadkill's, ~0.7 off 12 Pak's).
+     Ark's check 2026-10-26: homing / fire come out right; the reticle floats above the roof, the power missile
+     floats by the machine gun, gas can / rico don't open the trunk. Roadkill's weapon models (RKP): 4001 left rear
+     launcher (rot -2.58 -6.07), 4002 right rear (2.64 -6.25), 4003 roof launcher under char 0x3d630 (power),
+     4004 / 4005 rear-centre risers (chars 0x36230 / 0x3d940, napalm / rico), 4006 front right (char 0x3e780),
+     4100 front guns (switch 45, +-2.77 3.49). Launcher anim handle k = car animation k (InitLauncher:
+     animationGetHandle(h, v+0x20A8+6, v+0x20A4, k)); Roadkill also starts handle 30 (0xD54) for weapons 4 / 7.
+     Next: move 4003 / reticle / 4004 / 4005 to 12 Pak's mount points (HC_STOCK op5 id 62 list) and put the trunk
+     lid on the riser that napalm / rico use.
   6b. Gold Tooth back as his own car (Ark 2026-10-26), after 12 Pak's own-car work: the 2026-10-23 version was a skin
       inside Sweet Tooth's file (Sweet Tooth's wheels / mounts / collision / robot special, model and palettes
       squeezed under Sweet Tooth's size), removed as janky. As a separate car slot like 12 Pak: Head-On model
