@@ -131,6 +131,13 @@ static int addBot(void)
     veh = gameMakeAI(g, v, F(D_003156C0 + s * 0x220, 0xB4), v, -1, 1);
     if (!veh) return 0;
     netBotObjects(D_003156C0, veh);
+    {   /* a 12 Pak bot: his name on the marker / leaderboard (the slot name, +0x18, was the car's: ROADKILL) */
+        extern int tmbr_IsPak(char* v);
+        if (tmbr_IsPak(veh)) {
+            char* nm = D_003156C0 + s * 0x220 + 0x18;
+            nm[0] = '1'; nm[1] = '2'; nm[2] = ' '; nm[3] = 'P'; nm[4] = 'A'; nm[5] = 'K'; nm[6] = 0;
+        }
+    }
     tmbr_TeamsBotJoined(s, (int)(veh - g) / 0x31B0);
     return 1;
 }

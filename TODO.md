@@ -48,7 +48,11 @@
       then get back up to speed - sometimes, not every time.
   6. 12 Pak as a bot: DONE 2026-10-26 (host gives a bot slot 12 Pak 1 in 16, guests.c tmbr_BotCars; mask synced
      "\x01SB" in skins.c; marker says 12 PAK; tested with every bot 12 Pak: models, mounts, special).
-     Still open: Also his weapon panels (Ark 2026-10-26: the hatches that open as the weapons come out):
+     Still open (panel notes 2026-10-26: 29 of HC_STOCK's 112 meshes are outside hocollect's walk of the body roots
+     0x469d0 / 0x3a0 - weapon-ish ones: 0x459c0 / 0x46060 front corners (x +-2.5, y 5), 0x4e300 front bumper,
+     0x4ec60 right side out to x 5.1 (side gun), 0x4f300 roof (z 0.9-1.8), 0x4fa10 / 0x4fc20 rear deck, 0x1cc40 /
+     0x1d680 / 0x294d0 / 0x29ba0 / 0x29f40 / 0x41a50 in local coords (moving parts); 0x46a50-0x47800 rear flames,
+     0x47d30-0x4a580 tail light variants. Their placement / animation lives in the ops TMB lacks (20 / 26 / 27)): Also his weapon panels (Ark 2026-10-26: the hatches that open as the weapons come out):
      the Lost body pieces dropped in tools/lost/pakbuild.py (the 'side door left hanging open', 0x2bd70) are
      likely panels in their open pose; hook them to the weapon-mount animation. His mount points differ from
      Roadkill's: read them from the Lost file and move the mounts on his model copy (Roadkill untouched).
