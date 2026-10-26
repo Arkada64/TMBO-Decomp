@@ -88,13 +88,24 @@ class HoCar:
         wh = []
         for h in sorted(self.hd):
             lo, hi = box(self.hd[h]['pos']); d = hi - lo; c = (lo + hi) / 2
-            if d[1] > 1 and abs(d[1] - d[2]) < 0.1 * d[1] and d[0] < 0.8 * d[1] and abs(c[0]) > 1:
+            if d[1] > 1 and abs(d[1] - d[2]) < 0.1 * d[1] and d[0] < 0.8 * d[1] and abs(c[0]) > 1 \
+                    and not self.hd[h]['hflags'] & 0x0E:        # chrome hubcap / env shells are not the wheel
                 wh.append((h, c, d[2] / 2))
+        if len(wh) > 4:                # several per corner (Gold Tooth: low-poly copies): the most detailed one each
+            best4 = {}
+            for w in wh:
+                q = (w[1][0] > 0, w[1][1] > 0)
+                if q not in best4 or len(self.hd[w[0]]['pos']) > len(self.hd[best4[q][0]]['pos']):
+                    best4[q] = w
+            extra_w = [w[0] for w in wh if w not in best4.values()]
+            wh = list(best4.values())
+        else:
+            extra_w = []
         assert wh, 'no wheels found in car space'
         ys = [c[1] for _, c, _ in wh]
         self.wheel = dict(front=max(ys), rear=min(ys), z=float(np.mean([c[2] for _, c, _ in wh])),
                           r=float(np.mean([r for _, _, r in wh])), x=float(np.mean([abs(c[0]) for _, c, _ in wh])),
-                          meshes=[h for h, _, _ in wh])
+                          meshes=[h for h, _, _ in wh] + extra_w)
         assert len(wh) <= 4, 'more than 4 wheel candidates: %s' % [hex(h) for h, _, _ in wh]
         # 5-bit vertex colour level that counts as full (95th percentile of the brightest channel)
         c5 = [max(c & 31, (c >> 5) & 31, (c >> 10) & 31) for m in self.hd.values() for st in m['strips']
@@ -119,14 +130,24 @@ class HoCar:
                 return float(np.mean([(c & 31) if c <= 0xFFFF else (c & 255) / 8 for c in cs]))
             self.brake = sorted(bl[0], key=bright)   # off (darkest) first
 
-    def skip_reason(self, h, wheel_ground, far=False):
+    def env_overlay(self, h):
+        """an env-mapped mesh laid over a plain mesh of the same box (Thumper's shine shell) - not a part by itself"""
+        lo, hi = box(self.hd[h]['pos'])
+        for k, m in self.hd.items():
+            if k != h and m['pos'] and not m['hflags'] & 0x0E:
+                l2, h2 = box(m['pos'])
+                if np.abs(l2 - lo).max() < 0.05 and np.abs(h2 - hi).max() < 0.05:
+                    return True
+        return False
+
+    def skip_reason(self, h, wheel_ground, far=False, env='skip'):
         m = self.hd[h]
         lo, hi = box(m['pos'])
         if h in self.wheel['meshes']:
             return "wheel (the donor's are kept)"
         if not m['nrm'] and h not in self.brake:
             return 'no normals (light cone / flame / sprite)'
-        if m['hflags'] & 0x0E:
+        if m['hflags'] & 0x0E and (env == 'skip' or self.env_overlay(h)):
             return 'env-map shine shell'
         wt = {t for w in self.wheel['meshes'] for t in set(self.hd[w]['texrefs'][:2])}   # tyre + rim
         if m['texrefs'] and set(m['texrefs']) <= wt | (set(self.hd[self.wheel['meshes'][0]]['texrefs']) if far else set()):
@@ -287,6 +308,10 @@ def main():
     ap.add_argument('--own16', default='auto', help="Head-On texture keys quantized to 16 colours (hex list, 'auto' = "
                     "every texture but the largest when the CLUT / TEX budget would overflow, 'none')")
     ap.add_argument('--no-relight', action='store_true')
+    ap.add_argument('--env', default='skip', choices=('skip', 'bake'), help='env-mapped meshes: skip (shine shells, '
+                    'default) or bake their reflection lookup into UVs (parts made of chrome / gold; overlays still skipped)')
+    ap.add_argument('--add', default='', help='Head-On mesh headers outside the LOD roots added to every damage state '
+                    "(hex, comma separated; Gold Tooth's head / eyes / arm 0x1230,0x3bd0,0x3e0)")
     ap.add_argument('--hide-node', default='', help='donor node offsets (hex, comma separated) whose meshes get empty '
                     "packets too, e.g. Outlaw's roof light bar op31 (SUP 0x67ae0, SUA 0x5d6a0)")
     ap.add_argument('--keep-part', default='', help="donor node ids kept with their subtree, ';'-separated, each "
@@ -326,7 +351,13 @@ def build(a, rd, own16):
     # ---- donor structure
     root = u32(n, 4) - BASE
     R = u32(n, root) >> 18
-    lodn = next(t for t in kids(car, root) if u32(n, t) & 0x3f == 2 and struct.unpack_from('<i', n, t + 4)[0] == 2)
+    lvl, lodn = [root], None           # the root's op2 (most cars) or deeper: Sweet Tooth root -> op1 -> op6 id R+25
+    for _ in range(4):                 # (kid 0 truck, kid 1 robot) -> op2; breadth first, first 2-kid op2 wins
+        lodn = next((t for t in lvl if u32(n, t) & 0x3f == 2 and struct.unpack_from('<i', n, t + 4)[0] == 2), None)
+        if lodn is not None:
+            break
+        lvl = [k for o in lvl for k in kids(car, o)]
+    assert lodn is not None, 'no 2-kid LOD node'
     hi, lo = car.P(lodn + 0x28), car.P(lodn + 0x38)
     states_op31 = None
     lvl, cand = [hi], []
@@ -421,7 +452,9 @@ def build(a, rd, own16):
                 if st0:
                     t = list(st0[0]['tag']); t[3] = 1; st0[0]['tag'] = tuple(t)
                 m = dict(m, texrefs=[WHITE], strips=st0)
-            m = dict(m, twosided=False, bake=False, hflags=m.get('hflags', 0) & ~0x0E)
+            # --env bake: an env-mapped part (Gold Tooth's gold body) gets its reflection-map lookup baked into UVs
+            m = dict(m, twosided=False, bake=a.env == 'bake' and bool(ho.hd[h]['hflags'] & 0x0E),
+                     hflags=m.get('hflags', 0) & ~0x0E)
             blob, slots, pairs, sph = hierobject(m, 1.0, [tb.gs_ctx(k) for k in m['texrefs']])
             built[key] = car.append(blob, slots, pairs)
         return built[key]
@@ -432,17 +465,19 @@ def build(a, rd, own16):
             m = ho.hd.get(h)
             if m is None or not m['strips']:
                 continue
-            why = 'listed' if h in extra else ho.skip_reason(h, ground, far)
+            why = 'listed' if h in extra else ho.skip_reason(h, ground, far, a.env)
             if why:
                 skipped[h] = why; continue
             out.append(h)
         return out
 
+    add_meshes = [int(x, 16) for x in a.add.split(',') if x]   # Head-On meshes outside the LOD roots, every state
     dead = []
     for stn, g in enumerate(STATES):
         k = u32(car.n, g + 8) & 0xffff
         dead += [mesh_range(car, t) for t in meshes_under(car, g)]
         hs = ho_meshes(ho.hi, 0 if a.one_state else stn)
+        hs += [h for h in add_meshes if h not in hs]
         newg = car.group([node(h) for h in hs], sphere=struct.unpack_from('<3ff', car.n, g + 0x10))
         struct.pack_into('<H', car.n, g + 8, 1)
         car.setp(g + 0x20, newg)
