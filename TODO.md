@@ -1,5 +1,20 @@
 # TODO (later)
 
+- **Work queue (Ark 2026-10-26, top to bottom):**
+  1. Split-screen guests: car select (the real screen repeats "PLAYER n CHOOSE A VEHICLE" on that controller).
+  2. Guests joining (START on controller 2-4 in the waiting room; on a client the host makes the car over chat).
+  3. Guest camera pulled back (retail split distance) + HUD per view.
+  4. Letterbox off (the picture is 640x360 inside 448: give split screen the full height).
+  5. Bots charge the reticle weapon (satellite-style, hold up to 5 s; Launcher func_001549A0 charger code,
+     GetSatelliteReticle; find the held-fire input first).
+  6. 12 Pak as a bot.
+  7. Outlaw turret secondary / Manslaughter drop-behind (Launcher::UpdateSpecial 0x15CD80).
+  8. Minion toggle on the native game mods page.
+  9. HEALTH lobby option: ON = health pickups spawn and can be picked up (overrides the TMA ruleset's no-health);
+     OFF = no health on the map at all (replaces the TMA health rule; the respawn shield stays).
+  10. Environment pickups off, and the clouds on maps whose cloud is an environment pickup (Suburbs, Snowy Roads,
+      Mini Suburbs).
+
 - **Target: PCSX2 only** (Ark 2026-10-25): TMB Reloaded is unrestricted TMBO for the emulator; real PS2 hardware is
   not a goal. No view-distance / bot cuts for real-hardware limits: tune the EE cycle rate default instead (130 % now).
 
