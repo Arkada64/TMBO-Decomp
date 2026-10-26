@@ -1,5 +1,8 @@
 # TODO (later)
 
+- **Target: PCSX2 only** (Ark 2026-10-25): TMB Reloaded is unrestricted TMBO for the emulator; real PS2 hardware is
+  not a goal. No view-distance / bot cuts for real-hardware limits: tune the EE cycle rate default instead (130 % now).
+
 - **Ram damage in damage reports, online** (mods/dmgreport.c). Rams on another player's car still show nothing.
   The hook on the type-60 ram game event (`tmbr_RamSent`, `netSendGameEvent` call at 0x121744 in
   func_001214C0) is in both builds, but a test on 2026-10-24 showed no reports for rams. Next step: the debug
