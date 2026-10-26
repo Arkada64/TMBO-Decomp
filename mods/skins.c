@@ -332,7 +332,7 @@ static void keepRange(char* v, char* save, int a, int b, int put)
  * half track 0x3B4 (front / rear average), front / rear axle y 0x3B8 / 0x3BC (from the conversion logs). 0 = keep. */
 static float GEO[NSKIN][3] = {
     { 3.515f, 5.60f, -4.77f },      /* Gold Tooth */
-    { 0, 0, 0 },                    /* 12 Pak (Roadkill's wheels) */
+    { 3.32f, 5.63f, -4.58f },       /* 12 Pak (pakbuild PAK_OWNWHEELS=1) */
     { 4.10f, 7.36f, -6.01f },       /* Old Pickup */
     { 2.85f, 5.72f, -3.06f },       /* Pit Viper */
     { 2.92f, 6.16f, -3.90f },       /* Outlaw 2 */

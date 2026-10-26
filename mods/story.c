@@ -195,16 +195,16 @@ int tmbr_StoryCars(void)
     for (s = 0; s < 8; s++) {
         int c = 0;
         if (F(D_003156C0 + s * 0x220, 0x10) != -1 || tmbr_GuestSlot(s)) continue;
-        if (level == 14 && first) c = 15;
-        if (level == 20) {                                /* Warhawk's roof: retail's two boss cars 0x200 / 0x220 only */
-            if (first) c = 16; else if (!(used & 1 << 17)) c = 17; else continue;
-        }
+        if (level == 14) c = 15;                          /* Minion's stadium: Minion in every free slot (one bot comes) */
+        if (level == 20) c = (used & 1 << 16) ? 17 : 16;  /* Warhawk's roof: retail's boss cars 0x200 / 0x220 only, in
+                                                           * every free slot (the bot spawner may take any of them) */
         for (k = 0; !c && k < 200; k++) {
             int r = mathfRandI(1, 14);
             if (!(used & 1 << r)) c = r;
         }
         if (!c) c = 1;
         used |= 1 << c;
+        if (level == 20 && c == 17) used &= ~(3 << 16);  /* (alternate 16, 17, 16, ...) */
         first = 0;
         F(D_003156C0 + s * 0x220, 0xB4) = c << 5;
         if (level == 20) scePrintf("TMBR story: roof bot slot %d car %x\n", s, c << 5);

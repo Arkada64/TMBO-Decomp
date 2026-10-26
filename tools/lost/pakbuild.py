@@ -12,6 +12,12 @@ from textconv import TexBuilder
 from meshconv import hierobject
 
 ROOT_HI, ROOT_LO = 0x469d0, 0x3a0
+WHEEL_TEX = {0xb1a44, 0xcaf58}         # 12 Pak's wheel textures (PAK_OWNWHEELS=1 keeps them for its own wheels)
+
+
+def reach_all(car):
+    from hcbuild import traverse_check
+    return traverse_check(bytes(car.n), car.slots)[0]
 SKIP_TEX = {0xb1a44, 0xcaf58,          # 12 Pak's wheels (Roadkill's are kept)
             0x88de8,                   # its shadow
             0xc1fa8, 0x11d370, 0x8fed0}  # headlight / exhaust effects
@@ -25,9 +31,10 @@ if os.environ.get('PAK_ACAR'):         # RKA (other players' copy): same tree, o
     STATES, LOD1, LOD1_BODY = [0xc300, 0x169f0, 0x1f460], 0x4c7b0, 0x4aea0
 
 
-def strip_filter(m):
+def strip_filter(m, skip=None):
     """drop the strips drawn with a skipped texture; keep the used textures only (texsel tags remapped)"""
-    keep_refs = [t for t in m['texrefs'] if t not in SKIP_TEX]
+    skip = SKIP_TEX if skip is None else skip
+    keep_refs = [t for t in m['texrefs'] if t not in skip]
     if len(keep_refs) == len(m['texrefs']):
         return m
     remap = {i: keep_refs.index(t) for i, t in enumerate(m['texrefs']) if t in keep_refs}
@@ -57,15 +64,34 @@ def main(rkdir, bddpath, outdir, scale=1.0):
         m = decode(n, o)
         if m['hdr'] is not None:
             hd[m['hdr']] = m
+    # PAK_OWNWHEELS=1: the whole 12 Pak model goes up so its wheel bottoms stand on Roadkill's ground (12 Pak's
+    # raw wheels reach z -2.82, Roadkill's -2.30): LIFT = Roadkill (wheel z - r) - 12 Pak (wheel z - r), 0.52
+    # (PAK_LIFT overrides). Body, hatches (pivots too), wheels, moved brake lamps and mount moves all follow.
+    LIFT = 0.0
+    if os.environ.get('PAK_OWNWHEELS') == '1':
+        import numpy as np
+        from hcbuild import HoCar, traverse_check
+        from tmbmesh import decode as tdec
+        hw = HoCar(bddpath).wheel
+        R0 = u32(car.n, u32(car.n, 4) - 0x980000) >> 18
+        rk = [o for o in traverse_check(bytes(car.n), car.slots)[0]
+              if (u32(car.n, o) & 0x3f) == 4 and R0 + 1 <= (u32(car.n, o) >> 18) <= R0 + 4]
+        rz = float(np.mean([struct.unpack_from('<f', car.n, o + 0x48)[0] for o in rk]))
+        rr = float(np.mean([np.ptp(np.array(tdec(bytes(car.n), car.P(o + 0x50))['pos'])[:, 2]) / 2 for o in rk]))
+        LIFT = float(os.environ.get('PAK_LIFT', (rz - rr) - (hw['z'] - hw['r']) * scale))
+        print('lift %.3f (Roadkill ground %.2f, 12 Pak wheel bottom %.2f)' % (LIFT, rz - rr, (hw['z'] - hw['r']) * scale))
+        for m in hd.values():
+            m['pos'] = [(x, y, z + LIFT / scale) for x, y, z in m['pos']]
     built = {}
 
-    def node(h):
-        if h not in built:
-            m = strip_filter(hd[h])
+    def node(h, skip=None):
+        key = h if skip is None else (h, frozenset(skip))
+        if key not in built:
+            m = strip_filter(hd[h], skip)
             m = dict(m, twosided=os.environ.get('PAK_TWOSIDED', '0') == '1' and not (m.get('hflags', 0) & 0x800000), bake=False, hflags=m.get('hflags', 0) & ~0x0E)
             blob, slots, pairs, sph = hierobject(m, scale, [tb.gs_ctx(k) for k in m['texrefs']])
-            built[h] = car.append(blob, slots, pairs)
-        return built[h]
+            built[key] = car.append(blob, slots, pairs)
+        return built[key]
 
     # 12 Pak's rear hatches / trunk lid ride on Roadkill's animated panels (PAK_HATCH=0 turns it off): Roadkill's
     # left / right rear panels and trunk lid are bones of his animation characters (the launcher comes out under
@@ -111,6 +137,7 @@ def main(rkdir, bddpath, outdir, scale=1.0):
                     z * c + cz * sn + uz * d * (1 - c) + around[2])
         key = (h, deg)
         if key not in built:
+            piv = (piv[0], piv[1], piv[2] + LIFT / scale)
             m2 = dict(m, pos=[rot(p, piv) for p in m['pos']], nrm=[rot(q, (0, 0, 0)) for q in m.get('nrm', [])])
             m2 = strip_filter(m2)
             m2 = dict(m2, twosided=False, bake=False, hflags=m2.get('hflags', 0) & ~0x0E)
@@ -175,11 +202,80 @@ def main(rkdir, bddpath, outdir, scale=1.0):
                     car.setp(k, car.group([node(h) for h in hs], sphere=(f32(t + 0x10), f32(t + 0x14), f32(t + 0x18), f32(t + 0x1c) + 1.0)))
                 print('hatch', side, 'char', hex(c), 'states', len(ms), 'meshes', len(meshes(root, 0, skip=set())))
                 break
-    # far LOD: its body mesh -> 12 Pak's low LOD
-    for i in range(u32(car.n, LOD1 + 8) & 0xffff):
-        if car.P(LOD1 + 0x20 + 4 * i) == LOD1_BODY:
+    OWN = os.environ.get('PAK_OWNWHEELS') == '1'
+    old_cbps, rim_cb = set(), None
+    # far LOD: its body mesh -> 12 Pak's low LOD (PAK_OWNWHEELS=1: with its own far wheels, Roadkill's far
+    # wheels / underside mesh leaves the group)
+    nk = u32(car.n, LOD1 + 8) & 0xffff
+    for i in range(nk):
+        t = car.P(LOD1 + 0x20 + 4 * i)
+        if t == LOD1_BODY:
             dead.append(mesh_extent(car.n, LOD1_BODY))
-            car.setp(LOD1 + 0x20 + 4 * i, node(ROOT_LO))
+            car.setp(LOD1 + 0x20 + 4 * i, node(ROOT_LO, SKIP_TEX - WHEEL_TEX) if OWN else node(ROOT_LO))
+        elif OWN and t is not None and (u32(car.n, t) & 0x3f) == 0:
+            dead.append(mesh_extent(car.n, t))
+            struct.pack_into('<I', car.n, LOD1 + 0x20 + 4 * i, 0)
+    if OWN:                            # compact the kid list (no null kids)
+        ks = [car.P(LOD1 + 0x20 + 4 * i) for i in range(nk)]
+        ks = [k for k in ks if k is not None]
+        for i in range(nk):
+            struct.pack_into('<I', car.n, LOD1 + 0x20 + 4 * i, 0)
+        for i, k in enumerate(ks):
+            car.setp(LOD1 + 0x20 + 4 * i, k)
+        struct.pack_into('<H', car.n, LOD1 + 8, len(ks))
+    # PAK_OWNWHEELS=1 (Ark 2026-10-26): 12 Pak's own wheels on Roadkill's tire nodes (op4 id 33..36: the game
+    # spins / steers / bounces them and keeps the node's translation z as the tire's rest height): each node gets
+    # 12 Pak's wheel mesh of its corner, centred on the node, and moves to that wheel's centre (same as
+    # hcbuild.py --own-wheels; 12 Pak's model sits at scale 1 / no offset, so its wheels are where its body wants)
+    if OWN:
+        import numpy as np
+        from hcbuild import HoCar, relight, meshes_under, mesh_range
+        ho = HoCar(bddpath)
+        R = u32(car.n, u32(car.n, 4) - 0x980000) >> 18
+        # CLUT room (12 Pak already fills Roadkill's 76 blocks): the 2-colour tyre goes onto the rim's new palette
+        rim, tyre = 0xcaf58, 0xb1a44
+        cb = rim_cb = tb.add(rim)[4]
+        raw = np.frombuffer(bytes(tb.ho[rim]['clutraw']), np.uint8).reshape(-1, 4).astype(float)
+        tb.pal[cb] = raw
+        tb.reuse[tyre] = cb
+        reached = reach_all(car)
+        tires = sorted(o for o in reached if (u32(car.n, o) & 0x3f) == 4 and R + 1 <= (u32(car.n, o) >> 18) <= R + 4)
+        ymid = np.mean([struct.unpack_from('<f', car.n, w + 0x44)[0] for w in tires])
+        rep_, old_cbps = [], set()
+        for w in tires:
+            M = np.array(struct.unpack_from('<16f', car.n, w + 0x10)).reshape(4, 4)
+            R3, t = M[:3, :3], M[3, :3]
+            q = (bool(t[0] > 0), bool(t[1] > ymid))
+            mir = q not in ho.wheel_q
+            h, c, r = ho.wheel_q[(not q[0], q[1]) if mir else q]
+            c = np.asarray(c, float)
+            cw = c * np.array([-1.0, 1, 1]) if mir else c
+            m = ho.hd[h]
+            P = np.asarray(m['pos'], float) - c
+            N = np.asarray(m['nrm'], float)
+            if mir:
+                P[:, 0] *= -1; N = N * np.array([-1, 1, 1])
+            m2, _, _ = relight(dict(m, pos=[tuple(x) for x in P], nrm=[tuple(x) for x in N]), (scale, np.zeros(3)), ho.c5norm)
+            Ri = np.linalg.inv(R3)
+            m2 = dict(m2, pos=[tuple(np.asarray(x) @ Ri) for x in m2['pos']], nrm=[tuple(np.asarray(x) @ Ri) for x in m2['nrm']],
+                      twosided=mir, bake=False, hflags=m2.get('hflags', 0) & ~0x0E)
+            blob, slots, pairs, sph = hierobject(m2, 1.0, [tb.gs_ctx(k) for k in m2['texrefs']])
+            nd = car.append(blob, slots, pairs)
+            for old in meshes_under(car, w):
+                for i in range(struct.unpack_from('<H', car.n, old + 0x5a)[0]):   # Roadkill's tyre / rim CLUTs
+                    old_cbps.add((struct.unpack_from('<Q', car.n, old + 0x70 + 0x30 * i)[0] >> 37) & 0x3fff)
+                rr = mesh_range(car, old)
+                if rr: dead.append(rr)
+            k = struct.unpack_from('<i', car.n, w + 8)[0]
+            for i in range(1, max(k, 1)):
+                struct.pack_into('<I', car.n, w + 0x50 + 4 * i, 0)
+            struct.pack_into('<i', car.n, w + 8, 1)
+            car.setp(w + 0x50, nd)
+            cn = cw * scale + np.array([0.0, 0.0, LIFT])
+            struct.pack_into('<3f', car.n, w + 0x40, *cn)
+            rep_.append((u32(car.n, w) >> 18, cn, r * scale, hex(h) + (' mirrored' if mir else '')))
+        for wid, cn, r, src in sorted(rep_):
+            print('tire node id %d: centre (%.2f %.2f %.2f) radius %.2f  <- %s' % (wid, cn[0], cn[1], cn[2], r, src))
     # Roadkill's own parts (driver + roof guns, door / hood / side panels, gas cap, rear rack: characters 0..9 of
     # the op7 list, and the meshes laid out before them) get an empty packet; wheels stay
     if os.environ.get('PAK_KEEP_RK') != '1':
@@ -217,7 +313,7 @@ def main(rkdir, bddpath, outdir, scale=1.0):
                         x, y, z = struct.unpack_from('<3f', car.n, r[4] + 12 * k)
                         j = min(range(4), key=lambda q: abs(x - RK_C[q]))
                         struct.pack_into('<3f', car.n, r[4] + 12 * k, PK_C[j] + (x - RK_C[j]) * 0.5,
-                                         -8.05 + (y + 8.3) * 0.5, -0.24 + (z - 0.13) * 0.5)
+                                         -8.05 + (y + 8.3) * 0.5, -0.24 + LIFT + (z - 0.13) * 0.5)
         print('brake light meshes kept and moved:', len(brake))
         wheels |= brake
         # Roadkill's weapon hardware stays (the weapon mounts are still Roadkill's): the roof gun turret and
@@ -276,12 +372,35 @@ def main(rkdir, bddpath, outdir, scale=1.0):
             refs = [o for o in range(0, op7, 4) if u32(car.n, o) == c + 0x980000]
             for r in refs:
                 dx, dy, dz = MOVE[kind]
+                dz += LIFT
                 t = car.append(struct.pack('<IIIIfffI', 3, 0, 1, 0, dx, dy, dz, 0))
                 car.setp(t + 0x1c, c)
                 car.setp(r, t)
             print('moved', kind, hex(c), 'refs', len(refs))
     before = len(car.n)
     dropped = car.compact(sorted(set(dead)))
+    if OWN and rim_cb is not None:     # the rim's new CLUT moves into a Roadkill wheel CLUT nothing uses any more
+        newtids = {v[0] for v in tb.map.values()}
+        usedc = set()                  # CLUTs of the meshes still drawn (hidden ones have 0 vertices)
+        for o in reach_all(car):
+            if (u32(car.n, o) & 0x3f) == 0 and (u32(car.n, o + 0xc) >> 16) and o + 0x5c <= len(car.n):
+                for i in range(min(4, struct.unpack_from('<H', car.n, o + 0x5a)[0])):
+                    if struct.unpack_from('<H', car.n, o + 0x50 + 2 * i)[0] not in newtids:
+                        usedc.add((struct.unpack_from('<Q', car.n, o + 0x70 + 0x30 * i)[0] >> 37) & 0x3fff)
+        free = sorted(c for c in old_cbps if c not in usedc)
+        if free:
+            to = free[0]
+            for a_, g in car.pairs:
+                q = struct.unpack_from('<Q', car.n, g)[0]
+                if struct.unpack_from('<H', car.n, a_)[0] in newtids and ((q >> 37) & 0x3fff) == rim_cb:
+                    struct.pack_into('<Q', car.n, g, (q & ~(0x3fff << 37)) | (to << 37))
+            for i, r_ in enumerate(tb.new_rtx):
+                gs = struct.unpack_from('<Q', r_, 8)[0]
+                if (gs >> 16) & 0xffff == rim_cb:
+                    r_ = bytearray(r_); struct.pack_into('<Q', r_, 8, (gs & ~(0xffff << 16)) | (to << 16)); tb.new_rtx[i] = bytes(r_)
+            tb.drop_cbps = {to}
+            tb.next_cbp -= 1 if rim_cb == tb.next_cbp - 1 else 0
+            print('rim CLUT %d -> freed Roadkill wheel CLUT %d (unused: %s)' % (rim_cb, to, free))
     print('ngp %d -> %d (orig %d), dropped %d, new textures %d, CLUT blocks %d' % (
         before, len(car.n), len(rd('NGP')), dropped, len(tb.new_tex), tb.next_cbp))
     os.makedirs(outdir, exist_ok=True)

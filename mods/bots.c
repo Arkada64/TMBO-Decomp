@@ -1620,9 +1620,16 @@ static int aiUpdate(char* v)
         /* No fleeing: hunt mode (func_00108618) switches to flee (mode 3, then cruise) when healthScore <
          * fleeHealth; online there is no health pickup to flee to, and our think tick forced hunt back every
          * 0.5 s: stop-and-go. fleeHealth (brain+0x48) = 0.0 */
-        F(F(v, 0x2014), 0x48) = 0;
+        /* HEALTH on (Ark 2026-10-26): bots may go for health again - the game's own flee-to-health, at a low
+         * threshold, and rarer in a story run (the story AI is meant to be a bit different). */
+        {   static float FLEE[3] = { 0.0f, 0.30f, 0.12f };
+            int fl = tmbr_Opt(0x10) ? (tmbr_Opt(0x20) ? 2 : 1) : 0;
+            *(float*)(F(v, 0x2014) + 0x48) = FLEE[fl];
+            if (fl && drv && F(drv, 4) == 3) goto keepFlee;      /* fleeing to health: leave it */
+        }
         if (drv && t && F(drv, 4) >= 2 && F(drv, 4) <= 4 && !(F(drv, 4) == 4 && (ROLE(v) == R_CRUISER || leaveT[(int)(v - g) / 0x31B0 & 7] > 0))) { driverSetMode(drv, 5); driverSetTarget(drv, t); }
     }
+keepFlee:
     if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) {
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
 #if TMBR_NAV
