@@ -1,7 +1,9 @@
 // TMBR launcher (Ark 2026-10-26, TODO 4d): one window - Play, a few toggles, PCSX2 settings.
 // Build (Windows, .NET Framework 4 csc): csc /target:winexe /win32icon:TMBR.ico /resource:logo.png,TMBR.logo.png /out:TMBR.exe TMBR.cs
 // (TMBR.ico / logo.png: the game's own logo, SHELL1.TEX textures 60-62 - tools/package/logo.py)
-// (HD textures dropped 2026-10-26, Ark.) Lives next to pcsx2-qt.exe in the TMBR player folder; the game image is game\TMBR.iso.
+// (HD textures dropped 2026-10-26, Ark.) Folder layout (Ark 2026-10-26: keep the top level short): TMBR.exe, README.txt,
+// bios\ (the player's BIOS), game\TMBR.iso, emulator\ (portable PCSX2: exe, DLLs, inis, memcards ...). The emulator's
+// BIOS folder is pointed at ..\bios on every launch.
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -11,7 +13,8 @@ using System.Windows.Forms;
 class TMBR : Form
 {
     string dir = AppDomain.CurrentDomain.BaseDirectory;
-    string Ini { get { return Path.Combine(dir, "inis", "PCSX2.ini"); } }
+    string Emu { get { return Path.Combine(dir, "emulator"); } }
+    string Ini { get { return Path.Combine(Emu, "inis", "PCSX2.ini"); } }
     string Iso { get { return Path.Combine(dir, "game", "TMBR.iso"); } }
     CheckBox full, wide, potato;
     Label note;
@@ -50,7 +53,7 @@ class TMBR : Form
 
     void Read()
     {
-        if (!File.Exists(Ini)) { note.Text = "inis\\PCSX2.ini is missing"; return; }
+        if (!File.Exists(Ini)) { note.Text = "emulator\\inis\\PCSX2.ini is missing"; return; }
         var l = File.ReadAllLines(Ini);
         wide.Checked = Get(l, "AspectRatio") == "16:9";
         full.Checked = Get(l, "StartFullscreen") == "true";
@@ -65,15 +68,16 @@ class TMBR : Form
         Set(l, "AspectRatio", wide.Checked ? "16:9" : "Auto 4:3/3:2");
         Set(l, "StartFullscreen", full.Checked ? "true" : "false");
         Set(l, "upscale_multiplier", potato.Checked ? "1" : "3");
+        Set(l, "Bios", Path.Combine(dir, "bios"));
         File.WriteAllLines(Ini, l);
     }
     void Launch(bool play)
     {
         try { Write(); } catch (Exception ex) { note.Text = ex.Message; return; }
-        var exe = Path.Combine(dir, "pcsx2-qt.exe");
+        var exe = Path.Combine(Emu, "pcsx2-qt.exe");
         string args = play ? "-batch " + (full.Checked ? "-fullscreen " : "") + "-- \"" + Iso + "\"" : "";
         if (play && !File.Exists(Iso)) { note.Text = "game\\TMBR.iso is missing."; return; }
-        Process.Start(new ProcessStartInfo(exe, args) { WorkingDirectory = dir, UseShellExecute = false });
+        Process.Start(new ProcessStartInfo(exe, args) { WorkingDirectory = Emu, UseShellExecute = false });
         if (play) Close();
     }
     [STAThread] static void Main() { Application.EnableVisualStyles(); Application.Run(new TMBR()); }
