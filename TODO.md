@@ -53,6 +53,10 @@
       squeezed under Sweet Tooth's size), removed as janky. As a separate car slot like 12 Pak: Head-On model
       (tools/lost/gtbuild.py), his own wheels, Lost's mount points, Sweet Tooth only as the stats / special donor.
       Needs a second free car-select slot and stays under the per-car texture / palette budget.
+  6c. Five Harbor City cars as new characters (Ark 2026-10-26): Old Pickup, Outlaw 2, Thumper, Pit Viper, Twister -
+      files set aside in TMB Decomp/hc_cars (reference/wip/HEADON_ETE.md). Old Pickup / Pit Viper are near-static
+      models (tiny pointer lists): animate them from Black's files (wheels / suspension / weapon parts of a donor).
+      Each needs a car slot, so this follows the 12 Pak / Gold Tooth own-slot work.
   7. Outlaw turret secondary / Manslaughter drop-behind (Launcher::UpdateSpecial 0x15CD80).
   8. Minion toggle on the native game mods page.
   9. HEALTH lobby option: ON = health pickups spawn and can be picked up (overrides the TMA ruleset's no-health);

@@ -85,3 +85,18 @@ built TMB files, round-trip check). Test disc: `TMBO_GOLDTOOTH_TEST.iso` = peds 
    texture 0x87F40), damage states, Lost's mount points.
 2. 12-Pak (HC_STOCK.BDD) as a new character: needs a free car slot / car-select entry, its own collision and
    weapon mounts (Head-On op5 mount list), and a full NGP instead of a skin.
+
+## Harbor City fan build cars set aside (2026-10-26, Ark: 5 possible new characters)
+Source: `Desktop/Twisted Metal Harbor City/game` (the Head-On / Lost engine, run from host files by its own
+PCSX2, `TM.ELF`). Its roster strings: Axel, Stock Car, Pit Viper, Mr Grimm, Preacher, Roadkill, Old Pickup,
+Semi, Sweet Tooth, Thumper, Spectre, Mr Slam, Outlaw (files AXEL STCAR PVIPER MRGRIM PREACH RKILL PICKUP SEMI
+SWEET THUMP VETTE MRSLAM COPFOD). Copied to `TMB Decomp/hc_cars/CARS` + `/AICARS` (3.8 MB):
+| Car | File | ngp | tex | ptr | note |
+|---|---|---|---|---|---|
+| Old Pickup | PICKUP.BDD | 116,624 | 156,528 | 94 | tiny pointer list: a near-static model (Ark: needs animating) |
+| Pit Viper | PVIPER.BDD | 118,720 | 153,584 | 136 | also near-static |
+| Thumper | THUMP.BDD | 310,048 | 124,912 | 852 | full car |
+| Twister | TWIST.BDD | 253,824 | 92,400 | 822 | full car (not in this build's roster; AICARS has TWISTAI + OLDTWISTAI) |
+| Outlaw 2 | COP.BDD | 314,640 | 97,264 | 818 | the full cop car; COPFOD.BDD (50 KB ngp) is the traffic cop the roster names |
+Same BDD bundle format as the ETE disc above (ngp with Head-On node ops 20/26/27, tex, ptr), so the Gold Tooth /
+12 Pak converters (tools/lost) are the starting point. Retail TMB donors for animation: Black's own cars.
