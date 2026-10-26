@@ -259,6 +259,7 @@ static int lastLife(char* v)
 #define CH_SPECTRE 4
 #define CH_GRIMM 10
 #define CH_DARKSIDE 13
+#define CH_MANSLAUGHTER 14
 static int charOf(char* v) { return (F(v, 0x20F4) >> 5) & 0x1F; }
 static int fragile(char* v) { int c = charOf(v); return c == CH_SPECTRE || c == CH_GRIMM; }
 /* Per-car guidelines (Ark, 2026-10-25) - tendencies, not scripts: role odds (brawler / sniper / roamer %, the rest
@@ -627,6 +628,62 @@ static short standT[8];            /* frames coasting in a standoff */
 static int fbits(float f) { union { float f; int i; } u; u.f = f; return u.i; }
 extern void aiSetAttackState(char* v, int st) __asm__("aiSetAttackState__7Vehicle12_attackState");
 
+
+/* ---- flank / orbit (Ark 2026-10-25: bot-on-bot duels were mostly handbrake-and-charge head on, trading hits;
+ * players in TMA do that sometimes, but mostly flank or circle for a better shot) ----
+ * In a close duel (OR_MIN..OR_ENGAGE) with the target's nose on us (brain+0x28 < OR_EXPOSED), a bot decides once per
+ * engagement (OR_DECIDE frames): charge (the old head-on pass) or orbit. Charging is likelier for rammers and
+ * Manslaughter, with a clear health lead, or when the target is low (go finish it). Orbit: keep the target off the
+ * nose at about OR_ANG on whichever side it already is (steer away when it drifts in front, toward when it falls
+ * behind; wider when too close, tighter when too far), on the gas, no handbrake; once we are on its flank or
+ * behind (its nose more than OR_FLANKED off us) turn in and attack - the normal aim / fire takes over. At most
+ * OR_MAX frames, then commit. */
+#define OR_MIN      0x42A00000   /*  80.0 */
+#define OR_ENGAGE   0x43C80000   /* 400.0 */
+#define OR_TIGHT    0x43820000   /* 260.0: farther than this, orbit tighter (close in) */
+#define OR_WIDE     0x42F00000   /* 120.0: closer than this, orbit wider */
+#define OR_EXPOSED  0x3F32B8C2   /* 0.70 rad (40 deg): the target's nose is on us */
+#define OR_FLANKED  0x3F9C61AA   /* 1.22 rad (70 deg): we are on its side / behind */
+#define OR_ANG      0x3FA78D36   /* 1.31 rad (75 deg): target this far off our nose while orbiting */
+#define OR_ANG_IN   0x3F490FDB   /* 0.79 rad (45 deg): tighter */
+#define OR_ANG_OUT  0x3FDF66F3   /* 1.75 rad (100 deg): wider */
+#define OR_BAND     0x3E32B8C2   /* 0.17 rad (10 deg) dead band */
+#define OR_DECIDE   180
+#define OR_MAX      150
+static signed char orb[8];       /* 0 undecided, 1 orbiting, 2 charging (this engagement) */
+static short orbT[8], orbDec[8];
+static int flank(char* g, char* v, char* t, int idx, int b, int a, int d, int tf)
+{
+    unsigned char* pad = PAD(v);
+    int want, side, cut;
+    if (orbDec[idx] > 0) orbDec[idx]--;
+    if (orbDec[idx] == 0) orb[idx] = 0;
+    if (d < OR_MIN || d > OR_ENGAGE || ROLE(v) == R_SNIPER || ph[idx] == 3 || ph[idx] == 4) { if (orb[idx] == 1) orb[idx] = 0; return 0; }
+    if (!orb[idx]) {
+        int c = 25;                                          /* % chance to charge head on */
+        if (rammer(v) || charOf(v) == CH_MANSLAUGHTER) c += 35;
+        if (hpPct(v) > hpPct(t) + 25) c += 20;
+        if (hpPct(t) < 25) c += 25;
+        if (hpPct(v) < 35) c -= 15;
+        if (tf >= OR_EXPOSED) return 0;                      /* not facing us: no need to dance, attack */
+        orb[idx] = mathfRandI(0, 99) < c ? 2 : 1;
+        orbDec[idx] = OR_DECIDE; orbT[idx] = 0;
+    }
+    if (orb[idx] != 1) return 0;
+    if (tf > OR_FLANKED || ++orbT[idx] > OR_MAX) { orb[idx] = 2; orbDec[idx] = OR_DECIDE; return 0; }   /* on its flank (or enough): turn in */
+    want = d > OR_TIGHT ? OR_ANG_IN : d < OR_WIDE ? OR_ANG_OUT : OR_ANG;
+    side = b > 0 ? 1 : -1;                                   /* target on our right (b > 0) / left */
+    pad[4] = 1; pad[6] = 0; pad[2] = 0; pad[7] = 0; pad[8] = 0;
+    pad[9] = 0; pad[0xA] = 0;
+    cut = a < want - OR_BAND ? -1 : a > want + OR_BAND ? 1 : 0;   /* -1: too far in front, steer away; 1: turn toward */
+    if (cut) {
+        int right = (side > 0) == (cut > 0);                     /* toward a right-side target = steer right */
+        if (right) pad[0xA] = 1; else pad[9] = 1;
+    }
+    dbgWhy[idx] = 50;
+    return 1;
+}
+
 static void aggressiveTurn(char* g, char* v, char* t)
 {
     char* br = (char*)F(v, 0x2014);
@@ -682,6 +739,7 @@ static void aggressiveTurn(char* g, char* v, char* t)
         } else if (d < SN_MIN && ph[idx] == 0) { ph[idx] = 4; return; }
         else if (d < SN_MAX && a < CS_HB && (thinkTick & 3) == 0) pad[4] = 0;  /* in the band, roughly facing: ease off (gas 3 of 4 frames; full coasting crawled) */
     }
+    if (flank(g, v, t, idx, b, a, d, tf)) return;
     if (a < CS_AIM && ph[idx] != 1 && ph[idx] != 4) { dbgWhy[idx] = 6; ph[idx] = 0; return; }               /* nearly lined up: the AI aims */
     /* ---- dogfight: like PvP, keep speed and fight for the angle ----
      * phase 0 attack: gas, steer at the target, handbrake bursts past CS_HB (as before).
