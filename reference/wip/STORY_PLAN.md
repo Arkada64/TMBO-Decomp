@@ -107,3 +107,7 @@ ever asks for a file that does not exist.
   0x24: nextMovie = 0x46 + level, movieEnable 1) - the shell's movies play inside menu screens (probably into the
   shell's video panel), not as a fullscreen cutscene. Next: find how a menu state lets playMovie run (the loop's
   0x1B40D4 call path / which states), or give story movies their own UI state like retail's uiPlay*Movie screens.
+- g107/g108: the request set right before the UI loop's playMovie call (hook 0x1B40D4) is consumed (nextMovie
+  -> -2, movieEnable -> 0) but nothing plays (movieRequested stays 0, bytesInMovie unchanged): the -1 / incog path
+  in TMBO's playMovie apparently does not reach func_002220B8 as read from the asm. Open; next step would be a PCSX2
+  debugger breakpoint on 0x1CEF98 / 0x2220B8 (or try another existing id, e.g. 0x89 'none', with its name swapped).
