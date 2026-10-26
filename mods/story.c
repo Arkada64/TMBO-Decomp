@@ -25,6 +25,9 @@ extern void tmbr_OptSet(int bits, int on);         /* bots.c */
 extern void tmbr_TeamsBotMode(int on);             /* teams.c */
 extern int tmbr_TeamsWinner(void);                 /* teams.c: 0 = humans' team, 1 = bots', -1 none */
 
+#ifndef TMBR_STORYLEVEL
+#define TMBR_STORYLEVEL -1
+#endif
 #define OPT_STORY 0x20
 #define OPT_TEAMS 2
 #define OPT_TEAMS4 4
@@ -86,6 +89,9 @@ static void start(int fresh)
     level = 1; stage = 1; fork = -1; msg[0] = 0; introDone = 0;
     playedSerial = doneSerial = tmbr_levelSerial;
     if (!fresh && loadRun()) { scePrintf("TMBR story: continue, stage %d %s\n", stage, NAME[level]); return; }
+#if TMBR_STORYLEVEL >= 0
+    level = TMBR_STORYLEVEL; scePrintf("TMBR story: test start at %s\n", NAME[level]); return;   /* test build only */
+#endif
     if (fresh) { runs++; saveRun(); }
     scePrintf("TMBR story: new run, %s\n", NAME[level]);
 }
@@ -160,7 +166,7 @@ void tmbr_StoryLobby(void)
         scePrintf("TMBR story: branch -> %s\n", NAME[level]);
     }
     /* the rules of a story level */
-    n = (level == 14 ? 1 : AICOUNT[level]) + (tmbr_Opt(0x40) ? 1 : 0);   /* + the ally bot (GAME MODS ALLY BOT) */
+    n = (level == 14 ? 1 : level == 20 ? 2 : AICOUNT[level]) + (tmbr_Opt(0x40) ? 1 : 0);   /* (roof: the boss pair) */   /* + the ally bot (GAME MODS ALLY BOT) */
     tmbr_botCount = n > 7 ? 7 : n;
     tmbr_OptSet(OPT_TEAMS, 1);
     tmbr_OptSet(OPT_TEAMS4, 0);
@@ -170,6 +176,10 @@ void tmbr_StoryLobby(void)
         if (LEVEL() != level) { LEVEL() = level; ch = 1; }
         if (((F(gi, 0) >> 1) & 0xF) != 3) { F(gi, 0) = (F(gi, 0) & ~0x1E) | 3 << 1; ch = 1; }
         if (((unsigned char*)gi)[5] != LIVES) { gi[5] = LIVES; ch = 1; }
+        {   static int carsFor = -1;                     /* the bots' cars follow the level (the room picked them for the first) */
+            extern int tmbr_StoryCars(void);
+            if (carsFor != level) { carsFor = level; tmbr_StoryCars(); ch = 1; }
+        }
         if (ch) { netSendGameInfo(D_003156C0, -1); scePrintf("TMBR story: %s, %d bots\n", NAME[level], tmbr_botCount); }
     }
 }
@@ -186,6 +196,9 @@ int tmbr_StoryCars(void)
         int c = 0;
         if (F(D_003156C0 + s * 0x220, 0x10) != -1 || tmbr_GuestSlot(s)) continue;
         if (level == 14 && first) c = 15;
+        if (level == 20) {                                /* Warhawk's roof: retail's two boss cars 0x200 / 0x220 only */
+            if (first) c = 16; else if (!(used & 1 << 17)) c = 17; else continue;
+        }
         for (k = 0; !c && k < 200; k++) {
             int r = mathfRandI(1, 14);
             if (!(used & 1 << r)) c = r;

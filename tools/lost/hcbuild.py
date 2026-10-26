@@ -312,10 +312,16 @@ def main():
                     'default) or bake their reflection lookup into UVs (parts made of chrome / gold; overlays still skipped)')
     ap.add_argument('--add', default='', help='Head-On mesh headers outside the LOD roots added to every damage state '
                     "(hex, comma separated; Gold Tooth's head / eyes / arm 0x1230,0x3bd0,0x3e0)")
+    ap.add_argument('--skip-tex', default='', help='Head-On texture keys whose meshes are left out (hex, comma '
+                    'separated; Gold Tooth: flares / flames / far-LOD wheels 8a480,c1fa8,84320,87f40,8bba8,a2888)')
+    ap.add_argument('--reuse', default='', help="Head-On texture key:donor CLUT block, quantized onto the donor's "
+                    "palette instead of a new CLUT (Gold Tooth on STP: b0448:45,a91b8:49,8dc74:45,9e768:5; STA 53,57,53,5)")
+    ap.add_argument('--half-keys', default='', help='Head-On texture keys stored at half size (hex, comma separated)')
     ap.add_argument('--hide-node', default='', help='donor node offsets (hex, comma separated) whose meshes get empty '
                     "packets too, e.g. Outlaw's roof light bar op31 (SUP 0x67ae0, SUA 0x5d6a0)")
     ap.add_argument('--keep-part', default='', help="donor node ids kept with their subtree, ';'-separated, each "
-                    "optionally ':dx,dy,dz' to move it (e.g. Outlaw's turret '124:0,0,-1.9')")
+                    "optionally ':dx,dy,dz' to move it (e.g. Outlaw's turret '124:0,0,-1.9'); '@hex' names a node offset (Sweet "
+                    "Tooth's robot character '@0x91c20')")
     ap.add_argument('--skip', default='', help='extra Head-On mesh headers to leave out (hex, comma separated)')
     a = ap.parse_args()
 
@@ -393,7 +399,7 @@ def build(a, rd, own16):
     for spec in filter(None, a.keep_part.split(';')):
         pid, _, off = spec.partition(':')
         for o, h in nodes.items():
-            if (h >> 18) == int(pid, 0):
+            if (o == int(pid[1:], 16)) if pid.startswith('@') else (h >> 18) == int(pid, 0):   # '@hex' = node offset
                 keep |= set(meshes_under(car, o))
                 if off:
                     moves.append((o, [float(x) for x in off.split(',')]))
@@ -426,14 +432,17 @@ def build(a, rd, own16):
               ho.body[0][2] * s + dz, ho.body[1][2] * s + dz, dw['z'] - dw['r']))
 
     # ---- converting Head-On meshes
-    tb = TexBuilder(car.tex, car.rtx, ho.tex, car.max_tex_id() + 1, {}, [], own16)
+    reuse = {int(k, 16): int(v) for k, v in (x.split(':') for x in a.reuse.split(',') if x)}
+    tb = TexBuilder(car.tex, car.rtx, ho.tex, car.max_tex_id() + 1, reuse,
+                    [int(x, 16) for x in a.half_keys.split(',') if x], own16)
     WHITE = 0xFFFFFFF0                 # Head-On draws texture-less meshes (TME still set) on white: give them one
     tb.ho[WHITE] = dict(img=np.full((8, 8, 4), 255, np.uint8), idx=np.zeros(64, np.uint8), bpp=4,
                         clutraw=bytes([255, 255, 255, 0x80] * 16), clut=dict(tw=3, th=1))
     if a.half:
-        tb.half = set(ho.hd[h]['texrefs'][0] for h in ho.hd if ho.hd[h]['texrefs'])
+        tb.half |= set(ho.hd[h]['texrefs'][0] for h in ho.hd if ho.hd[h]['texrefs'])
     ground = ho.wheel['z'] - ho.wheel['r']
     extra = {int(x, 16) for x in a.skip.split(',') if x}
+    skip_tex = {int(x, 16) for x in a.skip_tex.split(',') if x}
     built, skipped, fixed = {}, {}, [0, 0]
 
     def node(h, cols=None):
@@ -465,7 +474,8 @@ def build(a, rd, own16):
             m = ho.hd.get(h)
             if m is None or not m['strips']:
                 continue
-            why = 'listed' if h in extra else ho.skip_reason(h, ground, far, a.env)
+            why = 'listed' if h in extra else 'skipped texture' if set(m['texrefs']) & skip_tex else \
+                ho.skip_reason(h, ground, far, a.env)
             if why:
                 skipped[h] = why; continue
             out.append(h)
@@ -588,6 +598,7 @@ def build(a, rd, own16):
         tid = struct.unpack_from('<H', car.n, x)[0]
         if tid not in newtids:
             used.add(tid); usedc.add((struct.unpack_from('<Q', car.n, g)[0] >> 37) & 0x3fff)
+    usedc |= set(reuse.values())       # donor palettes the new textures were quantized onto
     old = [(gs & 0xffff, b) for o, b, gs, k in tb.trecs]
     oldc = [((gs >> 16) & 0xffff, clut_blocks((gs >> 40) & 15, (gs >> 44) & 15)) for o, b, gs, k in tb.rrecs]
     if not a.no_drop:
@@ -611,7 +622,7 @@ def build(a, rd, own16):
         if struct.unpack_from('<H', car.n, x)[0] in newtids:
             q = struct.unpack_from('<Q', car.n, g)[0]
             c = (q >> 37) & 0x3fff
-            struct.pack_into('<Q', car.n, g, (q & ~(0x3fff << 37)) | (remap[c] << 37))
+            struct.pack_into('<Q', car.n, g, (q & ~(0x3fff << 37)) | (remap.get(c, c) << 37))
     clut_top = int(np.nonzero(taken)[0].max()) + 1
     print('textures: donor %d (%d dropped), new %d; CLUT blocks used %d, top %d (donor %d, limit %d)' % (
         len(old), len(getattr(tb, 'drop_tids', ())), len(tb.new_tex), int(taken.sum()), clut_top,
