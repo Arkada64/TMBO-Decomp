@@ -14,6 +14,15 @@
      OFF = no health on the map at all (replaces the TMA health rule; the respawn shield stays).
   10. Environment pickups removed for good (no option), with the clouds on maps whose cloud is an environment pickup
       (Suburbs, Snowy Roads, Mini Suburbs).
+  11. Story mode (single player) with retail's cutscenes: ~2.9 GB of retail movies onto the disc (fine for PCSX2), the
+      story flow rebuilt in online's menus, each level's story events / bosses checked (retail decomp to compare).
+      Health pads back on the maps that had them in retail (single player had them).
+  12. Local co-op story (split-screen guests = retail's 2P co-op path).
+  13. Online co-op story: story enemies / bosses are AI cars (synced like bots), cutscenes and scripted events
+      host-driven (hidden chat messages).
+  14. (Last, very experimental) Roguelike story option: each round a choice of two maps from any map, a visited map
+      leaves the pool; character dialogue won't fit every stage. AI back to the human-hunting routine and doing far
+      less damage to each other, so progressing stays a challenge like normal TMB.
 
 - **Target: PCSX2 only** (Ark 2026-10-25): TMB Reloaded is unrestricted TMBO for the emulator; real PS2 hardware is
   not a goal. No view-distance / bot cuts for real-hardware limits: tune the EE cycle rate default instead (130 % now).
