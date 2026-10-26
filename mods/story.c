@@ -243,7 +243,7 @@ int tmbr_StoryMoviesDone(void)
         char f[64], path[32];
         int b;
         const char* n = movQ[movI++];
-        sprintf(f, "\\MOV\\%s.PSS;1", n);
+        sprintf(f, "%cMOV%c%s.PSS;1", 92, 92, n);   /* (backslash as a number: the mod build drops it from string literals) */
         if (!sceCdSearchFile(movFile, f)) { scePrintf("TMBR story: no %s on the disc\n", f); continue; }
         sprintf(path, "mov/%s.pss", n);
         b = playMpegMovie(path, 1, 1);
