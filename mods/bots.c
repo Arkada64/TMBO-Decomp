@@ -127,7 +127,7 @@ static int addBot(void)
         if (v >= 0 && v < 8 && F(F(g, 0x9E670 + v * 4), 0x20D0) == 0) break;
     }
     if (s == 8) return 0;
-    if (tmbr_Opt(OPT_NOMINION) && (F(D_003156C0 + s * 0x220, 0xB4) >> 5) == 15)   /* Minion off: another car */
+    if (tmbr_Opt(OPT_NOMINION) && !tmbr_Opt(0x20) && (F(D_003156C0 + s * 0x220, 0xB4) >> 5) == 15)   /* Minion off: another car */
         F(D_003156C0 + s * 0x220, 0xB4) = mathfRandI(1, 14) << 5;
     veh = gameMakeAI(g, v, F(D_003156C0 + s * 0x220, 0xB4), v, -1, 1);
     if (!veh) return 0;
@@ -410,6 +410,16 @@ static void optSync(int flip)
         if (gi[0xC7] != bb) { gi[0xC7] = bb; flip = 1; }
     }
     if (flip || want != has) netSendGameInfo(D_003156C0, -1);
+}
+/* host: set / clear option bits (story.c) */
+void tmbr_OptSet(int bits, int on)
+{
+    char* gi = GINFO();
+    int cur, want;
+    if (!gi) return;
+    cur = gi[0xC6] & bits;
+    want = on ? bits : 0;
+    if (cur != want) optSync(cur ^ want);
 }
 extern int tmbr_TeamOf(char* v);         /* teams.c */
 extern void tmbr_TeamsFrame(void);
@@ -1817,7 +1827,13 @@ static void extraLines(int row)
         extern void tmbr_GuestsLine(char* b);
         char gb[64];
         tmbr_GuestsLine(gb);
-        if (gb[0]) lobbyLine(row + (teams ? 5 : 4), -1, gb);
+        if (gb[0]) { lobbyLine(row + (teams ? 5 : 4), -1, gb); row++; }
+    }
+    {   /* story run (story.c): "STAGE 2: SUBURBS" */
+        extern void tmbr_StoryLine(char* b);
+        char sb[40];
+        tmbr_StoryLine(sb);
+        if (sb[0]) lobbyLine(row + (teams ? 5 : 4), -1, sb);
     }
     fontSetColor(0, 0x50, 0x44, 0x2C);
 }
@@ -1848,8 +1864,8 @@ void tmbr_LobbyFrame(void)
             lobbyLine(10, -1, teams ? "LEFT/RIGHT : PICK TEAM" : "THE HOST SETS BOTS,");
             lobbyLine(11, -1, teams ? "SELECT : SHOW TEAMS" : "TRAFFIC AND TEAMS");
         } else {
-            lobbyLine(10, -1, teams ? "L1/R1 BOTS  LEFT/RIGHT TEAM" : "L1/R1 BOTS  L2/R2 SKILL");
-            lobbyLine(11, -1, teams ? "UP TRAF DN TEAMS TRI MIN O HP" : "UP TRAF DN TEAMS TRI MIN O HP");
+            lobbyLine(10, -1, teams ? "L1R1 BOT LT/RT TEAM SQ STORY" : "L1R1 BOT L2R2 SKILL SQ STORY");
+            lobbyLine(11, -1, "UP TRAF DN TEAM TRI MIN O HP");
         }
     } else if (teams && (pad & 0x1)) {
         lobbyLine(10, 0, ra);
@@ -1861,6 +1877,7 @@ void tmbr_LobbyFrame(void)
     }
     fontSetColor(0, 0x50, 0x44, 0x2C);
     if (!host) return;
+    { extern void tmbr_StoryLobby(void); tmbr_StoryLobby(); }   /* story.c: R3 + Square, its level rules */
     if ((pad & 0x4) && (pressed & 0x3050)) {
         {   /* Down cycles: teams off -> 2 teams -> 4 teams -> off; Triangle: Minion on / off */
             int f = (pressed & 0x10) ? OPT_TRAFFIC : 0;

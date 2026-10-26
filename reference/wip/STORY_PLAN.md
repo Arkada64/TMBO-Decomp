@@ -51,3 +51,12 @@ files picked only in story mode. Later: local co-op story (split-screen guests),
   characters differ only in movies / endings.
 - TMBO has neither SelectAICars nor RandomlySelectAI; our bots.c already spawns bots with chosen cars (+0xB4), so
   phase 1 = drive the existing bot spawner from these tables.
+
+## Phase 1 status (2026-10-26, mods/story.c)
+- Host lobby R3 + Square = STORY on/off. On: level = the story level (shell +0x23AC, goes out in the game info),
+  Last Man Standing (game info bits 1-4 = 3), 3 lives (+5), teams 2 + HUMANS VS BOTS, bots = retail's count
+  (capped at the free slots), distinct random drivers that are not a human's (Minion alone on his stadium),
+  no 12 Pak bots. Box line "STAGE n: LEVEL"; at a fork L3 swaps the branch. Win (teams.c winner = humans'
+  team) -> next stage; else "TRY AGAIN". Warhawk's Roof is a stand-in (6 bots, no boss) until phase 4.
+- Tested (qb g71): toggle -> JUNKYARD, LMS, teams 2, humans vs bots, 6 bots + guest, level loads. Win / loss
+  advance not yet seen in a test (needs a played match). No save yet.

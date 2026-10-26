@@ -305,7 +305,8 @@ void tmbr_BotCars(void* net)
 {
     int k, s, pak = 0;
     netRandomBotCars(net);
-    for (s = 0; s < 8; s++) {          /* bots' cars: 12 Pak as often as any other car (1 in 16; TODO 6, 2026-10-26) */
+    { extern int tmbr_StoryCars(void); if (tmbr_StoryCars()) s = 8; else s = 0; }   /* story.c: its own rule */
+    for (; s < 8; s++) {          /* bots' cars: 12 Pak as often as any other car (1 in 16; TODO 6, 2026-10-26) */
         if (F(D_003156C0 + s * 0x220, 0x10) != -1 || tmbr_GuestSlot(s)) continue;
         if (mathfRandI(0, 15) == 0) { F(D_003156C0 + s * 0x220, 0xB4) = 0x20; pak |= 1 << s; }
     }

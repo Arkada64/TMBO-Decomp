@@ -88,6 +88,8 @@ void tmbr_TeamsRecv(int client, const char* msg)
     }
 }
 
+void tmbr_TeamsBotMode(int on) { if (tmbr_botTeamMode != on) { tmbr_botTeamMode = on; dirty = 1; } }   /* story.c */
+int tmbr_TeamsWinner(void) { return winner; }
 int tmbr_TeamOfSlot(int s) { return s >= 0 && s < 8 ? tmbr_team[s] : -1; }
 
 /* team of a car: a bot's slot (host knows it), else its player slot (+0x20C0), else by car index */
