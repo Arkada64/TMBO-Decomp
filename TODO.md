@@ -76,7 +76,8 @@
   10. DONE 2026-10-26 (pickup type 8 hidden every frame and can't be taken; 5 hidden on the test map).
       Environment pickups removed for good (no option), with the clouds on maps whose cloud is an environment pickup
       (Suburbs, Snowy Roads, Mini Suburbs).
-  11. Story mode (single player) with retail's cutscenes: ~2.9 GB of retail movies onto the disc (fine for PCSX2), the
+  11. (Plan: reference/wip/STORY_PLAN.md, 2026-10-26 - phases: offline story run, movies, story level files, bosses,
+      co-op.) Story mode (single player) with retail's cutscenes: ~2.9 GB of retail movies onto the disc (fine for PCSX2), the
       story flow rebuilt in online's menus, each level's story events / bosses checked (retail decomp to compare).
       Health pads back on the maps that had them in retail (single player had them).
       Retail's story versions of the maps go on the disc as separate files (e.g. \LVL\SP_SUBURB.*) and the level
