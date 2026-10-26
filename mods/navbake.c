@@ -54,7 +54,7 @@ static const struct { int level; u32 addr, room; int late; } NAV_LEVELS[] = {
 };
 #define NLEV ((int)(sizeof(NAV_LEVELS) / sizeof(NAV_LEVELS[0])))
 
-static float KB[4] = { 1e30f, 0.25f, 16.0f, 0.75f };   /* no float literals in code (.lit4 is gp-relative) */
+static float KB[5] = { 1e30f, 0.25f, 16.0f, 0.75f, 0.41421f };   /* [4] tan 22.5 deg; no float literals in code (.lit4 is gp-relative) */
 static NavHdr* nav;            /* loaded map of the current level, or 0 */
 static NavNode* nodes;
 static int navLevel = -1;
@@ -155,6 +155,32 @@ static int nearest(fvec* p)
                 }
             }
     return best;
+}
+
+/* ---- obstacle feelers (bots.c avoidance): how far a car can drive from p along a heading on the route map ----
+ * The heading (fx, fy) is rounded to the nearest of the 8 lattice directions; from the node nearest p the walk
+ * follows that direction's links (a link exists only where a car can drive: no wall, no slope over ~41 deg, no
+ * drop) for up to maxc cells. Returns the free cells straight ahead; *l / *r get the same 45 deg to the left /
+ * right (counter-clockwise from above = left, Z up). -1: no map / off the map. */
+static int walk(int k, int d, int maxc)
+{
+    int c = 0;
+    while (c < maxc && k >= 0 && (nodes[k].links >> d & 1)) { k = neighbour(k, d); if (k < 0) break; c++; }
+    return c;
+}
+int tmbr_NavFeel(fvec* p, float fx, float fy, int maxc, int* l, int* r)
+{
+    int k, d;
+    float ax = fx < 0 ? -fx : fx, ay = fy < 0 ? -fy : fy;
+    if (!tmbr_NavBaked()) return -1;
+    k = nearest(p);
+    if (k < 0) return -1;
+    if (ay < ax * KB[4]) d = fx > 0 ? 0 : 4;
+    else if (ax < ay * KB[4]) d = fy > 0 ? 2 : 6;
+    else d = fx > 0 ? (fy > 0 ? 1 : 7) : (fy > 0 ? 3 : 5);
+    *l = walk(k, (d + 1) & 7, maxc);
+    *r = walk(k, (d + 7) & 7, maxc);
+    return walk(k, d, maxc);
 }
 
 /* ---- A* with a hash of visited nodes ---- */

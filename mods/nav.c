@@ -302,6 +302,8 @@ float tmbr_NavSteer(char* v, float dx, float dy, int gas)
     else if (fabs_(err) > K[9] && gas && (navFrame + (int)(v - D_004FA030) / 0x31B0 * 3) % 10 < 3) pad[2] = 1;
     return fabs_(err);
 }
+/* bots.c avoidance: this bot drives a planned route-map path right now (the path already goes round walls) */
+int tmbr_NavFollowing(char* v) { int i = vidx(D_004FA030, v); return i >= 0 && nb[i].st == 2; }
 /* breakaway (bots.c): the next roam goal should be far from here */
 void tmbr_NavRoamFar(char* g, char* v) { int i = vidx(g, v); if (i >= 0) { nb[i].far = 1; if (nb[i].roam) nb[i].st = 0; } }
 

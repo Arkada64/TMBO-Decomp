@@ -1240,6 +1240,45 @@ static void energyUse(char* g, char* v, int evading)
     }
 }
 
+
+/* ---- wall / hill avoidance (Ark 2026-10-25: bots still drove into hills and walls) ----
+ * Every AV_EVERY frames each bot moving forward feels ahead on the baked route map (navbake.c tmbr_NavFeel:
+ * drivable links straight on and 45 deg left / right, up to AV_LOOK cells, ~130-160 units). Blocked closer than
+ * AV_NEAR cells straight on: steer to the freer side for AV_HOLD frames (both sides equal: keep the side the
+ * wheel already turns to). Not while ramming a target dead ahead, reversing, or before the unstick code. */
+#define AV_EVERY 4
+#define AV_LOOK 4
+#define AV_NEAR 3
+#define AV_HOLD 8
+extern int tmbr_NavFeel(void* p, float fx, float fy, int maxc, int* l, int* r);   /* navbake.c */
+extern int tmbr_NavFollowing(char* v);   /* nav.c */
+static signed char avDir[8], avT[8];
+static void avoid(char* g, char* v)
+{
+    unsigned char* pad = PAD(v);
+    char* br = (char*)F(v, 0x2014);
+    char* cs = (char*)F(v, 0x2028);
+    int idx = (int)(v - g) / 0x31B0, f, l, r;
+    if (idx < 0 || idx > 7 || !cs || !br) return;
+    if (avT[idx] > 0) {
+        avT[idx]--;
+        if (pad[6]) return;
+        pad[9] = avDir[idx] < 0; pad[0xA] = avDir[idx] > 0;
+        return;
+    }
+    if ((thinkTick + idx) % AV_EVERY || !pad[4] || pad[6] || tmbr_NavFollowing(v)) return;
+    {   /* ramming / shooting a target right ahead: let it */
+        int d = fbits(*(float*)(br + 0x20)), a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF;
+        if (d >= 0 && d < OR_WIDE && a < CS_AIM) return;
+    }
+    /* forward = row 1 of the cs rotation (cs+0x20: m[4], m[5]) */
+    f = tmbr_NavFeel(cs + 0x10, *(float*)(cs + 0x30), *(float*)(cs + 0x34), AV_LOOK, &l, &r);
+    if (f < 0 || f >= AV_NEAR) return;
+    avDir[idx] = l > r ? -1 : r > l ? 1 : (pad[9] ? -1 : pad[0xA] ? 1 : ((idx & 1) ? 1 : -1));
+    avT[idx] = AV_HOLD;
+    pad[9] = avDir[idx] < 0; pad[0xA] = avDir[idx] > 0;
+}
+
 static int aiUpdate(char* v);
 extern void padClear(char* v) __asm__("vehicleSaveAndClearPadFlags__7Vehicle");
 int tmbr_AiUpdate(char* v)
@@ -1254,6 +1293,7 @@ int tmbr_AiUpdate(char* v)
         if (!dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]) ev = evade(D_004FA030, v);   /* (a dodge in progress wins) */
         turboUse(D_004FA030, v, ev || dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]);
         energyUse(D_004FA030, v, ev);
+        avoid(D_004FA030, v);
         unstick(D_004FA030, v);
     }
     return r;
