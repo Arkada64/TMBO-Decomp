@@ -230,6 +230,10 @@ int tmbr_BotsSpawn(void* net, int slot)
     syncPending = 0;
     balance(0);
     scePrintf("TMBR bots: start, %d humans, %d bots (setting %d)\n", humans(), NAI(D_004FA030), tmbr_botCount);
+    {   int q;                                       /* (debug 2026-10-26: which car each slot / vehicle has) */
+        for (q = 0; q < 8; q++) scePrintf("TMBR bots: slot %d car %x net veh %d | vehicle %d id %x load %d kind %d\n", q,
+            F(D_003156C0 + q * 0x220, 0xB4), netSlotVehicle(D_003156C0, q), q, F(D_004FA030 + q * 0x31B0, 0x20F4),
+            F(D_004FA030 + q * 0x31B0, 0x20F0), F(D_004FA030 + q * 0x31B0, 0x590)); }
     return 1;
 }
 
