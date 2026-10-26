@@ -51,6 +51,20 @@ def main():
                 if k < len(G): d.line([P(*a['p'][:2]), P(*G[k]['p'][:2])], fill=(110, 140, 255), width=1)
         for a in G:
             q = P(*a['p'][:2]); d.ellipse([q[0] - 3, q[1] - 3, q[0] + 3, q[1] + 3], fill=(110, 140, 255))
+    # the street points the game loaded ("TMBR tp" lines, TRAFFIC_TRACE builds): the lanes, faint green
+    rxp = re.compile(r'TMBR tp (\d+) (\d+): (-?\d+) (-?\d+) (-?\d+) n (-?\d+) k (-?\d+) l (.*)')
+    SP = {}
+    for f in logs:
+        for line in open(f, errors='replace'):
+            m = rxp.search(line)
+            if m and int(m.group(1)) == LEVEL[name]:
+                SP[int(m.group(2))] = (int(m.group(3)), int(m.group(4)), [int(x) for x in m.group(8).split()][:max(0, int(m.group(6)))])
+    for i, (x, y, L) in SP.items():
+        for k in L:
+            if k in SP: d.line([P(x, y), P(*SP[k][:2])], fill=(90, 230, 120), width=2)
+            else: q = P(x, y); d.line([q[0], q[1], q[0] + 25, q[1] - 25], fill=(255, 0, 255), width=3)  # link to a missing point
+    for i, (x, y, L) in SP.items():
+        q = P(x, y); d.ellipse([q[0] - 4, q[1] - 4, q[0] + 4, q[1] + 4], fill=(90, 230, 120))
     T = tracks(logs, LEVEL[name])
     W = max(2, int(max(im.size) / 700))
     nst = nhw = 0

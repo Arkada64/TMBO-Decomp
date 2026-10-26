@@ -67,6 +67,7 @@ static int doneSerial = -1;
 static char* cars;       /* traffic vehicle array */
 static int ncars;
 static int deadT[MAXCARS];   /* frames since destroyed (0 = alive) */
+static char csInit[MAXCARS];   /* cs placed from the vehicle once (cheap mode) */
 static void respawn(char* v);
 
 static void addFodder(char* v, void* cs, int name, int nameIndex)
@@ -100,7 +101,7 @@ static void setup(void)
     char *drv, *hwdrv;
     static int gHead[64], gName[64], gFirst[64], gLast[64], order[64];
     ncars = 0;
-    for (i = 0; i < MAXCARS; i++) deadT[i] = 0;
+    for (i = 0; i < MAXCARS; i++) deadT[i] = 0, csInit[i] = 0;
     if (!D_004FAE38) return;
     for (i = 0; i < tmbr_numFodderLevels; i++)
         if (tmbr_fodderLevels[i].level == tmbr_levelIndex) {
@@ -115,6 +116,14 @@ static void setup(void)
         F(game, 0x34890), F(game, 0x34890 + 0x248));
     type = F(game, 0x9FCA0);
     points = F(game, 0x34890 + 0x248);
+    if (TRAFFIC_TRACE && points > 0) {      /* the street points (lanes): 32-byte AttractPoints, links at +0x10 */
+        char* pp = (char*)F(game, 0x34890);
+        for (i = 0; i < points && i < 512; i++, pp += 32) {
+            short* l = (short*)(pp + 0x10);
+            scePrintf("TMBR tp %d %d: %d %d %d n %d k %d l %d %d %d %d %d %d\n", tmbr_levelIndex, i, (int)*(float*)pp,
+                (int)*(float*)(pp + 4), (int)*(float*)(pp + 8), pp[0x1E], l[6], l[0], l[1], l[2], l[3], l[4], l[5]);
+        }
+    }
     /* group the nodes like retail FodderParse: a car per base node (sub 0), attachments follow it */
     for (i = 0; i < n; i++) {
         u32 id = *(u32*)nodes[i] >> 18;
@@ -496,9 +505,17 @@ void tmbr_TrafficUpdate(void)
             vehicleSetCsMat(v);
             vehicleAfterNewPos(v);
         } else {
-            /* cheap mode (off screen): the drivers move the vehicle, not its cs. MINIBURB's street cars stayed
-             * at the origin (cs never set), so never on screen, so never out of cheap mode. */
-            vehicleSetCsMat(v);
+            /* cheap mode (off screen): FodderDriver::updatePosition moves and turns the car's cs (its driver +4),
+             * not the vehicle. So the first time, the cs gets the vehicle's placement (MINIBURB's street cars stayed
+             * at the origin, cs never set); after that the cs is the truth and goes into the vehicle state - it was
+             * the other way round every frame, which put the placement heading back on the cs each frame: cars
+             * far from every player drove dead straight off their lanes and off the map (route traces 2026-10-25). */
+            if (!csInit[j]) { vehicleSetCsMat(v); csInit[j] = 1; }
+            else if (cs) {
+                int q;
+                for (q = 0; q < 4; q++) ((int*)(v + 0x270))[q] = ((int*)(cs + 0x10))[q];
+                for (q = 0; q < 16; q++) ((int*)(v + 0x50))[q] = ((int*)(cs + 0x10))[4 + q];
+            }
         }
         tmbr_PerfAdd(5, tp);
     }

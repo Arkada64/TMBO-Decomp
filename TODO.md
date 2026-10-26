@@ -16,9 +16,9 @@
     %d Artifacts"); route to the nearest, chase carriers. TEAM FOX HUNT exists in the strings; maybe a cut mode.
 - **Ship (level 15)**: stuck spot near (-460, 518); game code func_0018F8E0 reads through a null table there
   (51 TLB misses, log 2026-10-24) - check whether vanilla does it too.
-- **Suburbs traffic** (mods/traffic.c): online Suburbs had traffic stripped; we use retail's models (ZSF pack) on the
-  online map's leftover street points (280). Half the cars spawn at z ~280-313 vs ~70-130, and cars drive off the road.
-  Next: dump the points from one run, drop the ones far above their neighbours / not in a lane; else traffic off there.
+- **Traffic routes**: fixed 2026-10-25 (cheap-mode cs overwritten from the stale vehicle every frame: far cars drove
+  straight off their lanes). Route maps: TRAFFIC_TRACE build + tools/traffic (trafmap.py over the nav heightfields);
+  all 6 traffic maps follow their street lanes now. Left: in-play check of the switch between cheap and full physics.
 - **Stress test: big maps, full bots, split screen** (Ark 2026-10-25; maybe after the decomp is complete). Find the load
   ceiling and set a load-based bot cap. The slot cap already exists (bots.c `wanted`: bots <= 8 - connected humans,
   rebalanced on join / leave); what is missing is a cap by local screens / traffic.
