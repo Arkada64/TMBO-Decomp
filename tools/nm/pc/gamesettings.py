@@ -10,5 +10,5 @@ c = crc(sys.argv[1])
 p = "%s/SCUS-97196_%08X.ini" % (G, c)
 if os.path.exists(p) and "EECycleRate" in open(p).read(): print("gamesettings: already there", p); sys.exit(0)
 with open(p, "a") as f: f.write("; TMB Reloaded build (written by the ISO build)\n[EmuCore/Speedhacks]\nEECycleRate = 1\n"
-                               "[EmuCore/GS]\nAspectRatio = 16:9\n")   # widescreen: the build renders a 16:9 picture (freecam.c)
+                               )   # (widescreen / AspectRatio 16:9 off until the HUD is laid out for it)
 print("gamesettings: wrote", p)

@@ -111,10 +111,11 @@ static char* splitCar[4];
  * Every view gets a 4/3 wider horizontal field of view with the same vertical one, and PCSX2 shows the picture at
  * 16:9 (gamesettings.py: AspectRatio). viewSetFov(view, a, b): a is the projection distance (the function does
  * atan(x / a)), b the vertical scale - a x 3/4 and b x 4/3 (test 2026-10-26: same view of the same car, the
- * picture 4/3 wider, the height the same). Checked 0.5 s after the level starts, then every second, and when
- * the split-screen views are made; a view that already has our value is left alone (no stacking).
+ * picture 4/3 wider, the height the same). Applied 0.5 s after the level starts and when the split-screen views
+ * are made (viewCreate resets them).
  * tmbr_wide[1]: 1 on (default), 0 off; tests: 8 = 2 views both on the player, view 1 widened. */
-int tmbr_wide[2] = { 0x45444957, 1 };   /* "WIDE" */
+int tmbr_wide[2] = { 0x45444957, 0 };   /* "WIDE" - off by default until the HUD is laid out for 16:9 (2026-10-26: the
+                                         * 3D-placed HUD parts moved inward and the online score sat on the weapon list) */
 extern void viewSetFov(int i, float a, float b) __asm__("viewSetFov__Fiff");
 extern void viewGetFov(int i, float* a, float* b) __asm__("viewGetFov__FiPfT1");
 extern int viewGetNumViews(void) __asm__("viewGetNumViews__Fv");
@@ -130,6 +131,8 @@ static void wideApply(int views)
         if (a == wideSet[i]) continue;          /* ours already */
         a = a * KW[1]; b = b * KW[0];
         viewSetFov(i, a, b);
+        viewGetFov(i, &a, &b);                  /* what the view reports back now (not exactly what was set: the
+                                                 * first test re-widened every second - 2026-10-26) */
         wideSet[i] = a;
         scePrintf("TMBR wide: view %d\n", i);
     }
@@ -139,7 +142,8 @@ static void wideFrame(void)
 {
     if (!tmbr_wide[1]) return;
     if (wideSerial != tmbr_levelSerial) { wideSerial = tmbr_levelSerial; wideWait = 30; return; }
-    if (--wideWait <= 0) { wideWait = 60; wideApply(viewGetNumViews()); }   /* then every second (a view the game resets gets it back) */
+    if (wideWait > 0 && --wideWait == 0) wideApply(viewGetNumViews());   /* once (re-checking every second widened again
+                                                                          * and again: the read-back differs, 2026-10-26) */
 }
 static void splitFrame(char* cam)
 {

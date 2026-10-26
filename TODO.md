@@ -29,7 +29,11 @@
         players can position them.
   13. Online co-op story: story enemies / bosses are AI cars (synced like bots), cutscenes and scripted events
       host-driven (hidden chat messages).
-  14. (Last, very experimental) Roguelike story option: each round a choice of two maps from any map, a visited map
+  4b. Widescreen done properly (Ark 2026-10-26): the FOV change works, but the HUD parts placed through the 3D
+      projection moved inward and the online score text sat on the weapon list / health. Lay the HUD out for 16:9
+      (elements to the edges, sprites x 3/4 so they aren't stretched); widescreen stays off by default until then.
+  14. (Last, very experimental) Roguelike story option (no story: online's default loading screen instead of the
+      story loading screens / dialogue, no cutscenes; synchronous entry by default so everyone starts together): each round a choice of two maps from any map, a visited map
       leaves the pool; character dialogue won't fit every stage. AI back to the human-hunting routine and doing far
       less damage to each other, so progressing stays a challenge like normal TMB.
 

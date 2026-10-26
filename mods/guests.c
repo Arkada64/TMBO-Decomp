@@ -37,7 +37,7 @@ static signed char padOf[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };   /* car slot 
 static char* guestCar[4];
 static int guestN;
 static int joinCar[4], joinSlot[4] = { -1, -1, -1, -1 };   /* per controller 2..4 (index 1..3): car, net slot */
-static int picking, pickSavedCar, pickSavedPos, prevBtn[4];
+static int picking, pickSavedCar, pickSavedPos, prevBtn[4], idleT[4];
 
 int tmbr_GuestCount(void) { return guestN; }
 int tmbr_GuestPicking(void) { return picking; }
@@ -160,12 +160,28 @@ static int reserveSlot(void)
     }
     return -1;
 }
+extern int inputIsCtlAvailable(int pad, int b) __asm__("inputIsCtlAvailable__Fib");
+/* a controller's buttons (active high), -1 when it is not there / not ready / reads as all pressed */
+static int padBtn(int pad)
+{
+    int b = inputGetPadButtons(pad) & 0xFFFF;
+    static int logT;
+    if (pad == 2 && ++logT % 120 == 0)            /* (debug: what controllers 2-4 read in the waiting room) */
+        scePrintf("TMBR guests: pads 2 %04x %d 4 %04x %d 6 %04x %d\n", inputGetPadButtons(2) & 0xFFFF, inputIsCtlAvailable(2, 1),
+            inputGetPadButtons(4) & 0xFFFF, inputIsCtlAvailable(4, 1), inputGetPadButtons(6) & 0xFFFF, inputIsCtlAvailable(6, 1));
+    return b == 0xFFFF ? -1 : b;
+}
 void tmbr_GuestsLobby(void)
 {
     int k;
     if (D_004FA684 != UI_ROOM || picking) return;
     for (k = 1; k <= 3; k++) {
-        int b = inputGetPadButtons(2 * k), pr = b & ~prevBtn[k];
+        int b = padBtn(2 * k), pr;
+        /* a press counts only after the controller has been seen answering with nothing pressed for a while
+         * (a missing / not-ready multitap slot reads as garbage: everything pressed, test 2026-10-26) */
+        if (b < 0) { idleT[k] = 0; prevBtn[k] = 0; continue; }
+        if (!(b & (B_START | B_SELECT))) { if (idleT[k] < 100) idleT[k]++; }
+        pr = idleT[k] >= 30 ? b & ~prevBtn[k] : 0;
         prevBtn[k] = b;
         if ((pr & B_START) && !joinCar[k]) {
             if (!netIsHost(D_003156C0)) { scePrintf("TMBR guests: joining on a client console is not done yet\n"); continue; }
@@ -204,7 +220,10 @@ void tmbr_CarSelNet(void* net, int st)
 /* the UI's pad (func_001CE258): the picking guest's controller while it picks */
 int tmbr_UiPadButtons(int pad)
 {
-    return inputGetPadButtons(picking ? 2 * picking : pad);
+    int b;
+    if (!picking) return inputGetPadButtons(pad);
+    b = padBtn(2 * picking);
+    return b < 0 ? 0 : b;
 }
 /* car select frame (skins.c): title for a guest's pick */
 extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
