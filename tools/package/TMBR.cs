@@ -1,7 +1,7 @@
 // TMBR launcher (Ark 2026-10-26, TODO 4d): one window - Play, a few toggles, PCSX2 settings.
 // Build (Windows, .NET Framework 4 csc): csc /target:winexe /win32icon:TMBR.ico /resource:logo.png,TMBR.logo.png /out:TMBR.exe TMBR.cs
 // (TMBR.ico / logo.png: the game's own logo, SHELL1.TEX textures 60-62 - tools/package/logo.py)
-// Lives next to pcsx2-qt.exe in the TMBR player folder; the game image is game\TMBR.iso.
+// (HD textures dropped 2026-10-26, Ark.) Lives next to pcsx2-qt.exe in the TMBR player folder; the game image is game\TMBR.iso.
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -13,14 +13,14 @@ class TMBR : Form
     string dir = AppDomain.CurrentDomain.BaseDirectory;
     string Ini { get { return Path.Combine(dir, "inis", "PCSX2.ini"); } }
     string Iso { get { return Path.Combine(dir, "game", "TMBR.iso"); } }
-    CheckBox hd, full, wide, potato;
+    CheckBox full, wide, potato;
     Label note;
 
     TMBR()
     {
         Text = "Twisted Metal: Black Reloaded";
         FormBorderStyle = FormBorderStyle.FixedSingle; MaximizeBox = false;
-        ClientSize = new Size(360, 330); BackColor = Color.FromArgb(24, 24, 24); ForeColor = Color.Gainsboro;
+        ClientSize = new Size(360, 300); BackColor = Color.FromArgb(24, 24, 24); ForeColor = Color.Gainsboro;
         Font = new Font("Segoe UI", 10);
         Control title;
         var res = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("TMBR.logo.png");
@@ -31,14 +31,13 @@ class TMBR : Form
             Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
         } else title = new Label { Text = "TMB RELOADED", Font = new Font("Segoe UI", 18, FontStyle.Bold), ForeColor = Color.FromArgb(230, 60, 40), AutoSize = true, Location = new Point(16, 10) };
         int y0 = title.Bottom + 8;
-        hd = Box("HD textures (needs a stronger GPU)", y0);
-        wide = Box("16:9 picture", y0 + 26);
-        full = Box("Fullscreen", y0 + 52);
-        potato = Box("Potato mode (native resolution, for weak PCs)", y0 + 78);
-        var play = Btn("PLAY", 16, y0 + 118, 160); play.BackColor = Color.FromArgb(150, 30, 20);
-        var set = Btn("PCSX2 settings", 184, y0 + 118, 160);
-        note = new Label { AutoSize = false, Size = new Size(330, 22), Location = new Point(16, y0 + 160), ForeColor = Color.Gray };
-        Controls.AddRange(new Control[] { title, hd, wide, full, potato, play, set, note });
+        wide = Box("16:9 picture", y0);
+        full = Box("Fullscreen", y0 + 26);
+        potato = Box("Potato mode (native resolution, for weak PCs)", y0 + 52);
+        var play = Btn("PLAY", 16, y0 + 92, 160); play.BackColor = Color.FromArgb(150, 30, 20);
+        var set = Btn("PCSX2 settings", 184, y0 + 92, 160);
+        note = new Label { AutoSize = false, Size = new Size(330, 22), Location = new Point(16, y0 + 134), ForeColor = Color.Gray };
+        Controls.AddRange(new Control[] { title, wide, full, potato, play, set, note });
         play.Click += (s, e) => Launch(true);
         set.Click += (s, e) => Launch(false);
         Load += (s, e) => Read();
@@ -53,7 +52,6 @@ class TMBR : Form
     {
         if (!File.Exists(Ini)) { note.Text = "inis\\PCSX2.ini is missing"; return; }
         var l = File.ReadAllLines(Ini);
-        hd.Checked = Get(l, "LoadTextureReplacements") == "true";
         wide.Checked = Get(l, "AspectRatio") == "16:9";
         full.Checked = Get(l, "StartFullscreen") == "true";
         potato.Checked = Get(l, "upscale_multiplier") == "1";
@@ -64,8 +62,6 @@ class TMBR : Form
     void Write()
     {
         var l = File.ReadAllLines(Ini);
-        Set(l, "LoadTextureReplacements", hd.Checked ? "true" : "false");
-        Set(l, "PrecacheTextureReplacements", "false");
         Set(l, "AspectRatio", wide.Checked ? "16:9" : "Auto 4:3/3:2");
         Set(l, "StartFullscreen", full.Checked ? "true" : "false");
         Set(l, "upscale_multiplier", potato.Checked ? "1" : "3");

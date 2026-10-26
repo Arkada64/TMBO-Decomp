@@ -21,11 +21,10 @@ sed -e 's/^EnableCheats = .*/EnableCheats = false/' \
     -e '/^RecursivePaths = /d' -e '/^Paths = /d' "$R/inis/PCSX2.ini" > "$P/inis/PCSX2.ini"
 grep -q "^StandardVolume = 0" "$P/inis/PCSX2.ini" && sed -i 's/^StandardVolume = 0/StandardVolume = 100/; s/^FastForwardVolume = 0/FastForwardVolume = 100/' "$P/inis/PCSX2.ini"
 sed -i 's/^SDL = false/SDL = true/' "$P/inis/PCSX2.ini"
-# HD pack (hard links into the renamed copy: no extra disk)
-[ -d "$P/textures/SCUS-97196" ] || cp -al "$W/Textures/SCUS-97196" "$P/textures/"
+# (HD texture pack dropped 2026-10-26, Ark)
 # launcher
-cp "$W/cloud/in/pkg/TMBR.cs" "$P/TMBR.cs"
-( cd "$P" && /mnt/c/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe /nologo /target:winexe /out:TMBR.exe TMBR.cs ) && rm "$P/TMBR.cs"
+cp "$W/cloud/in/pkg/TMBR.cs" "$W/cloud/in/pkg/TMBR.ico" "$W/cloud/in/pkg/logo.png" "$P/"
+( cd "$P" && /mnt/c/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe /nologo /target:winexe /win32icon:TMBR.ico /resource:logo.png,TMBR.logo.png /out:TMBR.exe TMBR.cs ) && rm "$P/TMBR.cs" "$P/TMBR.ico" "$P/logo.png"
 cp "$W/cloud/in/pkg/README.txt" "$P/"
 du -sh --apparent-size "$P"; du -sh "$P"/* | sort -h | tail -8
 grep -n "^EECycleRate\|^MultitapPort1\|^AspectRatio\|^upscale\|^Renderer\|^LoadTextureReplacements\|^StartFullscreen\|^EnableWideScreenPatches\|^StandardVolume\|^SDL =" "$P/inis/PCSX2.ini"

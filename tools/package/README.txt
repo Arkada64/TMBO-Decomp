@@ -4,7 +4,7 @@ Twisted Metal: Black Reloaded - player package
 2. Put the game image in "game" as TMBR.iso.
 3. Run TMBR.exe, pick your options, press PLAY.
 
-Options: HD textures (the community HD pack, needs a stronger GPU), 16:9 picture, fullscreen,
+Options: 16:9 picture, fullscreen,
 potato mode (native resolution for weak PCs). "PCSX2 settings" opens the emulator's own settings
 (controllers, renderer ...).
 
