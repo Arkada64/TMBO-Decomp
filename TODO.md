@@ -69,8 +69,9 @@
      behind, Outlaw at 100-350 now and then; the special consumes the flag - tested; the special-up energy combo did
      not set it for them). Outlaw turret secondary / Manslaughter drop-behind (Launcher::UpdateSpecial 0x15CD80).
   8. Minion toggle on the native game mods page.
-  9. DONE 2026-10-26 (lobby HEALTH : ON / OFF, host R3 + Circle; off hides health / full-health pickups and
-     TakeHit ignores them - tested: 3-5 hidden on the test map). HEALTH lobby option: ON = health pickups spawn and can be picked up (overrides the TMA ruleset's no-health);
+  9. DONE 2026-10-26 (lobby HEALTH : ON / OFF, host R3 + Circle, OFF by default = the baked TMA rule (mods/tmbr.pnach
+     makes func_001E32D8, the add-health function, return at once); ON writes its first two instructions back. OFF
+     also hides health / full-health pickups and TakeHit ignores them). HEALTH lobby option: ON = health pickups spawn and can be picked up (overrides the TMA ruleset's no-health);
      OFF = no health on the map at all (replaces the TMA health rule; the respawn shield stays).
   10. DONE 2026-10-26 (pickup type 8 hidden every frame and can't be taken; 5 hidden on the test map).
       Environment pickups removed for good (no option), with the clouds on maps whose cloud is an environment pickup
@@ -110,7 +111,9 @@
       multitap, renderer), a TMBR.exe launcher that boots the ISO straight in (-batch -fullscreen), and toggles
       (HD textures, potato preset, upscale, later widescreen). The user supplies the BIOS; a rebuilt PCSX2 means
       publishing its source (GPL).
-  4e. Retail loading screen (Ark 2026-10-26): TMB's load screen where the top and bottom halves come crashing
+  4e. DONE 2026-10-26, Ark to judge (guests.c tmbr_LoadScreen, hook 0x1B3CA4 = UI state 0x29's func_001CBD18:
+      halves 9902 top / 9901 bottom = shell +0xB950 screens, slam together with gravity + bounce + shell sfx 0xD,
+      then the load). Retail loading screen (Ark 2026-10-26): TMB's load screen where the top and bottom halves come crashing
       down; TMBO skips it. Bring it back for TMBR's level loads.
       Findings 2026-10-26 (retail decomp ~/tmb_decomp on the PC, symbols): retail uiLoadLevel__Fv (0x194C60, a UI
       state: setPov, smoothEasyIn, levelLoadCharBlurb) + LoadingBarBackground__Fv (0x1944B0: 63 hierSetSwitch,

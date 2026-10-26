@@ -371,10 +371,51 @@ void tmbr_GuestPickEnd(int accept)
     D_004FA718 = 0x75;                                  /* camera back to the room (as car select's own confirm) */
     D_004FA688 = UI_ROOM; D_004FA910 = 0; D_004FA914 = 0; D_004FA6E4 = 1;
 }
+/* ---- the retail loading screen's crash (TODO 4e, Ark 2026-10-26: in TMB the two halves of the loading screen come
+ * crashing together; TMBO shows them already shut). The halves are shell screens (node ids 9901 = bottom half with the
+ * LOADING plate, 9902 = top half; struct shell +0xB950 + i * 0x30, its cs at +0x20, the vertical offset at cs +0x18,
+ * 0 = shut; found 2026-10-26). The loading UI state (0x29) runs func_001CBD18 (the LOADING... state, called from the
+ * UI loop at 0x1B3CA4), which starts the load at once; tmbr_LoadScreen holds it back: the halves start apart (top
+ * above the screen, bottom below), fall together with gravity, slam (the shell's crash sound, retail's 0xD), bounce
+ * a little and settle; then the original runs and the load starts. */
+extern void uiLoadLevel(void) __asm__("func_001CBD18");
+extern void shellSfx(void* snd, int id) __asm__("playShellSFXSound__10ShellSoundi");
+static int lsT, lsHold;
+static float lsY, lsV;
+/* (an array, not literals: mod code has no .lit4) start gap, gravity / frame, bounce, settle speed, crash speed */
+static float LS_F[5] = { 520.0f, 1.6f, 0.35f, 12.0f, 20.0f };
+void tmbr_LoadScreenReset(void) { lsT = 0; }
+void tmbr_LoadScreen(void)
+{
+    char *top, *bot;
+    if (!shellPtr || lsT < 0) { uiLoadLevel(); return; }
+    bot = *(char**)(shellPtr + 0xB950 + 0x20);
+    top = *(char**)(shellPtr + 0xB950 + 0x30 + 0x20);
+    if (!top || !bot) { uiLoadLevel(); return; }
+    if (lsT == 0) { lsY = LS_F[0]; lsV = 0; lsHold = 0; }
+    lsT++;
+    if (!lsHold) {
+        lsV += LS_F[1]; lsY -= lsV;
+        if (lsY <= 0) {
+            if (lsV > LS_F[3]) {                         /* impact: crash, bounce back a little */
+                if (lsV > LS_F[4]) shellSfx(shellPtr + 0x1A16C, 0xD);
+                lsY = 0; lsV = -lsV * LS_F[2];
+            } else { lsY = 0; lsV = 0; lsHold = 1; }
+        }
+        if (lsT > 150) { lsY = 0; lsV = 0; lsHold = 1; }
+    } else lsHold++;
+    *(float*)(top + 0x18) = lsY; *(float*)(bot + 0x18) = -lsY;
+    if (lsHold > 12) {                                   /* shut a moment: now the load */
+        scePrintf("TMBR loading: halves shut after %d frames\n", lsT);
+        lsT = -1;
+        uiLoadLevel();
+    }
+}
 int tmbr_UiPadButtons(int pad)
 {
     static int prev, held;
     int b, pr;
+    if (D_004FA684 != 0x29) tmbr_LoadScreenReset();   /* (loading screen crash: armed again outside the load) */
     if (naming) return 0;                              /* (the keyboard reads the guest's pad itself) */
     if (!picking) { held = 0; return inputGetPadButtons(pad); }
     if (D_004FA684 != UI_CARSEL) return 0;            /* still flying in */

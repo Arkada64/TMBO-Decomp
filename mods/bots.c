@@ -12,7 +12,7 @@
 typedef unsigned int u32;
 #define F(p, off) (*(int*)((char*)(p) + (off)))
 #define OPT_NOMINION 8    /* lobby option (game info +0xC6): Minion off - car select skips him, no Minion bots */
-#define OPT_NOHEALTH 16   /* lobby option: health pickups off (TODO 9, 2026-10-26) */
+#define OPT_HEALTH 16     /* lobby option: health ON (TODO 9, 2026-10-26; off by default = the baked TMA rule) */
 extern int tmbr_Opt(int bit);
 #define MAXBOTS 7       /* 1 player + 7 bots = the 8 car slots */
 #define TMBR_BOTDBG 0
@@ -436,14 +436,27 @@ int tmbr_PickupHit(char* p, char* v, char* cs, int b)
 {
     int t = pickupType(cs);
     if (t == ENV_PICKUP) return 0;
-    if (tmbr_Opt(OPT_NOHEALTH) && healthType(t)) return 0;
+    if (!tmbr_Opt(OPT_HEALTH) && healthType(t)) return 0;
     return pickupsTakeHit(p, v, cs, b);
 }
 static void healthFrame(void)
 {
     static int shown = -1, envShown = -1;
     char* p;
-    int i, n = 0, e = 0, off = tmbr_Opt(OPT_NOHEALTH);
+    int i, n = 0, e = 0, off = !tmbr_Opt(OPT_HEALTH);
+    {   /* the baked TMA rule "No Health Pickups (always on)" makes the add-health function (func_001E32D8) return at
+         * once (jr ra; nop): HEALTH : ON puts its first two instructions back, OFF the rule's again */
+        extern void FlushCache(int mode) __asm__("FlushCache");
+        static int patched = -1;
+        unsigned* fn = (unsigned*)0x1E32D8;
+        if (off != patched) {
+            fn[0] = off ? 0x03E00008u : 0x27BDFFC0u;
+            fn[1] = off ? 0x00000000u : 0x700014A9u;
+            FlushCache(0); FlushCache(2);
+            patched = off;
+            scePrintf("TMBR health: pickups and healing %s\n", off ? "off (TMA rule)" : "on");
+        }
+    }
     if (!D_004FA030) return;
     p = D_004FA030 + 0x86340;
     for (i = 0; i < 0x68; i++) {
@@ -1793,7 +1806,7 @@ static void extraLines(int row)
     lobbyLine(row + 1, -1, tmbr_Opt(OPT_TRAFFIC) ? "TRAFFIC : ON" : "TRAFFIC : OFF");
     lobbyLine(row + 2, -1, !teams ? "TEAMS : OFF" : tmbr_Opt(OPT_TEAMS4) ? "TEAMS : 4" : "TEAMS : 2");
     lobbyLine(row + 3, -1, tmbr_Opt(OPT_NOMINION) ? "MINION : OFF" : "MINION : ON");
-    lobbyLine(row + 4, -1, tmbr_Opt(OPT_NOHEALTH) ? "HEALTH : OFF" : "HEALTH : ON");
+    lobbyLine(row + 4, -1, tmbr_Opt(OPT_HEALTH) ? "HEALTH : ON" : "HEALTH : OFF");
     row++;
     if (teams) {
         if (tmbr_botTeamMode) sprintf(b, "HUMANS VS BOTS");
@@ -1852,12 +1865,12 @@ void tmbr_LobbyFrame(void)
         {   /* Down cycles: teams off -> 2 teams -> 4 teams -> off; Triangle: Minion on / off */
             int f = (pressed & 0x10) ? OPT_TRAFFIC : 0;
             if (pressed & 0x1000) f |= OPT_NOMINION;
-            if (pressed & 0x2000) f |= OPT_NOHEALTH;
+            if (pressed & 0x2000) f |= OPT_HEALTH;
             if (pressed & 0x40) f |= !tmbr_Opt(OPT_TEAMS) ? OPT_TEAMS : !tmbr_Opt(OPT_TEAMS4) ? OPT_TEAMS4 : (OPT_TEAMS | OPT_TEAMS4);
             optSync(f);
         }
         scePrintf("TMBR lobby: traffic %s, teams %s, minion %s\n", tmbr_Opt(OPT_TRAFFIC) ? "on" : "off", !tmbr_Opt(OPT_TEAMS) ? "off" : tmbr_Opt(OPT_TEAMS4) ? "4" : "2", tmbr_Opt(OPT_NOMINION) ? "off" : "on");
-        scePrintf("TMBR lobby: health %s\n", tmbr_Opt(OPT_NOHEALTH) ? "off" : "on");
+        scePrintf("TMBR lobby: health %s\n", tmbr_Opt(OPT_HEALTH) ? "on" : "off");
     } else optSync(0);
     if ((pad & 0x4) && (pressed & 0xF00)) {
         if (pressed & 0x800) tmbr_botCount++;

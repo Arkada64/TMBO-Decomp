@@ -243,6 +243,7 @@ PATCHES = [
     # ... bot weapons pass (bots.c): heavy-weapon cooldowns, weighted pick
     (A("nonmatchings/tmb/ai/aiUpdateAttack__7Vehicle.s"), "00105BA0", "jal", "jal        tmbr_AiKeepWeapon"),
     (A("nonmatchings/tmb/ai/aiUpdateAttack__7Vehicle.s"), "00105BB0", "jal", "jal        tmbr_AiPickWeapon"),
+    (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B3CA4", "jal", "jal        tmbr_LoadScreen"),   # loading screen crash (guests.c)
     (A("tmb/collis.s"), "0011F0DC", "jal", "jal        tmbr_PickupHit"),                       # HEALTH : OFF (bots.c)
     (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167378", "jal", "jal        tmbr_PickupHit"),
     (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167454", "jal", "jal        tmbr_PickupHit"),
