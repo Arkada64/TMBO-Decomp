@@ -70,7 +70,8 @@
   9. DONE 2026-10-26 (lobby HEALTH : ON / OFF, host R3 + Circle; off hides health / full-health pickups and
      TakeHit ignores them - tested: 3-5 hidden on the test map). HEALTH lobby option: ON = health pickups spawn and can be picked up (overrides the TMA ruleset's no-health);
      OFF = no health on the map at all (replaces the TMA health rule; the respawn shield stays).
-  10. Environment pickups removed for good (no option), with the clouds on maps whose cloud is an environment pickup
+  10. DONE 2026-10-26 (pickup type 8 hidden every frame and can't be taken; 5 hidden on the test map).
+      Environment pickups removed for good (no option), with the clouds on maps whose cloud is an environment pickup
       (Suburbs, Snowy Roads, Mini Suburbs).
   11. Story mode (single player) with retail's cutscenes: ~2.9 GB of retail movies onto the disc (fine for PCSX2), the
       story flow rebuilt in online's menus, each level's story events / bosses checked (retail decomp to compare).

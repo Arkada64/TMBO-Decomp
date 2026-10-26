@@ -429,26 +429,36 @@ static int pickupType(char* cs)
     return hh ? (int)(*(unsigned*)hh >> 18) - 5000 : -1;
 }
 static int healthType(int t) { return t == 7 || t == 17; }
+/* environment pickups (type 8) are gone for good (TODO 10, Ark: no option) - on Suburbs / Snowy Roads / Mini
+ * Suburbs that pickup is the storm cloud, so the cloud goes with it */
+#define ENV_PICKUP 8
 int tmbr_PickupHit(char* p, char* v, char* cs, int b)
 {
-    if (tmbr_Opt(OPT_NOHEALTH) && healthType(pickupType(cs))) return 0;
+    int t = pickupType(cs);
+    if (t == ENV_PICKUP) return 0;
+    if (tmbr_Opt(OPT_NOHEALTH) && healthType(t)) return 0;
     return pickupsTakeHit(p, v, cs, b);
 }
 static void healthFrame(void)
 {
-    static int shown = -1;
+    static int shown = -1, envShown = -1;
     char* p;
-    int i, n = 0;
-    if (!tmbr_Opt(OPT_NOHEALTH) || !D_004FA030) return;
+    int i, n = 0, e = 0, off = tmbr_Opt(OPT_NOHEALTH);
+    if (!D_004FA030) return;
     p = D_004FA030 + 0x86340;
     for (i = 0; i < 0x68; i++) {
         char* cs;
         if (!F(p, 4 * i)) continue;
         cs = (char*)F(p, 0x60 + i * 0x18);
         if ((u32)cs < 0x100000 || (u32)cs >= 0x2000000) continue;
-        if (healthType(pickupType(cs))) { cs[0xC] = 0; n++; }
+        {
+            int t = pickupType(cs);
+            if (t == ENV_PICKUP) { cs[0xC] = 0; e++; }
+            else if (off && healthType(t)) { cs[0xC] = 0; n++; }
+        }
     }
-    if (n != shown) { shown = n; scePrintf("TMBR health: off, %d health pickups hidden\n", n); }
+    if (off && n != shown) { shown = n; scePrintf("TMBR health: off, %d health pickups hidden\n", n); }
+    if (e != envShown) { envShown = e; scePrintf("TMBR pickups: %d environment pickups hidden\n", e); }
 }
 
 void tmbr_BotsThink(void)
