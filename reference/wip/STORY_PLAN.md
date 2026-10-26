@@ -4,6 +4,11 @@ Ark: story mode (single player) with retail's cutscenes; the online menus host i
 bosses checked against retail; health pads back where retail had them; retail's story map versions as separate
 files picked only in story mode. Later: local co-op story (split-screen guests), online co-op.
 
+## Modded characters in story (Ark 2026-10-26)
+A modded character (12 Pak, the Harbor City cars, ...) uses the story files of the character it borrows its stats
+from: intro / ending movies, story blurbs and the loading screen quotes (12 Pak = Roadkill's). So no story path
+ever asks for a file that does not exist.
+
 ## Menu layout Ark wants (2026-10-26)
 - Main menu: two lines, SINGLE PLAYER and ONLINE.
   - SINGLE PLAYER -> SOLO or SPLIT-SCREEN CO-OP: the story run offline (alone, or with guests on controllers 2-4).

@@ -100,6 +100,8 @@ void tmbr_StoryLobby(void)
     pressed = pad & ~prevPad;
     prevPad = pad;
     if ((pad & 0x4) && (pressed & 0x8000)) tmbr_OptSet(OPT_STORY, !tmbr_Opt(OPT_STORY));
+    {   extern int tmbr_singlePlayer;                    /* menu.c: SINGLE PLAYER lands here with STORY on */
+        if (tmbr_singlePlayer == 1) { tmbr_singlePlayer = 2; tmbr_OptSet(OPT_STORY, 1); scePrintf("TMBR story: single player room\n"); } }
     on = tmbr_Opt(OPT_STORY);
     if (on && !wasOn) start();
     if (!on && wasOn) tmbr_TeamsBotMode(0);

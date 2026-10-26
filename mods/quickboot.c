@@ -24,12 +24,17 @@ typedef struct {
 QbScript tmbr_qb = { 0x42514D54, 0, 0, 0xFFFF, { { 0, 0 } } };
 
 static int qbStep = -1, qbLeft;
+int tmbr_padInject;          /* buttons pressed on controller 1 by the mods themselves (menu.c single player flow) */
 static unsigned int qbFrame;
 
 int tmbr_PadRead(int port, int slot, unsigned char* data)
 {
     int r = scePadRead(port, slot, data);
     unsigned int b, target;
+    if (tmbr_padInject && port == 0 && slot == 0 && r && data[0] == 0) {
+        data[2] &= ~(tmbr_padInject & 0xFF);
+        data[3] &= ~(tmbr_padInject >> 8);
+    }
     if (!tmbr_qb.enabled || port != 0) return r;
     if (slot == 0) {                       /* controller 1's read: once a frame, advances the script */
         qbFrame++;

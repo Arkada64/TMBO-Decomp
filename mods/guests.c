@@ -417,6 +417,7 @@ int tmbr_UiPadButtons(int pad)
     static int prev, held;
     int b, pr;
     if (D_004FA684 != 0x29) tmbr_LoadScreenReset();   /* (loading screen crash: armed again outside the load) */
+    { extern void tmbr_SingleFrame(void); tmbr_SingleFrame(); }   /* menu.c: single player flow */
     { static int lastUi = -1;                           /* UI state changes in the log (menu work) */
       if (D_004FA684 != lastUi) { lastUi = D_004FA684; scePrintf("TMBR ui: state %x\n", lastUi); } }
     if (naming) return 0;                              /* (the keyboard reads the guest's pad itself) */

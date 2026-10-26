@@ -153,3 +153,20 @@ void tmbr_MainMenu(void)
     }
     menuMain();
 }
+
+/* SINGLE PLAYER (Ark 2026-10-26): the LAN host path without the network screens - in the LAN game list (UI state
+ * 0x13) SQUARE (create game), on the create-game screen (0xF) CROSS (the default name), then the waiting room
+ * (0x21) opens with STORY on (story.c). Split-screen co-op = controllers 2-4 press START there (guests.c).
+ * Called every UI frame (guests.c tmbr_UiPadButtons); the presses go in through quickboot.c's pad read. */
+#define B_SQUARE 0x8000
+extern int tmbr_padInject;
+void tmbr_SingleFrame(void)
+{
+    static int st = -1, t;
+    tmbr_padInject = 0;
+    if (tmbr_singlePlayer != 1) { st = -1; return; }
+    if (D_004FA684 != st) { st = D_004FA684; t = 0; scePrintf("TMBR single: ui %x\n", st); }
+    t++;
+    if (st == 0x13 && t >= 40 && t < 46) tmbr_padInject = B_SQUARE;
+    if (st == 0xF && t >= 40 && t < 46) tmbr_padInject = B_CROSS;
+}
