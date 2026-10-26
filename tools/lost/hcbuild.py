@@ -1,0 +1,446 @@
+"""A Harbor City / Head-On car (BDD) onto a retail TMB donor car (generalized pakbuild.py, no 12 Pak hatches / mounts).
+  python3 hcbuild.py DONORDIR DONORCODE CAR.BDD OUTDIR OUTCODE [--scale S] [--lift Z] [--half] [--no-drop] [--no-relight]
+DONORDIR holds the donor as <DONORCODE>.NGP/PTR/TEX/RTX (or STP.*); output: OUTDIR/<OUTCODE>.NGP/PTR/TEX/RTX.
+e.g. python3 hcbuild.py /mnt/user-data/uploads/cloud/hc PCP THUMP.BDD out ZUP     (Thumper on Brimstone, local copy)
+     python3 hcbuild.py /mnt/user-data/uploads/cloud/hc PCA THUMP.BDD out ZUA --half
+
+What is found automatically (printed):
+ Donor (TMB car NGP, entry 0 = op1 car root with id R):
+  - LOD node = the root's op2 child with 2 kids: kid 0 high, kid 1 far LOD (an op1 group of meshes).
+  - body damage states = the op31 directly under the high LOD whose kids are exactly 3 op1 groups with r >= 8
+    (Roadkill 0x32270, Brimstone 0x1ad30); each gets the new car's damage state 0/1/2.
+  - kept: wheels (op4 id R+1..R+4), shadow (op1 id R+5), weapon-mount models (op1 id >= 4000), everything outside
+    the high LOD (headlight beams, shield / freeze shells, op7 effect characters with id 0).
+  - the scorch op31 (first kid op9, >= 5 op1 kids: black burn decal shells in the donor's shape shown as health drops;
+    Brimstone 0x26ac0, Roadkill 0x5ca90, which pakbuild kept) is hidden: the new car's damage states carry their own.
+  - brake lights = op6 id R+10 with 3 kids: its kids become the new car's own 3 brake-light meshes (off / on / on).
+  - every other op0 of the high LOD (body panels, doors, driver, weapon hardware, op7 characters with id != 0)
+    gets an empty packet, no texture slots; the far LOD group's meshes are replaced by the new car's far LOD.
+  - donor textures / CLUTs no longer referenced are dropped; new CLUTs go into the freed CLUT blocks.
+ Head-On car (BDD ngp):
+  - LOD roots = the op2 node with 2 kids that holds the most meshes: kid with more meshes = high, other = far.
+  - wheels = meshes outside the LOD roots with a wheel-shaped box (dy ~ dz, thin in x, |x| > 1) in car space.
+  - brake lights = 3 meshes outside the roots with one shared, flat box at the rear (darkest = off).
+  - skipped: meshes without normals (light cones, flames), env-map shine shells (hflags & 0x0E), parts reaching
+    below the wheels' ground or out past the body sides (stray poles / exhaust).
+ Placement: scale = donor wheelbase / new wheelbase (both measured), y offset centres the axles, z offset puts the
+ wheel centres on the donor's (+ --lift); the donor's wheels stay.
+ Relight (HC fan-build cars are unfinished: most meshes carry no vertex colours, so TMB drew them at the 0xFFFF
+ default (~2.5x a retail car's prelit level) next to flat 128 RGBA8 parts at ~41: patchy lighting): normals are
+ renormalized, normals disagreeing with the surface (|dot| < 0.5) are replaced by the geometric normal, and every
+ vertex gets a baked colour from its normal (retail prelit range, Brimstone's body averages ~55); alpha is kept.
+"""
+import sys, os, struct, argparse
+import numpy as np
+from bdd import bdd
+from homesh import find_packets, decode, triangles
+from hocollect import collect
+from tmbcar import Car, mesh_extent, u32, BASE
+from textconv import TexBuilder, clut_blocks
+from meshconv import hierobject
+from tmbtree_walk import kid_slots
+
+CLUT_LIMIT = 76            # retail cars use 57-76 CLUT blocks (Sweet Tooth / Brimstone 76)
+TEX_LIMIT = 299520         # largest retail car TEX
+
+
+def f32(d, o): return struct.unpack_from('<f', d, o)[0]
+
+
+def box(P):
+    P = np.asarray(P, float)
+    return P.min(0), P.max(0)
+
+
+# ---------------------------------------------------------------- Head-On side
+class HoCar:
+    def __init__(self, path):
+        s = bdd(path)
+        self.n, self.tex = s['ngp'], s['tex']
+        n = self.n
+        self.hd = {}
+        for o in find_packets(n):
+            m = decode(n, o)
+            if m['hdr'] is not None:
+                self.hd[m['hdr']] = m
+        best = None
+        for o in range(0, len(n) - 0x40, 16):
+            if u32(n, o) & 0x3f != 2 or struct.unpack_from('<i', n, o + 4)[0] != 2:
+                continue
+            ks = [u32(n, o + 0x28 + 0x10 * i) for i in range(2)]
+            if not all(0 < k < len(n) and k % 16 == 0 for k in ks):
+                continue
+            cnt = [len(collect(n, k, 0, lod=0)) for k in ks]
+            if best is None or sum(cnt) > best[0]:
+                best = (sum(cnt), o, ks, cnt)
+        _, self.lod, ks, cnt = best
+        self.hi, self.lo = (ks[1], ks[0]) if cnt[1] >= cnt[0] else (ks[0], ks[1])
+        inroots = set()
+        for st in range(4):
+            inroots |= set(collect(n, self.hi, st, lod=0)) | set(collect(n, self.lo, st, lod=0))
+        self.outside = [h for h in sorted(self.hd) if h not in inroots]
+        # wheels
+        wh = []
+        for h in self.outside:
+            lo, hi = box(self.hd[h]['pos']); d = hi - lo; c = (lo + hi) / 2
+            if d[1] > 1 and abs(d[1] - d[2]) < 0.1 * d[1] and d[0] < 0.6 * d[1] and abs(c[0]) > 1:
+                wh.append((h, c, d[2] / 2))
+        assert wh, 'no wheels found in car space'
+        ys = [c[1] for _, c, _ in wh]
+        self.wheel = dict(front=max(ys), rear=min(ys), z=float(np.mean([c[2] for _, c, _ in wh])),
+                          r=float(np.mean([r for _, _, r in wh])), x=float(np.mean([abs(c[0]) for _, c, _ in wh])),
+                          meshes=[h for h, _, _ in wh])
+        # body box (state 0 high LOD)
+        big = max((h for h in collect(n, self.hi, 0, lod=0) if h in self.hd), key=lambda h: len(self.hd[h]['pos']))
+        self.body = box(self.hd[big]['pos'])        # the main shell (flames / poles would stretch a box of all)
+        # brake lights: 3 outside meshes sharing one flat box behind the rear axle
+        groups = {}
+        for h in self.outside:
+            lo, hi = box(self.hd[h]['pos'])
+            if hi[1] - lo[1] < 0.3 and hi[1] < self.wheel['rear'] - 2:
+                groups.setdefault(tuple(np.round(np.r_[lo, hi], 2)), []).append(h)
+        bl = [g for g in groups.values() if len(g) == 3]
+        self.brake = []
+        if bl:
+            def bright(h):
+                cs = [c for s in self.hd[h]['strips'] for c in s['col']]
+                if not cs: return 31.0              # no colours = 0xFFFF default
+                return float(np.mean([(c & 31) if c <= 0xFFFF else (c & 255) / 8 for c in cs]))
+            self.brake = sorted(bl[0], key=bright)   # off (darkest) first
+
+    def skip_reason(self, h, wheel_ground, far=False):
+        m = self.hd[h]
+        lo, hi = box(m['pos'])
+        if not m['nrm']:
+            return 'no normals (light cone / flame / sprite)'
+        if m['hflags'] & 0x0E:
+            return 'env-map shine shell'
+        if far:                      # far LOD: its wheels give way to the donor's far wheels (kept), nothing else is cut
+            wt = {t for w in self.wheel['meshes'] for t in self.hd[w]['texrefs']}
+            return 'far LOD wheels (donor\'s kept)' if m['texrefs'] and set(m['texrefs']) <= wt else None
+        if lo[2] < wheel_ground - 0.2:
+            return 'below the ground'
+        if max(-lo[0], hi[0]) > max(-self.body[0][0], self.body[1][0]) + 0.3:
+            return 'out past the body sides'
+        return None
+
+
+def relight(m, xform):
+    """placement + normal repair + baked vertex colours; returns new mesh dict and stats"""
+    s, d = xform
+    P = np.asarray(m['pos'], float)
+    N = np.zeros_like(P)
+    if m['nrm']:
+        N[:len(m['nrm'])] = np.asarray(m['nrm'], float)[:len(P)]
+    acc = np.zeros_like(P)
+    for a, b, c in triangles(m):
+        i, j, k = a[0], b[0], c[0]
+        f = np.cross(P[j] - P[i], P[k] - P[i]); acc[i] += f; acc[j] += f; acc[k] += f
+    ln = np.linalg.norm(N, axis=1); la = np.linalg.norm(acc, axis=1)
+    G = np.where(la[:, None] > 1e-9, acc / np.maximum(la, 1e-9)[:, None], 0)
+    Nn = np.where(ln[:, None] > 1e-6, N / np.maximum(ln, 1e-6)[:, None], 0)
+    dot = (G * Nn).sum(1)
+    bad = (ln < 0.5) | ((la > 1e-9) & (np.abs(dot) < 0.5))
+    sign = np.where(dot < 0, -1.0, 1.0)
+    out = (P - np.array([0, 0.5, 1.5])); sg2 = np.where((G * out).sum(1) < 0, -1.0, 1.0)
+    sign = np.where(ln < 0.5, sg2, sign)
+    Nf = np.where(bad[:, None], G * sign[:, None], Nn)
+    Nf = np.where((np.linalg.norm(Nf, axis=1) < 1e-6)[:, None], np.array([0, 0, 1.0]), Nf)
+    L = np.array([0.3, 0.4, 0.85]); L /= np.linalg.norm(L)
+    lum = 0.35 + 0.45 * np.maximum(0, Nf @ L) + 0.2 * (0.5 + 0.5 * Nf[:, 2])
+    rgb = np.clip(90 * lum, 0, 255).astype(int)
+    strips = []
+    for st in m['strips']:
+        cols = []
+        for i, pi in enumerate(st['idx']):
+            c0 = st['col'][i] if i < len(st['col']) else 0xFFFF
+            a = (0x80 if (c0 >> 15) & 1 else 0) if c0 <= 0xFFFF else (c0 >> 24) & 255
+            v = int(rgb[pi])
+            cols.append(v | (v << 8) | (v << 16) | (a << 24))     # > 0xFFFF: meshconv's RGBA8 path
+        strips.append(dict(st, col=cols, noscale=True))
+    pos = [tuple(p * s + d) for p in P]
+    m2 = dict(m, pos=pos, nrm=[tuple(x) for x in Nf], strips=strips)
+    return m2, int(bad.sum()), len(P)
+
+
+# ---------------------------------------------------------------- donor side
+def chars_of(n, op7):
+    return [u32(n, op7 + 8 + 4 * i) - BASE for i in range(u32(n, op7 + 4))]
+
+
+def kids(car, o):
+    op = u32(car.n, o) & 0x3f
+    if op == 0:
+        return []
+    sl = kid_slots(car.n, o)
+    if op in (17, 25):
+        sl = [o + 0x2c] + sl
+    out = []
+    for s in sl:
+        if s + 4 <= len(car.n):
+            t = car.P(s)
+            if t is not None:
+                out.append(t)
+    return out
+
+
+def meshes_under(car, root, stop=lambda o: False):
+    out, seen, st = [], set(), [root]
+    while st:
+        o = st.pop()
+        if o in seen or stop(o):
+            continue
+        seen.add(o)
+        if u32(car.n, o) & 0x3f == 0:
+            out.append(o)
+        else:
+            st += kids(car, o)
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('donordir'); ap.add_argument('donorcode'); ap.add_argument('bdd'); ap.add_argument('outdir')
+    ap.add_argument('outcode')
+    ap.add_argument('--scale', type=float, default=None)
+    ap.add_argument('--lift', type=float, default=0.25, help='raise the body above the wheel-centre match')
+    ap.add_argument('--half', action='store_true', help='new textures at half size (other players\' copy)')
+    ap.add_argument('--no-drop', action='store_true')
+    ap.add_argument('--keep-scorch', action='store_true', help="keep the donor's scorch op31 (black burn shells in its shape)")
+    ap.add_argument('--one-state', action='store_true', help='damage state 0 for all three states (smaller NGP)')
+    ap.add_argument('--own16', default='auto', help="Head-On texture keys quantized to 16 colours (hex list, 'auto' = "
+                    "every texture but the largest when the CLUT / TEX budget would overflow, 'none')")
+    ap.add_argument('--no-relight', action='store_true')
+    ap.add_argument('--skip', default='', help='extra Head-On mesh headers to leave out (hex, comma separated)')
+    a = ap.parse_args()
+
+    def rd(e):
+        for nm in (a.donorcode, 'STP'):
+            p = os.path.join(a.donordir, nm + '.' + e)
+            if os.path.exists(p):
+                return open(p, 'rb').read()
+        raise FileNotFoundError(e)
+    own = set() if a.own16 in ('auto', 'none') else {int(x, 16) for x in a.own16.split(',')}
+    outs, over, keys = build(a, rd, own)
+    if over and a.own16 == 'auto':
+        own = set(keys)
+        print('--- over budget: again with 16-colour palettes for', [hex(k) for k in sorted(own)])
+        outs, over, keys = build(a, rd, own)
+    os.makedirs(a.outdir, exist_ok=True)
+    for e, b in outs:
+        open(os.path.join(a.outdir, a.outcode + '.' + e), 'wb').write(b)
+        print(e, len(b), '(donor %d)' % len(rd(e)))
+    if over:
+        print('WARNING: CLUT blocks or TEX above the retail limits')
+
+
+def build(a, rd, own16):
+    os.environ.setdefault('GT_ENVLIFT', '0')     # textconv's own16 tints palettes for reflection maps otherwise
+    car = Car(rd('NGP'), rd('PTR'), rd('TEX'), rd('RTX'))
+    orig_ngp = len(car.n)
+    n = car.n
+    ho = HoCar(a.bdd)
+    print('Head-On: LOD %#x high %#x far %#x; wheels %s; brake %s' % (ho.lod, ho.hi, ho.lo,
+          {k: (round(v, 2) if isinstance(v, float) else [hex(x) for x in v]) for k, v in ho.wheel.items()}, [hex(x) for x in ho.brake]))
+
+    # ---- donor structure
+    root = u32(n, 4) - BASE
+    R = u32(n, root) >> 18
+    lodn = next(t for t in kids(car, root) if u32(n, t) & 0x3f == 2 and struct.unpack_from('<i', n, t + 4)[0] == 2)
+    hi, lo = car.P(lodn + 0x28), car.P(lodn + 0x38)
+    states_op31 = None
+    for t in kids(car, hi):
+        if u32(n, t) & 0x3f != 31:
+            continue
+        ks = [k for k in kids(car, t) if u32(n, k) & 0x3f != 9]
+        if len(ks) == 3 and all(u32(n, k) & 0x3f == 1 and f32(n, k + 0x1c) >= 8 for k in ks):
+            states_op31, STATES = t, ks
+    assert states_op31, 'no body damage-state op31'
+    nodes = {}
+    st = [root]; seen = set()
+    while st:
+        o = st.pop()
+        if o in seen: continue
+        seen.add(o); nodes[o] = u32(n, o)
+        st += kids(car, o)
+    wheels4 = [o for o, h in nodes.items() if h & 0x3f == 4 and R + 1 <= (h >> 18) <= R + 4]
+    shadow = [o for o, h in nodes.items() if h & 0x3f == 1 and (h >> 18) == R + 5]
+    mounts = [o for o, h in nodes.items() if h & 0x3f == 1 and (h >> 18) >= 4000]
+    brake_sw = [o for o, h in nodes.items() if h & 0x3f == 6 and (h >> 18) == R + 10 and n[o + 0xb] == 3]
+    wreck = [o for o, h in nodes.items() if h & 0x3f == 31 and n[o + 9] >= 6 and (u32(n, car.P(o + 0xc) or 0) & 0x3f) == 9
+             and sum(1 for k in kids(car, o) if u32(n, k) & 0x3f == 1) >= 5]
+    keep = set()
+    for k in wheels4 + shadow + mounts + (wreck if a.keep_scorch else []):
+        keep |= set(meshes_under(car, k))
+    wpos = [(f32(n, w + 0x40), f32(n, w + 0x44), f32(n, w + 0x48)) for w in wheels4]
+    wr = max(box(__import__('tmbmesh').decode(bytes(n), m)['pos'])[1][2] for w in wheels4 for m in meshes_under(car, w))
+    dw = dict(front=max(p[1] for p in wpos), rear=min(p[1] for p in wpos), z=float(np.mean([p[2] for p in wpos])),
+              x=float(np.mean([abs(p[0]) for p in wpos])), r=wr)
+    print('donor %s: root %#x id %d, LOD %#x high %#x far %#x, states op31 %#x %s, wheels %s %s, shadow %s, mounts %d, '
+          'brake %s, wreck %s' % (a.donorcode, root, R, lodn, hi, lo, states_op31, [hex(x) for x in STATES],
+                                  [hex(x) for x in wheels4], {k: round(v, 2) for k, v in dw.items()},
+                                  [hex(x) for x in shadow], len(mounts), [hex(x) for x in brake_sw], [hex(x) for x in wreck]))
+
+    # ---- placement
+    s = a.scale or (dw['front'] - dw['rear']) / (ho.wheel['front'] - ho.wheel['rear'])
+    dy = (dw['front'] + dw['rear']) / 2 - s * (ho.wheel['front'] + ho.wheel['rear']) / 2
+    dz = dw['z'] - s * ho.wheel['z'] + a.lift
+    xform = (s, np.array([0.0, dy, dz]))
+    print('placement: scale %.3f offset y %.3f z %.3f | wheels new (scaled) x %.2f r %.2f vs donor x %.2f r %.2f | '
+          'body (scaled) x %.2f..%.2f y %.2f..%.2f z %.2f..%.2f, donor ground z %.2f' % (
+              s, dy, dz, ho.wheel['x'] * s, ho.wheel['r'] * s, dw['x'], dw['r'],
+              ho.body[0][0] * s, ho.body[1][0] * s, ho.body[0][1] * s + dy, ho.body[1][1] * s + dy,
+              ho.body[0][2] * s + dz, ho.body[1][2] * s + dz, dw['z'] - dw['r']))
+
+    # ---- converting Head-On meshes
+    tb = TexBuilder(car.tex, car.rtx, ho.tex, car.max_tex_id() + 1, {}, [], own16)
+    if a.half:
+        tb.half = set(ho.hd[h]['texrefs'][0] for h in ho.hd if ho.hd[h]['texrefs'])
+    ground = ho.wheel['z'] - ho.wheel['r']
+    extra = {int(x, 16) for x in a.skip.split(',') if x}
+    built, skipped, fixed = {}, {}, [0, 0]
+
+    def node(h, cols=None):
+        key = (h, cols)
+        if key not in built:
+            m = ho.hd[h]
+            if a.no_relight:
+                m = dict(m, pos=[tuple(np.asarray(p) * s + xform[1]) for p in m['pos']])
+            else:
+                m, nb, nv = relight(m, xform)
+                fixed[0] += nb; fixed[1] += nv
+            if cols is not None:      # brake lights: fixed brightness (off dim, on glowing)
+                m = dict(m, strips=[dict(st, col=[cols | (0x80 << 24)] * len(st['idx']), noscale=True) for st in m['strips']])
+            m = dict(m, twosided=False, bake=False, hflags=m.get('hflags', 0) & ~0x0E)
+            blob, slots, pairs, sph = hierobject(m, 1.0, [tb.gs_ctx(k) for k in m['texrefs']])
+            built[key] = car.append(blob, slots, pairs)
+        return built[key]
+
+    def ho_meshes(r, state, far=False):
+        out = []
+        for h in collect(ho.n, r, state, lod=0):
+            m = ho.hd.get(h)
+            if m is None or not m['strips']:
+                continue
+            why = 'listed' if h in extra else ho.skip_reason(h, ground, far)
+            if why:
+                skipped[h] = why; continue
+            out.append(h)
+        return out
+
+    dead = []
+    for stn, g in enumerate(STATES):
+        k = u32(car.n, g + 8) & 0xffff
+        dead += [mesh_extent(car.n, t) for t in meshes_under(car, g)]
+        hs = ho_meshes(ho.hi, 0 if a.one_state else stn)
+        newg = car.group([node(h) for h in hs], sphere=struct.unpack_from('<3ff', car.n, g + 0x10))
+        struct.pack_into('<H', car.n, g + 8, 1)
+        car.setp(g + 0x20, newg)
+        for i in range(1, k):
+            struct.pack_into('<I', car.n, g + 0x20 + 4 * i, 0)
+        print('state', stn, len(hs), 'meshes')
+    # far LOD: the donor's meshes -> the new car's far LOD, except the donor's far wheels / underside (a mesh centred
+    # at or below the wheel centres, Brimstone 0x4aa30, Roadkill 0x5e310), which stays like the near wheels
+    k = u32(car.n, lo + 8) & 0xffff
+    lokids = [car.P(lo + 0x20 + 4 * i) for i in range(k)]
+    lokeep = [t for t in lokids if t is not None and u32(car.n, t) & 0x3f == 0 and f32(car.n, t + 0x18) <= dw['z'] + 0.3]
+    lomesh = [t for t in meshes_under(car, lo) if t not in lokeep]
+    dead += [mesh_extent(car.n, t) for t in lomesh]
+    hs = ho_meshes(ho.lo, 0, far=True)
+    newk = [car.group([node(h) for h in hs], sphere=struct.unpack_from('<3ff', car.n, lo + 0x10))] + lokeep
+    struct.pack_into('<H', car.n, lo + 8, len(newk))
+    for i in range(k):
+        struct.pack_into('<I', car.n, lo + 0x20 + 4 * i, 0)
+    for i, t in enumerate(newk):
+        car.setp(lo + 0x20 + 4 * i, t)
+    print('far LOD: donor meshes %s -> new car %d meshes + kept donor wheels %s' % (
+        [hex(t) for t in lomesh], len(hs), [hex(t) for t in lokeep]))
+    # brake lights
+    brake_old = set()
+    if brake_sw and len(ho.brake) == 3:
+        sw = brake_sw[0]
+        for i in range(3):
+            brake_old |= set(meshes_under(car, car.P(sw + 0xc + 4 * i)))
+        dead += [mesh_extent(car.n, t) for t in brake_old]
+        ws = [0x2d2d2d, 0xffffff, 0xffffff]          # off: dim, braking / reverse: glowing
+        for i, h in enumerate([ho.brake[0], ho.brake[2], ho.brake[2]]):
+            car.setp(sw + 0xc + 4 * i, node(h, ws[i]))
+        print('brake lights: donor switch %#x (%d meshes) -> %s' % (sw, len(brake_old), [hex(x) for x in ho.brake]))
+    print('skipped Head-On meshes:', {hex(h): w for h, w in sorted(skipped.items())})
+    if not a.no_relight:
+        print('relight: %d of %d vertices got a geometric normal' % tuple(fixed))
+
+    # ---- hide the donor's own parts (empty packet, no texture slots)
+    deadset = {x for x, _ in dead}
+    op7 = next(u32(n, 4 + 4 * i) - BASE for i in range(u32(n, 0)) if (u32(n, u32(n, 4 + 4 * i) - BASE) & 0x3f) == 7)
+    hide = set(meshes_under(car, hi))
+    for c in chars_of(car.n, op7):
+        if (u32(car.n, c) >> 18) != 0:
+            hide |= set(meshes_under(car, c))
+    hide -= keep | deadset | set(built.values())
+    nopk = car.append(struct.pack('<4I', 0x60000001, 0, 0, 0) + struct.pack('<4I', 0x01000404, 0, 0, 0))
+    hidepairs = set()
+    for nd in sorted(hide):
+        a0, b2 = mesh_extent(car.n, nd)
+        pk = car.P(nd + 4)
+        if pk is not None and pk > nd:
+            dead.append((pk, b2))
+        nt = struct.unpack_from('<H', car.n, nd + 0x5a)[0]
+        hidepairs |= {nd + 0x50 + 2 * i for i in range(nt)}
+        struct.pack_into('<H', car.n, nd + 0x5a, 0)
+        car.setp(nd + 4, nopk)
+        struct.pack_into('<I', car.n, nd + 0xc, u32(car.n, nd + 0xc) & 0xFFFF)
+    car.pairs = [(x, g) for x, g in car.pairs if x not in hidepairs]
+    print('donor parts hidden: %d meshes (kept: %d wheel / shadow / mount / wreck meshes)' % (len(hide), len(keep)))
+
+    before = len(car.n)
+    dropped = car.compact(sorted(set(dead)))
+
+    # ---- textures: drop the donor's unreferenced ones, pack new CLUTs into free blocks
+    newtids = {v[0] for v in tb.map.values()}
+    used, usedc = set(), set()
+    for x, g in car.pairs:
+        tid = struct.unpack_from('<H', car.n, x)[0]
+        if tid not in newtids:
+            used.add(tid); usedc.add((struct.unpack_from('<Q', car.n, g)[0] >> 37) & 0x3fff)
+    old = [(gs & 0xffff, b) for o, b, gs, k in tb.trecs]
+    oldc = [((gs >> 16) & 0xffff, clut_blocks((gs >> 40) & 15, (gs >> 44) & 15)) for o, b, gs, k in tb.rrecs]
+    if not a.no_drop:
+        tb.drop_tids = {t for t, _ in old if t not in used}
+        tb.drop_cbps = {c for c, _ in oldc if c not in usedc}
+    dc = getattr(tb, 'drop_cbps', set())
+    taken = np.zeros(512, bool)
+    for c, nb in oldc:
+        if c not in dc:
+            taken[c:c + nb] = True
+    remap, newrtx = {}, []
+    for r in tb.new_rtx:
+        gs = struct.unpack_from('<Q', r, 8)[0]
+        c, nb = (gs >> 16) & 0xffff, clut_blocks((gs >> 40) & 15, (gs >> 44) & 15)
+        f = next(i for i in range(512) if not taken[i:i + nb].any())
+        taken[f:f + nb] = True
+        remap[c] = f
+        r = bytearray(r); struct.pack_into('<Q', r, 8, (gs & ~(0xffff << 16)) | (f << 16)); newrtx.append(bytes(r))
+    tb.new_rtx = newrtx
+    for x, g in car.pairs:
+        if struct.unpack_from('<H', car.n, x)[0] in newtids:
+            q = struct.unpack_from('<Q', car.n, g)[0]
+            c = (q >> 37) & 0x3fff
+            struct.pack_into('<Q', car.n, g, (q & ~(0x3fff << 37)) | (remap[c] << 37))
+    clut_top = int(np.nonzero(taken)[0].max()) + 1
+    print('textures: donor %d (%d dropped), new %d; CLUT blocks used %d, top %d (donor %d, limit %d)' % (
+        len(old), len(getattr(tb, 'drop_tids', ())), len(tb.new_tex), int(taken.sum()), clut_top,
+        max(c + nb for c, nb in oldc), CLUT_LIMIT))
+    print('ngp %d -> %d (donor %d, %+.1f%%), dropped slots %d' % (before, len(car.n), orig_ngp,
+                                                                  100.0 * (len(car.n) - orig_ngp) / orig_ngp, dropped))
+    outs = (('NGP', car.ngp_bytes()), ('PTR', car.ptr_bytes()), ('TEX', tb.tex_bytes()), ('RTX', tb.rtx_bytes()))
+    over = clut_top > CLUT_LIMIT or len(outs[2][1]) > TEX_LIMIT
+    big = sorted(tb.map, key=lambda k: -tb.ho[k]['img'].size)
+    # 16-colour candidates: all but the largest, opaque (own16 drops alpha) and with more than 16 colours
+    keys = [k for k in big[1:] if (tb.ho[k]['img'][:, :, 3] == 255).all()
+            and len(np.unique(tb.ho[k]['img'].reshape(-1, 4), axis=0)) > 16]
+    return outs, over, keys
+
+
+if __name__ == '__main__':
+    main()
