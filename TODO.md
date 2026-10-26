@@ -196,8 +196,9 @@
   power 6, rico 7, pickups 11-13, freeze 14 (tagged in the log 2026-10-25), 15 ?, specials 17 Roadkill, 21 Spectre, 26 Grimm, 27 Axel, 28
   Manslaughter; freeze / mines / the other specials not seen yet (bots never used them in the logged match).
   Still to do:
-  - Outlaw's turret secondary, Manslaughter dropping his special behind: not in the energy handler's switch -
-    find how the player triggers them (launcher update, func_0015CD80 UpdateSpecial) and drive it for bots.
+  - DONE 2026-10-26: Outlaw's turret secondary, Manslaughter's drop-behind (launcher +4) and Shadow / Axel's second
+    specials (the combo's own writes) set directly by bots before the special; +0x22B0 is always 0 for bots, so
+    the old Shadow / Axel request never fired (test: Shadow's second special now shows, kind 19).
   - Darkside's T-slide: a first try is in (handbrake flick at ~90 on a special ram, 40 %) - check it lands side-on.
   - Roadkill's charge by confidence: the original AI has per-car special firing (aiCheckSpecialWeaponFiring
     0x1095F0: Crazy 8, Roadkill, Sweet Tooth, Darkside) - tune that rather than replace it.

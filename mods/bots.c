@@ -1361,6 +1361,7 @@ static void turboUse(char* g, char* v, int evading)
 #define EN_SHIELD_T 12
 #define FRZ_CD 900      /* 15 s between a bot's freezes */
 static short enCd[8];
+extern int aiGoodChoice3(char* v, int w) __asm__("aiIsGoodWeaponChoice__7Vehiclei");
 static signed char altFire[8];
 static short altCd[8], altChk[8];      /* frames until the special goes after arming its second mode (TODO 7) */
 static int incoming(char* g, char* v, int k)
@@ -1408,7 +1409,9 @@ static void energyUse(char* g, char* v, int evading)
         F(v, 0x21B4) = 0;
     if (altFire[k] > 0 && --altFire[k] == 0) {   /* the second mode flag (launcher +4) and the special now - the
                                                   * special-up combo (energy 9) did not set it for them (test) */
-        F(v, 0x21B4) = 1; altChk[k] = 30;
+        if (charOf(v) == 9) { *(v + 0x5A3) = 1; F(v, 0x2778) = 1; *(v + 0x5B5) = 0; }
+        else if (charOf(v) == 11) { *(v + 0x5A3) = 1; F(v, 0x24F8) = 1; *(v + 0x5B5) = 0; }
+        else { F(v, 0x21B4) = 1; altChk[k] = 30; }
         F(br, 0x47C) = 1; aiSetAttackState(v, 7);
     }
     if (enCd[k]) return;
@@ -1426,9 +1429,6 @@ static void energyUse(char* g, char* v, int evading)
         if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d drops a mine on its chaser\n", k);
         return;
     }
-    /* alternate specials (special-up combo, 9: the energy handler's per-car case - Shadow 288 and Axel 352 switch to
-     * their second special; it checks the special is ready, +0x22B0 == 1): Shadow in a small fight, Axel's War Wheel
-     * on a lone car up close (Ark 2026-10-25) */
     /* (TODO 7) Outlaw / Manslaughter: second special mode when the AI could fire the special (its own check:
      * aiIsGoodWeaponChoice(v, 1) - +0x22B0 stays 0 for them) */
     if ((charOf(v) == 3 || charOf(v) == CH_MANSLAUGHTER) && F(drv, 4) == 5 && F(drv, 0xB4) && !altFire[k] && !altCd[k] &&
@@ -1445,20 +1445,24 @@ static void energyUse(char* g, char* v, int evading)
             return;
         }
     }
-    if (F(drv, 4) == 5 && F(drv, 0xB4) && (thinkTick + k * 11) % 45 == 0 && F(v, 0x22B0) == 1) {
+    /* Shadow / Axel: their second special the same way. The special-up combo (energy 9) only switches it while the
+     * special is the selected weapon (+0x21B0 == 1, which a bot's never is between shots) - +0x22B0 stayed 0 for
+     * bots (test 2026-10-26), so the old request never fired. altFire sets what the combo would: Shadow +0x5A3 = 1,
+     * +0x2778 = 1, +0x5B5 = 0; Axel +0x5A3 = 1, +0x24F8 = 1, +0x5B5 = 0 (func_001E4690 0x1E4D20..). */
+    if (F(drv, 4) == 5 && F(drv, 0xB4) && !altFire[k] && !altCd[k] && (thinkTick + k * 11) % 45 == 0 && aiGoodChoice3(v, 1)) {
         char* tg = (char*)F(drv, 0xB4);
         int tk = (int)(tg - g) / 0x31B0 & 7, d = (int)*(float*)(br + 0x20), c = charOf(v);
         if ((c == 9 && crowd[tk] < 2 && d > 0 && d < 300 && mathfRandI(0, 99) < 40) ||
             (c == 11 && crowd[tk] == 0 && d > 0 && d < 250 && mathfRandI(0, 99) < 50)) {
-            F(br, 0x418) = 9;
-            if (TMBR_BOTDBG) scePrintf("TMBR bots: car %d alternate special\n", k);
+            altFire[k] = 3; altCd[k] = 360;
+            scePrintf("TMBR bots: car %d (char %d) alternate special, d %d\n", k, c, d);
             return;
         }
     }
     /* (2026-10-25 Ark: far too many freezes. Now: checked every 1 s, 5 % (hurt / escaping target 15 %, rammer
      * before its ram 25 %), only with energy left for a shield afterwards (>= 80), only when a big hit is ready
      * (special charged, or a rammer), and at most one per FRZ_CD frames.) */
-    if (F(drv, 4) == 5 && F(drv, 0xB4) && (thinkTick + k * 7) % 60 == 0 && en >= 80 && (F(v, 0x22B0) == 1 || rammer(v))) {
+    if (F(drv, 4) == 5 && F(drv, 0xB4) && (thinkTick + k * 7) % 60 == 0 && en >= 80 && (F(v, 0x22B0) == 1 || rammer(v))) {   /* (+0x22B0 stays 0 for bots: in effect rammers only - as tuned) */
         char* tg = (char*)F(drv, 0xB4);
         int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, d = (int)*(float*)(br + 0x20), chance = 5;
         if (a < FIRE_TIGHT && d > 60 && d < 350) {
