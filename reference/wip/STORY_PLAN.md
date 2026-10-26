@@ -37,3 +37,17 @@ files picked only in story mode. Later: local co-op story (split-screen guests),
 - Pull retail's story tables: per character the level order and each stage's opponents (shell / ui code around
   EvaluateOnePlayerStoryStatus and the level setup that spawns story enemies), movie numbers per point.
 - Decide the lobby entry (a STORY mode line in the game settings, like TRAFFIC / TEAMS).
+
+## Retail story setup, read from retail code (2026-10-26)
+- Opponents are NOT fixed per character or stage. SelectAICars__5Shell (retail 0x15EA48): in story mode the AI count
+  is a per-level table (shell+0x19DDC + 4*level, filled in __5Shell), then RandomlySelectAI picks that many distinct
+  random cars from the 15 drivers (car value = character id << 5, 0x20..0x1E0), never the player's car; Minion
+  (0x1E0) only when unlocked (shell+0x1A1C4) or on his own level; after 200 failed picks it pads with Roadkill.
+- AI count per level: Suburbs 8, Junkyard 7, Freeway 7, Prison Passage 8, Skyscrapers 8, Downtown 7, Highway Loop 8,
+  Elevators-Junk2 8, Minion's Stadium / Prison Ship / Asylum / Mini levels 6, Warhawk's Roof 6.
+- Boss overrides: level 14 (Minion's Stadium) = 1 AI, car 0x1E0 (Minion). Level 20 (Warhawk's Roof) = 2 AI,
+  cars 0x220 and 0x200 (character ids 17 and 16: the Warhawk boss pieces, not drivers - check TMBO has them).
+- The level order is the same for every character (m_nextLevelMap; the player picks a branch in chooseNextLevel);
+  characters differ only in movies / endings.
+- TMBO has neither SelectAICars nor RandomlySelectAI; our bots.c already spawns bots with chosen cars (+0xB4), so
+  phase 1 = drive the existing bot spawner from these tables.
