@@ -296,12 +296,36 @@ void tmbr_ReticleUsed(void* w, char* v, int slot)
 }
 
 /* every game frame (freecam.c's camera hook) */
+/* 12 Pak's hatches (tools/lost/pakbuild.py PAK_HATCH=2): three 3-frame switches in his body, registered by the game
+ * at vehicle +0x2A20 + sub * 4 (attach type 7, subs no weapon uses). Each opens over a few frames while its weapons
+ * are selected (current weapon = launcher +0 = vehicle +0x21B0) and closes again (Ark 2026-10-26: back left = fire,
+ * back right = homing / power, trunk = gas can / rico). */
+extern void hierSetSwitch(void* sw, int k) __asm__("hierSetSwitch__FP11_hierswitchi");
+static const unsigned char HATCH_SUB[3] = { 9, 11, 12 };
+static signed char hatchPos[8][3];
+static void pakHatches(char* v, int car)
+{
+    int w = *(int*)(v + 0x21B0), h, want, *sw;
+    for (h = 0; h < 3; h++) {
+        sw = *(int**)(v + 0x2A20 + HATCH_SUB[h] * 4);
+        if (!sw) continue;
+        want = h == 0 ? w == 2 : h == 1 ? (w == 3 || w == 6) : (w == 4 || w == 7);
+        want = want ? 2 * 4 : 0;                       /* position in frames: 0 closed .. 8 open (4 per step) */
+        if (hatchPos[car][h] < want) hatchPos[car][h]++;
+        else if (hatchPos[car][h] > want) hatchPos[car][h]--;
+        hierSetSwitch(sw, hatchPos[car][h] / 4 > 2 ? 2 : hatchPos[car][h] / 4);
+    }
+}
 void tmbr_SkinsFrame(void)
 {
     int i, any = 0;
     if (!D_004FA030) return;
     pakFrames++;
     tmbr_DamageReportTick();
+    for (i = 0; i < 8; i++) {
+        char* v = D_004FA030 + i * 0x31B0;
+        if (*(int*)(v + 0x590) && isPak(v)) pakHatches(v, i);
+    }
     if (pakGame != D_004FA030) {
         pakGame = D_004FA030;
         for (i = 0; i < 8; i++) pakRet[i] = pakHold[i] = pakMountLog[i] = pakCool[i] = 0;

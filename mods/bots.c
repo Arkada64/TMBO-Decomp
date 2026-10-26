@@ -519,9 +519,10 @@ void tmbr_BotsThink(void)
         extern int tmbr_levelSerial; extern void tmbr_TeamsForceWin(int team);
         static int ser = -1, tk, wins;
         char* gi = GINFO();
-        if (g && gi && (F(gi, 0) & 1) && tmbr_Opt(0x20) && netIsHost(D_003156C0)) {
+        if (g && gi && tmbr_Opt(0x20) && netIsHost(D_003156C0)) {
             if (ser != tmbr_levelSerial) { ser = tmbr_levelSerial; tk = 0; }
-            if (++tk == 900 && wins++ == 0) tmbr_TeamsForceWin(0);
+            if (++tk == 2400 && wins++ == 0) tmbr_TeamsForceWin(0);     /* ~40 s after the level load */
+            if (tk % 600 == 0) scePrintf("TMBR storytest: tick %d gi %x wins %d\n", tk, F(gi, 0), wins);
         }
     }
 #endif
