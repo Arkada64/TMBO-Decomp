@@ -69,6 +69,7 @@ class TMBR : Form
         Set(l, "StartFullscreen", full.Checked ? "true" : "false");
         Set(l, "upscale_multiplier", potato.Checked ? "1" : "3");
         Set(l, "Bios", Path.Combine(dir, "bios"));
+        Set(l, "CheckAtStartup", "false");               // no PCSX2 auto updater (Ark 2026-10-26; updater.exe is left out too)
         File.WriteAllLines(Ini, l);
     }
     void Launch(bool play)

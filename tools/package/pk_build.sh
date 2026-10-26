@@ -7,7 +7,7 @@ set -e
 # cache / logs / snaps ... folders there when it needs them).
 W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; R="/mnt/c/Users/Ark/Desktop/TMBO Ready2Play Edition"; P="$W/release/TMBR_Player"; E="$P/emulator"
 mkdir -p "$P"/{bios,game} "$E"/{inis,memcards}
-cp -u "$R"/pcsx2-qt.exe "$R"/*.dll "$R"/qt.conf "$E"/
+cp -u "$R"/pcsx2-qt.exe "$R"/*.dll "$R"/qt.conf "$E"/   # (not updater.exe: no auto updates, Ark 2026-10-26)
 cp -ru "$R"/QtPlugins "$R"/D3D12 "$R"/resources "$E"/
 : > "$E/portable.ini"
 cp -u "$R"/bios/* "$P"/bios/
@@ -20,6 +20,7 @@ sed -e 's/^EnableCheats = .*/EnableCheats = false/' \
     -e 's/^LoadTextureReplacements = .*/LoadTextureReplacements = false/' \
     -e 's/^PrecacheTextureReplacements = .*/PrecacheTextureReplacements = false/' \
     -e 's/^EnablePINE = .*/EnablePINE = false/' \
+    -e 's/^CheckAtStartup = .*/CheckAtStartup = false/' \
     -e '/^RecursivePaths = /d' -e '/^Paths = /d' "$R/inis/PCSX2.ini" > "$E/inis/PCSX2.ini"
 grep -q "^StandardVolume = 0" "$E/inis/PCSX2.ini" && sed -i 's/^StandardVolume = 0/StandardVolume = 100/; s/^FastForwardVolume = 0/FastForwardVolume = 100/' "$E/inis/PCSX2.ini"
 sed -i 's/^SDL = false/SDL = true/' "$E/inis/PCSX2.ini"
