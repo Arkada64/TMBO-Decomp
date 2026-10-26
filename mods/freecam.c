@@ -315,6 +315,26 @@ static void splitAnchors(char* g)
         }
     }
 }
+/* widescreen, one view (TODO 4b, Ark 2026-10-26): the wider field of view pulls the 3D-placed HUD clusters (radar,
+ * weapon bay) toward the middle by 3/4 (a x 3/4 in viewSetFov) and the online score text then sat on the weapon list;
+ * their x goes out by 4/3 so they keep their 4:3 places, i.e. the screen edges once PCSX2 shows the picture at 16:9.
+ * Written every frame like the split-screen anchors (the game sets x again after the level starts). */
+static void wideHud(void)
+{
+    extern char* D_004FA030;
+    char* h0;
+    int c;
+    if (!tmbr_wide[1] || splitN >= 2 || !D_004FA030 || wideSet[0] == 0) return;
+    h0 = D_004FA030 + 0x97B50;
+    if (!ancSet) {
+        float* f = (float*)(h0 + 0x800);
+        if (!*(int*)h0 || f[1] <= ancLim[1] || f[1] > ancLim[0]) return;
+        for (c = 0; c < 2; c++) { int k; for (k = 0; k < 3; k++) anc0[c][k] = ((float*)(h0 + 0x800 + c * 0x10))[k]; }
+        ancSet = 1;
+    }
+    if (!*(int*)h0) return;
+    for (c = 0; c < 2; c++) ((float*)(h0 + 0x800 + c * 0x10))[0] = anc0[c][0] * KW[0];
+}
 /* the guests' HUDs (after each guest is made; again for one made late) */
 static char hudDone[4];
 static void splitHuds(char* g)
@@ -518,6 +538,7 @@ void tmbr_CameraUpdate(char *cam)
 #ifndef TMBR_PNACH
     splitFrame(cam);
     wideFrame();
+    wideHud();
 #endif
     cameraUpdate(cam);
 #if TMBR_WEAPTEST
