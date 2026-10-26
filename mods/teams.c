@@ -134,6 +134,14 @@ __asm__(".section .text\n.set push\n.set noreorder\n.globl tmbr_TeamColorS\ntmbr
         "    lq $12, 0x80($29)\n    lq $13, 0x90($29)\n    lq $14, 0xA0($29)\n    lq $15, 0xB0($29)\n"
         "    jr $31\n    addiu $29, $29, 0xC0\n.set pop\n.previous\n");
 
+/* Ally bot (GAME MODS "ALLY BOT", option bit 0x40, humans-vs-bots / story; TODO 12): the first bot that joins goes to
+ * the humans' team. Damage between bots and the ally is scaled in dmgreport.c (tmbr_TakeHit). */
+static int allySlot = -1;
+int tmbr_IsAlly(char* v)
+{
+    int k = (int)(v - D_004FA030) / VSIZE;
+    return allySlot >= 0 && v && F(v, 0x590) == 2 && k >= 0 && k < 8 && vehSlot[k] == allySlot;
+}
 /* bots.c addBot: a bot (car index k) took slot s (host) */
 void tmbr_TeamsBotJoined(int s, int k)
 {
@@ -141,8 +149,10 @@ void tmbr_TeamsBotJoined(int s, int k)
     if (s < 0 || s > 7) return;
     botSlot[s] = 1;
     if (k >= 0 && k < 8) vehSlot[k] = s;
-    if (tmbr_botTeamMode) t = 1;
-    else {
+    if (tmbr_botTeamMode) {
+        t = 1;
+        if (tmbr_Opt(0x40) && allySlot < 0) { t = 0; allySlot = s; scePrintf("TMBR teams: ally bot in slot %d (car %d)\n", s, k); }
+    } else {
         for (s2 = 0; s2 < 8; s2++)
             if (s2 != s && (HUMAN(s2) || botSlot[s2])) n[tmbr_team[s2] % NT()]++;
         for (t = 0, s2 = 1; s2 < NT(); s2++) if (n[s2] < n[t]) t = s2;
@@ -153,6 +163,7 @@ void tmbr_TeamsBotLeft(char* v)
 {
     int k = (int)(v - D_004FA030) / VSIZE;
     if (k < 0 || k > 7 || vehSlot[k] < 0) return;
+    if (vehSlot[k] == allySlot) allySlot = -1;
     botSlot[(int)vehSlot[k]] = 0;
     vehSlot[k] = -1;
 }

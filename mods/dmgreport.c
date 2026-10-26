@@ -175,6 +175,13 @@ int tmbr_TakeHit(char* v, void* pos, int dmg, int att, int x)
         extern int tmbr_SameTeam(char* a, char* b);       /* teams.c: 0 unless team play is on */
         if (a && a != v && tmbr_SameTeam(a, v)) return 0;
     }
+    {   /* ally bot (teams.c): enemy bots hit it for 20 %, it hits them for 50 % (players hit everyone in full) */
+        extern int tmbr_IsAlly(char* v);
+        if (a && a != v && *(int*)(a + 0x590) == 2 && *(int*)(v + 0x590) == 2) {
+            if (tmbr_IsAlly(v)) dmg = dmg / 5 > 0 ? dmg / 5 : (dmg > 0);
+            else if (tmbr_IsAlly(a)) dmg = dmg / 2 > 0 ? dmg / 2 : (dmg > 0);
+        }
+    }
 #endif
     hp0 = *(float*)(v + 0x404);
     r = gameTakeHit(v, pos, dmg, att, x);

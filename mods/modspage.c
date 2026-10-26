@@ -5,7 +5,7 @@
  * (test 2026-10-26: D_004FA8B4 up, 8B8 down, 8AC left, 8B0 right, 8C8 cross). Hook (apply_mods.py): the UI
  * loop's call of func_001CAC18 -> tmbr_ModsPage. Two more rows follow the native five; while one of ours is
  * selected the native cursor is 0 (no native row lit) and the flags are taken before the page sees them. The values
- * are the lobby options in the game info (bots.c tmbr_OptSet: MINION = bit 8 on, HEALTH = bit 16 on). */
+ * are the lobby options in the game info (bots.c tmbr_OptSet: MINION = bit 8 on, HEALTH = bit 16 on, ALLY BOT = 0x40). */
 #define F(p, off) (*(int*)((char*)(p) + (off)))
 extern void modsMain(void) __asm__("func_001CAC18");
 extern int scePrintf(const char* fmt, ...);
@@ -22,9 +22,9 @@ extern char* shellPtr __asm__("D_004FA03C");
 extern char D_003156C0[];
 extern int D_004FA8AC, D_004FA8B0, D_004FA8B4, D_004FA8B8, D_004FA8C8;
 #define CUR F(shellPtr + 0x18000, 0x1BE4 + 0x25 * 4)
-#define NROW 2
-static const char* const LABEL[NROW] = { "           MINION: %s", "           HEALTH: %s" };
-static const int BIT[NROW] = { 8, 16 };
+#define NROW 3
+static const char* const LABEL[NROW] = { "           MINION: %s", "           HEALTH: %s", "         ALLY BOT: %s" };
+static const int BIT[NROW] = { 8, 16, 0x40 };   /* ALLY BOT (teams.c): a bot on the humans' team when it is humans vs bots */
 
 void tmbr_ModsPage(void)
 {
@@ -37,11 +37,11 @@ void tmbr_ModsPage(void)
         scePrintf("TMBR modspage: up %d down %d left %d right %d ok %d cursor %d ours %d\n", up, dn, lt, rt, ok, CUR, v);
     }
     if (v) {
-        if (up) { if (v == 2) v = 1; else { v = 0; CUR = 5; } }   /* (game cursor was 0: its move is overwritten) */
-        else if (dn) { if (v == 1) v = 2; else { v = 0; CUR = 1; } }        /* (the native list wraps too) */
+        if (up) { if (v > 1) v--; else { v = 0; CUR = 5; } }      /* (game cursor was 0: its move is overwritten) */
+        else if (dn) { if (v < NROW) v++; else { v = 0; CUR = 1; } }    /* (the native list wraps too) */
         else if ((lt || rt || ok) && netIsHost(D_003156C0)) {
             tmbr_OptSet(BIT[v - 1], !tmbr_Opt(BIT[v - 1]));
-            scePrintf("TMBR modspage: %s %s\n", v == 1 ? "minion" : "health", tmbr_Opt(BIT[v - 1]) ? "on" : "off");
+            scePrintf("TMBR modspage: row %d bit %x %s\n", v, BIT[v - 1], tmbr_Opt(BIT[v - 1]) ? "on" : "off");
         }
         D_004FA8AC = D_004FA8B0 = D_004FA8B4 = D_004FA8B8 = D_004FA8C8 = 0;
         if (v) CUR = 0;

@@ -149,7 +149,7 @@ void tmbr_StoryLobby(void)
         scePrintf("TMBR story: branch -> %s\n", NAME[level]);
     }
     /* the rules of a story level */
-    n = level == 14 ? 1 : AICOUNT[level];
+    n = (level == 14 ? 1 : AICOUNT[level]) + (tmbr_Opt(0x40) ? 1 : 0);   /* + the ally bot (GAME MODS ALLY BOT) */
     tmbr_botCount = n > 7 ? 7 : n;
     tmbr_OptSet(OPT_TEAMS, 1);
     tmbr_OptSet(OPT_TEAMS4, 0);
