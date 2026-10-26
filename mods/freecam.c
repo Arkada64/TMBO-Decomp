@@ -85,6 +85,61 @@ static void hudDefault(void)
 extern int tmbr_en[3];
 extern void tmbr_DamageReportTick(void);   /* dmgreport.c */
 #endif
+
+/* ---- split-screen stress test (experimental disc): more views, each extra one following another car ----
+ * Online never shows more than 1 view, but kept retail's machinery: viewSetNumViews, viewCreate (the viewport
+ * layouts retail's gameReestablishViews uses: 2 views 0xD / 0xE, 4 views 0xA..0xD), the Camera's per-viewport
+ * cameras (count at cam+0x43E0, cs per viewport at cam+0x42A0+4i) and the render loop over the views.
+ * tmbr_split[1] = views (0/1 = off, 2, or 3/4 = the 4-way layout like retail's 3 player), set in the ELF by
+ * tools/qb/split/splitpatch.py (tmbr_split[0] is its tag). 5 s after the level starts, views 1.. follow the
+ * other live cars (bots first); a view whose car is gone moves to the next live one. View 0 stays the player's.
+ * Only HUD and input for view 0: this measures the rendering + camera cost of split screen with full bots. */
+int tmbr_split[2] = { 0x54494C53, 0 };   /* "SLIT" */
+extern void viewSetNumViews(int n) __asm__("viewSetNumViews__Fi");
+extern void viewCreate(int vp, int idx) __asm__("func_00242658");
+extern void camFollow(char* cam, int i, char* v, void* cs) __asm__("SetCameraToFollowVehicle__6CameraiP7VehicleP3_cs");
+extern void camPov(char* cam, int i, int pov) __asm__("SetCameraPOV__6Camerai10_cameraPOV");
+extern int tmbr_levelSerial;
+static int splitSerial = -1, splitWait, splitN;
+static char* splitCar[4];
+static void splitFrame(char* cam)
+{
+    extern char* D_004FA030;
+    char* g = D_004FA030;
+    int n = tmbr_split[1], i, k;
+    if (n < 2 || !g) return;
+    if (n > 4) n = 4;
+    if (splitSerial != tmbr_levelSerial) { splitSerial = tmbr_levelSerial; splitWait = 300; splitN = 0; }
+    if (splitWait > 0) {
+        if (--splitWait) return;
+        splitN = n == 2 ? 2 : 4;
+        viewSetNumViews(splitN);
+        if (splitN == 2) { viewCreate(0xD, 0); viewCreate(0xE, 1); }
+        else for (i = 0; i < 4; i++) viewCreate(0xA + i, i);
+        *(int*)(cam + 0x43E0) = splitN;
+        for (i = 0; i < 4; i++) splitCar[i] = 0;
+        scePrintf("TMBR split: %d views (asked %d), cs %x %x %x %x\n", splitN, n, *(int*)(cam + 0x42A0), *(int*)(cam + 0x42A4),
+            *(int*)(cam + 0x42A8), *(int*)(cam + 0x42AC));
+    }
+    if (!splitN) return;
+    for (i = 1; i < splitN; i++) {
+        char* v = splitCar[i];
+        if (v && *(int*)(v + 0x590) && *(int*)(v + 0x2028)) continue;
+        for (k = 0; k < 8; k++) {     /* next live car not shown yet (not the local player: kind 1 is a human) */
+            int j, used = 0;
+            char* c = g + ((i + k) & 7) * 0x31B0;
+            if (*(int*)(c + 0x590) != 2 || !*(int*)(c + 0x2028)) continue;
+            for (j = 1; j < splitN; j++) if (splitCar[j] == c) used = 1;
+            if (used && k < 7) continue;
+            splitCar[i] = c;
+            camFollow(cam, i, c, *(void**)(c + 0x2028));
+            camPov(cam, i, *(int*)cam);
+            scePrintf("TMBR split: view %d follows car %d\n", i, (int)(c - g) / 0x31B0);
+            break;
+        }
+    }
+}
+
 void tmbr_CameraUpdate(char *cam)
 {
     int b, pad, pressed, i;
@@ -132,6 +187,9 @@ void tmbr_CameraUpdate(char *cam)
                 }
             }
     }
+#endif
+#ifndef TMBR_PNACH
+    splitFrame(cam);
 #endif
     cameraUpdate(cam);
 #ifdef TMBR_PNACH
