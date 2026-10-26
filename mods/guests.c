@@ -196,6 +196,11 @@ int tmbr_GuestsMake(int views)
             scePrintf("TMBR guests: player %d net object %x, net slot %d\n", i + 1, F(veh, 0x20D8), F(veh, 0x20C0));
         }
         guestCar[i] = veh;
+        {   /* the human branch of gameMakeAI never switches on this car's animation manager (ai branch: 0x13A850),
+             * so a guest's shield shimmer / special / death animations stood still (reference/wip/GUEST_SHIELD.md) */
+            extern void animMgrEnable(int en, int idx) __asm__("func_001FDE10");
+            animMgrEnable(1, (veh - g) / 0x31B0 + 1);
+        }
         if (i > guestN) guestN = i;
         scePrintf("TMBR guests: player %d (controller %d) = car slot %d, char %d, pad %d, view %d, kind %d\n", i + 1, k + 1, v, car >> 5, pads[k], i, F(veh, 0x590));
     }
