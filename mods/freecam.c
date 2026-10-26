@@ -88,8 +88,9 @@ extern void tmbr_DamageReportTick(void);   /* dmgreport.c */
 
 /* ---- split-screen stress test (experimental disc): more views, each extra one following another car ----
  * Online never shows more than 1 view, but kept retail's machinery: viewSetNumViews, viewCreate (the viewport
- * layouts retail's gameReestablishViews uses: 2 views 0xD / 0xE, 4 views 0xA..0xD), the Camera's per-viewport
- * cameras (count at cam+0x43E0, cs per viewport at cam+0x42A0+4i) and the render loop over the views.
+ * layouts retail's gameReestablishViews uses: 2 views 1 / 2 (top / bottom; 0xE is the rear mirror), 4 views
+ * 0xA..0xD), the Camera's per-viewport cameras (count at cam+0x43E0, Camera::Init func_00116038 takes each one's cs
+ * from viewGetViewCs) and the render loop over the views.
  * tmbr_split[1] = views (0/1 = off, 2, or 3/4 = the 4-way layout like retail's 3 player), set in the ELF by
  * tools/qb/split/splitpatch.py (tmbr_split[0] is its tag). 5 s after the level starts, views 1.. follow the
  * other live cars (bots first); a view whose car is gone moves to the next live one. View 0 stays the player's.
@@ -99,6 +100,7 @@ extern void viewSetNumViews(int n) __asm__("viewSetNumViews__Fi");
 extern void viewCreate(int vp, int idx) __asm__("func_00242658");
 extern void camFollow(char* cam, int i, char* v, void* cs) __asm__("SetCameraToFollowVehicle__6CameraiP7VehicleP3_cs");
 extern void camPov(char* cam, int i, int pov) __asm__("SetCameraPOV__6Camerai10_cameraPOV");
+extern void camInit(char* cam) __asm__("func_00116038");
 extern int tmbr_levelSerial;
 static int splitSerial = -1, splitWait, splitN;
 static char* splitCar[4];
@@ -114,9 +116,21 @@ static void splitFrame(char* cam)
         if (--splitWait) return;
         splitN = n == 2 ? 2 : 4;
         viewSetNumViews(splitN);
-        if (splitN == 2) { viewCreate(0xD, 0); viewCreate(0xE, 1); }
-        else for (i = 0; i < 4; i++) viewCreate(0xA + i, i);
-        *(int*)(cam + 0x43E0) = splitN;
+        {
+            int pov0 = *(int*)cam;
+            if (splitN == 2) { viewCreate(1, 0); viewCreate(2, 1); }
+            else for (i = 0; i < 4; i++) viewCreate(0xA + i, i);
+            *(int*)(cam + 0x43E0) = splitN;
+            camInit(cam);                     /* every camera's cs from its view; resets camera 0 too: */
+            for (k = 0; k < 8; k++) {         /* view 0 back on the local player */
+                char* c = g + k * 0x31B0;
+                if (*(int*)(c + 0x590) == 1 && *(int*)(c + 0x210C) == 0 && *(int*)(c + 0x2028)) {
+                    camFollow(cam, 0, c, *(void**)(c + 0x2028));
+                    break;
+                }
+            }
+            camPov(cam, 0, pov0);
+        }
         for (i = 0; i < 4; i++) splitCar[i] = 0;
         scePrintf("TMBR split: %d views (asked %d), cs %x %x %x %x\n", splitN, n, *(int*)(cam + 0x42A0), *(int*)(cam + 0x42A4),
             *(int*)(cam + 0x42A8), *(int*)(cam + 0x42AC));
