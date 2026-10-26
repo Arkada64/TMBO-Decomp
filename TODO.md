@@ -74,6 +74,17 @@
       squeezed under Sweet Tooth's size), removed as janky. As a separate car slot like 12 Pak: Head-On model
       (tools/lost/gtbuild.py), his own wheels, Lost's mount points, Sweet Tooth only as the stats / special donor.
       Needs a second free car-select slot and stays under the per-car texture / palette budget.
+  6d. Harbor City cars (Ark 2026-10-26), each its own car slot built from its own Lost model (like 12 Pak's rebuild):
+      - Old Pickup: Junkyard Dog's stats; special = a weaker Minion-style special that only tracks ahead and slightly to
+        the side. Needs animating; weapon racks unknown.
+      - Pit Viper: Spectre's stats and special. Needs animating; weapon racks unknown.
+      - Outlaw 2: Crazy 8's stats and special; move the special's effect so it fits (in Harbor City it sits above
+        the siren).
+      - Thumper: Brimstone's stats; special = Warthog's.
+      - Twister: Mr. Grimm's stats; special = Axel's primary.
+      - Gold Tooth: Sweet Tooth's stats; the size problem (model / texture budget) still needs a plan.
+  6e. Some cars have oddly lit parts (Ark 2026-10-26): find and fix the lighting / normals on those parts.
+  6f. MINION and HEALTH toggles move into the native game mods menu (Ark 2026-10-26), both default OFF.
   6c. Five Harbor City cars as new characters (Ark 2026-10-26): Old Pickup, Outlaw 2, Thumper, Pit Viper, Twister -
       files set aside in TMB Decomp/hc_cars (reference/wip/HEADON_ETE.md). Old Pickup / Pit Viper are near-static
       models (tiny pointer lists): animate them from Black's files (wheels / suspension / weapon parts of a donor).
