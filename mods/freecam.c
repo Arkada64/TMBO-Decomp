@@ -102,7 +102,9 @@ extern void camFollow(char* cam, int i, char* v, void* cs) __asm__("SetCameraToF
 extern void camPov(char* cam, int i, int pov) __asm__("SetCameraPOV__6Camerai10_cameraPOV");
 extern void camInit(char* cam) __asm__("func_00116038");
 extern int tmbr_GuestsWanted(void), tmbr_GuestCount(void);   /* guests.c */
-extern void tmbr_GuestsMake(int views), tmbr_GuestsReset(void);
+extern int tmbr_GuestsMake(int views);
+extern char* tmbr_GuestCar(int i);
+extern void tmbr_GuestsReset(void);
 extern int tmbr_levelSerial;
 static int splitSerial = -1, splitWait, splitN;
 static char* splitCar[4];
@@ -145,6 +147,126 @@ static void wideFrame(void)
     if (wideWait > 0 && --wideWait == 0) wideApply(viewGetNumViews());   /* once (re-checking every second widened again
                                                                           * and again: the read-back differs, 2026-10-26) */
 }
+/* ---- split screen: the scoreboard (func_0018C7D0: the player list shown while dead / waiting) per half ----
+ * Ark 2026-10-26: shrink it for each screen. The game draws it from its update (func_00138C90 0x139344), which
+ * the render loop runs during the LAST view, so it always landed in the bottom half, at full size. With 2+ views
+ * that call is held back (tmbr_SbCall) and the scoreboard is drawn during each view's HUD (0x183AD4 ->
+ * tmbr_HudView): the player's view when the game wanted it, a guest's view while the guest's car is dead
+ * (+0x485). Its prints (font coordinates 640 x 224 per view) go through tmbr_SbPrint / tmbr_SbPrintC /
+ * tmbr_SbSize / tmbr_SbDefSize (apply_mods.py, the calls in func_0018C7D0): half height, half letter size, full width. */
+extern void scoreboard(int a) __asm__("func_0018C7D0");
+extern void fontPrintXY(int f, int x, int y, const char* t) __asm__("func_00202DF8");
+extern void fontPrintCXY(int f, int x, int y, const char* t) __asm__("fontSpritePrintCenteredXY__FiiiPc");
+extern void fontSize(int f, int sz) __asm__("fontSetSize__Fii");
+static int sbArg = -1, sbScale;
+void tmbr_SbCall(int a)
+{
+    if (splitN < 2) { scoreboard(a); return; }
+    sbArg = a;
+}
+static int sbX(int x) { return x; }            /* (full width: a half keeps it - 0.6 x overlapped the columns, Ark 2026-10-26) */
+static int sbY(int y) { return sbScale ? 12 + y / 2 : y; }
+void tmbr_SbPrint(int f, int x, int y, const char* t) { fontPrintXY(f, sbX(x), sbY(y), t); }
+void tmbr_SbPrintC(int f, int x, int y, const char* t) { fontPrintCXY(f, sbX(x), sbY(y), t); }
+void tmbr_SbSize(int f, int sz) { fontSize(f, sbScale ? (sz + 1) / 2 : sz); }   /* (letters half size with the rows) */
+extern void fontDefSize(int f) __asm__("fontSetDefaultSize__Fi");
+void tmbr_SbDefSize(int f) { fontDefSize(f); if (sbScale) fontSize(f, f == 0 ? 8 : 6); }   /* (defaults 16 / 12) */
+extern void hudBuild(char* hud, int view) __asm__("func_001475F8");
+/* the HUD's 3D clusters are placed by func_00145860(hud) per view (0x1838B4); the anchors are set right before
+ * (in tests PCSX2 applies the community pnach to the original ELF every frame, which puts hud 0's x back) */
+extern void hudPlace(char* hud) __asm__("func_00145860");
+static void splitAnchors(char* g);
+void tmbr_HudPlace(char* hud)
+{
+    extern char* D_004FA030;
+    if (splitN == 2 && D_004FA030) splitAnchors(D_004FA030);
+    hudPlace(hud);
+}
+void tmbr_HudView(char* hud, int view)
+{
+    hudBuild(hud, view);
+    if (splitN < 2) return;
+    if (view == 0) {
+        if (sbArg >= 0) { sbScale = 1; scoreboard(sbArg); sbScale = 0; sbArg = -1; }
+    } else {
+        char* v = tmbr_GuestCar(view);
+        if (v && *(char*)(v + 0x485)) { sbScale = 1; scoreboard(1); sbScale = 0; }
+    }
+}
+/* 2 views: the HUD's two 3D clusters (hud +0x800 left/top: radar, +0x810 right/bottom: weapon bay; camera space
+ * x right, y forward, z up) are placed for a full-height view and stick out of a half-height one. Pushed 1.5x
+ * further away (2/3 the size), x out to the screen edges (Ark 2026-10-26: radar and weapon list to their edges,
+ * the weapon bay's blue bar was cut off at the bottom), z pulled in to fit the half height. Written every frame:
+ * the game sets x again after the level starts (the 16:9 values of the baked community widescreen patch). */
+static float anc0[2][3];
+static int ancSet;
+static float ancK[8] = { 1.5f, 1.0f, 0.72f, 0.62f, 4.0f, 0.0f, 0, 0 };   /* (x 1.18 put P2's off the edges, 2026-10-26) */   /* (an array: float literals overflowed
+                                                                       * the small-data area at link time) */
+static void splitAnchors(char* g)
+{
+    char* h0 = g + 0x97B50;
+    int i, c, k;
+    if (!ancSet) {                        /* the single-view values, once (the game's own, before we touch them) */
+        float* f = (float*)(h0 + 0x800);
+        if (!*(int*)h0 || f[1] <= ancK[5] || f[1] > ancK[4]) return;
+        for (c = 0; c < 2; c++) for (k = 0; k < 3; k++) anc0[c][k] = ((float*)(h0 + 0x800 + c * 0x10))[k];
+        ancSet = 1;
+    }
+    for (i = 0; i < 2; i++) {
+        char* h = h0 + i * 0xA20;
+        if (!*(int*)h) continue;
+        for (c = 0; c < 2; c++) {
+            float* f = (float*)(h + 0x800 + c * 0x10);
+            f[0] = anc0[c][0] * ancK[0] * ancK[1]; f[1] = anc0[c][1] * ancK[0]; f[2] = anc0[c][2] * ancK[2 + c];
+        }
+    }
+}
+/* the guests' HUDs (after each guest is made; again for one made late) */
+static char hudDone[4];
+static void splitHuds(char* g)
+{
+    int i;
+    {   /* guest HUDs: hud[i] (game + 0x97B50 + i * 0xA20) is built for every view (func_00183580 ->
+         * func_001475F8) but skipped while hud+0 is 0; only hud 0 is set up in online. Start the guests' as a
+         * copy of the player's, on their own car (+0x5E4, set by gameInitCamera). */
+        char* h0 = g + 0x97B50;
+        int gc = tmbr_GuestCount(), q;
+        scePrintf("TMBR split: humans %d, hud0 %x %x %x, hud1 %x %x %x\n", *(int*)(g + 0x98000 + 0x7CAC),
+            *(int*)h0, *(int*)(h0 + 4), *(int*)(h0 + 0x5E4), *(int*)(h0 + 0xA20), *(int*)(h0 + 0xA24), *(int*)(h0 + 0xA20 + 0x5E4));
+        for (i = 1; i <= gc && i < splitN; i++) {
+            char* h = h0 + i * 0xA20;
+            int car = *(int*)(h + 0x5E4);
+            if (!tmbr_GuestCar(i) || !car || hudDone[i]) continue;
+            for (q = 0; q < 0xA20 / 4; q++) ((int*)h)[q] = ((int*)h0)[q];
+            *(int*)(h + 0x5E4) = car;
+        }
+        {   /* the HUD's 3D parts are drawn from per-view cs tables (ParseHudElements: D_002C0910[view] left
+             * cluster, D_002C0920[view] right cluster; func_001475F8 / func_00145860 use [view]); online only
+             * fills [0], so the guests' views had none. Give them their own cs on the same model. */
+            extern char* D_002C0910[4];
+            extern char* D_002C0920[4];
+            extern char* csAlloc(void) __asm__("func_00213F80");
+            extern void csAddToList(char* cs) __asm__("hierCsAddToCsList__FP3_cs");
+            char** tb[2];
+            int t;
+            tb[0] = D_002C0910; tb[1] = D_002C0920;
+            for (t = 0; t < 2; t++)
+                for (i = 1; i <= gc && i < splitN && i < 4; i++) {
+                    char* c;
+                    if (!tb[t][0] || hudDone[i] || !tmbr_GuestCar(i)) continue;   /* (new each level: the cs pool starts over) */
+                    if (!(c = csAlloc())) break;
+                    *(char**)c = *(char**)tb[t][0];        /* its model (hierSetCsEpNode) */
+                    c[0xC] = 1;
+                    csAddToList(c);
+                    tb[t][i] = c;
+                }
+            for (i = 1; i <= gc && i < 4; i++) if (tmbr_GuestCar(i)) hudDone[i] = 1;
+            scePrintf("TMBR split: hud cs %x %x / %x %x\n", (int)D_002C0910[0], (int)D_002C0910[1], (int)D_002C0920[0], (int)D_002C0920[1]);
+        }
+    }
+}
+static int guestsPending, guestsMade;
+static char povSet[4];
 static void splitFrame(char* cam)
 {
     extern char* D_004FA030;
@@ -153,14 +275,17 @@ static void splitFrame(char* cam)
     if (tmbr_GuestsWanted() && n < tmbr_GuestsWanted() + 1) n = tmbr_GuestsWanted() + 1;
     if (n < 2 || !g) return;
     if (n > 4) n = 4;
-    if (splitSerial != tmbr_levelSerial) { splitSerial = tmbr_levelSerial; splitWait = 300; splitN = 0; tmbr_GuestsReset(); { extern void tmbr_GuestsPreload(void); tmbr_GuestsPreload(); } }
+    if (splitSerial != tmbr_levelSerial) { splitSerial = tmbr_levelSerial; splitWait = 2; splitN = 0; splitCar[0] = 0; guestsPending = 0; for (i = 0; i < 4; i++) hudDone[i] = povSet[i] = 0; tmbr_GuestsReset(); { extern void tmbr_GuestsPreload(void); tmbr_GuestsPreload(); } }
     if (splitWait > 0) {
+        /* from the first frames of the match (Ark 2026-10-26: no switching to split screen mid-match), as soon
+         * as the local player's car is there */
+        for (k = 0; k < 8; k++) {
+            char* c = g + k * 0x31B0;
+            if (*(int*)(c + 0x590) == 1 && *(int*)(c + 0x210C) == 0 && *(int*)(c + 0x2028)) break;
+        }
+        if (k == 8) return;
         if (--splitWait) return;
         splitN = n == 2 ? 2 : 4;
-        {   /* (debug: the views' projection before and after the split - the HUD's left parts end up off screen) */
-            float a0, b0; viewGetFov(0, &a0, &b0);
-            scePrintf("TMBR split: 1P fov %d %d\n", (int)(a0 * 1000), (int)(b0 * 1000));
-        }
         viewSetNumViews(splitN);
         {
             int pov0 = *(int*)cam;
@@ -172,62 +297,17 @@ static void splitFrame(char* cam)
                 char* c = g + k * 0x31B0;
                 if (*(int*)(c + 0x590) == 1 && *(int*)(c + 0x210C) == 0 && *(int*)(c + 0x2028)) {
                     camFollow(cam, 0, c, *(void**)(c + 0x2028));
+                    splitCar[0] = c;
                     break;
                 }
             }
             camPov(cam, 0, pov0);
-            tmbr_GuestsMake(splitN);           /* guests: their own camera + HUD through gameInitCamera */
-            {   /* guest HUDs: hud[i] (game + 0x97B50 + i * 0xA20) is built for every view (func_00183580 ->
-                 * func_001475F8) but skipped while hud+0 is 0; only hud 0 is set up in online. Start the guests' as a
-                 * copy of the player's, on their own car (+0x5E4, set by gameInitCamera). */
-                char* h0 = g + 0x97B50;
-                int gc = tmbr_GuestCount(), q;
-                scePrintf("TMBR split: humans %d, hud0 %x %x %x, hud1 %x %x %x\n", *(int*)(g + 0x98000 + 0x7CAC),
-                    *(int*)h0, *(int*)(h0 + 4), *(int*)(h0 + 0x5E4), *(int*)(h0 + 0xA20), *(int*)(h0 + 0xA24), *(int*)(h0 + 0xA20 + 0x5E4));
-                for (i = 1; i <= gc && i < splitN; i++) {
-                    char* h = h0 + i * 0xA20;
-                    int car = *(int*)(h + 0x5E4);
-                    if (!car) continue;
-                    for (q = 0; q < 0xA20 / 4; q++) ((int*)h)[q] = ((int*)h0)[q];
-                    *(int*)(h + 0x5E4) = car;
-                }
-                {   /* the HUD's 3D parts are drawn from per-view cs tables (ParseHudElements: D_002C0910[view] left
-                     * cluster, D_002C0920[view] right cluster; func_001475F8 / func_00145860 use [view]); online only
-                     * fills [0], so the guests' views had none. Give them their own cs on the same model. */
-                    extern char* D_002C0910[4];
-                    extern char* D_002C0920[4];
-                    extern char* csAlloc(void) __asm__("func_00213F80");
-                    extern void csAddToList(char* cs) __asm__("hierCsAddToCsList__FP3_cs");
-                    char** tb[2];
-                    int t;
-                    tb[0] = D_002C0910; tb[1] = D_002C0920;
-                    for (t = 0; t < 2; t++)
-                        for (i = 1; i <= gc && i < splitN && i < 4; i++) {
-                            char* c;
-                            if (!tb[t][0]) continue;            /* (always new: the cs pool starts over each level) */
-                            if (!(c = csAlloc())) break;
-                            *(char**)c = *(char**)tb[t][0];        /* its model (hierSetCsEpNode) */
-                            c[0xC] = 1;
-                            csAddToList(c);
-                            tb[t][i] = c;
-                        }
-                    scePrintf("TMBR split: hud cs %x %x / %x %x\n", (int)D_002C0910[0], (int)D_002C0910[1], (int)D_002C0920[0], (int)D_002C0920[1]);
-                }
-                /* 2 views: the HUD's two 3D clusters (hud +0x800 left/top: radar, +0x810 right/bottom: weapons; camera
-                 * space x right, y forward, z up) are placed for a full-height view and stick out of a half-height one.
-                 * 1.5x further away and 1.5x wider: same place across, half as far up/down, 2/3 the size. */
-                if (splitN == 2)
-                    for (i = 0; i < 2; i++) {
-                        char* h = h0 + i * 0xA20;
-                        int c;
-                        if (!*(int*)h) continue;
-                        for (c = 0x800; c <= 0x810; c += 0x10) {
-                            float* f = (float*)(h + c);
-                            if (f[1] > 4.0f) continue;          /* (done already: kept from the last match) */
-                            f[0] *= 1.5f; f[1] *= 1.5f; f[2] *= 0.75f;
-                        }
-                    }
-            }
+            guestsPending = tmbr_GuestsMake(splitN);   /* guests: their own camera + HUD through gameInitCamera */
+            guestsMade = tmbr_GuestCount();
+            for (i = guestsMade + 1; i <= tmbr_GuestsWanted() && i < splitN; i++)   /* (a guest whose car is still
+                                                         * loading: their view on the player meanwhile) */
+                if (splitCar[0]) { camFollow(cam, i, splitCar[0], *(void**)(splitCar[0] + 0x2028)); camPov(cam, i, pov0); }
+            splitHuds(g);
             if (splitN == 2) {
                 /* 2 views (test 2026-10-26): the half-height views get a 4/3 narrower horizontal field than the
                  * single view (projection 608 vs 456: the single view is widened for 16:9 by the community widescreen patch
@@ -244,16 +324,19 @@ static void splitFrame(char* cam)
             }
             else if (tmbr_wide[1]) wideApply(splitN);
         }
-        for (i = 0; i < 4; i++) splitCar[i] = 0;
-        {
-            extern int D_004CFB98;
-            float a0, b0, a1, b1; viewGetFov(0, &a0, &b0); viewGetFov(1, &a1, &b1);
-            scePrintf("TMBR split: 2P fov %d %d / %d %d, display mode %d\n", (int)(a0 * 1000), (int)(b0 * 1000), (int)(a1 * 1000), (int)(b1 * 1000), D_004CFB98);
-        }
+        for (i = 1; i < 4; i++) splitCar[i] = 0;
         scePrintf("TMBR split: %d views (asked %d), cs %x %x %x %x\n", splitN, n, *(int*)(cam + 0x42A0), *(int*)(cam + 0x42A4),
             *(int*)(cam + 0x42A8), *(int*)(cam + 0x42AC));
     }
     if (!splitN) return;
+    if (guestsPending) {
+        guestsPending = tmbr_GuestsMake(splitN);
+        if (tmbr_GuestCount() != guestsMade) { guestsMade = tmbr_GuestCount(); splitHuds(g); }
+    }
+    if (splitN == 2) splitAnchors(g);
+    for (i = 1; i < splitN && i < 4; i++)       /* a guest's camera: the player's view (gameInitCamera leaves the
+                                                 * default, closer one - test 2026-10-26) */
+        if (!povSet[i] && tmbr_GuestCar(i)) { camPov(cam, i, *(int*)cam); povSet[i] = 1; }
     if (tmbr_wide[1] == 8 && !splitCar[1]) {             /* widescreen test: view 1 on the player too */
         for (k = 0; k < 8; k++) {
             char* c = g + k * 0x31B0;
@@ -261,7 +344,7 @@ static void splitFrame(char* cam)
         }
         return;
     }
-    for (i = 1 + tmbr_GuestCount(); i < splitN; i++) {     /* (views 1..guests are the guests') */
+    for (i = 1 + tmbr_GuestsWanted(); i < splitN; i++) {   /* (views 1..guests are the guests') */
         char* v = splitCar[i];
         if (v && *(int*)(v + 0x590) && *(int*)(v + 0x2028)) continue;
         for (k = 0; k < 8; k++) {     /* next live car not shown yet (not the local player: kind 1 is a human) */

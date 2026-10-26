@@ -41,6 +41,7 @@ static int joinCar[4], joinSlot[4] = { -1, -1, -1, -1 };   /* per controller 2..
 static int picking, pickSavedCar, pickSavedPos, prevBtn[4], idleT[4];
 
 int tmbr_GuestCount(void) { return guestN; }
+char* tmbr_GuestCar(int i) { return i > 0 && i < 4 && guestCar[i] != (char*)-1 ? guestCar[i] : 0; }   /* view i's guest car, 0 = none / not made yet */
 int tmbr_GuestPicking(void) { return picking; }
 static int joined(void) { int k, n = 0; for (k = 1; k <= 3; k++) if (joinCar[k]) n++; return n; }
 int tmbr_GuestsWanted(void)
@@ -96,7 +97,9 @@ extern char* D_004FA03C;
 extern void shellLoadSlotCar(char* shell, int s) __asm__("func_001890F0");
 extern void carUnloadVeh(int v) __asm__("func_001FE0B8");
 extern int carLoadDone(int v) __asm__("func_0018A480");
-void tmbr_GuestsPreload(void)
+static void preload(int inGame);
+void tmbr_GuestsPreload(void) { preload(1); }
+static void preload(int inGame)
 {
     int k;
     for (k = 1; k <= 3; k++) {
@@ -110,22 +113,21 @@ void tmbr_GuestsPreload(void)
         was10 = F(sl, 0x10); wasB8 = F(sl, 0xB8);
         F(sl, 0x10) = s; F(sl, 0xB8) = 1;
         vn = netSlotVehicle(D_003156C0, s);
-        carUnloadVeh(vn);
+        if (inGame) carUnloadVeh(vn);
         shellLoadSlotCar(D_004FA03C, s);
         F(sl, 0x10) = was10; F(sl, 0xB8) = wasB8;
         scePrintf("TMBR guests: slot %d now %d, done %d\n", s, D_00313F00[s] >> 5, carLoadDone(vn));
     }
 }
 /* make the guests (freecam.c splitFrame, right after the views are set up, cam = their view) */
-void tmbr_GuestsMake(int views)
+/* returns how many guests are still waiting for their car to load (call again next frame) */
+int tmbr_GuestsMake(int views)
 {
     char* g = D_004FA030;
-    int i, n = tmbr_GuestsWanted();
+    int i, n = tmbr_GuestsWanted(), pending = 0;
     static const int pads[4] = { 0, 2, 4, 6 };
     int order[4];
-    guestN = 0;
-    for (i = 0; i < 8; i++) padOf[i] = -1;
-    if (!g) return;
+    if (!g) return 0;
     {   /* guests from the waiting room joins (controller k, its reserved slot and car) or the test config */
         int k, m = 0;
         for (k = 1; k <= 3; k++) if (joinCar[k]) { m++; order[m] = k; }
@@ -134,6 +136,8 @@ void tmbr_GuestsMake(int views)
     for (i = 1; i <= n && i < views; i++) {
         int k = order[i], v = -1, car;
         char* veh;
+        if (guestCar[i]) continue;                      /* made already */
+        if (k > 0 && joinSlot[k] >= 0 && !carLoadDone(netSlotVehicle(D_003156C0, joinSlot[k]))) { pending++; continue; }
         if (k > 0) {
             car = joinCar[k];
             if (joinSlot[k] >= 0) v = netSlotVehicle(D_003156C0, joinSlot[k]) - 1;
@@ -141,23 +145,23 @@ void tmbr_GuestsMake(int views)
             if (v < 0) v = freeSlot(g);
             if (joinSlot[k] >= 0) scePrintf("TMBR guests: controller %d slot %d car %d (slot says %d)\n", k + 1, joinSlot[k], car >> 5, F(D_003156C0 + joinSlot[k] * 0x220, 0xB4) >> 5);
         } else { k = -k; car = tmbr_guests[1 + k]; v = freeSlot(g); }
-        if (v < 0) { scePrintf("TMBR guests: no free car slot for player %d\n", i + 1); break; }
+        if (v < 0) { scePrintf("TMBR guests: no free car slot for player %d\n", i + 1); guestCar[i] = (char*)-1; continue; }
         if (car <= 0) car = mathfRandI(1, 14) << 5;
         if ((car >> 5) == 15 && tmbr_Opt(8)) car = mathfRandI(1, 14) << 5;   /* Minion off */
         padOf[v] = pads[k];
-        if (k > 0 && joinSlot[k] >= 0) scePrintf("TMBR guests: load done %d, slot car %d\n", carLoadDone(netSlotVehicle(D_003156C0, joinSlot[k])), D_00313F00[joinSlot[k]] >> 5);
         veh = gameMakeAI(g, v, car, v, i, 0);
         if (!veh) {             /* (the human branch does not return the car: find the one it set up) */
             int k;
             for (k = 0; k < 8; k++)
                 if (F(g + k * 0x31B0, 0x20F0) == v && F(g + k * 0x31B0, 0x590) == 1) veh = g + k * 0x31B0;
         }
-        if (!veh) { padOf[v] = -1; scePrintf("TMBR guests: player %d not made\n", i + 1); break; }
+        if (!veh) { padOf[v] = -1; scePrintf("TMBR guests: player %d not made\n", i + 1); guestCar[i] = (char*)-1; continue; }
         F(veh, 0x210C) = i;
         guestCar[i] = veh;
-        guestN = i;
+        if (i > guestN) guestN = i;
         scePrintf("TMBR guests: player %d (controller %d) = car slot %d, char %d, pad %d, view %d, kind %d\n", i + 1, k + 1, v, car >> 5, pads[k], i, F(veh, 0x590));
     }
+    return pending;
 }
 /* level change / match end */
 void tmbr_GuestsReset(void)
@@ -278,6 +282,7 @@ void tmbr_CarSelNet(void* net, int st)
 #define B_TRI 0x1000
 #define B_CIRCLE 0x2000
 #define B_CROSS 0x4000
+static void preload(int inGame);
 void tmbr_GuestPickEnd(int accept)
 {
     int k = picking;
@@ -291,6 +296,8 @@ void tmbr_GuestPickEnd(int accept)
             scePrintf("TMBR guests: controller %d joins with %s (net slot %d)\n", k + 1, D_0041BF00[car >> 5], s);
         } else scePrintf("TMBR guests: no free slot for controller %d\n", k + 1);
     } else scePrintf("TMBR guests: controller %d backed out\n", k + 1);
+    preload(0);                     /* load the car now, in the room (the shell's own per-player car load), so it is
+                                     * there when the match starts (Ark 2026-10-26: both halves showed P1 for a second) */
     if (myClient()) F(myClient(), 0xA4) = pickSavedCar;
     carSelPos = pickSavedPos;
     D_004FA718 = 0x75;                                  /* camera back to the room (as car select's own confirm) */
