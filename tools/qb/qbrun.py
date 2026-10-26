@@ -65,6 +65,13 @@ def main():
     ini = f'{P}/inis/PCSX2.ini'; shutil.copy(ini, ini + '.qbbak')
     s = open(ini).read().replace('StandardVolume = 100', 'StandardVolume = 0').replace('FastForwardVolume = 100', 'FastForwardVolume = 0').replace('\nSDL = true', '\nSDL = false').replace('\nXInput = true', '\nXInput = false').replace('\nDInput = true', '\nDInput = false')   # no real controllers in tests (Ark 2026-10-26: his Xbox pad rumbled)
     if os.environ.get('QB_EXTRAMEM') == '1': s = s.replace('ExtraMemory = false', 'ExtraMemory = true')   # 128 MB EE test
+    if os.environ.get('QB_MEMCARD') == '1':          # memory card writes go to a copy (story saves in tests)
+        import re as _re
+        mm = _re.search(r'\nSlot1_Filename = (.*)', s)
+        if mm:
+            src = f'{P}/memcards/{mm.group(1).strip()}'; dst = f'{P}/memcards/qb_test.ps2'
+            if os.path.exists(src) and not os.path.exists(dst): shutil.copy(src, dst)
+            s = s.replace(mm.group(0), '\nSlot1_Filename = qb_test.ps2')
     if os.environ.get('QB_TEXLOAD'): s = s.replace('LoadTextureReplacements = false', 'LoadTextureReplacements = true').replace('PrecacheTextureReplacements = false', 'PrecacheTextureReplacements = true')   # (HD pack test)
     if os.environ.get('QB_TEXDUMP'): s = s.replace('DumpReplaceableTextures = false', 'DumpReplaceableTextures = true')   # (HD pack hit check)
     # PINE on (savestates on request, for the EE registers of a hang) and uncompressed savestates

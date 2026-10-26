@@ -43,13 +43,45 @@ static const char* const NAME[21] = { "SUBURBS", "JUNKYARD", "FREEWAY", "PRISON 
 static int level = 1, stage = 1, fork = -1, playedSerial = -1, doneSerial = -1, wasOn, prevPad;
 static char msg[32];
 
+/* Progress on the memory card (Ark: a story run is saved): retail's co-op save file (TwistedMemoryCard at shell
+ * +0x19E60, "<dir>/coopFile", 0x24-byte records with an 18-bit checksum in word +8 bits 12..29), which TMBO never
+ * uses. Record 0 = ours: 'TMBS', level, stage, fork, finished flag. Read when STORY is switched on (a run in
+ * progress continues), written after every won level. R3 + L3 in the waiting room starts a new run. */
+typedef struct { unsigned magic; signed char level, stage, fork, finished; unsigned ck; unsigned runs; unsigned pad[5]; } StorySave;
+extern int coopSave(void* tmc, unsigned slot, void* d) __asm__("func_001B01B8");
+extern int coopList(void* tmc, void* d, unsigned* n) __asm__("coopGetGameListing__17TwistedMemoryCardP17TmCoopMemCardDataRUi");
+#define TMC (D_004FA03C + 0x19E60)
+#define SAVE_MAGIC 0x53424D54
+static StorySave saves[16];
+static unsigned runs;
+static void saveRun(void)
+{
+    StorySave* r = &saves[0];
+    int i, ok;
+    for (i = 0; i < (int)sizeof(StorySave); i++) ((char*)r)[i] = 0;
+    r->magic = SAVE_MAGIC; r->level = level; r->stage = stage; r->fork = fork; r->runs = runs;
+    ok = coopSave(TMC, 0, r);
+    scePrintf("TMBR story: saved stage %d %s -> %d\n", stage, NAME[level], ok);
+}
+static int loadRun(void)
+{
+    unsigned n = 0;
+    int ok = coopList(TMC, saves, &n);
+    scePrintf("TMBR story: card read %d, %d records, magic %x\n", ok, n, n ? saves[0].magic : 0);
+    if (!ok || !n || n > 16 || saves[0].magic != SAVE_MAGIC || saves[0].level < 0 || saves[0].level > 20) return 0;
+    level = saves[0].level; stage = saves[0].stage; fork = saves[0].fork; runs = saves[0].runs;
+    return 1;
+}
+
 int tmbr_StoryOn(void) { return tmbr_Opt(OPT_STORY); }
 int tmbr_StoryLevel(void) { return level; }
 
-static void start(void)
+static void start(int fresh)
 {
     level = 1; stage = 1; fork = -1; msg[0] = 0;
     playedSerial = doneSerial = tmbr_levelSerial;
+    if (!fresh && loadRun()) { scePrintf("TMBR story: continue, stage %d %s\n", stage, NAME[level]); return; }
+    if (fresh) { runs++; saveRun(); }
     scePrintf("TMBR story: new run, %s\n", NAME[level]);
 }
 
@@ -81,12 +113,14 @@ static void result(void)
     if (NEXT[level][0] == END) {
         sprintf(msg, "STORY COMPLETE!");
         fork = -1; level = 1; stage = 1;
+        saveRun();
         return;
     }
     fork = level;
     level = NEXT[level][0];
     stage++;
     msg[0] = 0;
+    saveRun();
 }
 
 /* host, every waiting-room frame (bots.c tmbr_LobbyFrame) */
@@ -102,7 +136,8 @@ void tmbr_StoryLobby(void)
     {   extern int tmbr_singlePlayer;                    /* menu.c: SINGLE PLAYER lands here with STORY on */
         if (tmbr_singlePlayer == 1) { tmbr_singlePlayer = 2; tmbr_OptSet(OPT_STORY, 1); scePrintf("TMBR story: single player room\n"); } }
     on = tmbr_Opt(OPT_STORY);
-    if (on && !wasOn) start();
+    if (on && !wasOn) start(0);
+    if (on && (pad & 0x4) && (pressed & 0x2)) start(1);                   /* R3 + L3: a new run */
     if (!on && wasOn) tmbr_TeamsBotMode(0);
     wasOn = on;
     if (!on) return;
@@ -110,6 +145,7 @@ void tmbr_StoryLobby(void)
     if (!(pad & 0x4) && (pressed & 0x2) && fork >= 0 && NEXT[fork][0] != NEXT[fork][1]) {
         level = level == NEXT[fork][0] ? NEXT[fork][1] : NEXT[fork][0];
         msg[0] = 0;
+        saveRun();
         scePrintf("TMBR story: branch -> %s\n", NAME[level]);
     }
     /* the rules of a story level */

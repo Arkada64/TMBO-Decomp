@@ -28,32 +28,30 @@ static const int BIT[NROW] = { 8, 16 };
 
 void tmbr_ModsPage(void)
 {
-    static int v, lastField, logged;
+    static int v, lastField, logged, lastCur;
     int t = timerGetFieldCount(), up = D_004FA8B4, dn = D_004FA8B8, lt = D_004FA8AC, rt = D_004FA8B0, ok = D_004FA8C8, i;
-    if (t - lastField > 4) v = 0;                              /* page (re)opened */
+    if (t - lastField > 4) { v = 0; lastCur = CUR; }          /* page (re)opened */
     lastField = t;
     if ((up | dn | lt | rt | ok) && logged < 12) {
         logged++;
         scePrintf("TMBR modspage: up %d down %d left %d right %d ok %d cursor %d ours %d\n", up, dn, lt, rt, ok, CUR, v);
     }
     if (v) {
-        if (up) { if (v == 2) v = 1; else { v = 0; CUR = 5; } }
+        if (up) { if (v == 2) v = 1; else { v = 0; CUR = 5; } }   /* (game cursor was 0: its move is overwritten) */
         else if (dn) { if (v == 1) v = 2; else { v = 0; CUR = 1; } }        /* (the native list wraps too) */
         else if ((lt || rt || ok) && netIsHost(D_003156C0)) {
             tmbr_OptSet(BIT[v - 1], !tmbr_Opt(BIT[v - 1]));
             scePrintf("TMBR modspage: %s %s\n", v == 1 ? "minion" : "health", tmbr_Opt(BIT[v - 1]) ? "on" : "off");
         }
-        if (up || dn || lt || rt || ok) shellSfx(shellPtr + 0x1A16C, 2);
         D_004FA8AC = D_004FA8B0 = D_004FA8B4 = D_004FA8B8 = D_004FA8C8 = 0;
         if (v) CUR = 0;
-    } else if (CUR == 5 && dn) {
+    } else if (lastCur == 5 && dn) {            /* (the game moved its cursor before us: 5 -> 1 = it wrapped) */
         v = 1; CUR = 0; D_004FA8B8 = 0;
-        shellSfx(shellPtr + 0x1A16C, 2);
-    } else if (CUR == 1 && up) {
+    } else if (lastCur == 1 && up) {
         v = NROW; CUR = 0; D_004FA8B4 = 0;
-        shellSfx(shellPtr + 0x1A16C, 2);
     }
     modsMain();
+    lastCur = CUR;
     for (i = 0; i < NROW; i++) {
         char b[48];
         if (v == i + 1) fontSetColor(0, 0x74, 0x5A, 0x2C); else fontSetColor(0, 0x44, 0x32, 0x20);
