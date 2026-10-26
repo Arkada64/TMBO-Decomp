@@ -43,6 +43,8 @@ static const char* const NAME[21] = { "SUBURBS", "JUNKYARD", "FREEWAY", "PRISON 
 
 static int level = 1, stage = 1, fork = -1, playedSerial = -1, doneSerial = -1, wasOn, prevPad, introDone;
 static char msg[32];
+static int movN, movI, movBuilt;      /* story movies (phase 2, below) */
+int tmbr_StoryMoviesDone(void);
 
 /* Progress on the memory card (Ark: a story run is saved): retail's co-op save file (TwistedMemoryCard at shell
  * +0x19E60, "<dir>/coopFile", 0x24-byte records with an 18-bit checksum in word +8 bits 12..29), which TMBO never
@@ -145,6 +147,10 @@ void tmbr_StoryLobby(void)
     wasOn = on;
     if (!on) return;
     result();
+    {   static int key = -1, wait;                     /* the stage's movies, a second after the room is up */
+        if (key != stage * 32 + level) { key = stage * 32 + level; movBuilt = 0; wait = 0; }
+        if (++wait > 60) tmbr_StoryMoviesDone();
+    }
     {   static int wait;
         if (saveRetry && ++wait >= 30) { wait = 0; if (saveRetry < 5) saveRun(); else saveRetry = 0; } }
     if (!(pad & 0x4) && (pressed & 0x2) && fork >= 0 && NEXT[fork][0] != NEXT[fork][1]) {
@@ -193,12 +199,13 @@ int tmbr_StoryCars(void)
 }
 
 /* ---- phase 2: retail's story movies (reference/wip/STORY_MOVIES.md) ----
- * Played on the loading screen (guests.c: before uiLoadLevel, while tmbr_StoryMoviesDone() says 0), on every
- * console, when the level being loaded is the story run's level: the character's intro (X??A) before the first
+ * Played in the waiting room (tmbr_StoryLobby, once per stage, a second after the room shows: TMBO's own clips
+ * only play inside menu screens - the loading screen attempts froze or never started, tests g100-g104), host side
+ * for now: the character's intro (X??A) before the first
  * Junkyard, ??ARENA before Minion's stadium, X??B before Prison Passage, ??ROOF before Warhawk's roof, then the
  * level's LLn clip. The character is this console's car (12 Pak = a Roadkill: Roadkill's movies). A movie that is not
  * on the disc is skipped (the game's file lookup first), so a disc without retail's \MOV\ files plays nothing.
- * Player: see tmbr_StoryMoviesDone (blocking). */
+ * Player: see tmbr_StoryMoviesDone. */
 extern int fileSearch(void* f, const char* name) __asm__("func_00201910");   /* the game's disc file lookup (strFileOpen uses it) */
 extern int movieRequested __asm__("D_004FB068");    /* set by the player, cleared when the clip ends (the UI loop decodes while set) */
 extern int netGetMyClientIndex(void* net) __asm__("netGetMyClientIndex");
@@ -207,7 +214,6 @@ static const char* const ARENA[14] = { "BR", "PR", "SW", "GR", "JD", "NF", "BM",
 static const signed char LLNUM[21] = { 1, 0, 2, 6, 7, 3, 4, -1, 8, -1, -1, -1, 9, -1, 5, -1, -1, -1, -1, -1, 10 };
 static char movQ[4][16];
 static int movFile[32];                            /* sceCdlFILE (+ slack) */
-static int movN, movI, movBuilt;
 static void movAdd(const char* name) { if (movN < 4) sprintf(movQ[movN++], "%s", name); }
 static void movBuild(void)
 {
@@ -239,6 +245,26 @@ extern int nextMovie __asm__("D_004FA718");
 extern int movieEnable __asm__("D_004FB5A0");
 extern int movieDelay __asm__("D_004FA728");
 static char incogSave[16];
+static int movPending, movDbg;
+/* the UI loop's playMovie call (0x1B40D4, func_001CE9B0; apply_mods.py): our request goes in right before it, so no
+ * state code between can overwrite nextMovie / movieEnable (test g106: a request made from the room never started) */
+extern void playMovie(void) __asm__("func_001CE9B0");
+void tmbr_PlayMovie(void)
+{
+    if (movPending) {
+        extern int D_004FB06C, D_004FA778, D_004FA3A4;
+        movPending = 0;
+        nextMovie = -1; movieDelay = 0; movieEnable = 1;
+        scePrintf("TMBR story: movie start (finished %d key %d ok %d)\n", D_004FB06C, D_004FA778, D_004FA3A4);
+        movDbg = 8;
+    }
+    playMovie();
+    if (movDbg > 0) {                                     /* (debug: what the game made of the request) */
+        extern int D_004FA71C, D_004FB06C;
+        movDbg--;
+        scePrintf("TMBR story: after playMovie next %d enable %d req %d bytes %d finished %d\n", nextMovie, movieEnable, movieRequested, D_004FA71C, D_004FB06C);
+    }
+}
 static int movPhase, movT;
 int tmbr_StoryMoviesDone(void)
 {
@@ -261,7 +287,7 @@ int tmbr_StoryMoviesDone(void)
         sprintf(f, "mov/%s.pss", n);
         if (strlen(f) > 15) { scePrintf("TMBR story: name too long %s\n", f); continue; }
         sprintf(incogName, "%s", f);
-        nextMovie = -1; movieDelay = 0; movieEnable = 1;
+        movPending = 1;                                   /* tmbr_PlayMovie sets the request right before the game's call */
         movPhase = 1; movT = 0;
         {   extern int D_004FB06C, D_004FA778, D_004FA3A4;
             scePrintf("TMBR story: movie %s requested (finished %d key %d ok %d req %d)\n", f, D_004FB06C, D_004FA778, D_004FA3A4, movieRequested); }

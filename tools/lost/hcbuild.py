@@ -88,7 +88,7 @@ class HoCar:
         wh = []
         for h in sorted(self.hd):
             lo, hi = box(self.hd[h]['pos']); d = hi - lo; c = (lo + hi) / 2
-            if d[1] > 1 and abs(d[1] - d[2]) < 0.1 * d[1] and d[0] < 0.7 * d[1] and abs(c[0]) > 1:
+            if d[1] > 1 and abs(d[1] - d[2]) < 0.1 * d[1] and d[0] < 0.8 * d[1] and abs(c[0]) > 1:
                 wh.append((h, c, d[2] / 2))
         assert wh, 'no wheels found in car space'
         ys = [c[1] for _, c, _ in wh]
@@ -128,9 +128,11 @@ class HoCar:
             return 'no normals (light cone / flame / sprite)'
         if m['hflags'] & 0x0E:
             return 'env-map shine shell'
+        wt = {t for w in self.wheel['meshes'] for t in set(self.hd[w]['texrefs'][:2])}   # tyre + rim
+        if m['texrefs'] and set(m['texrefs']) <= wt | (set(self.hd[self.wheel['meshes'][0]]['texrefs']) if far else set()):
+            return "wheel part (the donor's wheels are kept)"
         if far:                      # far LOD: its wheels give way to the donor's far wheels (kept), nothing else is cut
-            wt = {t for w in self.wheel['meshes'] for t in self.hd[w]['texrefs']}
-            return 'far LOD wheels (donor\'s kept)' if m['texrefs'] and set(m['texrefs']) <= wt else None
+            return None
         if lo[2] < wheel_ground - 0.2:
             return 'below the ground'
         if max(-lo[0], hi[0]) > max(-self.body[0][0], self.body[1][0]) + 0.5:
@@ -285,6 +287,10 @@ def main():
     ap.add_argument('--own16', default='auto', help="Head-On texture keys quantized to 16 colours (hex list, 'auto' = "
                     "every texture but the largest when the CLUT / TEX budget would overflow, 'none')")
     ap.add_argument('--no-relight', action='store_true')
+    ap.add_argument('--hide-node', default='', help='donor node offsets (hex, comma separated) whose meshes get empty '
+                    "packets too, e.g. Outlaw's roof light bar op31 (SUP 0x67ae0, SUA 0x5d6a0)")
+    ap.add_argument('--keep-part', default='', help="donor node ids kept with their subtree, ';'-separated, each "
+                    "optionally ':dx,dy,dz' to move it (e.g. Outlaw's turret '124:0,0,-1.9')")
     ap.add_argument('--skip', default='', help='extra Head-On mesh headers to leave out (hex, comma separated)')
     a = ap.parse_args()
 
@@ -350,6 +356,24 @@ def build(a, rd, own16):
     keep = set()
     for k in wheels4 + shadow + mounts + (wreck if a.keep_scorch else []):
         keep |= set(meshes_under(car, k))
+    # --keep-part ID[:dx,dy,dz]: donor parts kept (e.g. Outlaw's roof turret, op4 id R+28), optionally moved by a
+    # translate node put in front of them
+    moves = []
+    for spec in filter(None, a.keep_part.split(';')):
+        pid, _, off = spec.partition(':')
+        for o, h in nodes.items():
+            if (h >> 18) == int(pid, 0):
+                keep |= set(meshes_under(car, o))
+                if off:
+                    moves.append((o, [float(x) for x in off.split(',')]))
+                print('kept donor part id %s node %#x (%d meshes)%s' % (pid, o, len(meshes_under(car, o)),
+                                                                        ' moved by ' + off if off else ''))
+    for o, (dx, dy, dz) in moves:
+        refs = [sl for sl in list(car.slots) if car.P(sl) == o]
+        t = car.append(struct.pack('<IIIIfffI', 3, 0, 1, 0, dx, dy, dz, 0))
+        car.setp(t + 0x1c, o)
+        for sl in refs:
+            car.setp(sl, t)
     wpos = [(f32(n, w + 0x40), f32(n, w + 0x44), f32(n, w + 0x48)) for w in wheels4]
     wr = max(box(__import__('tmbmesh').decode(bytes(n), m)['pos'])[1][2] for w in wheels4 for m in meshes_under(car, w))
     dw = dict(front=max(p[1] for p in wpos), rear=min(p[1] for p in wpos), z=float(np.mean([p[2] for p in wpos])),
@@ -435,6 +459,9 @@ def build(a, rd, own16):
     lomesh = [t for t in meshes_under(car, lo) if t not in lokept]
     dead += [mesh_range(car, t) for t in lomesh]
     hs = ho_meshes(ho.lo, 0, far=True)
+    if not hs:                         # far LOD with nothing but wheels (Twister): the high LOD's state 0 (shared nodes)
+        hs = ho_meshes(ho.hi, 0)
+        print('far LOD: the new car\'s far LOD is wheels only, using its high LOD')
     newk = [car.group([node(h) for h in hs], sphere=struct.unpack_from('<3ff', car.n, lo + 0x10))] + lokeep
     struct.pack_into('<H', car.n, lo + 8, len(newk))
     for i in range(k):
@@ -444,7 +471,7 @@ def build(a, rd, own16):
     print('far LOD: donor meshes %s -> new car %d meshes + kept donor wheels %s' % (
         [hex(t) for t in lomesh], len(hs), [hex(t) for t in lokeep]))
     # brake lights
-    brake_old = set()
+    brake_old, brake_hide = set(), set()
     if brake_sw and len(ho.brake) == 3:
         sw = brake_sw[0]
         for i in range(3):
@@ -454,6 +481,12 @@ def build(a, rd, own16):
         for i, h in enumerate([ho.brake[0], ho.brake[2], ho.brake[2]]):
             car.setp(sw + 0xc + 4 * i, node(h, ws[i]))
         print('brake lights: donor switch %#x (%d meshes) -> %s' % (sw, len(brake_old), [hex(x) for x in ho.brake]))
+    elif brake_sw:                     # the new car has none: the donor's lamps (often outside the high LOD) go
+        sw = brake_sw[0]
+        for i in range(3):
+            if car.P(sw + 0xc + 4 * i) is not None:
+                brake_hide |= set(meshes_under(car, car.P(sw + 0xc + 4 * i)))
+        print('brake lights: the new car has none, donor switch %#x lamps hidden (%d meshes)' % (sw, len(brake_hide)))
     print('skipped Head-On meshes:', {hex(h): w for h, w in sorted(skipped.items())})
     if not a.no_relight:
         print('relight: %d of %d vertices got a geometric normal' % tuple(fixed))
@@ -462,7 +495,11 @@ def build(a, rd, own16):
     dead = [r for r in dead if r]
     deadset = {x for x, _ in dead}
     op7 = next(u32(n, 4 + 4 * i) - BASE for i in range(u32(n, 0)) if (u32(n, u32(n, 4 + 4 * i) - BASE) & 0x3f) == 7)
-    hide = set(meshes_under(car, hi))
+    hide = set(meshes_under(car, hi)) | brake_hide
+    for x in filter(None, a.hide_node.split(',')):      # donor parts outside the high LOD hidden on request
+        hn = set(meshes_under(car, int(x, 16)))
+        hide |= hn
+        print('hidden on request: donor node %s (%d meshes)' % (x, len(hn)))
     for c in chars_of(car.n, op7):
         if (u32(car.n, c) >> 18) != 0:
             hide |= set(meshes_under(car, c))

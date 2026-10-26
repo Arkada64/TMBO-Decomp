@@ -335,6 +335,16 @@ void tmbr_VehInitDynamics(char* v)
     vehInitDynamics(v);
     *(int*)(v + 0x20F4) = id;
     keepRange(v, s1, 0x380, 0x398, 1); keepRange(v, s2, 0x3A4, 0x3F0, 1); keepRange(v, s3, 0x478, 0x47C, 1); keepRange(v, s4, 0x1F40, 0x2010, 1);
+    {   /* the shockwave's model (EP 0xFB0) comes from the level files for slots 0..4 only (the extra copies all carry
+         * index 4): a higher slot borrows slot 4's node and animation (every console runs this) */
+        extern void* shockNode[] __asm__("D_0045FFD8");
+        extern char shockAnim[] __asm__("D_00460000");
+        int sl = *(int*)(v + 0x20F0), b;
+        if (sl > 4 && sl < 8 && !shockNode[sl] && shockNode[4]) {
+            shockNode[sl] = shockNode[4];
+            for (b = 0; b < 0xC; b++) shockAnim[sl * 0xC + b] = shockAnim[4 * 0xC + b];
+        }
+    }
     scePrintf("TMBR skins: Twister stats (Mr. Grimm) for car %d, health %d\n", vidx(v), (int)*(float*)(v + 0x400));
 }
 
@@ -390,7 +400,7 @@ static void pakMissileValues(int on)
  * own slot-5 pickup and his previous weapon come back (tmbr_SkinsFrame). */
 /* Axel's primary special, the shockwave (CAR_STATS_SPECIALS.md: online func_001599A0's plain-press branch): weapon
  * 0x1B, its sound, one special used. Its model node (EP id 0xFB0) must be loaded for the slot (Twister's files carry
- * a copy of Axel's), else the weapon does nothing. Only the owning console fires (+0x20B4 1 or 4), like Axel. */
+ * slots 0..4 from the level files, higher slots borrow slot 4's - tmbr_VehInitDynamics), else the weapon does nothing. Only the owning console fires (+0x20B4 1 or 4), like Axel. */
 extern void createWeapon2(void* w, int type, char* v, int a, int b) __asm__("func_001ED8D0");
 extern void shockSound(void* snd, void* pos) __asm__("func_00194D78");
 extern void weaponUsedSpecial(void* w, char* v, int slot) __asm__("func_001F1AE0");
