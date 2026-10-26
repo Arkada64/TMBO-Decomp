@@ -14,7 +14,10 @@
   Open:
   1. Guests' spawn shield is not animated (pixels identical 4 s apart; the timer / state match P1's). The shimmer is
      a UV scroll from the car cs's animation channels (pktAddVu1Obj -> pktClipUVScroll, values via scratchpad
-     0x70000020); find what runs that animation for P1 (player spawn path?) and run it for guests. Check bots too.
+     0x70000020 = the current _animCharInstance during hierTraverse, hierc func_00212430); Ark: P1's scrolls.
+     Not the shield switches (0x2068 / 0x206C, both 1 or 2 by car +0x24B4, same for guests) nor forceField (boss
+     only). Next: which animCharInstance a car draws with and who advances it (per view? owner 1 only?); check
+     bots' shields and P1's shield seen from a guest view.
   2. Sound in split: the mixer (calcDualMonoMixVolPan, func_0019B5F8 ...) loops over every view's camera (count
      game +0x2BB60 = the render loop's view count), so guests should be heard around their cars - Ark to listen.
   3. Guests joining on a client console (host makes the car over chat) - feature, lower priority.
