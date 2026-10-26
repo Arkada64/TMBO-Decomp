@@ -118,8 +118,12 @@
       cs +0x18 by 200 / 400 per frame until they meet - then exitUi). The 6 screens (0x30 apart from shell
       +0x17140) are set up in uiInitScreens__FP3_cs (0x18F890). TMBO's uiInitScreens = func_001B44E0 (same float
       constants) and has no screen / halves code; TMBO's shell struct offsets differ (0x19BE4 / 0x1A16C ...).
-      Next: are the halves' meshes still in TMBO's SHELL NGP (retail screen node ids vs TMBO's), then port the
-      two functions as a mod UI step before the level load.
+      TMBO's loading screen (qb pic 2026-10-26) still shows a tiled top half and a metal bottom half with the LOADING
+      bar - the halves look present, only static. Retail screens: 6 x 0x30 structs at shell +0x17140, cs at +0x20,
+      y at cs +0x18 (uiInitScreens zeroes / places them); the cs pointers are not written in retail shell.s (set by
+      a table-driven loader?). TMBO's main UI loop is func_001B2B68 (calls func_001B44E0 = uiInitScreens).
+      Next: find the two halves' cs in TMBO (PINE memory read during a load, or the shell object loader), then a
+      mod step that starts them off screen and slides them in (200 / 400 per frame as retail) before the load.
   13b. Garage / car colour (Ark 2026-10-26, idea): recolour a car's body textures (palette / CLUT tint at load, or
       a texture swap like the 12 Pak skin), choice synced to other players like the skin byte.
   14. (Last, very experimental) Roguelike story option (no story: online's default loading screen instead of the
