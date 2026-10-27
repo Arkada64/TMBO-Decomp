@@ -178,9 +178,20 @@ class TexBuilder:
 
     def rtx_bytes(self):
         old = []
+        gold = getattr(self, 'gold_cbps', set())
         for o, b, gs, k in self.rrecs:
             r = bytearray(self.rtx[o:o + b])
             struct.pack_into('<I', r, 0, b // 4)
+            if ((gs >> 16) & 0xffff) in gold:      # a donor palette mapped onto a gold ramp by brightness (gtrecolor.py)
+                ne = (1 << ((gs >> 40) & 15)) * (1 << ((gs >> 44) & 15))
+                pp = np.frombuffer(bytes(r[16:16 + 4 * ne]), np.uint8).reshape(ne, 4).copy()
+                L = (pp[:, :3].astype(float) @ np.array([0.30, 0.55, 0.15])) / 255.0
+                L = np.clip((L - 0.08) / 0.8, 0, 1) ** 0.85
+                D_, M_, H_ = np.array([45, 30, 6]), np.array([190, 140, 45]), np.array([255, 236, 170])
+                lo = D_ + (M_ - D_) * np.clip(L / 0.6, 0, 1)[:, None]
+                hi = M_ + (H_ - M_) * np.clip((L - 0.6) / 0.4, 0, 1)[:, None]
+                pp[:, :3] = np.where((L < 0.6)[:, None], lo, hi).clip(0, 255).astype(np.uint8)
+                r[16:16 + 4 * ne] = pp.tobytes()
             old.append(bytes(r))
         dropc = getattr(self, 'drop_cbps', set())
         old = [r for r in old if ((struct.unpack_from('<Q', r, 8)[0] >> 16) & 0xffff) not in dropc]

@@ -377,6 +377,7 @@ def main():
                     "leave the static --add parts and turn with the bone (its pivot moves to their centre)")
     ap.add_argument('--hide-node', default='', help='donor node offsets (hex, comma separated) whose meshes get empty '
                     "packets too, e.g. Outlaw's roof light bar op31 (SUP 0x67ae0, SUA 0x5d6a0)")
+    ap.add_argument('--glow', default='', help="Head-On mesh headers drawn full bright (hex, comma separated: Gold Tooth's red eyes)")
     ap.add_argument('--hide-ids', default='', help="donor op1 ids (weapon / special models, decimal, comma separated) hidden")
     ap.add_argument('--keep-part', default='', help="donor node ids kept with their subtree, ';'-separated, each "
                     "optionally ':dx,dy,dz' to move it (e.g. Outlaw's turret '124:0,0,-1.9'); '@hex' names a node offset (Sweet "
@@ -693,14 +694,43 @@ def build(a, rd, own16):
         for h in hs:
             j = min(range(len(tm)), key=lambda i: ((norm_g(gc[h]) - norm_t(tm[i][4])) ** 2).sum())
             by_slot.setdefault(j, []).append(h)
+        made_ = {}
         for j, hl in by_slot.items():
             s_, k_, M, t = tm[j][:4]
             nodes_ = [node(h, frame=(M, t)) for h in hl]
+            made_[j] = nodes_[0] if len(nodes_) == 1 else car.group(nodes_, sphere=(0, 0, 0, 20.0))
+            car.setp(s_, made_[j])
+        # Ark 2026-10-26: "robot form is missing pieces": Sweet Tooth's robot keeps several variants of a part (the
+        # cargo box / its sides: same rest box, other bones or switch frames); a variant no new mesh landed on stayed
+        # empty. It gets the part of the covered slot with the closest rest box (same meshes, re-framed for its bone)
+        bx = [(x[5].min(0), x[5].max(0)) for x in tm]
+        for j in range(len(tm)):
+            if j in by_slot:
+                continue
+            cand = [(np.abs(bx[j][0] - bx[i][0]).sum() + np.abs(bx[j][1] - bx[i][1]).sum(), i) for i in by_slot]
+            if not cand:
+                continue
+            dist, i = min(cand)
+            if dist > float(os.environ.get('HC_ROBOT_FILL', '3.0')):
+                continue
+            s_, k_, M, t = tm[j][:4]
+            nodes_ = [node(h, frame=(M, t)) for h in by_slot[i]]
             car.setp(s_, nodes_[0] if len(nodes_) == 1 else car.group(nodes_, sphere=(0, 0, 0, 20.0)))
+            by_slot.setdefault(j, by_slot[i])
+            print('robot: donor slot %d (%#x) filled with slot %d\'s part (rest box distance %.2f)' % (j, k_, i, dist))
         for j, (s_, k_, M, t, c, P) in enumerate(tm):
             if j in by_slot:
                 r = mesh_range(car, k_)
                 if r: dead.append(r)
+        for j, (s_, k_, M, t, c, P) in enumerate(tm):
+            if j not in by_slot:               # (Sweet Tooth's own robot part stays, its palettes turned gold:
+                keep.add(k_)                   # Gold Tooth is a gold Sweet Tooth)
+                for i_ in range(min(4, struct.unpack_from('<H', car.n, k_ + 0x5a)[0])):
+                    cb_ = (struct.unpack_from('<Q', car.n, k_ + 0x70 + 0x30 * i_)[0] >> 37) & 0x3fff
+                    if cb_ not in set(reuse.values()):
+                        tb.gold_cbps = getattr(tb, 'gold_cbps', set()) | {cb_}
+                print('robot: donor slot %d mesh %#x kept (no Gold Tooth part), box %s..%s (%d verts)' % (j, k_, P.min(0).round(1), P.max(0).round(1), len(P)))
+        print('robot: donor palettes turned gold: %s' % sorted(getattr(tb, 'gold_cbps', set())))
         print('robot: %d new meshes onto %d of %d donor bone meshes of %#x (new box %s..%s, donor rest box %s..%s)' % (
             len(hs), len(by_slot), len(tm), ch, g0.round(1), g1.round(1), t0.round(1), t1.round(1)))
     # --head SRC,SRC:@BONE: the new car's head on the donor's animated head bone (Sweet Tooth's head turns on op17
@@ -709,7 +739,8 @@ def build(a, rd, own16):
     for hl, bone in head_specs:
         assert u32(car.n, bone) & 0x3f == 17, 'not an op17 bone: %#x' % bone
         old_k = [car.P(bone + 0xcc + 4 * i) for i in range(struct.unpack_from('<i', car.n, bone + 4)[0])]
-        hn = [node(h) for h in hl if h in ho.hd]
+        glow_ = {int(x, 16) for x in filter(None, a.glow.split(','))}
+        hn = [node(h, cols=0xFFFFFF if h in glow_ else None) for h in hl if h in ho.hd]   # --glow: full bright (eyes)
         car.setp(bone + 0xcc, hn[0] if len(hn) == 1 else car.group(hn, sphere=(0, 0, 0, 12.0)))
         for i in range(1, len(old_k)):
             struct.pack_into('<I', car.n, bone + 0xcc + 4 * i, 0)

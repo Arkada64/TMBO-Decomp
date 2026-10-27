@@ -137,7 +137,7 @@ def main():
     if a.rear:
         parts = [(p[0] * np.array([-1, -1, 1]),) + tuple(p[1:]) for p in parts]
         lights = [L * np.array([-1, -1, 1]) for L in lights]
-    ms = [dict(pos=p[0], tris=p[1], col=COL[p[2]], **(dict(uvs=p[3], tex=p[4]) if len(p) > 3 and p[2] == 'car' else {}))
+    ms = [dict(pos=p[0], tris=p[1], col=COL[p[2]], **(dict(uvs=p[3], tex=p[4]) if len(p) > 3 and p[2] in ('car', 'char') else {}))
           for p in parts]
     for L in lights:                           # a small yellow octahedron per light
         r = 0.35
