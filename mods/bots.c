@@ -2006,8 +2006,8 @@ void tmbr_LobbyFrame(void)
             lobbyLine(10, -1, teams ? "LEFT/RIGHT : PICK TEAM" : "THE HOST SETS BOTS,");
             lobbyLine(11, -1, teams ? "SELECT : SHOW TEAMS" : "TRAFFIC AND TEAMS");
         } else {
-            lobbyLine(10, -1, teams ? "L1R1 BOT LT/RT TEAM SQ STORY" : "L1R1 BOT L2R2 SKILL SQ STORY");
-            lobbyLine(11, -1, "UP TRAF DN TEAM TRI MIN O HP");
+            lobbyLine(10, -1, teams ? "L1R1 BOT LT/RT TEAM" : "L1R1 BOT L2R2 SKILL");   /* (no story / Minion / HP hints: Ark 2026-10-27) */
+            lobbyLine(11, -1, "UP TRAF DN TEAM");
         }
     } else if (teams && (pad & 0x1)) {
         lobbyLine(10, 0, ra);

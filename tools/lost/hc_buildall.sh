@@ -24,10 +24,11 @@ unset HC_SHELL_MARGIN
 run pviper   $H SPP $H/PVIPER.BDD /tmp/claude-0/hc_pviper/out ZWP
 run pviper   $H SPA $H/PVIPER.BDD /tmp/claude-0/hc_pviper/out ZWA --half
 # Twister (Ark 2026-10-26): no gun on the model - the guns beside the nose, above the front wing
+# (Ark 2026-10-27: Outlaw's gunner still popped out - his character 0x1e980 / 0x22140 hidden with no children)
 # (Ark 2026-10-27 "tiny Twister": x1.2 - his wheel track now matches Outlaw's; guns at 1.08,8.64,-2.34 in skins.c XMG)
 export HC_MG_DONOR=1.08,8.64,-2.34
-run twister  $H SUP $H/TWIST.BDD  /tmp/claude-0/hc_twister/out ZTP --hide-node 0x67ae0 --scale 1.2
-run twister  $H SUA $H/TWIST.BDD  /tmp/claude-0/hc_twister/out ZTA --half --hide-node 0x5d6a0 --scale 1.2
+run twister  $H SUP $H/TWIST.BDD  /tmp/claude-0/hc_twister/out ZTP --hide-node 0x67ae0,0x1e980 --scale 1.2
+run twister  $H SUA $H/TWIST.BDD  /tmp/claude-0/hc_twister/out ZTA --half --hide-node 0x5d6a0,0x22140 --scale 1.2
 unset HC_MG_DONOR
 # Gold Tooth (Ark 2026-10-27): side compartments closed with Sweet Tooth's shutters / frames coated in the gold map
 # (--gild), the robot keeps Sweet Tooth's torso pieces gilded instead of emptying them (HC_ROBOT_OWN=0: the gold

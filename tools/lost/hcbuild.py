@@ -563,6 +563,28 @@ def build(a, rd, own16):
             # clear; Ark 2026-10-27: Gold Tooth's head / cab windows see-through - only their front faces were built)
             two = bool(local is not None and local[2]) or h in two_force or (os.environ.get('HC_TWOSIDED', '1') == '1'
                                                            and not (ho.hd[h].get('hflags', 0x800000) & 0x800000))
+            # Head-On sets the blend bit on many opaque parts; TMB draws 0x8000 meshes in its sorted alpha pass, after
+            # the shield shell, which then hid them (Ark 2026-10-27: Old Pickup's body vanished under the shield).
+            # Blended only when a texture really has see-through texels (HC_ALPHA_TEX=0: Head-On's bit as before).
+            if os.environ.get('HC_ALPHA_TEX', '1') == '1' and m['texrefs']:
+                imgs_ = [tb.ho[k_]['img'] for k_ in m['texrefs'] if k_ in tb.ho]
+                if imgs_:
+                    abe_ = any(st['tag'][1] & 0x200000 for st in m['strips'])
+                    uv_ = np.array([q for st in m['strips'] for q in st.get('uv', [])], float).reshape(-1, 2)
+
+                    def see_(im_):              # see-through texels (2 %+) inside the part's UV box (shared atlases)
+                        if not len(uv_):
+                            return bool((im_[..., 3] < 200).mean() > 0.02)
+                        hh, ww = im_.shape[:2]
+                        u0, v0 = (-uv_.max(0) / 4096.0); u1, v1 = (-uv_.min(0) / 4096.0)
+                        if u1 - u0 >= 1 or v1 - v0 >= 1:
+                            sub = im_
+                        else:
+                            xs = (np.arange(int(np.floor(u0 * ww)), int(np.ceil(u1 * ww)) + 1)) % ww
+                            ys = (np.arange(int(np.floor(v0 * hh)), int(np.ceil(v1 * hh)) + 1)) % hh
+                            sub = im_[np.ix_(ys, xs)]
+                        return bool((sub[..., 3] < 200).mean() > 0.02)
+                    m = dict(m, alpha=abe_ and any(see_(im_) for im_ in imgs_))
             if a.env == 'bake' and ho.hd[h]['hflags'] & 0x0E and m['texrefs']:
                 gold_keys.append(m['texrefs'][0])
             m = dict(m, twosided=two,

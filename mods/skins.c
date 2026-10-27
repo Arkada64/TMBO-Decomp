@@ -565,9 +565,11 @@ static float pkNode[8][24] __attribute__((aligned(16)));   /* +0x10: the turret 
 static int pkAng[8][3], pkInit[8];
 static int bId, bAng[3], bNode, bShell, pickupOn;
 
+static int borrowDepth;   /* nested (Old Pickup: the launcher update borrows, and its FireSpecial / UpdateSpecial again) */
 static void borrowIn(char* l, char* v, int k)
 {
     int i = vidx(v), j;
+    if (borrowDepth++) return;
     bId = *(int*)(v + 0x20F4);
     *(int*)(v + 0x20F4) = k == SK_THUMPER ? WARTHOG_ID : MINION_ID;
     if (k != SK_PICKUP) return;
@@ -587,6 +589,7 @@ static void borrowIn(char* l, char* v, int k)
 static void borrowOut(char* l, char* v, int k)
 {
     int i = vidx(v), j;
+    if (borrowDepth > 0 && --borrowDepth) return;
     *(int*)(v + 0x20F4) = bId;
     if (k != SK_PICKUP) return;
     if (i < 0) i = 0;
@@ -683,10 +686,8 @@ void tmbr_UpdateTowTruck(void* l, char* v)
     borrowIn((char*)l, v, SK_PICKUP);
     minionAim(l, v);
     borrowOut((char*)l, v, SK_PICKUP);
-    r = *(int*)((char*)l + 0x27C);
-    *(int*)((char*)l + 0x27C) = 0;
-    towUpdate(l, v);
-    *(int*)((char*)l + 0x27C) = r;
+    /* (no tow update for him any more: it showed Junkyard Dog's tow ball with the special ready - Ark 2026-10-27) */
+    (void)r;
 }
 
 /* Outlaw's special-selected turret aim / laser (func_0015FCA8, 0x155B84, type 0x60 with the special selected):
