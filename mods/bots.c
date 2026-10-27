@@ -1662,6 +1662,9 @@ static float EG[4] = { 60.0f, 15.0f, 4.0f, 0.4f };   /* drop, on-ground height, 
 static float egLast[8][4];
 static int egOk[8], egLog[8];
 static float egQ[4] __attribute__((aligned(16)));
+/* Rooftop maps (Skyscrapers 4, Mini Skyscrapers 13, Warhawk's roof 20): the game's own bot driving only - our fight
+ * steering, route-map driving, dodging, turbo and unstick drove bots off the roofs (Ark 2026-10-27) */
+static int roofMap(void) { return tmbr_levelIndex == 4 || tmbr_levelIndex == 13 || tmbr_levelIndex == 20; }
 static void edgeGuard(char* g, char* v)
 {
     int i = (int)(v - g) / 0x31B0 & 7, k;
@@ -1693,7 +1696,7 @@ int tmbr_AiUpdate(char* v)
     if (F(D_003156C0, 0x1BB4) == 0xA && F(v, 0x2014)) { padClear(v); return 0; }   /* sync hold: bots frozen */
     r = aiUpdate(v);
     /* match over (game type 1): the game stops every car - no dodging / unsticking then (log 2026-10-24) */
-    if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030 && !(GINFO() && ((F(GINFO(), 0) >> 1) & 0xF) == 1)) {
+    if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030 && !roofMap() && !(GINFO() && ((F(GINFO(), 0) >> 1) & 0xF) == 1)) {
         int ev = 0;
         dodge(D_004FA030, v);
         if (!dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]) ev = evade(D_004FA030, v);   /* (a dodge in progress wins) */
@@ -1722,7 +1725,7 @@ static int aiUpdate(char* v)
         if (++shieldT[si] > 600) { shieldOff(v); shieldT[si] = 0; scePrintf("TMBR shield: bot %d off\n", si); }    /* 10 s, like the players' shield */
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
 #if TMBR_NAV
-        tmbr_NavDrive(g, v, 0);          /* roam the route map */
+        if (!roofMap()) tmbr_NavDrive(g, v, 0);          /* roam the route map */
 #endif
         return r;
     }
@@ -1744,7 +1747,7 @@ keepFlee:
     if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) {
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
 #if TMBR_NAV
-        if (tmbr_botCount >= 0 && F(v, 0x2014)) tmbr_NavDrive(g, v, 0);
+        if (tmbr_botCount >= 0 && F(v, 0x2014) && !roofMap()) tmbr_NavDrive(g, v, 0);
 #endif
         return r;
     }
@@ -1760,9 +1763,9 @@ keepFlee:
     if (swap) F(g, 0x9FD40 + k * 4) = save;
     t0 = tmbr_Cycles();
 #if TMBR_NAV
-    if (tmbr_NavDrive(g, v, t)) { tmbr_PerfAdd(2, t0); return r; }
+    if (!roofMap() && tmbr_NavDrive(g, v, t)) { tmbr_PerfAdd(2, t0); return r; }
 #endif
-    aggressiveTurn(g, v, t);
+    if (!roofMap()) aggressiveTurn(g, v, t);
     tmbr_PerfAdd(2, t0);
     return r;
 }
