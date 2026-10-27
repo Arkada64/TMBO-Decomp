@@ -1652,6 +1652,41 @@ static void avoid(char* g, char* v)
 
 static int aiUpdate(char* v);
 extern void padClear(char* v) __asm__("vehicleSaveAndClearPadFlags__7Vehicle");
+/* Edge guard (Ark 2026-10-27: on Skyscrapers / Mini Skyscrapers bots drove straight off the roofs - our faster
+ * fight steering / route following has no idea of a drop). Rooftop maps only (levels 4, 13, 20): each frame look
+ * where the car will be in 12 and 24 frames at its current speed (from its last move); if the ground there is more
+ * than EG_DROP below (hdHatTest: height above ground, > 5000 = none) while the car is on the ground: no gas, no
+ * turbo, brake. The game's own jumps between roofs are lost on these maps - staying on the roof is the trade. */
+extern float hdHat(void* pos, void* n, void* c) __asm__("hdHatTest__FP8_fvectorT0P14ColorUnionType");
+static float EG[4] = { 60.0f, 15.0f, 4.0f, 0.4f };   /* drop, on-ground height, probe lift, min speed (units / frame) */
+static float egLast[8][4];
+static int egOk[8], egLog[8];
+static float egQ[4] __attribute__((aligned(16)));
+static void edgeGuard(char* g, char* v)
+{
+    int i = (int)(v - g) / 0x31B0 & 7, k;
+    float* p, dx, dy;
+    unsigned char* pad = PAD(v);
+    if (tmbr_levelIndex != 4 && tmbr_levelIndex != 13 && tmbr_levelIndex != 20) return;
+    if (!F(v, 0x2028)) { egOk[i] = 0; return; }
+    p = (float*)POS(v);
+    dx = p[0] - egLast[i][0]; dy = p[1] - egLast[i][1];
+    egLast[i][0] = p[0]; egLast[i][1] = p[1]; egLast[i][2] = p[2];
+    if (!egOk[i]) { egOk[i] = 1; return; }
+    if (egLog[i] > 0) egLog[i]--;
+    if (dx * dx + dy * dy < EG[3] * EG[3]) return;
+    egQ[0] = p[0]; egQ[1] = p[1]; egQ[2] = p[2] + EG[2]; egQ[3] = p[3];
+    if (!(hdHat(egQ, 0, 0) < EG[1])) return;                   /* in the air (a jump under way): leave it */
+    for (k = 12; k <= 24; k += 12) {
+        egQ[0] = p[0] + dx * (float)k; egQ[1] = p[1] + dy * (float)k; egQ[2] = p[2] + EG[2];
+        if (hdHat(egQ, 0, 0) > EG[0]) {
+            pad[4] = 0; pad[7] = 0; pad[8] = 0; pad[2] = 0; pad[6] = 1;
+            if (!egLog[i]) { egLog[i] = 120; scePrintf("TMBR edge: bot %d brakes at a drop (%d %d %d), level %d\n", i, (int)p[0], (int)p[1], (int)p[2], tmbr_levelIndex); }
+            return;
+        }
+    }
+}
+
 int tmbr_AiUpdate(char* v)
 {
     int r;
@@ -1666,6 +1701,7 @@ int tmbr_AiUpdate(char* v)
         energyUse(D_004FA030, v, ev);
         avoid(D_004FA030, v);
         unstick(D_004FA030, v);
+        edgeGuard(D_004FA030, v);
     }
     return r;
 }
