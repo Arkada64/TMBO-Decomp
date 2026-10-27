@@ -1,4 +1,4 @@
-/* TMB-Reloaded mod: STORY run, phase 1 (reference/wip/STORY_PLAN.md, Ark 2026-10-26).
+/* TMB-Reloaded mod: STORY run, phase 1 (reference/archive/STORY_PLAN.md, Ark 2026-10-26).
  * The host turns it on in the waiting room (R3 + Square). It plays retail's story level order, the same for
  * every driver (retail Shell::m_nextLevelMap):
  *   JUNKYARD -> SUBURBS | FREEWAY -> HIGHWAY LOOP | DOWNTOWN -> MINION'S STADIUM -> PRISON PASSAGE
@@ -234,7 +234,7 @@ int tmbr_StoryCars(void)
     return 1;
 }
 
-/* ---- phase 2: retail's story movies (reference/wip/STORY_MOVIES.md) ----
+/* ---- phase 2: retail's story movies (reference/archive/STORY_MOVIES.md) ----
  * Played in the waiting room (tmbr_StoryLobby, once per stage, a second after the room shows: TMBO's own clips
  * only play inside menu screens - the loading screen attempts froze or never started, tests g100-g104), host side
  * for now: the character's intro (X??A) before the first
@@ -339,7 +339,7 @@ int tmbr_StoryMoviesDone(void)
     return 1;
 }
 
-/* ---- Prison Passage, retail's story sequence (reference/wip/STORY_PRISON.md; Ark 2026-10-26: in retail you start
+/* ---- Prison Passage, retail's story sequence (reference/archive/STORY_PRISON.md; Ark 2026-10-26: in retail you start
  * locked on the ship to the prison, the AI spread out, timed events; online Prison Passage skips it) ----
  * The Prison level object's state machine survives in TMBO; online skips it in three places, undone here in a story
  * run on level 3 only (hooks in apply_mods.py):
@@ -418,7 +418,7 @@ void tmbr_PrisonState2(char* p)
     }
 }
 
-/* ---- phase 4: Warhawk's roof boss (reference/wip/STORY_BOSSES.md) ----
+/* ---- phase 4: Warhawk's roof boss (reference/archive/STORY_BOSSES.md) ----
  * TMBO keeps retail's FinalBoss code (game+0x97120) but never calls it: InitAfterDbLoad's level-20 case is gone. Hooked at
  * the switch's common tail (0x1387FC, plightActivate): on the roof with the story on and both boss cars loaded (0x200 the
  * boss body, 0x220 the tanker), run retail's InitBossBefore / forceFieldInitBefore / InitBossAfter; then every frame
@@ -547,7 +547,7 @@ int tmbr_VehTakeHit(char* v, void* pos, int dmg, int att, int x)
     return r;
 }
 
-/* ---- Minion's Stadium (level 14): retail's shielded Minion (reference/wip/STORY_BOSSES.md, "Minion's Stadium") ----
+/* ---- Minion's Stadium (level 14): retail's shielded Minion (reference/archive/STORY_BOSSES.md, "Minion's Stadium") ----
  * Retail, for an AI-driven Minion (type +0x580 != 1) on level 0xE:
  *  - vehicleInitDynamics: 250 health (a human Minion 150), big-car geometry, and forceFieldCreate(cs+0x20, cs+0x10,
  *    dup, -14.5, 4, 30, 49, 35) + forceFieldSetState(2) around him (on every spawn: vehicleInit runs on respawn too);

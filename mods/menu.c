@@ -1,4 +1,4 @@
-/* TMB-Reloaded mod: main menu SINGLE PLAYER / ONLINE / OPTIONS (Ark 2026-10-26, reference/wip/STORY_PLAN.md).
+/* TMB-Reloaded mod: main menu SINGLE PLAYER / ONLINE / OPTIONS (Ark 2026-10-26, reference/archive/STORY_PLAN.md).
  * The boot menu (UI state 6, func_001B8C10) shows three label quads from SHELL1.TEX texture 3: INTERNET, LAN,
  * OPTIONS. tools/lost/menulabels.py paints SINGLE PLAYER into that texture (over the dead ACCOUNT line); ONLINE is
  * already there (SONY ONLINE). On the main page the INTERNET / LAN quads (and their highlighted copies) get the
