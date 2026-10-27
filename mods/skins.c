@@ -257,6 +257,8 @@ void tmbr_CarSelStep(void)
     applyX();
 }
 
+static int platesOk;                      /* the disc's SHELL1 has the extras' plates (tools/lost/platesx.py) */
+
 void tmbr_CarSelectSound(void* snd, int car)
 {
     int k, sel;
@@ -277,7 +279,7 @@ void tmbr_CarSelectSound(void* snd, int car)
     playCarSound(snd, car);
     { extern void tmbr_GuestPickTitle(void); tmbr_GuestPickTitle(); }   /* guests.c: "PLAYER n" while a guest picks */
     sel = carSelPos == PAK_POS ? xlist[xsel] : -1;
-    if (sel >= 0 && sel != 1) {                       /* an extra's name (its plate would be the donor's) */
+    if (sel >= 0 && sel != 1 && !platesOk) {          /* an extra's name (no plate of its own on this disc) */
         fontSetCursorAtSubPixel(0, 0x1400, 0x700);
         fontPrint(0, skinName[sel]);
     }
@@ -295,9 +297,18 @@ void tmbr_CarSelectSound(void* snd, int car)
 /* car select name plate (shell+0xC3C switch, one child per position; SHELL1 ids 9033). Child 15 was the cut
  * 'Black Razer' plate; the test disc's SHELL1.TEX repaints it '12 Pak' (tools/lost/plate12pak.py), so the 16th
  * spot uses it as is. */
+static const signed char plateOf[NSKIN] = { 0, -1, 1, 2, 3, 4, 5 };   /* skin -> plate in the child-16 switch */
 void tmbr_PreviewSwitch(void* sw, int i)
 {
-    if (i == PAK_POS && xn && xlist[xsel] != 1) i = 18;   /* an extra: child 18 (a spare plate; its name is printed) */
+    if (i == PAK_POS && xn && xlist[xsel] != 1) {
+        /* an extra: child 16 is a switch of the extras' plates on a patched SHELL1 (platesx.py); else child 18
+         * (a spare plate) and the name is printed */
+        char* sub = (char*)sw + 0xC + 4 * 16;
+        sub = (*(unsigned char*)((char*)sw + 0xB) == 19) ? *(char**)sub : 0;
+        platesOk = sub && (*(int*)sub & 0x3F) == 6 && plateOf[xlist[xsel]] >= 0;
+        if (platesOk) { hierSetSwitch(sub, plateOf[xlist[xsel]]); i = 16; }
+        else i = 18;
+    }
     hierSetSwitch(sw, i);
 }
 
