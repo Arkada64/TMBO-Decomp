@@ -660,3 +660,82 @@ def fix_lights(car, pts, box_n, log=print, ho_heads=None):
             log('headlight %#x: (%.2f %.2f %.2f) -> (%.2f %.2f %.2f)' % (o, *p, *q))
         log('headlight switch %#x: assembly moved by (%.2f %.2f %.2f)' % (sw, *d))
     return hide
+
+
+# ---------------------------------------------------------------- shield / freeze shells (HC_SHELLS, default 1)
+# The shield bubble is a mesh in the car's own NGP: op6 switch id R+15 (attach type 15; vehicleUpdateShields
+# func_001DD0C8 toggles the shield switches, vehicle +0x2068 / +0x206C) -> op1 -> op25 character (id 0, its UV-scroll
+# channels shimmer it) -> one shell mesh in the donor's body shape (Outlaw 0x5e930: x +-4.83, y -10.1..10.2,
+# z -2.2..4.9; Sweet Tooth has a second, robot-shaped one). The freeze shell is the same under op6 id R+14 (char id
+# R+14, an ice texture + icicle quads). Nothing in the exe scales them per car, so hcbuild kept the donor's shield
+# (Ark 2026-10-26: "doesn't fit the new body") and hid the freeze shell with the other id != 0 characters.
+# HC_SHELLS=1: every vertex of those meshes is box-mapped (donor body box -> new body box, as the weapon mounts),
+# in place (positions only: UVs, colours, the characters and their channels stay), and both shells stay drawn.
+
+def shell_meshes(car):
+    """{R+14 / R+15: [op0 meshes]} under the op6 switches with those ids, reached from entry 0"""
+    from hcbuild import kids, meshes_under
+    n = car.n
+    R = u32(n, u32(n, 4) - BASE) >> 18
+    out, seen, st = {}, set(), [u32(n, 4) - BASE]
+    while st:
+        o = st.pop()
+        if o in seen:
+            continue
+        seen.add(o)
+        h = u32(n, o)
+        if (h & 0x3f) == 6 and (h >> 18) in (R + 14, R + 15):
+            out.setdefault((h >> 18) - R, set()).update(meshes_under(car, o))
+            continue
+        st += kids(car, o)
+    return {k: sorted(v) for k, v in out.items()}
+
+
+def remap_positions(n, node, fn):
+    """rewrite an op0 mesh's vertex pool (VIF UNPACK V3-32 at 0x68 commands) in place through fn(Nx3) -> Nx3"""
+    from vif import parse
+    pk = u32(n, node + 4) - BASE
+    qwc = u32(n, pk) & 0xffff
+    cnt = 0
+    for r in parse(n, pk + 8, pk + 16 + qwc * 16):
+        if r[1] == 'BAD':
+            raise ValueError(hex(r[0]))
+        off, cmd, num, imm, p, pl = r
+        if cmd == 0x68:
+            P = np.array(struct.unpack_from('<%df' % (3 * num), n, p)).reshape(num, 3)
+            Q = fn(P)
+            struct.pack_into('<%df' % (3 * num), n, p, *np.asarray(Q, float).ravel())
+            cnt += num
+    return cnt
+
+
+def refit_shells(car, box_d, box_n, log=print):
+    """HC_SHELLS: box-map the shield / freeze shell meshes onto the new body; returns those meshes (keep them drawn)"""
+    if os.environ.get('HC_SHELLS', '1') == '0':
+        return set()
+    def ch(b):
+        lo, hi = np.asarray(b[0], float), np.asarray(b[1], float)
+        c, h = (lo + hi) / 2, (hi - lo) / 2
+        c[0], h[0] = 0.0, max(-lo[0], hi[0])
+        return c, h
+    (cd, hd_), (cn, hn) = ch(box_d), ch(box_n)
+    k = hn / np.maximum(hd_, 1e-3)
+    fn = lambda P: cn + (P - cd) * k
+    done = set()
+    for rel, ms in sorted(shell_meshes(car).items()):
+        for m in ms:
+            if m in done:
+                continue
+            try:
+                P = np.asarray(__import__('tmbmesh').decode(bytes(car.n), m)['pos'], float)
+                nv = remap_positions(car.n, m, fn)
+            except Exception as e:
+                log('shell R+%d mesh %#x: odd packet, left (%s)' % (rel, m, e))
+                continue
+            done.add(m)
+            if len(P):
+                Q = fn(P)
+                log('shell R+%d (%s) mesh %#x: %d vertices, box %s..%s -> %s..%s' % (
+                    rel, 'shield' if rel == 15 else 'freeze', m, nv, P.min(0).round(2), P.max(0).round(2),
+                    Q.min(0).round(2), Q.max(0).round(2)))
+    return done

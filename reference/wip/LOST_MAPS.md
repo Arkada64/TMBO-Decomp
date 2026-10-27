@@ -106,3 +106,18 @@ op15 grid + op7 list built, spawn points found, then a test disc (swap into a le
 - Disc: tools/mklost.sh -> TMBR_LOST.iso: Elevators = City of the Dead, Snowy Roads = Suburban Terror,
   Power Plant = Carnival of Darkness, Dogpound = Death Port, Sewers = Stadium Slaughter. DEATH1-5 route maps moved
   to 0x1524000 (NGP tail; all five merged NGP + PTR end below 0x1460000).
+
+## Status 2026-10-26 (own level-select slots, parked)
+- mods/lostslots.c + tools/lost/mklostslots.sh: the five maps have their own level-select entries (run as Dogpound,
+  index 10, with their own files \LVL\HC*.*, \PTS\HC*.*, \PCAR\ZNHC*.BIN); tests g131-g133, Ark's own play.
+  mkdisc.py now grows a full directory by as many sectors as needed (the \PCAR dir had run out of room).
+- Look debug (L3 + SELECT on a Lost map: fog off + brighter ambient, then + free camera) showed it is not fog /
+  lighting: Ark 2026-10-26 "the textures are extremely broken and corrupted ... it's the map conversion itself".
+  128 MB EE made no difference (not memory).
+- Suburban Terror: glitchy collision lifted the car into the air and would not put it down (a wrongly solid region
+  in the lvcol BSP build - prism / open-part slabs).
+- Next: (1) textures - preview the merged cloud/lost2 files (lvtexprev.py walks the file's first entry = the donor's
+  root, so it shows DEATH4's sky; walk from the callback-id-1 node instead) against the stage-1 standalone outputs to
+  see whether levtex.py or the DEATH4 merge (id / CLUT block renumbering, halved / 16-colour textures, shared
+  palettes) scrambles them; then check in game (VRAM layout of donor + appended textures). (2) collision - find the
+  lift spot, check lvcol solid labelling there.

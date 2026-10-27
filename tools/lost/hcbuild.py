@@ -819,6 +819,7 @@ def build(a, rd, own16):
         k, v = next(iter(hq.items()))
         hq[-k] = v * np.array([-1.0, 1, 1])
     light_hide = hcmounts.fix_lights(car, to_donor(P0), box_n, ho_heads=hq)  # HC_LIGHTS: light bars off, headlights moved
+    shells = hcmounts.refit_shells(car, box_d, box_n)            # HC_SHELLS: shield / freeze shells onto the new body
 
     # ---- hide the donor's own parts (empty packet, no texture slots)
     dead = [r for r in dead if r]
@@ -832,7 +833,7 @@ def build(a, rd, own16):
     for c in chars_of(car.n, op7):
         if (u32(car.n, c) >> 18) != 0:
             hide |= set(meshes_under(car, c))
-    hide -= keep | deadset | set(built.values())
+    hide -= keep | deadset | set(built.values()) | shells
     nopk = car.append(struct.pack('<4I', 0x60000001, 0, 0, 0) + struct.pack('<4I', 0x01000404, 0, 0, 0))
     hidepairs = set()
     odd = []
