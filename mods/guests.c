@@ -214,6 +214,9 @@ void tmbr_LevelLoadCars(char* shell, int a)
                  * was ever seen, Ark 2026-10-27) */
                 extern int tmbr_BotSkin(int slot); extern int tmbr_SkinDonor(int k);
                 int b = tmbr_BotSkin(k);
+                int hu = 0, q;
+                for (q = 0; q < nu; q++) if (b >= 0 && used[q] == tmbr_SkinDonor(b) << 5) hu = 1;
+                if (hu) { extern void tmbr_BotSkinDrop(int slot); tmbr_BotSkinDrop(k); b = -1; }
                 if (b >= 0 && tmbr_SkinDonor(b)) {
                     D_00313F00[k] = tmbr_SkinDonor(b) << 5;
                     F(D_003156C0 + k * 0x220, 0xB4) = D_00313F00[k];

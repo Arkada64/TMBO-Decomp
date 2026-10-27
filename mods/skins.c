@@ -102,6 +102,14 @@ void tmbr_BotSkinSet(const signed char* t)
     if (ch) for (i = 0; i < 8; i++) if (botSkin[i] >= 0) scePrintf("TMBR skins: bot slot %d drives %s\n", i, skinName[(int)botSkin[i]]);
     sendBotSkins();
 }
+/* level load (guests.c): a bot's bonus car whose donor is already in the match (a human or an earlier slot) is dropped on every console alike (same slot
+ * data everywhere, no message): two copies of one big model in a match crashed (Ark 2026-10-27, two Gold Tooths) */
+void tmbr_BotSkinDrop(int slot)
+{
+    if (slot < 0 || slot >= 8 || botSkin[slot] < 0) return;
+    scePrintf("TMBR skins: bot slot %d leaves %s (its car is already in the match)\n", slot, skinName[(int)botSkin[slot]]);
+    botSkin[slot] = -1;
+}
 static void sendSkins(void)
 {
     char m[8];

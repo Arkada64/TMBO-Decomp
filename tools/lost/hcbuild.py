@@ -762,7 +762,25 @@ def build(a, rd, own16):
             if j in by_slot:
                 r = mesh_range(car, k_)
                 if r: dead.append(r)
+        # HC_ROBOT_SHARE (Ark 2026-10-27: two Gold Tooths in one match crashed - model memory): kept Sweet Tooth
+        # parts that are variants of one part (same bone frame, rest boxes within 0.6) share the first one's mesh
+        shared_ = {}
+        if os.environ.get('HC_ROBOT_SHARE', '1') == '1':
+            firsts = []
+            for j in sorted(range(len(tm)), key=lambda j: -len(tm[j][5])):   # the fullest variant is kept
+                s_, k_, M, t, c, P = tm[j]
+                if j in by_slot or len(P) < 30:
+                    continue
+                f = next((i for i in firsts if same(i, j) and np.abs(bx[i][0] - bx[j][0]).sum() + np.abs(bx[i][1] - bx[j][1]).sum() < 0.6), None)
+                if f is None:
+                    firsts.append(j); continue
+                car.setp(s_, tm[f][1]); shared_[j] = f
+                r = mesh_range(car, k_)
+                if r and k_ != tm[f][1]: dead.append(r)
+                print('robot: donor slot %d mesh %#x shares slot %d\'s mesh %#x' % (j, k_, f, tm[f][1]))
         for j, (s_, k_, M, t, c, P) in enumerate(tm):
+            if j in shared_:
+                continue
             if j not in by_slot:               # (Sweet Tooth's own robot part stays, its palettes turned gold:
                 keep.add(k_)                   # Gold Tooth is a gold Sweet Tooth)
                 if os.environ.get('HC_ROBOT_GILD', '1') == '1':
