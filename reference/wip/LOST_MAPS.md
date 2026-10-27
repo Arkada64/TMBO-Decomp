@@ -116,8 +116,39 @@ op15 grid + op7 list built, spawn points found, then a test disc (swap into a le
   128 MB EE made no difference (not memory).
 - Suburban Terror: glitchy collision lifted the car into the air and would not put it down (a wrongly solid region
   in the lvcol BSP build - prism / open-part slabs).
-- Next: (1) textures - preview the merged cloud/lost2 files (lvtexprev.py walks the file's first entry = the donor's
+- Next: (1) textures - DONE (see "Texture corruption" below; was: preview the merged cloud/lost2 files (lvtexprev.py walks the file's first entry = the donor's
   root, so it shows DEATH4's sky; walk from the callback-id-1 node instead) against the stage-1 standalone outputs to
   see whether levtex.py or the DEATH4 merge (id / CLUT block renumbering, halved / 16-colour textures, shared
-  palettes) scrambles them; then check in game (VRAM layout of donor + appended textures). (2) collision - find the
+  palettes) scrambles them; then check in game (VRAM layout of donor + appended textures)). (2) collision - find the
   lift spot, check lvcol solid labelling there.
+
+## Texture corruption: cause + fix (2026-10-26)
+- **Cause: none of the converted maps' CLUTs were ever loaded.** TEX / RTX record lists end with a record whose
+  sizew is 0 (runs to the end of the file; texmRelocate / texmResRelocate stop after it). The DEATH4 merge
+  (lvbuild donor path) copied the donor's RTX records unchanged and appended ours: DEATH4's old last RTX record
+  (a VRAM-resident PSMT4HH texture, id 0x35, 8320 bytes) kept sizew 0 at index 173 / offset 0x4EA40 of every
+  merged HC*.RTX, so the game stopped there and the 50-180 CLUTs per map behind it never reached VRAM. Every
+  converted texture was drawn with whatever sat at its CBP (DEATH4's palettes / garbage) = "extremely broken".
+  The texture pixels themselves were fine: Head-On decode (levtex.py) and the TEX side of the merge are correct
+  (contact sheets match the Head-On source; TEX ends with exactly one sizew-0 record).
+- Contributing bug: textconv.rtx_rec_size sized every RTX record as a CLUT (16 + 4n), so a resident texture record
+  (0x80 header + n or n/2 bytes, kind byte 0x20 / 0x40 instead of 0x08) could not be sized. The donor slice only
+  came out right because it was clipped at EOF. tex_rec_size likewise only knew PSMT8 / PSMT4 (psm 0 = 4n now).
+- Fix: textconv.rtx_rec_size / tex_rec_size know resident / CT32 records; LevelTex.rtx_bytes rewrites every
+  donor record's sizew (like tex_bytes already did), only the real last record keeps 0; donor_prepare's CLUT drop
+  only applies to CLUT records (resident textures have their own address space). A rebuild of HC_SU with the fixed
+  lvbuild gives a TEX identical and an RTX identical to the repaired one.
+- levels/rtxfix.py IN OUT repairs an already merged RTX (only that one sizew word changes; NGP / TEX / PTR stay).
+  Repaired set: /tmp/claude-0/lost3/HC{SC,SU,GD,ND,ST}.{NGP,TEX,RTX,PTR} (NGP / TEX / PTR = cloud/lost2 copies).
+  Note: the repo lvbuild.py does not reproduce cloud/lost2's NGP byte for byte (HCSU 10.65 MB vs 11.35 MB, PTR
+  differs too), so the disc set keeps the lost2 NGP / PTR and only swaps the RTX.
+- lvtexprev.py rewritten: walks the callback-id-1 arena node (merged) or entry 0 (stage 1), parses records like
+  the game (stop at the first sizew 0), rasterizes per pixel (UV-mapped, not one texel per triangle), magenta =
+  CLUT the game never loads, cyan = missing texture id; also writes NAME_sheet.png (biggest textures + their
+  CLUT). Old lost2 files: SC 162/162, SU 150/152, GD 179/204, ND 50/51, ST 94/96 arena textures without a loaded
+  CLUT; repaired: 0 everywhere.
+- VRAM side checked: CLUTs (kind 0x08) end at block SC 1018, SU 955, GD 1032, ND 666, ST 815 (< 0x411 level CLUT
+  area), no CLUT-CLUT overlap; texture ids max 401 (GD) < 600 (car ids start at 600); classes <= 10 (game: 15);
+  the TEX bins are an LRU cache (texmAllocateBinSpace scales bin counts to the free VRAM, texmFindVramSpace), so
+  2.6 MB of level textures does not overlap anything - at worst more uploads per frame. RTX (<= 452 KB) is read
+  into the TEX slot first (func_00188688 -> 0x1C05670) and uploaded before the TEX load, so it has its own room.
