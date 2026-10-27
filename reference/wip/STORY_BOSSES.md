@@ -151,3 +151,15 @@ Read-only research for STORY_PLAN phase 4. Retail addresses are from /home/claud
   vehicleTakeHit = func_001E1C40 is a guess.
 - **Address-space overlap.** The FinalBoss interactive (type 0xC) and RegisterFodderLock (TMBO func_0013D788) may clash with
   the mod's traffic/fodder code.
+
+## Status 2026-10-26 (tests g120-g129, parked for the Lost maps)
+- Boss cars load: story.c writes the slot cars into D_00313F00 before the level load (guests.c tmbr_LevelLoadCars);
+  vehicles 0x200 / 0x220 exist (bots slots 1 / 2). B2A/B3A come from \ACAR (type 2), no PCAR copies needed.
+- GetVehicleFromName(g, name, dup) matches +0x20F0 == dup (TMBO's load index), so retail's (0x200, 0) lookups fail:
+  the five boss-code calls are hooked to tmbr_BossVehName (by name only).
+- Init hook: InitAfterDbLoad's common tail 0x1387FC (plightActivate) -> tmbr_LevelInitAfter.
+- Crash: calling InitBossAfter (func_00111ED8) -> EE runs data at 0x33e498 (vehicle 0 + 0x2038), "Unknown R5900
+  SPECIAL", TLB store 0x1003b, same frame. BOSSSTEP 0-2 (no InitBossAfter) never crash (only the HUD's null boss cs
+  TLBs at 0x14AC64 / 0x14B778). A trampoline on InitBossAfter's first call (0x11206C, tmbr_BT0) never printed, and
+  nothing between its entry and that call jumps - unexplained. Next: check that 0x111ED8 in the built ELF really is
+  this code (shift build?), single-step with PCSX2's debugger, or call the pieces (csCreate func_00213F80 etc.) from C.
