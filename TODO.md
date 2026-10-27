@@ -80,6 +80,8 @@
       fixed area high up (e.g. 64-128 MB) is free for us: extra cars, story data, bigger textures. Needs: the
       TMBR launcher turns the setting on; online, everyone must have it if content depends on it (check in the
       lobby); mods check GetMemorySize() and fall back when it is 32 MB.
+      Ark 2026-10-26: with an older BIOS the 128 MB setting hard-locks PCSX2 right after the ELF loads (before the
+      game runs); a newer BIOS handles it. The TMBR launcher / Ready2Play setup must ship or require a BIOS that does.
   6d. Car select for them DONE 2026-10-26 (skins.c, tested g100 with a placeholder model): the extras sit behind
       12 Pak's spot (right / left from there steps through them, name printed, donor's stand clip), each shows only
       when its \PCAR\Z?P.NGP is on the disc; picked one loads its own files, synced like 12 Pak; story uses the

@@ -795,12 +795,13 @@ def build(a, rd, own16):
         {k: [None if p is None else tuple(round(x, 2) for x in p) for p in v] for k, v in sorted(L.items())} or 'none',
         np.round(box_d[0], 2), np.round(box_d[1], 2), np.round(box_n[0], 2), np.round(box_n[1], 2)))
     hcmounts.apply(car, mount_rec, L, to_donor, box_d, box_n, name=os.path.basename(a.bdd), pts=to_donor(P0))
+    light_hide = hcmounts.fix_lights(car, to_donor(P0), box_n)      # HC_LIGHTS: donor light bars off, headlights moved
 
     # ---- hide the donor's own parts (empty packet, no texture slots)
     dead = [r for r in dead if r]
     deadset = {x for x, _ in dead}
     op7 = next(u32(n, 4 + 4 * i) - BASE for i in range(u32(n, 0)) if (u32(n, u32(n, 4 + 4 * i) - BASE) & 0x3f) == 7)
-    hide = set(meshes_under(car, hi)) | brake_hide
+    hide = set(meshes_under(car, hi)) | brake_hide | light_hide
     for x in filter(None, a.hide_node.split(',')):      # donor parts outside the high LOD hidden on request
         hn = set(meshes_under(car, int(x, 16)))
         hide |= hn
