@@ -505,8 +505,8 @@ void tmbr_ShockFix(char* v)
  * targets only within +-45 deg of straight ahead (tmbr_MinionLockOn, Minion's three lock-on calls). */
 #define WARTHOG_ID (12 << 5)
 #define MINION_ID  (15 << 5)
-#define PK_TIME    120                 /* frames (Minion 240) */
-#define PK_SHELL   3                   /* cannon shell damage (Minion D_004FAD84 = 5) */
+#define PK_TIME    60                  /* frames (Minion 240; 120 was still far too strong - Ark 2026-10-27: "closer to Warthog") */
+#define PK_SHELL   2                   /* cannon shell damage (Minion D_004FAD84 = 5) */
 extern int D_004FAD84;
 static float PK_OFS[8] = { 1.1f, -1.9f, 4.73f, 0.0f, 0.0f, 6.75f, 0.0f, 0.0f };   /* pivot (car space) / muzzle (turret space) */
 static float PK_K[5] = { 0.176f, 0.577f, 0.0f, 1.0f, 0.25f };   /* tan 10 deg, tan 30 deg, 0, 1, torch range x4 (no float literals in mod code) */

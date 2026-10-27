@@ -14,6 +14,9 @@ def piece(n, node):
     V = (np.array(struct.unpack_from('<%dh' % (3 * nv), n, vp), float).reshape(nv, 3) + org) * sc
     return V, tris[:, :3].astype(int), tris[:, 3].copy()
 
+import os
+ALT_STATES = int(os.environ.get('LV_ALTCOL', '0'))   # 1 = the old behaviour (every state's collision)
+
 def node_matrix(n, o):
     """local transform of a node (row vectors), identity for non-transform nodes"""
     u = lambda q: struct.unpack_from('<I', n, q)[0]
@@ -44,8 +47,20 @@ def collision_objects(n):
         w7 = u(o + 0x1c)
         if (w7 >> 16) != 0xffff: break
         cnt = w7 & 0xff; path = [u(o + 0x20 + 4 * i) for i in range(cnt)]
-        M = np.eye(4)
-        for p in path[:-1]: M = node_matrix(n, p) @ M
-        out.append((path[-1], u(path[-1]) & 0x3f, M, struct.unpack_from('<6f', n, o)))
+        # an op19 (LOD / damage-state choice) is followed in the path by the chosen child's index, not a node:
+        # index >= 1 = a far LOD or another damage state, which the render never draws (hotx: first child only).
+        # Their collision was built too (Ark 2026-10-27: stadium walls far too thick, tunnel / boat holes / jumps
+        # blocked), and the index was read as a node for the matrix.
+        keep = True; M = np.eye(4); skip = False
+        for i, p in enumerate(path[:-1]):
+            if skip:
+                skip = False
+                if p >= 1 and ALT_STATES == 0: keep = False
+                continue
+            if p >= 0x100 and (u(p) & 0x3f) == 19:
+                skip = True
+            M = node_matrix(n, p) @ M if p >= 0x100 else M
+        if keep:
+            out.append((path[-1], u(path[-1]) & 0x3f, M, struct.unpack_from('<6f', n, o)))
         o = (o + 0x20 + 4 * cnt + 3) & ~3
     return out

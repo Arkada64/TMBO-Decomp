@@ -15,10 +15,11 @@ run cop      $H DCA $H/COP.BDD    /tmp/claude-0/hc_cop/out ZVA --half
 # Outlaw 2's siren lights: Outlaw's beacons on his light bar, alternated by mods/skins.c (Ark 2026-10-27)
 python3 sirens.py /tmp/claude-0/hc_cop/out ZVP; python3 sirens.py /tmp/claude-0/hc_cop/out ZVA
 # Old Pickup (Ark 2026-10-26: "still has pieces of Junkyard Dog"): JD's roof lamp box and its long roof beam hidden
+# (Ark 2026-10-27: Junkyard Dog's tow ball / cable (op4 kind 28) showed behind it with the special ready: hidden)
 # (Ark 2026-10-26 23:09: the spawn shield hides parts of it) shells 1.0 outside the body box instead of 0.4
 export HC_SHELL_MARGIN=1.0
-run pickup   $H TTP $H/PICKUP.BDD /tmp/claude-0/hc_pickup/out ZXP --hide-node 0x69b30,0x628e0
-run pickup   $H TTA $H/PICKUP.BDD /tmp/claude-0/hc_pickup/out ZXA --half --hide-node 0x62e80,0x5bc30
+run pickup   $H TTP $H/PICKUP.BDD /tmp/claude-0/hc_pickup/out ZXP --hide-node 0x69b30,0x628e0,0x1f150
+run pickup   $H TTA $H/PICKUP.BDD /tmp/claude-0/hc_pickup/out ZXA --half --hide-node 0x62e80,0x5bc30,0x1f510
 unset HC_SHELL_MARGIN
 run pviper   $H SPP $H/PVIPER.BDD /tmp/claude-0/hc_pviper/out ZWP
 run pviper   $H SPA $H/PVIPER.BDD /tmp/claude-0/hc_pviper/out ZWA --half

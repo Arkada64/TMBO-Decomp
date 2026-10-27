@@ -274,9 +274,10 @@ extern void viewSetBgColor(unsigned long r, unsigned long g, unsigned long b, un
 static const unsigned char SKYCOL[NLOST + 1][3] = { { 0, 0, 0 }, { 70, 36, 12 }, { 58, 64, 72 }, { 80, 74, 62 }, { 58, 64, 72 }, { 82, 76, 62 } };
 /* LOSTCLIP: view distance. Ark 2026-10-27: far clip 30000 (g146) and 12000 (g147) both stalled the maps (the game
  * keeps running, nothing drawn but the background colour); Dogpound's own is fog 720..4370, far clip 3170. Test g148
- * splits the suspects over the five maps: clip per map (0 = the level's own, only the fog / background colour set),
+ * split the suspects over the five maps (only Suburban Terror at 6000 stalled: the view distance is the limit, the sky
+ * dome and the white meshes are fine). All maps run with the level's own now; clip per map (0 = the level's own, only the fog / background colour set),
  * and the builds differ in the sky dome / untextured (white) meshes (tools/lost/levels/lvbuild.py LV_SKY, LV_WHITE). */
-static const int clipK[NLOST + 1][2] = { { 0, 0 }, { 0, 0 }, { 3600, 6000 }, { 0, 0 }, { 0, 0 }, { 0, 0 } };   /* fog start, far clip (ints: no float literals in mod code) */
+static const int clipK[NLOST + 1][2] = { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } };   /* fog start, far clip (ints: no float literals in mod code) */
 extern float D_004FAE58, D_004FAE5C, D_004FAE60, D_004FAE64;
 static int skyLogged = -1;
 static void lostSky(void)

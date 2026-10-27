@@ -254,6 +254,37 @@ def donor_prepare(car, drop=None, drop_c=None):
                 kept_bytes=sum(len(r) for r in keep_t), dropped=len(drop))
 
 GROUND_NZ = 0.6
+def pickups_down(pk, tris, keep_above=17.0, h=3.0):
+    """Ark 2026-10-27: "floor pickups are often set too high" (Head-On floats them ~11 units up, a car is ~4 tall):
+    a pickup up to keep_above over the surface below it goes down to h above it; higher ones (over jumps, ledges)
+    stay. Surface = highest collision / ground triangle under it, not above it."""
+    T = np.concatenate([t for t in tris if len(t)])
+    A, B, C = T[:, 0], T[:, 1], T[:, 2]
+    v0, v1 = C - A, B - A
+    d00 = (v0[:, :2] ** 2).sum(1); d01 = (v0[:, :2] * v1[:, :2]).sum(1); d11 = (v1[:, :2] ** 2).sum(1)
+    den = d00 * d11 - d01 * d01
+    pk = bytearray(pk); cnt = struct.unpack_from('<I', pk, 4)[0]; moved = kept = nog = 0
+    for i in range(cnt):
+        o = 8 + 20 * i
+        x, y, z = struct.unpack_from('<3f', pk, o + 4)
+        v2 = np.array([x, y, 0.0]) - A
+        d20 = (v2[:, :2] * v0[:, :2]).sum(1); d21 = (v2[:, :2] * v1[:, :2]).sum(1)
+        with np.errstate(all='ignore'):
+            u = (d11 * d20 - d01 * d21) / den; v = (d00 * d21 - d01 * d20) / den
+        ok = (u >= -1e-4) & (v >= -1e-4) & (u + v <= 1 + 1e-4) & (np.abs(den) > 1e-9)
+        zz = (A[:, 2] + u * v0[:, 2] + v * v1[:, 2])[ok]
+        zz = zz[zz <= z + 0.5]
+        if not len(zz):
+            nog += 1; continue
+        g = zz.max()
+        if z - g <= keep_above:
+            struct.pack_into('<f', pk, o + 12, float(g + h)); moved += 1
+        else:
+            kept += 1
+    print('  pickups: %d lowered to %.1f over the ground, %d kept high (jumps / ledges), %d with nothing under' % (moved, h, kept, nog))
+    return bytes(pk)
+
+
 def ground_pieces(meshes, pieces, tl, cell=50.0, tol=8.0):
     """Head-On's collision table has no pieces for much of the ground (streets, lots between the blocks - spawn
     points stood over nothing, Ark 2026-10-26 "the collision is all wrong"): the game must take that ground from
@@ -437,6 +468,12 @@ def build(path, outdir, name, scale=1.15, donor=None):
         m['level'] = True
         if os.environ.get('LV_ALPHA', '1') == '1':
             m['alpha'] = any(tl.get(k) for k in m['texrefs'])   # retail arenas: ~15% alpha meshes
+            # Ark 2026-10-27: black slabs on the ground (shadow / dirt decals), flat "PNG" cards, flicker on coplanar
+            # layers: Head-On blends those (ABE bit on the strips) through their vertex alpha, the texture is opaque
+            if not m['alpha'] and os.environ.get('LV_VALPHA', '1') == '1':
+                abe = any(s_['tag'][1] & 0x200000 for s_ in m['strips'])
+                va = any(c_ > 0xFFFF and (c_ >> 24) < 0x78 for s_ in m['strips'] for c_ in s_['col'])
+                m['alpha'] = bool(abe and va)
         try:
             blob, rel, pairs, sph = hierobject(m, 1.0, ctx)
         except Exception as e:
@@ -483,8 +520,12 @@ def build(path, outdir, name, scale=1.15, donor=None):
             for blob, pk, kk, _ in sky[0]:
                 bb = bytearray(blob); struct.pack_into('<I', bb, 4, BASE + pk)
                 Pd = np.array(tdecode(bytes(bb), 0)['pos']); rmax = max(rmax, float(np.abs(Pd[:, :2]).max()))
-            ssc = SKY_R / rmax
-            print('  sky dome radius %.0f -> %.0f' % (rmax, SKY_R))
+            # g148: the view distance is the level's own again (anything past ~3200 stalled the game) and the dome
+            # draws regardless; it only has to clear the map (Ark 2026-10-27: Carnival's sat inside the map at 9000)
+            ext = max(float(np.linalg.norm(np.asarray(s_[:2]) - mc[:2])) + s_[3] for _, s_ in placed if s_[3] <= 3000)
+            R_ = max(rmax, 1.3 * ext)
+            ssc = R_ / rmax
+            print('  sky dome radius %.0f -> %.0f (map reaches %.0f from its centre)' % (rmax, R_, ext))
             for blob, pk, kk, _ in sky[0]:
                 sb = bytearray(blob)
                 for i, k in enumerate(kk):
@@ -495,7 +536,7 @@ def build(path, outdir, name, scale=1.15, donor=None):
                 t4 = car.append(struct.pack('<IIiI16fI', 4, 0, 1, 0, ssc, 0, 0, 0, 0, ssc, 0, 0, 0, 0, ssc, 0,
                                             mc[0], mc[1], 0.0, 1.0, 0) + b'\0' * 12)
                 car.setp(t4 + 0x50, mo)
-                groups.append((car.group([t4], sphere=(mc[0], mc[1], 0.0, SKY_R * 1.5)), (mc[0], mc[1], 0.0, SKY_R * 1.5)))
+                groups.append((car.group([t4], sphere=(mc[0], mc[1], 0.0, R_ * 1.5)), (mc[0], mc[1], 0.0, R_ * 1.5)))
         if small: groups += kd(small)
         for off, sph in big: groups.append((car.group([off], sphere=sph), sph))
     # ---- collision: one op18 per Head-On collision piece
@@ -613,7 +654,8 @@ def build(path, outdir, name, scale=1.15, donor=None):
              'TEX': LT.tex_bytes(dn['keep_t'] if dn else ()), 'RTX': LT.rtx_bytes(dn['keep_r'] if dn else ())}
     struct.pack_into('<4I', colblob, 0, 0x314C4F43, COLBASE, len(colblob), 0)
     files['COL'] = bytes(colblob) + b'\0' * (-len(colblob) % 2048)
-    pk, seen = pkp_convert(b['pkp'], scale); files['PKP'] = pk
+    pk, seen = pkp_convert(b['pkp'], scale)
+    pk = pickups_down(pk, [W[T] for W, T in pieces + gp]); files['PKP'] = pk
     for ext, d in files.items(): open(f'{outdir}/{name}.{ext}', 'wb').write(d)
     import meshconv as _mc
     rep = dict(color_scale=round(_mc.COLOR_SCALE, 3), donor_compacted=dn.get('compacted', 0) if dn else 0, donor_dropped_tex=dn['dropped'] if dn else 0, to4=len(LT.to4), meshes=len(meshes), groups=len(groups), textures=len(LT.map), halved=len(LT.half), missing_tex=len(missing),
