@@ -43,3 +43,11 @@
 
 ## Queue for the user
 - perm_targeted.sh (permuter on the 99 vehicle functions), then send results.
+
+## Bots (Ark 2026-10-26 23:29-23:31, queued after the Lost maps' collision / rendering)
+- Lost maps: rebuild the bot route maps (ZNHC*.BIN, tools/lost/levels/navlost.py) from the fixed collision
+  (colfix.py); the shipped ones were rasterized from the broken trees.
+- Bonus cars for bots: bots can drive the extras (Gold Tooth, 12 Pak, Old Pickup, Pit Viper, Outlaw 2, Thumper,
+  Twister) with working AI; specials touched up later.
+- Repetition check: story mode - the same car never twice in one match; multiplayer - bots avoid cars already
+  taken (players' and other bots'), repeats only when the pool runs out.

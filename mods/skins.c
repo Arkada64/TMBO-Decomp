@@ -790,8 +790,24 @@ static void pakMounts(char* l, int i)
     pakMountLog[i] = 1;
 }
 
+/* Thumper / Twister machine guns: both alternating muzzles (launcher +0x610 / +0x620) at the gun models' points
+ * (tools/lost/hc_buildall.sh HC_MG_DONOR, right gun; left mirrored). Brimstone (Thumper's chassis) has one gun:
+ * both of its muzzles were the same point, so Thumper fired from one side only and away from his barrels
+ * (Ark 2026-10-26). */
+static float XMG[2][3] = { { 2.35f, 7.40f, 0.37f }, { 0.9f, 7.2f, -2.7f } };   /* Thumper, Twister */
+static void xMounts(char* l, char* v)
+{
+    int k = vehSkinF(v), g = k == SK_THUMPER ? 0 : k == SK_TWISTER ? 1 : -1, j;
+    if (g < 0) return;
+    for (j = 0; j < 2; j++) {
+        float* e = (float*)(l + 0x610 + 16 * j);
+        e[0] = j ? -XMG[g][0] : XMG[g][0]; e[1] = XMG[g][1]; e[2] = XMG[g][2];
+    }
+}
+
 void tmbr_LauncherUpdate(void* l, char* v)
 {
+    xMounts((char*)l, v);
     if (isPak(v)) {
         int i = vidx(v);
         if (i >= 0) pakMounts((char*)l, i);
