@@ -110,11 +110,13 @@ void tmbr_BotSkinDrop(int slot)
     scePrintf("TMBR skins: bot slot %d leaves %s (its car is already in the match)\n", slot, skinName[(int)botSkin[slot]]);
     botSkin[slot] = -1;
 }
+static void sendPaint(void);
 static void sendSkins(void)
 {
     char m[8];
     int k;
     sendBotSkins();
+    sendPaint();
     for (k = 0; k < NSKIN; k++) {
         m[0] = 1; m[1] = 'S'; m[2] = 'K'; m[3] = '0' + skinType[k]; m[4] = '0' + (tmbr_skin[k] != 0); m[5] = 0;
         netChatSend(netState, m);
@@ -138,6 +140,11 @@ int tmbr_ChatHandler(int a0, int a1, int client, char* msg)
     if (msg && msg[0] == 1 && msg[1] == 'L' && msg[2] == 'M') {   /* lostslots.c: the host's Lost map */
         extern void tmbr_LostRecv(int client, const char* d);
         tmbr_LostRecv(client, msg + 3);
+        return 0x44;
+    }
+    if (msg && msg[0] == 1 && msg[1] == 'S' && msg[2] == 'H') {   /* a player's paint (hue step) */
+        extern void tmbr_PaintRecv(int client, int step);
+        tmbr_PaintRecv(client, msg[3] - 'A');
         return 0x44;
     }
     if (msg && msg[0] == 1 && msg[1] == 'S' && msg[2] == 'V') {
@@ -309,6 +316,7 @@ void tmbr_CarSelectSound(void* snd, int car)
         fontPrint(0, skinName[sel]);
     }
     { extern int tmbr_GuestPicking(void); if (tmbr_GuestPicking()) return; }   /* a guest's pick: not the host's skin */
+    { extern void tmbr_PaintSelect(void); tmbr_PaintSelect(); }
     for (k = 0; k < NSKIN; k++) {
         int on = sel == k;
         if (on != tmbr_skin[k]) {
@@ -933,4 +941,95 @@ void tmbr_KillMessage(void* hud, int victim, int killer)
 void tmbr_SkinsLobby(void)
 {
     if (++resendTick >= 300) { resendTick = 0; sendSkins(); }
+}
+
+/* ---- Paint (COLOR_TEST, Ark 2026-10-27: "custom colors with a color slider"). On the car select L2 / R2 step the
+ * hue of your car's paint (24 steps, 0 = stock; L2 + R2 = stock), sent to everyone ("\x01SH" + 'A' + step). Every
+ * console recolours a car when its RTX (CLUTs, read to 0x1C05670) is uploaded for its file slot (rtxInit, hooks
+ * 0x188BAC / 0x18937C / 0x18A660): CLUT entries that are paint-like (saturation >= PAINT_S, brightness >= PAINT_V)
+ * get their hue turned; greys, blacks, whites and dark browns stay. tools/lost/paintprev.py renders the same rule. */
+#define PAINT_STEPS 24
+#define PAINT_S 80
+#define PAINT_V 40
+static unsigned char paintOf[8];        /* per client: hue step */
+static int paintMine, paintPrevPad, paintHold;
+extern void rtxInit(int vram, char* rtx, int slot) __asm__("func_0023EC80");
+static void sendPaint(void)
+{
+    char m[6];
+    m[0] = 1; m[1] = 'S'; m[2] = 'H'; m[3] = (char)('A' + paintMine); m[4] = 0;
+    netChatSend(netState, m);
+}
+void tmbr_PaintRecv(int client, int step)
+{
+    if (client < 0 || client >= 8 || step < 0 || step >= PAINT_STEPS) return;
+    if (paintOf[client] != step) scePrintf("TMBR paint: client %d hue step %d\n", client, step);
+    paintOf[client] = (unsigned char)step;
+}
+void tmbr_PaintSelect(void)
+{
+    int b = inputGetPadButtons(0) & 0x300, pr = b & ~paintPrevPad, old = paintMine;
+    char t[24];
+    paintPrevPad = b;
+    if (b == 0x300) paintMine = 0;                                     /* L2 + R2: stock */
+    else if (pr & 0x100) paintMine = (paintMine + PAINT_STEPS - 1) % PAINT_STEPS;
+    else if (pr & 0x200) paintMine = (paintMine + 1) % PAINT_STEPS;
+    else if (b && ++paintHold > 12 && (paintHold & 3) == 0)            /* held: keeps stepping */
+        paintMine = (paintMine + (b & 0x200 ? 1 : PAINT_STEPS - 1)) % PAINT_STEPS;
+    if (!b) paintHold = 0;
+    if (paintMine != old) {
+        int me = netGetMyClientIndex(netState);
+        if (me >= 0 && me < 8) paintOf[me] = (unsigned char)paintMine;
+        scePrintf("TMBR paint: mine %d\n", paintMine);
+        sendPaint();
+    }
+    if (paintMine) sprintf(t, "L2 PAINT %d R2", paintMine); else sprintf(t, "L2 PAINT STOCK R2");
+    fontSetCursorAtSubPixel(0, 0x1000, 0x1A00);
+    fontPrint(0, t);
+}
+static void hueTurn(unsigned char* c, int turn)    /* turn: 0..1535 (256 per 60 degrees) */
+{
+    int r = c[0], g = c[1], b = c[2], mx, mn, d, h, f, x, y;
+    mx = r > g ? (r > b ? r : b) : (g > b ? g : b);
+    mn = r < g ? (r < b ? r : b) : (g < b ? g : b);
+    d = mx - mn;
+    if (mx < PAINT_V || d * 255 < PAINT_S * mx) return;
+    if (mx == r) { h = (g - b) * 256 / d; if (h < 0) h += 1536; }
+    else if (mx == g) h = 512 + (b - r) * 256 / d;
+    else h = 1024 + (r - g) * 256 / d;
+    h = (h + turn) % 1536;
+    f = h & 255;
+    x = mn + d * f / 256;            /* rising */
+    y = mx - d * f / 256;            /* falling */
+    switch (h >> 8) {
+    case 0: r = mx; g = x; b = mn; break;
+    case 1: r = y; g = mx; b = mn; break;
+    case 2: r = mn; g = mx; b = x; break;
+    case 3: r = mn; g = y; b = mx; break;
+    case 4: r = x; g = mn; b = mx; break;
+    default: r = mx; g = mn; b = y; break;
+    }
+    c[0] = (unsigned char)r; c[1] = (unsigned char)g; c[2] = (unsigned char)b;
+}
+void tmbr_CarRtxInit(int vram, char* rtx, int slot)
+{
+    int c, step = 0, o = 0, n = 0, guard = 0;
+    for (c = 0; c < 8; c++)
+        if (slot > 0 && netSlotVehicle(netState, c) == slot) { step = paintOf[c]; break; }
+    if (step > 0 && rtx) {
+        while (guard++ < 4096) {
+            unsigned sz = *(unsigned*)(rtx + o);
+            unsigned lo = *(unsigned*)(rtx + o + 8), hi = *(unsigned*)(rtx + o + 12);   /* gs (64 bits) */
+            if (!sz && !lo && !hi) break;
+            if (((hi >> 16) & 0xFF) == 0x08) {                        /* a CLUT: 16-byte header, RGBA entries */
+                int k, ne = sz ? (int)(sz * 4 - 16) / 4 : (1 << ((hi >> 8) & 15)) * (1 << ((hi >> 12) & 15));   /* (last: size from gs) */
+                for (k = 0; k < ne; k++) hueTurn((unsigned char*)rtx + o + 16 + 4 * k, step * 1536 / PAINT_STEPS);
+                n++;
+            }
+            if (!sz) break;
+            o += sz * 4;
+        }
+        scePrintf("TMBR paint: slot %d (client %d) hue step %d, %d palettes\n", slot, c, step, n);
+    }
+    rtxInit(vram, rtx, slot);
 }

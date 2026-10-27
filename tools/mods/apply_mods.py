@@ -427,6 +427,10 @@ PATCHES = [
     (A("nonmatchings/online/net/netInitDme.s"), "0016E680", "lui", "lui        $5, %hi(tmbr_ChatHandler)"),
     (A("nonmatchings/online/net/netInitDme.s"), "0016E68C", "addiu", "addiu      $5, $5, %lo(tmbr_ChatHandler)"),
     (A("tmb/shell.s"), "001884BC", "jal", "jal        tmbr_LoadOwnCar"),
+    # paint (COLOR_TEST, mods/skins.c tmbr_CarRtxInit): a car's CLUTs recoloured before its RTX upload
+    (A("tmb/shell.s"), "00188BAC", "jal", "jal        tmbr_CarRtxInit"),
+    (A("tmb/shell.s"), "0018937C", "jal", "jal        tmbr_CarRtxInit"),
+    (A("tmb/shell.s"), "0018A660", "jal", "jal        tmbr_CarRtxInit"),
     (A("tmb/shell.s"), "00189048", "jal", "jal        tmbr_LoadCar268"),
     (A("tmb/shell.s"), "00189070", "jal", "jal        tmbr_LoadCar478"),
     (A("tmb/shell.s"), "00189098", "jal", "jal        tmbr_LoadCar680"),
