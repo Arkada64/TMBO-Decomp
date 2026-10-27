@@ -59,3 +59,5 @@
   (drop the printed font name).
 - Picture: the level preview is a movie clip (LS<level>.PSS, nextMovie 0x46 + level), not a texture. A clean own
   picture = a short PSS per map (MPEG-2 + PS2 stream mux) from in-game footage once the maps render right.
+- Ark 2026-10-26 23:43: name plates now (after the collision fix); the preview clips after the weekly reset,
+  together with: story mode movies for all the cars (incl. the extras), and online co-op story.
