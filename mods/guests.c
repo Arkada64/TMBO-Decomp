@@ -132,17 +132,45 @@ static void preload(int inGame)
  * cars there first, so their cars load with the level (Ark 2026-10-26: both halves showed P1 for a second while a
  * guest's car loaded in the match). */
 extern void levelLoadCars(char* shell, int a) __asm__("func_00188248");
+/* a car (id << 5) for a bot that nobody in `used` (n car ids) drives yet: `car` itself when it is free, else a
+ * random free regular car (1..14, Minion 15 too when allowed); the same car only when every one is taken.
+ * (Ark 2026-10-27: story - the same car never twice in a match; multiplayer - bots avoid cars already in.) */
+int tmbr_FreeCar(int car, const int* used, int n, int minionOk)
+{
+    int c, i, nf = 0, pick, top = minionOk ? 15 : 14;
+    unsigned taken = 0;
+    for (i = 0; i < n; i++) if ((used[i] >> 5) >= 1 && (used[i] >> 5) <= 15) taken |= 1u << (used[i] >> 5);
+    if ((car >> 5) < 1 || (car >> 5) > 15 || !(taken >> (car >> 5) & 1)) return car;   /* (bosses / specials: as is) */
+    for (c = 1; c <= top; c++) if (!(taken >> c & 1)) nf++;
+    if (!nf) return car;
+    pick = mathfRandI(0, nf - 1);
+    for (c = 1; c <= top; c++) if (!(taken >> c & 1) && pick-- == 0) return c << 5;
+    return car;
+}
+
 void tmbr_LevelLoadCars(char* shell, int a)
 {
     int k;
-    if (tmbr_Opt(0x20))     /* story: the level loader takes AI slots' cars from D_00313F00 (the session's earlier
+    if (tmbr_Opt(0x20)) {   /* story: the level loader takes AI slots' cars from D_00313F00 (the session's earlier
                              * roll), not slot +0xB4 where the story set them (reference/wip/BOSS_CARIDS.md) */
+        int used[16], nu = 0;
+        for (k = 0; k < 8; k++)                          /* players' (and guests') cars first */
+            if (F(D_003156C0 + k * 0x220, 0x214) != 0) used[nu++] = F(D_003156C0 + k * 0x220, 0xB4);
+        for (k = 1; k <= 3; k++) if (joinCar[k]) used[nu++] = joinCar[k];
         for (k = 0; k < 8; k++) {
-            int c = F(D_003156C0 + k * 0x220, 0xB4);
-            if (F(D_003156C0 + k * 0x220, 0x214) != 0 || tmbr_GuestSlot(k) || c <= 0 || c == D_00313F00[k]) continue;
+            int c = F(D_003156C0 + k * 0x220, 0xB4), c2;
+            if (F(D_003156C0 + k * 0x220, 0x214) != 0 || tmbr_GuestSlot(k) || c <= 0) continue;
+            c2 = (c >> 5) == 15 ? c : tmbr_FreeCar(c, used, nu, 0);     /* (Minion: a story boss - kept) */
+            if (c2 != c) {
+                scePrintf("TMBR story: slot %d car %d taken, now %d\n", k, c >> 5, c2 >> 5);
+                F(D_003156C0 + k * 0x220, 0xB4) = c = c2;
+            }
+            used[nu++] = c;
+            if (c == D_00313F00[k]) continue;
             scePrintf("TMBR story: level load, slot %d car %x -> %x\n", k, D_00313F00[k], c);
             D_00313F00[k] = c;
         }
+    }
     for (k = 1; k <= 3; k++)
         if (joinCar[k] && joinSlot[k] >= 0) {
             scePrintf("TMBR guests: level load, slot %d car %d -> %d\n", joinSlot[k], D_00313F00[joinSlot[k]] >> 5, joinCar[k] >> 5);
