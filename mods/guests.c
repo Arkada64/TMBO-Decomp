@@ -148,6 +148,21 @@ int tmbr_FreeCar(int car, const int* used, int n, int minionOk)
     return car;
 }
 
+/* the same, deterministic (the next free car after it): every console runs the level loader on the same roll and
+ * must end with the same cars */
+static int freeCarSeq(int car, const int* used, int n, int minionOk)
+{
+    int c, i, top = minionOk ? 15 : 14;
+    unsigned taken = 0;
+    for (i = 0; i < n; i++) if ((used[i] >> 5) >= 1 && (used[i] >> 5) <= 15) taken |= 1u << (used[i] >> 5);
+    if ((car >> 5) < 1 || (car >> 5) > 15 || !(taken >> (car >> 5) & 1)) return car;
+    for (i = 1, c = car >> 5; i <= top; i++) {
+        c = c % top + 1;
+        if (!(taken >> c & 1)) return c << 5;
+    }
+    return car;
+}
+
 void tmbr_LevelLoadCars(char* shell, int a)
 {
     int k;
@@ -169,6 +184,26 @@ void tmbr_LevelLoadCars(char* shell, int a)
             if (c == D_00313F00[k]) continue;
             scePrintf("TMBR story: level load, slot %d car %x -> %x\n", k, D_00313F00[k], c);
             D_00313F00[k] = c;
+        }
+    }
+    else {  /* multiplayer: the AI slots' cars are loaded here (D_00313F00, the session's random roll - repeats
+             * allowed) and a bot later takes its vehicle's loaded model whatever its slot car says (Ark 2026-10-27: the
+             * bots' no-repeat pick in addBot only renamed the slot, the car stayed a copy). Repeats go here. */
+        extern int tmbr_MinionOff(void);
+        int used[16], nu = 0;
+        for (k = 0; k < 8; k++)
+            if (F(D_003156C0 + k * 0x220, 0x214) != 0 || tmbr_GuestSlot(k)) used[nu++] = F(D_003156C0 + k * 0x220, 0xB4);
+        for (k = 1; k <= 3; k++) if (joinCar[k]) used[nu++] = joinCar[k];
+        for (k = 0; k < 8; k++) {
+            int c = D_00313F00[k], c2;
+            if (F(D_003156C0 + k * 0x220, 0x214) != 0 || tmbr_GuestSlot(k) || c <= 0) continue;
+            c2 = freeCarSeq(c, used, nu, !tmbr_MinionOff());
+            if (c2 != c) {
+                scePrintf("TMBR bots: level load, slot %d car %d repeats, now %d\n", k, c >> 5, c2 >> 5);
+                D_00313F00[k] = c2;
+                F(D_003156C0 + k * 0x220, 0xB4) = c2;
+            }
+            used[nu++] = D_00313F00[k];
         }
     }
     for (k = 1; k <= 3; k++)

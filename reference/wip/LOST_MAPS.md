@@ -171,3 +171,21 @@ The exact trees are 2-4x the old size, too big for the fixed level NGP slot, so 
 read at level db load to 0x3000000 (mods/lostslots.c tmbr_LostColLoad, 128 MB EE needed); op18 roots point there.
 Every converted map's spawn points now have ground right below and free space above (spawncheck). Route maps rebuilt
 from the new collision (curbs over 2 units split the lawns from the streets: bots keep to the roads for now).
+
+## Parked (Ark 2026-10-27, after g150)
+State: all five maps load and draw (Dogpound's view distance 3170: anything past ~3200 stalls the draw; g146-g148),
+skies from retail levels (dome scaled to 2x the map's reach), level meshes prelit (no 0x100 lit flag), junk
+"meshes" from the climb dropped (object flags 0 / garbage top byte), missing-texture cards and black shadow decals
+dropped, op19 destroyed-state collision left out (an op19 in a collision path is followed by the child index),
+floor pickups lowered to 3 over the ground, ABE + vertex-alpha meshes blended. Dogpound's helicopter sound off.
+Open:
+- z-fighting / flicker on coplanar layers (retail level flags 0x4000 / 0x8040 / 0x1001 / 0x4020 unexplored).
+- collision: Stadium Slaughter's tunnel out of the stadium resets the car ("CAR TELEPORTED" = func_001ACF98: the
+  tire hat test (hdHatTest, collision grid) found no ground); Ark's screenshot shows the tunnel exit floor missing
+  (sky/fog colour under the far end). Carnival's rollercoaster meshes / collision. Jumps / drive-throughs.
+- destructibles: Head-On op19 = damage states with health thresholds (kid entry +8: fraction of 0xFFFF); TMB's
+  are level nodes 6000-6999 (and op31 id 0) handed to func_00129000 (Destructibles, D_004FA038) by the db callback
+  func_00127650. Needs a converter to TMB's destructible node format.
+- falling off the map: no damage.
+- debug views: /tmp tools topdbg.py (render vs collision top-down), wh.py / sh.py (white / shadow mesh survey) -
+  worth moving into tools/lost/levels if picked up again.
