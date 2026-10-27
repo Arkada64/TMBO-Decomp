@@ -757,7 +757,7 @@ void tmbr_RoofHeliSound(void* s, void* pos, int a, int b)
 {
     char* g = D_004FA030;
     extern int tmbr_LostActive(void);
-    if (g && F(g, 0x9FCA0) == 20 && !tmbr_Opt(OPT_STORY)) return;
+    if (g && F(g, 0x9FCA0) == 20) return;   /* (Ark 2026-10-27: no single player any more - never on this map) */
     if (tmbr_LostActive()) return;          /* Lost maps run as Dogpound: its helicopter object plays with no model */
     heliSound(s, pos, a, b);
 }

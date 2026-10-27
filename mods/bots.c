@@ -1495,7 +1495,8 @@ static void turboUse(char* g, char* v, int evading)
 #define EN_SHIELD_T 12
 #define FRZ_CD 900      /* 15 s between a bot's freezes */
 static short enCd[8];
-extern int aiGoodChoice3(char* v, int w) __asm__("aiIsGoodWeaponChoice__7Vehiclei");
+static int aiSpecialAs(char* v, int w, int pick);
+#define aiGoodChoice3(v, w) aiSpecialAs(v, w, 0)
 static signed char altFire[8];
 static short altCd[8], altChk[8];      /* frames until the special goes after arming its second mode (TODO 7) */
 static int incoming(char* g, char* v, int k)
@@ -1732,7 +1733,19 @@ keepFlee:
 
 /* Weapon choice (attack state 1, func_00106440): with the fairness gate gone for bot targets, specials would
  * dominate; let a bot take its special only SPECIAL_CHANCE % of the times it is offered. */
-extern int aiGoodWeapon(char* v, int w) __asm__("aiGoodWeaponToPick__7Vehiclei");
+extern int aiGoodWeapon0(char* v, int w) __asm__("aiGoodWeaponToPick__7Vehiclei");
+extern int aiGoodChoice0(char* v, int w) __asm__("aiIsGoodWeaponChoice__7Vehiclei");
+extern int tmbr_SkinAiSpecialId(char* v);   /* skins.c */
+/* the special (w 1) judged under the car id it really fires as (bonus cars borrowing another car's special) */
+static int aiSpecialAs(char* v, int w, int pick)
+{
+    int id = w == 1 ? tmbr_SkinAiSpecialId(v) : 0, sv = 0, r;
+    if (id) { sv = *(int*)(v + 0x20F4); *(int*)(v + 0x20F4) = id; }
+    r = pick ? aiGoodWeapon0(v, w) : aiGoodChoice0(v, w);
+    if (id) *(int*)(v + 0x20F4) = sv;
+    return r;
+}
+#define aiGoodWeapon(v, w) aiSpecialAs(v, w, 1)
 extern int mathfRand(int lo, int hi) __asm__("mathfRand__Fii");
 int tmbr_AiGoodWeapon(char* v, int w)
 {
@@ -1747,7 +1760,7 @@ int tmbr_AiGoodWeapon(char* v, int w)
  * and tops the AI's ammo (car +0x2338[w]) back up to 1 so it never runs out. So bots fired their heaviest
  * weapons back to back. Now: heavy weapons (special, power, ricochet, napalm, pickup) have a cooldown per bot,
  * the pick is a weighted draw that favours fire / homing missiles, and a heavy weapon is only held briefly. */
-extern int aiGoodChoice(char* v, int w) __asm__("aiIsGoodWeaponChoice__7Vehiclei");
+#define aiGoodChoice(v, w) aiSpecialAs(v, w, 0)
 extern void aiPickBest(char* v) __asm__("aiPickBestWeaponToFireNow__7Vehicle");
 extern int mathfRandW(int lo, int hi) __asm__("mathfRand__Fii");
 static int wpnClock;               /* = thinkTick */

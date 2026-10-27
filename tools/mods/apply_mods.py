@@ -255,7 +255,9 @@ PATCHES = [
     (A("nonmatchings/tmb/game/func_00138358.s"), "001386C8", "jal", "jal        tmbr_PrisonInitAfter"),        # Prison Passage story sequence (story.c)
     (A("nonmatchings/tmb/game/func_00138358.s"), "001387FC", "jal", "jal        tmbr_LevelInitAfter"),         # Warhawk's roof boss init (story.c)
     (A("nonmatchings/tmb/boss/func_00114B78.s"), "00114D5C", "jal", "jal        tmbr_BossWon"),                # the roof boss down: stage won (story.c)
-    (A("nonmatchings/tmb/helicop/Update__10Helicopter.s"), "00141178", "jal", "jal        tmbr_RoofHeliSound"),   # roof's rotor sound: story only (story.c)
+    (A("nonmatchings/tmb/helicop/Update__10Helicopter.s"), "00141178", "jal", "jal        tmbr_RoofHeliSound"),   # roof's rotor sound: never on level 20 (story.c)
+    (A("nonmatchings/tmb/envheli/UpdateEnvHeli__7EnvHeli.s"), "001328F8", "jal", "jal        tmbr_RoofHeliSound"),  # the level's ambient helicopter: same rule
+    (A("nonmatchings/tmb/boss/func_001123C0.s"), "001141A0", "jal", "jal        tmbr_RoofHeliSound"),       # the boss helicopter's rotor: same rule
     # (the dispatch 0x14F184 -> tmbr_VehTakeHit: one entry, with the hit-function hooks below)
     (A("nonmatchings/tmb/ai/aiInit__7Vehicle.s"), "0010011C", "jal", "jal        tmbr_MinionVehInit"),          # Minion's stadium: AI Minion health + force field (story.c)
     (A("nonmatchings/tmb/game/func_0013D0C0.s"), "0013D574", "jal", "jal        tmbr_DoFogVolume"),           # Lost map look debug: fog volumes off (lostslots.c)

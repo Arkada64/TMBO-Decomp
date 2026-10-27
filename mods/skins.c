@@ -853,7 +853,7 @@ static void pakMounts(char* l, int i)
  * (tools/lost/hc_buildall.sh HC_MG_DONOR, right gun; left mirrored). Brimstone (Thumper's chassis) has one gun:
  * both of its muzzles were the same point, so Thumper fired from one side only and away from his barrels
  * (Ark 2026-10-26). */
-static float XMG[3][3] = { { 2.35f, 7.40f, 0.37f }, { 0.9f, 7.2f, -2.7f },     /* Thumper, Twister */
+static float XMG[3][3] = { { 2.35f, 7.40f, 0.37f }, { 1.08f, 8.64f, -2.34f },  /* Thumper, Twister (x1.2 model, Ark 2026-10-27) */
                            { 1.31f, 7.30f, -0.48f } };                         /* Pit Viper (Head-On's gun points; Ark 2026-10-27: shots out of line) */
 #define SK_PITVIPER 3
 static void xMounts(char* l, char* v)
@@ -866,6 +866,16 @@ static void xMounts(char* l, char* v)
     }
 }
 
+/* AI special checks (bots.c, Ark 2026-10-27 "the AI does not use the bonus car specials"): the AI judged a borrowed
+ * special by the donor's rules (Thumper by Brimstone's zealot, Old Pickup by Junkyard Dog's tow). The car id the
+ * special really runs under while the AI asks (0 = the car's own). */
+int tmbr_SkinAiSpecialId(char* v)
+{
+    int k = vehSkinF(v);
+    if (k == SK_THUMPER) return WARTHOG_ID;
+    if (k == SK_PICKUP) return MINION_ID;
+    return 0;
+}
 void tmbr_LauncherUpdate(void* l, char* v)
 {
     xMounts((char*)l, v);
