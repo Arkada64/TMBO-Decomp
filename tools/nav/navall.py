@@ -37,9 +37,25 @@ def largest(G):
     remap = -np.ones(N, int); remap[keep] = np.arange(keep.sum())
     nb2 = np.where(nb[keep] >= 0, remap[np.maximum(nb[keep], 0)], -1)
     return dict(G, rec=G["rec"][keep], z=G["z"][keep], nb=nb2)
+# areas the bots must not plan into: (x0, x1, y0, y1, below z) - surfaces lower than z in the box are dropped
+# FREEWAY: the dead-end ramp by the hospital (drops from the road at y -2080, z 11 to z -63 at y -2880 and ends;
+# Ark 2026-10-27: bots got stuck down there)
+EXCLUDE = dict(freeway=[(-90, 150, -2910, -2070, 10.5)])
+def exclude(name, H, R):
+    for xa, xb, ya, yb, zt in EXCLUDE.get(name, []):
+        ia, ib = int((xa - R["x0"]) / R["step"]), int((xb - R["x0"]) / R["step"]) + 1
+        ja, jb = int((ya - R["y0"]) / R["step"]), int((yb - R["y0"]) / R["step"]) + 1
+        sub = H[:, ja:jb, ia:ib]
+        n = int((np.isfinite(sub) & (sub < zt)).sum())
+        sub[np.isfinite(sub) & (sub < zt)] = np.nan
+        print(f"{name}: excluded {n} cells in x {xa}..{xb} y {ya}..{yb} below z {zt}")
+    return H
 table = []
+ONLY = os.environ.get("NAV_ONLY")
 for name, lvl in LEVEL.items():
+    if ONLY and name not in ONLY.split(","): continue
     H = np.load(f"{name}_H.npy"); R = pickle.load(open(f"{name}_R.pkl", "rb"))
+    H = exclude(name, H, R)
     addr, cap = region(name)
     for lat in (8, 9, 10, 12, 14, 16, 20):
         G = largest(build(H, R, lat))
