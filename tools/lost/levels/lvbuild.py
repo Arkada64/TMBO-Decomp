@@ -413,6 +413,23 @@ def build(path, outdir, name, scale=1.15, donor=None):
     keys = sorted({k for m in meshes for k in m['texrefs']})
     missing = [k for k in keys if k not in T]
     nwhite = 0
+    # Ark 2026-10-27: Suburban Terror drew nothing, a white sheet covered Death Port, white boxes on City of the Dead:
+    # the walk's climb also decodes things that are not meshes (object flags 0 or garbage in the top byte: 328 on SU,
+    # some 50000 units across) - dropped; meshes whose texture is not in the file (white cards) - dropped too
+    n0 = len(meshes)
+    meshes = [m for m in meshes if m.get('hflags', 0) and not (m.get('hflags', 0) >> 24)]
+    nbad = n0 - len(meshes); n0 = len(meshes)
+    meshes = [m for m in meshes if not any(k not in T for k in m['texrefs'])]
+    print('  not-meshes dropped', nbad, 'missing-texture meshes dropped', n0 - len(meshes))
+    # baked shadow decals (black texture with an alpha ramp, Stadium Slaughter 63): TMB drew them as hard black slabs
+    # (Ark 2026-10-27 "bad shadows") - dropped
+    def shadow_tex(k):
+        im = T[k]['img']; a = im[..., 3]
+        return float(im[..., :3].mean()) < 6 and float((a < a.max()).mean()) > 0.2
+    n0 = len(meshes)
+    if os.environ.get('LV_SHADOWS', '0') != '1':
+        meshes = [m for m in meshes if not (m['texrefs'] and all(shadow_tex(k) for k in m['texrefs']))]
+    print('  shadow decals dropped', n0 - len(meshes))
     for m in meshes:
         if os.environ.get('LV_WHITE', '1') != '1':          # (test switch: drop them again, as before 2026-10-27)
             if not m['texrefs'] or any(k not in T for k in m['texrefs']):
@@ -523,7 +540,7 @@ def build(path, outdir, name, scale=1.15, donor=None):
             # g148: the view distance is the level's own again (anything past ~3200 stalled the game) and the dome
             # draws regardless; it only has to clear the map (Ark 2026-10-27: Carnival's sat inside the map at 9000)
             ext = max(float(np.linalg.norm(np.asarray(s_[:2]) - mc[:2])) + s_[3] for _, s_ in placed if s_[3] <= 3000)
-            R_ = max(rmax, 1.3 * ext)
+            R_ = max(rmax, 2.0 * ext)   # (1.3 left Carnival's inside the map)
             ssc = R_ / rmax
             print('  sky dome radius %.0f -> %.0f (map reaches %.0f from its centre)' % (rmax, R_, ext))
             for blob, pk, kk, _ in sky[0]:
