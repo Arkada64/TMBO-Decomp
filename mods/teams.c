@@ -118,8 +118,13 @@ int tmbr_MarkerTeam(char* v)
         return t < 2 ? t : 0xF00 + t;
     }
 }
+int tmbr_IsAlly(char* v);
+/* friends: teammates in team play; in a story run (free for all, Ark 2026-10-27) the humans and the ally bot - they
+ * cannot hurt each other, the ally never goes for a human; every other bot fights everyone */
+static int storyFriend(char* v) { return v && (F(v, 0x590) == 1 || tmbr_IsAlly(v)); }
 int tmbr_SameTeam(char* a, char* b)
 {
+    if (!tmbr_Opt(OPT_TEAMS)) return tmbr_Opt(0x20) && a != b && storyFriend(a) && storyFriend(b);
     return tmbr_MarkerTeam(a) >= 0 && tmbr_MarkerTeam(a) == tmbr_MarkerTeam(b);
 }
 /* the callers keep values in argument / temp registers across this point: save them all */
@@ -149,7 +154,7 @@ void tmbr_TeamsBotJoined(int s, int k)
     if (s < 0 || s > 7) return;
     botSlot[s] = 1;
     if (k >= 0 && k < 8) vehSlot[k] = s;
-    if (tmbr_botTeamMode) {
+    if (tmbr_botTeamMode || (tmbr_Opt(0x20) && !tmbr_Opt(OPT_TEAMS))) {
         t = 1;
         if (tmbr_Opt(0x40) && allySlot < 0) { t = 0; allySlot = s; scePrintf("TMBR teams: ally bot in slot %d (car %d)\n", s, k); }
     } else {

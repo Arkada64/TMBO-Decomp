@@ -106,10 +106,9 @@ static void reindex(char* g)
             if (F(v, 0x20D0)) *(char*)(F(v, 0x20D0) + 0x2F) = i;
             if (F(v, 0x20D4)) *(char*)(F(v, 0x20D4) + 0x11) = i;
         }
-        {   /* (a 12 Pak bot is a Roadkill inside: its marker says 12 PAK) */
-            extern int tmbr_IsPak(char* v);
-            static const char pakName[] = "12 PAK";
-            radarName(0xA + i, tmbr_IsPak(v) ? (int)pakName : D_002C07F8[F(v, 0x20F4) >> 5]);
+        {   /* (a bonus car bot - 12 Pak is a Roadkill inside: its marker says its own name, skins.c) */
+            extern const char* tmbr_VehName(char* v, const char* d);
+            radarName(0xA + i, (int)tmbr_VehName(v, (const char*)D_002C07F8[F(v, 0x20F4) >> 5]));
         }
     }
 }
@@ -143,13 +142,17 @@ static int addBot(void)
     if (!veh) return 0;
     netBotObjects(D_003156C0, veh);
     {   /* a 12 Pak bot: his name on the marker / leaderboard (the slot name, +0x18, was the car's: ROADKILL) */
-        extern int tmbr_IsPak(char* v);
-        if (tmbr_IsPak(veh)) {
+        extern const char* tmbr_VehName(char* v, const char* d);
+        const char* b = tmbr_VehName(veh, 0);         /* (any bonus car: its own name, skins.c) */
+        if (b) {
             char* nm = D_003156C0 + s * 0x220 + 0x18;
-            nm[0] = '1'; nm[1] = '2'; nm[2] = ' '; nm[3] = 'P'; nm[4] = 'A'; nm[5] = 'K'; nm[6] = 0;
+            int j;
+            for (j = 0; b[j] && j < 15; j++) nm[j] = b[j];
+            nm[j] = 0;
         }
     }
     tmbr_TeamsBotJoined(s, (int)(veh - g) / 0x31B0);
+    { extern void tmbr_StoryAllyCheck(char* v); tmbr_StoryAllyCheck(veh); }
     return 1;
 }
 
@@ -454,6 +457,7 @@ void tmbr_OptSet(int bits, int on)
     if (cur != want) optSync(cur ^ want);
 }
 extern int tmbr_TeamOf(char* v);         /* teams.c */
+extern int tmbr_SameTeam(char* a, char* b);
 extern void tmbr_TeamsFrame(void);
 extern void tmbr_TeamsLobby(char* lineA, char* lineB);
 extern void tmbr_TeamsBotJoined(int slot, int car);
@@ -704,7 +708,7 @@ void tmbr_BotsThink(void)
             char* v = g + k * 0x31B0;
             int others;
             if (v == b || !live(v)) continue;
-            if (tmbr_Opt(OPT_TEAMS) && tmbr_TeamOf(v) == tmbr_TeamOf(b)) continue;   /* teammate */
+            if (tmbr_SameTeam(v, b)) continue;           /* teammate (story: the humans and the ally) */
             d = (int)manhat(POS(b), POS(v));
             others = hunted[k] - (k == ci);              /* other bots already on it */
             if (F(v, 0x590) == 1) {                      /* humans: never more than HUMAN_MAX_BOTS bots at once */
@@ -1382,7 +1386,7 @@ static int evade(char* g, char* v)
         char* c = g + j * 0x31B0;
         int dx, dy, dot, crs, mdot, mcrs, d;
         if (j == k || !cok[j] || !live(c)) continue;
-        if (tmbr_Opt(OPT_TEAMS) && tmbr_TeamOf(c) == tmbr_TeamOf(v)) continue;
+        if (tmbr_SameTeam(c, v)) continue;
         dx = cpx[j] - cpx[k]; dy = cpy[j] - cpy[k];
         d = iabs(dx) + iabs(dy);
         if (d > 4 * EV_DIST || d >= bd) continue;
@@ -1908,8 +1912,8 @@ extern int tmbr_botTeamMode;
 static void extraLines(int row);
 void tmbr_PrintEntryC(int font, const char* s, int row)
 {
-    fontPrint(font, s);
-    extraLines(row);
+    (void)font; (void)s;            /* ENTRY : SYNCHRONOUS not printed (sync is the standard - Ark 2026-10-27) */
+    extraLines(row - 1);
 }
 /* Last Man Standing's box has no ENTRY line (it ends with NUMBER OF LIVES, 0x1C6304) and no USE BOTS row
  * (where the other modes show BOTS): BOTS first, then the same lines */

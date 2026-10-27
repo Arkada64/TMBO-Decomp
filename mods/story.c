@@ -119,13 +119,14 @@ void tmbr_StoryLine(char* b)
         sprintf(b, "STAGE %d: %s", stage, NAME[level]);
 }
 
+static int storyWin = -1;        /* the match's outcome (storyFrame): 0 = the humans won, 1 = lost, -1 = undecided */
 /* the match just played (host, waiting room): advance on a win, retry on a loss */
 static void result(void)
 {
     int w;
     if (playedSerial == tmbr_levelSerial || tmbr_levelIndex != level) { playedSerial = tmbr_levelSerial; return; }
     playedSerial = tmbr_levelSerial;
-    w = tmbr_TeamsWinner();
+    w = storyWin;
     if (w != 0) {
         sprintf(msg, "TRY AGAIN: %s", NAME[level]);
         scePrintf("TMBR story: lost %s (winner %d), again\n", NAME[level], w);
@@ -179,9 +180,11 @@ void tmbr_StoryLobby(void)
     /* the rules of a story level */
     n = (level == 14 ? 1 : level == 20 && ROOF_BOSS ? 2 : AICOUNT[level]) + (tmbr_Opt(0x40) ? 1 : 0);   /* + the ally bot (GAME MODS ALLY BOT) */
     tmbr_botCount = n > 7 ? 7 : n;
-    tmbr_OptSet(OPT_TEAMS, 1);
+    /* free for all (Ark 2026-10-27: not humans vs bots): the bots fight everyone, the humans and the ally bot are
+     * friends (teams.c tmbr_SameTeam). Last Man Standing, 3 lives; co-op humans share theirs (storyFrame below) */
+    tmbr_OptSet(OPT_TEAMS, 0);
     tmbr_OptSet(OPT_TEAMS4, 0);
-    tmbr_TeamsBotMode(1);
+    tmbr_TeamsBotMode(0);
     {
         int ch = 0;
         if (LEVEL() != level) { LEVEL() = level; ch = 1; }
@@ -266,6 +269,8 @@ void tmbr_StoryMoviesReset(void) { movBuilt = 0; }
  * characters: mov/jdarena.pss). movieEnable (D_004FB5A0) = 1 starts it on the loop's next playMovie call;
  * movieRequested (D_004FB068) is up while it plays. */
 extern char incogName[] __asm__("D_004EF7C0");
+extern char noneName[] __asm__("D_004EF7B0");      /* mov/none.pss: nextMovie 0x89, played without audio */
+static int movSilent;                               /* 1 = this try goes through the silent 0x89 slot */
 extern int nextMovie __asm__("D_004FA718");
 extern int movieEnable __asm__("D_004FB5A0");
 extern int movieDelay __asm__("D_004FA728");
@@ -279,7 +284,7 @@ void tmbr_PlayMovie(void)
     if (movPending) {
         extern int D_004FB06C, D_004FA778, D_004FA3A4;
         movPending = 0;
-        nextMovie = -1; movieDelay = 0; movieEnable = 1;
+        nextMovie = movSilent ? 0x89 : -1; movieDelay = 0; movieEnable = 1;
         scePrintf("TMBR story: movie start (finished %d key %d ok %d)\n", D_004FB06C, D_004FA778, D_004FA3A4);
         movDbg = 8;
     }
@@ -299,19 +304,24 @@ int tmbr_StoryMoviesDone(void)
         movT++;
         if (movieRequested) { if (movT < 100000) movT = 100000; return 0; }
         if (movT < 100000 && movT < 120) return 0;        /* not started yet (gives up after 2 s) */
-        for (i = 0; i < 16; i++) incogName[i] = incogSave[i];
-        scePrintf("TMBR story: movie %s (%d)\n", movT >= 100000 ? "done" : "did not start", movT % 100000);
+        for (i = 0; i < 16; i++) (movSilent ? noneName : incogName)[i] = incogSave[i];
+        scePrintf("TMBR story: movie %s (%d%s)\n", movT >= 100000 ? "done" : "did not start", movT % 100000, movSilent ? ", silent slot" : "");
         movPhase = 0;
+        /* g150 test: the audio slot (incog) ended at once (player started, movieRequested cleared in the same frame).
+         * A clip that did not start is tried once more through the silent slot (none.pss, no audio): tells whether
+         * the stream or the audio is the problem */
+        if (movT < 100000 && !movSilent && movI > 0) { movSilent = 1; movI--; }
+        else movSilent = 0;
     }
     while (movI < movN) {
         char f[64];
         const char* n = movQ[movI++];
         sprintf(f, "%cMOV%c%s.PSS;1", 92, 92, n);   /* (backslash as a number) */
         if (!fileSearch(movFile, f)) { scePrintf("TMBR story: no %s on the disc\n", n); continue; }
-        for (i = 0; i < 16; i++) incogSave[i] = incogName[i];
+        for (i = 0; i < 16; i++) incogSave[i] = (movSilent ? noneName : incogName)[i];
         sprintf(f, "mov/%s.pss", n);
         if (strlen(f) > 15) { scePrintf("TMBR story: name too long %s\n", f); continue; }
-        sprintf(incogName, "%s", f);
+        sprintf(movSilent ? noneName : incogName, "%s", f);
         movPending = 1;                                   /* tmbr_PlayMovie sets the request right before the game's call */
         movPhase = 1; movT = 0;
         {   extern int D_004FB06C, D_004FA778, D_004FA3A4;
@@ -457,10 +467,42 @@ void tmbr_LevelInitAfter(void)
         scePrintf("TMBR boss: up, state %d health %d cs %x\n", F(b, 0x10), F(b, 0x1C), F(b, 0xE0));
     }
 }
+/* ---- free-for-all story rules (Ark 2026-10-27), host, every frame of a story match ----
+ * Lives: each car has the game's Last Man Standing lives (game info byte 5 = 3; deaths per player slot net +0x2F48,
+ * the car's slot +0x2104). Co-op humans share one pool of 3: their deaths add up. Won when no bot but the ally is
+ * left with lives; lost when the humans' pool is used up (or no human is left). The game's own Last Man Standing
+ * end cannot be relied on (two co-op humans never hurt each other), so the host ends the match itself. */
+extern void netEndMatch(void* net, int reason, int x) __asm__("func_00174D78");
+extern int tmbr_IsAlly(char* v);
+static int storySer = -1, storyEnded;
+static void storyFrame(void)
+{
+    char *g = D_004FA030, *gi = *(char**)(D_003156C0 + 0x3148);
+    int k, lives, hd = 0, humans = 0, foes = 0, foesLeft = 0;
+    if (!g || !gi || !tmbr_Opt(OPT_STORY) || !netIsHost(D_003156C0)) return;
+    if (storySer != tmbr_levelSerial) { storySer = tmbr_levelSerial; storyEnded = 0; storyWin = -1; }
+    if (storyEnded || !(F(gi, 0) & 1)) return;               /* not running / over */
+    lives = ((unsigned char*)gi)[5] ? ((unsigned char*)gi)[5] : LIVES;
+    for (k = 0; k < 8; k++) {
+        char* v = g + k * 0x31B0;
+        int kind = F(v, 0x590), slot = F(v, 0x2104), d;
+        if (kind != 1 && kind != 2) continue;
+        d = slot >= 0 && slot < 8 ? F(D_003156C0, 0x2F48 + 4 * slot) : 0;
+        if (kind == 1) { humans++; hd += d; }
+        else if (!tmbr_IsAlly(v)) { foes++; if (d < lives) foesLeft++; }
+    }
+    if (humans && hd >= lives) storyWin = 1;
+    else if (foes && !foesLeft) storyWin = 0;
+    if (storyWin < 0) return;
+    storyEnded = 1;
+    scePrintf("TMBR story: %s (human deaths %d of %d shared, bots left %d of %d)\n", storyWin ? "lost" : "won", hd, lives, foesLeft, foes);
+    netEndMatch(D_003156C0, 3, 0);
+}
 void tmbr_BossFrame(void)
 {
     char* g = D_004FA030;
     static int tk;
+    storyFrame();
     minionFrame();
     if (bossSer < 0 || bossSer != tmbr_levelSerial || !bossOn()) return;
     bossUpdate(g + 0x97120);
@@ -573,9 +615,38 @@ static void minionLevelInit(void)
     scePrintf("TMBR minion: stadium init, force field reset\n");
 }
 /* aiInit's vehicleInit (0x10011C): every AI spawn and respawn (gameMakeAI, the death sequence func_001E3800) */
+/* story bots' health (Ark 2026-10-27): hard solo +25 %, medium co-op +75 %, hard co-op +119 %; never the ally */
+static float STORY_HP[3] = { 1.25f, 1.75f, 2.19f };
+static signed char boosted[8];
+/* bots.c addBot, after the bot got its team: the ally's first spawn was boosted before it was known to be the ally */
+void tmbr_StoryAllyCheck(char* v)
+{
+    int k = (int)(v - D_004FA030) / 0x31B0 & 7;
+    if (!v || !boosted[k] || !tmbr_IsAlly(v)) return;
+    *(float*)(v + 0x400) /= STORY_HP[boosted[k] - 1];
+    *(float*)(v + 0x404) = *(float*)(v + 0x400);
+    boosted[k] = 0;
+    scePrintf("TMBR story: ally bot car %d back to normal health %d\n", k, (int)*(float*)(v + 0x400));
+}
+static void storyHp(char* v)
+{
+    extern int tmbr_botDiff;
+    char* g = D_004FA030;
+    int k, humans = 0, i;
+    boosted[(int)(v - g) / 0x31B0 & 7] = 0;
+    if (!tmbr_Opt(OPT_STORY) || F(v, 0x590) != 2 || tmbr_IsAlly(v)) return;
+    for (k = 0; k < 8; k++) if (F(g + k * 0x31B0, 0x590) == 1) humans++;
+    i = humans >= 2 ? (tmbr_botDiff >= 2 ? 2 : tmbr_botDiff == 1 ? 1 : -1) : (tmbr_botDiff >= 2 ? 0 : -1);
+    if (i < 0) return;
+    *(float*)(v + 0x400) *= STORY_HP[i];
+    *(float*)(v + 0x404) = *(float*)(v + 0x400);
+    boosted[(int)(v - g) / 0x31B0 & 7] = (signed char)(i + 1);
+    scePrintf("TMBR story: bot car %d health %d (%d humans, difficulty %d)\n", (int)(v - g) / 0x31B0, (int)*(float*)(v + 0x400), humans, tmbr_botDiff);
+}
 void tmbr_MinionVehInit(char* v)
 {
     vehicleInit(v);
+    storyHp(v);
     if (!minionLevel() || F(v, 0x20F4) != 0x1E0 || F(v, 0x590) != 2) return;
     *(unsigned*)(v + 0x400) = 0x437A0000;           /* 250.0: retail's AI Minion health (TMBO gives every Minion 160) */
 #if MINION_BIG

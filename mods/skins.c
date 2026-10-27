@@ -471,6 +471,34 @@ static int vehSkinF(char* v)
 
 int tmbr_VehSkinAi(char* v) { return v ? vehSkinF(v) : -1; }   /* bots.c: per-car AI of the bonus cars */
 
+/* ---- in-game names of the bonus cars (Ark 2026-10-27: "old pickup gets its own name rather than being junk-dog").
+ * The game names an AI car by its type (D_002C07F8[+0x20F4 >> 5]) in six places: the HUD target name (0x14B008),
+ * kill / death messages (0x14E818, 0x14E8E8), the scoreboard (0x18CF08), the net name copy (0x175BE8) and the radar
+ * marker (0x13A934). Those calls go through the trampolines below: the name becomes the vehicle's bonus car name. */
+const char* tmbr_VehName(char* v, const char* d)
+{
+    int k;
+    if (!v) return d;
+    if (isPak(v)) return skinName[1];
+    k = vehSkinF(v);
+    return k >= 0 ? skinName[k] : d;
+}
+const char* tmbr_VehNameI(int i, const char* d)
+{
+    return (i >= 0 && i < 8 && D_004FA030) ? tmbr_VehName(D_004FA030 + i * 0x31B0, d) : d;
+}
+#define NM_TRAMP(nm, fn, getv, namereg, target) __asm__(".text; .align 3; .set noreorder; .globl " nm "; " nm ": " \
+    "addiu $29, $29, -0x60; sq $4, 0($29); sq $5, 0x10($29); sq $6, 0x20($29); sq $7, 0x30($29); sq $31, 0x40($29); " \
+    getv " move $5, " namereg "; jal " fn "; nop; " \
+    "lq $4, 0($29); lq $5, 0x10($29); lq $6, 0x20($29); lq $7, 0x30($29); lq $31, 0x40($29); move " namereg ", $2; " \
+    "j " target "; addiu $29, $29, 0x60; .set reorder")
+NM_TRAMP("tmbr_NmA", "tmbr_VehName",  "move $4, $19;", "$5", "strcpy");
+NM_TRAMP("tmbr_NmB", "tmbr_VehNameI", "move $4, $16;", "$5", "strcpy");
+NM_TRAMP("tmbr_NmC", "tmbr_VehNameI", "move $4, $17;", "$5", "strcat");
+NM_TRAMP("tmbr_NmD", "tmbr_VehName",  "move $4, $18;", "$7", "tmbr_SbPrint");
+NM_TRAMP("tmbr_NmE", "tmbr_VehName",  "move $4, $17;", "$5", "strcpy");
+NM_TRAMP("tmbr_NmF", "tmbr_VehName",  "move $4, $16;", "$5", "func_0014ECE8");
+
 /* Twister: the shockwave weapon (0x1B) needs D_0045FFD8[slot] (its EP node 0xFB0) else InitWeapon drops it. The
  * level files fill slots 0..4; a slot without one borrows another slot's node + animation (D_00460000, 0xC each).
  * Run at vehicleInit, before each shockwave and every frame (InitWeaponsAfter clears the table; the weapon is

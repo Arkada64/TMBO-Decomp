@@ -27,6 +27,9 @@ static const char* const LABEL[NROW] = { "           MINION: %s", "           HE
 static const int BIT[NROW] = { 8, 16, 0x40, 0x20 };   /* STORY (story.c): online co-op story - humans together vs the story bots */
 
 extern int inputGetPadButtons(int pad) __asm__("inputGetPadButtons__Fi");
+extern int D_002C07F8[];   /* car names by type */
+int tmbr_allyCar;          /* the ally bot's car type, 0 = random (host; guests.c tmbr_LevelLoadCars gives it) */
+#define ALLYN 16           /* no, random, types 1..14 */
 int tmbr_uiEat;           /* (unused now: guests.c tmbr_UiPadButtons still masks with it) */
 #define B_UP 0x10
 #define B_RIGHT 0x20
@@ -58,6 +61,14 @@ void tmbr_ModsPage(void)
         ate = 1;
         if (pr & B_UP) { if (v > 1) v--; else { v = 0; CUR = 5; } }
         else if (pr & B_DOWN) { if (v < NROW) v++; else { v = 0; CUR = 1; } }
+        else if ((pr & (B_LEFT | B_RIGHT | B_CROSS)) && netIsHost(D_003156C0) && BIT[v - 1] == 0x40) {
+            /* ALLY BOT: NO, RANDOM, then a car of your choice (Ark 2026-10-27) - the ally drives it */
+            int a = tmbr_Opt(0x40) ? tmbr_allyCar + 1 : 0;            /* 0 no, 1 random, 2.. car 1.. */
+            a = (pr & B_LEFT) ? (a + ALLYN - 1) % ALLYN : (a + 1) % ALLYN;
+            tmbr_OptSet(0x40, a != 0);
+            tmbr_allyCar = a ? a - 1 : 0;
+            scePrintf("TMBR modspage: ally bot %s car %d\n", a ? "on" : "off", tmbr_allyCar);
+        }
         else if ((pr & (B_LEFT | B_RIGHT | B_CROSS)) && netIsHost(D_003156C0)) {
             tmbr_OptSet(BIT[v - 1], !tmbr_Opt(BIT[v - 1]));
             scePrintf("TMBR modspage: row %d bit %x %s\n", v, BIT[v - 1], tmbr_Opt(BIT[v - 1]) ? "on" : "off");
@@ -73,7 +84,9 @@ void tmbr_ModsPage(void)
         char t2[48];
         if (v == i + 1) fontSetColor(0, 0x74, 0x5A, 0x2C); else fontSetColor(0, 0x44, 0x32, 0x20);
         fontSetCursorAtSubPixel(0, 0x370, 0x640 + (5 + i) * 0x200);
-        sprintf(t2, LABEL[i], tmbr_Opt(BIT[i]) ? "YES" : "NO");
+        if (BIT[i] == 0x40 && tmbr_Opt(0x40))
+            sprintf(t2, LABEL[i], tmbr_allyCar ? (const char*)D_002C07F8[tmbr_allyCar] : "RANDOM");
+        else sprintf(t2, LABEL[i], tmbr_Opt(BIT[i]) ? "YES" : "NO");
         fontPrint(0, t2);
     }
 }

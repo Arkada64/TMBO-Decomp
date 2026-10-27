@@ -165,7 +165,20 @@ static int freeCarSeq(int car, const int* used, int n, int minionOk)
 
 void tmbr_LevelLoadCars(char* shell, int a)
 {
-    int k;
+    int k, allyK = -1;
+    {   /* the ally bot's chosen car (GAME MODS ALLY BOT, modspage.c): the first AI slot - the first bot to join is
+         * the ally (teams.c tmbr_TeamsBotJoined) */
+        extern int tmbr_allyCar;
+        if (tmbr_Opt(0x40) && tmbr_allyCar > 0)
+            for (k = 0; k < 8; k++) {
+                if (F(D_003156C0 + k * 0x220, 0x214) != 0 || tmbr_GuestSlot(k)) continue;
+                D_00313F00[k] = tmbr_allyCar << 5;
+                F(D_003156C0 + k * 0x220, 0xB4) = tmbr_allyCar << 5;
+                scePrintf("TMBR guests: ally bot (slot %d) drives car %d\n", k, tmbr_allyCar);
+                allyK = k;
+                break;
+            }
+    }
     if (tmbr_Opt(0x20)) {   /* story: the level loader takes AI slots' cars from D_00313F00 (the session's earlier
                              * roll), not slot +0xB4 where the story set them (reference/wip/BOSS_CARIDS.md) */
         int used[16], nu = 0;
@@ -175,7 +188,7 @@ void tmbr_LevelLoadCars(char* shell, int a)
         for (k = 0; k < 8; k++) {
             int c = F(D_003156C0 + k * 0x220, 0xB4), c2;
             if (F(D_003156C0 + k * 0x220, 0x214) != 0 || tmbr_GuestSlot(k) || c <= 0) continue;
-            c2 = (c >> 5) == 15 ? c : tmbr_FreeCar(c, used, nu, 0);     /* (Minion: a story boss - kept) */
+            c2 = (c >> 5) == 15 || k == allyK ? c : tmbr_FreeCar(c, used, nu, 0);     /* (Minion: a story boss - kept; the ally's chosen car too) */
             if (c2 != c) {
                 scePrintf("TMBR story: slot %d car %d taken, now %d\n", k, c >> 5, c2 >> 5);
                 F(D_003156C0 + k * 0x220, 0xB4) = c = c2;
@@ -197,7 +210,7 @@ void tmbr_LevelLoadCars(char* shell, int a)
         for (k = 0; k < 8; k++) {
             int c = D_00313F00[k], c2;
             if (F(D_003156C0 + k * 0x220, 0x214) != 0 || tmbr_GuestSlot(k) || c <= 0) continue;
-            c2 = freeCarSeq(c, used, nu, !tmbr_MinionOff());
+            c2 = k == allyK ? c : freeCarSeq(c, used, nu, !tmbr_MinionOff());
             if (c2 != c) {
                 scePrintf("TMBR bots: level load, slot %d car %d repeats, now %d\n", k, c >> 5, c2 >> 5);
                 D_00313F00[k] = c2;

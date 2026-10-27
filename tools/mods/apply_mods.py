@@ -172,7 +172,7 @@ PATCHES = [
     (A("nonmatchings/online/after_shelloverlays_45/func_0018C7D0.s"), "0018CD28", "jal", "jal        tmbr_SbPrint"),
     (A("nonmatchings/online/after_shelloverlays_45/func_0018C7D0.s"), "0018CE6C", "jal", "jal        tmbr_SbPrint"),
     (A("nonmatchings/online/after_shelloverlays_45/func_0018C7D0.s"), "0018CE90", "jal", "jal        tmbr_SbPrint"),
-    (A("nonmatchings/online/after_shelloverlays_45/func_0018C7D0.s"), "0018CF08", "jal", "jal        tmbr_SbPrint"),
+    (A("nonmatchings/online/after_shelloverlays_45/func_0018C7D0.s"), "0018CF08", "jal", "jal        tmbr_NmD"),   # (tmbr_SbPrint after the bonus car name, skins.c)
     (A("nonmatchings/online/after_shelloverlays_45/func_0018C7D0.s"), "0018CF38", "jal", "jal        tmbr_SbPrint"),
     (A("nonmatchings/online/after_shelloverlays_45/func_0018C7D0.s"), "0018CFB0", "jal", "jal        tmbr_SbPrint"),
     (A("nonmatchings/online/after_shelloverlays_45/func_0018C7D0.s"), "0018CFE0", "jal", "jal        tmbr_SbPrint"),
@@ -340,7 +340,13 @@ PATCHES = [
     # index and the next lw 0x3148($s0) faulted (TLB miss at 0x1C8368, addr 0x314E): sync entry could not be set
     (A("tmb/ui.s"), "001C8334", "bne", "b          .L001C8364"),
     # draw 7 rows, not 8: row 7 (sync entry) is shown in row 6's place by settingsRows, it was listed twice
-    (A("tmb/ui.s"), "001C80BC", "slti", "slti       $v0, $s1, 0x7"),
+    (A("tmb/ui.s"), "001C80BC", "slti", "slti       $v0, $s1, 0x6"),   # 6: the sync entry row is not drawn either (sync is the standard)
+    # bonus cars' own names where the game names an AI car by its type (skins.c tmbr_VehName, Ark 2026-10-27)
+    (A("tmb/hud.s"), "0014B008", "jal", "jal        tmbr_NmA"),
+    (A("tmb/hud.s"), "0014E818", "jal", "jal        tmbr_NmB"),
+    (A("tmb/hud.s"), "0014E8E8", "jal", "jal        tmbr_NmC"),
+    (A("nonmatchings/online/net/func_00175AA0.s"), "00175BE8", "jal", "jal        tmbr_NmE"),
+    (A("nonmatchings/tmb/game/func_0013A7B8.s"), "0013A934", "jal", "jal        tmbr_NmF"),
     # ... bot count picked in the waiting room
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B39B4", "jal", "jal        tmbr_LobbyFrame"),
     # waiting room: traffic / teams lines inside the game settings box, after ENTRY (mods/lobby.s, bots.c)

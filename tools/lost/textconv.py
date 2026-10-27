@@ -114,7 +114,12 @@ class TexBuilder:
             # ramp) went onto Sweet Tooth's red ramp palette by colour alone - every texel the alpha-2 entry, unseen
             d = ((img[:, None, :3] - P[None, :, :3]) ** 2).sum(2)
             if np.ptp(P[:, 3]) > 0:
-                d = d + 4 * (img[:, None, 3] - P[None, :, 3]) ** 2
+                if img[:, 3].min() >= 250:
+                    # an opaque texture: colour only, among the palette's opaque entries (g147 weighted alpha for
+                    # every texture and Gold Tooth's opaque gold parts went onto the few opaque entries: wrong colours)
+                    d = d + np.where(P[None, :, 3] >= 200, 0.0, 1e9)
+                else:
+                    d = d + 4 * (img[:, None, 3] - P[None, :, 3]) ** 2
             idx = d.argmin(1).astype(np.uint8)
             bpp = 8 if len(P) == 256 else 4
         elif key in self.own16:                     # own 16-colour palette: 1 CLUT block instead of 4
