@@ -384,10 +384,7 @@ def on_body(p, pts, box, zmin=0.0, inset=0.8):
     if q[2] < bot:
         q[2] = bot
         return q, 'raised to the body bottom (z %.2f)' % bot
-    # inside the body: the weapon model was hidden in it (Ark 2026-10-27: zoomy / power missiles not seen on some
-    # extras): up onto the top there, like a point above it
-    q[2] = top - min(zmin, 0.0) * 0.8 if zmin < 0 else top
-    return q, 'raised out of the body onto its top (z %.2f)' % top
+    return q, 'inside the body (top %.2f)' % top
 
 
 def rear_point(pts, box):
@@ -482,8 +479,11 @@ def apply(car, rec, L, to_donor, box_d, box_n, name='', log=print, pts=None, ski
     # weapon character's bone channels are scaled towards the exported pose (damp_char) by the largest factor
     # (1, 0.9 .. 0) that keeps every animated position of its mounts within the new body box + HC_ANIM_TOL (0.5).
     if os.environ.get('HC_ANIM', '1') == '1':
-        tol = float(os.environ.get('HC_ANIM_TOL', '0.5'))
+        tol = float(os.environ.get('HC_ANIM_TOL', '1.0'))   # (Ark 2026-10-27: 0.5 kept side launchers inside the bodies)
         lo_b, hi_b = np.asarray(box_n[0], float) - tol, np.asarray(box_n[1], float) + tol
+        # upwards a launcher may rise well above the body (Ark 2026-10-27: zoomy / power missiles never came out of
+        # the bodies, Pit Viper's fire missile stood still - their pop-up slides were scaled away); HC_ANIM_UP (3.0)
+        hi_b[2] = box_n[1][2] + float(os.environ.get('HC_ANIM_UP', '3.0'))
         damped = set()
         for c, nodes in sorted(bychar.items()):
             def fits(f, rot):

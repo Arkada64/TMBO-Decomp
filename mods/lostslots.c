@@ -272,22 +272,27 @@ extern void viewSetBgColor(unsigned long r, unsigned long g, unsigned long b, un
 /* horizon colours of the skies Ark picked (2026-10-27; tools/lost/levels/lvbuild.py SKY_PICK): Carnival = Junkyard's,
  * Suburban Terror = Prison's, City of the Dead = City's, Death Port = Prison's, Stadium Slaughter = Suburb's */
 static const unsigned char SKYCOL[NLOST + 1][3] = { { 0, 0, 0 }, { 70, 36, 12 }, { 58, 64, 72 }, { 80, 74, 62 }, { 58, 64, 72 }, { 82, 76, 62 } };
-/* LOSTCLIP: view distance (Ark 2026-10-27: 30000 stalled the game's draw list - only the sky colour on screen);
- * the sky domes are built 9000 across (tools/lost/levels/lvbuild.py SKY_R). Fog from skyK[0] to the far clip. */
-static float skyK[3] = { 7000.0f, 12000.0f, 0.0f };
-extern float D_004FAE58, D_004FAE5C, D_004FAE64;
+/* LOSTCLIP: view distance. Ark 2026-10-27: far clip 30000 (g146) and 12000 (g147) both stalled the maps (the game
+ * keeps running, nothing drawn but the background colour); Dogpound's own is fog 720..4370, far clip 3170. Test g148
+ * splits the suspects over the five maps: clip per map (0 = the level's own, only the fog / background colour set),
+ * and the builds differ in the sky dome / untextured (white) meshes (tools/lost/levels/lvbuild.py LV_SKY, LV_WHITE). */
+static const int clipK[NLOST + 1][2] = { { 0, 0 }, { 0, 0 }, { 3600, 6000 }, { 0, 0 }, { 0, 0 }, { 0, 0 } };   /* fog start, far clip (ints: no float literals in mod code) */
+extern float D_004FAE58, D_004FAE5C, D_004FAE60, D_004FAE64;
 static int skyLogged = -1;
 static void lostSky(void)
 {
     const unsigned char* c;
+    const int* k;
     if (!active() || tmbr_lostDbg) return;
+    k = clipK[tmbr_lostMap];
     if (skyLogged != tmbr_lostMap) {
         skyLogged = tmbr_lostMap;
-        scePrintf("TMBR lost: level fog %d..%d far clip %d -> %d..%d far clip %d\n", (int)D_004FAE58, (int)D_004FAE5C,
-                  (int)D_004FAE64, (int)skyK[0], (int)skyK[1], (int)skyK[1]);
+        scePrintf("TMBR lost: level fog %d..%d far clip %d -> clip %d\n", (int)D_004FAE58, (int)D_004FAE5C,
+                  (int)D_004FAE64, k[1]);
     }
     c = SKYCOL[tmbr_lostMap];
-    fogSet(skyK[0], skyK[1], skyK[2], skyK[1], c[0], c[1], c[2]);
+    if (k[1]) { float n = (float)k[0], f = (float)k[1]; fogSet(n, f, D_004FAE60, f, c[0], c[1], c[2]); }
+    else fogSet(D_004FAE58, D_004FAE5C, D_004FAE60, D_004FAE64, c[0], c[1], c[2]);
     viewSetBgColor(c[0], c[1], c[2], 0x80);
 }
 void tmbr_DoFogVolume(int a, void* v, void* p) { if (!tmbr_lostDbg) doFogVolume(a, v, p); lostSky(); }

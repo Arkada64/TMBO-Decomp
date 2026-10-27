@@ -670,10 +670,13 @@ __asm__(".text; .align 3; .set noreorder; .globl tmbr_BT12; tmbr_BT12: addiu $29
 #endif
 
 /* Warhawk's roof outside the story (Ark 2026-10-27: "on warhawk i can hear warhawk flying around even tho he isnt
- * spawned"): TMBO's ambient manager runs a level-20-only stream (+0x5A0, updateAmbientSound 0x1A4AF0: Warhawk's
- * rotor loop) whatever the mode. Multiplayer gets the roof as a plain arena: that stream is only evaluated (so only
- * started) in a story run. */
-extern void ambPrep(char* m, char* s) __asm__("func_001A47B8");
-extern void ambEval(char* m, char* s) __asm__("evaluateStreamState__19AmbientSoundManagerP14StreamingSound");
-void tmbr_RoofAmbPrep(char* m, char* s) { if (tmbr_Opt(OPT_STORY)) ambPrep(m, s); }
-void tmbr_RoofAmbEval(char* m, char* s) { if (tmbr_Opt(OPT_STORY)) ambEval(m, s); }
+ * spawned"): the roof's Helicopter object still runs its rotor sound (Helicopter::Update 0x141178 -> func_0019BB80:
+ * the moving, doppler-shifted helicopter loop) with nothing drawn. Multiplayer gets the roof as a plain arena: that
+ * sound is only updated (so only started) in a story run. (g147 tried the ambient stream +0x5A0: not it.) */
+extern void heliSound(void* s, void* pos, int a, int b) __asm__("func_0019BB80");
+void tmbr_RoofHeliSound(void* s, void* pos, int a, int b)
+{
+    char* g = D_004FA030;
+    if (g && F(g, 0x9FCA0) == 20 && !tmbr_Opt(OPT_STORY)) return;
+    heliSound(s, pos, a, b);
+}

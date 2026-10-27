@@ -552,7 +552,11 @@ def build(a, rd, own16):
                     t = list(st0[0]['tag']); t[3] = 1; st0[0]['tag'] = tuple(t)
                 m = dict(m, texrefs=[WHITE], strips=st0)
             # --env bake: an env-mapped part (Gold Tooth's gold body) gets its reflection-map lookup baked into UVs
-            m = dict(m, twosided=bool(local is not None and local[2]),        # mirrored wheel: both faces
+            # both faces: a mirrored wheel, and every mesh Head-On draws without backface culling (hflags bit 23
+            # clear; Ark 2026-10-27: Gold Tooth's head / cab windows see-through - only their front faces were built)
+            two = bool(local is not None and local[2]) or (os.environ.get('HC_TWOSIDED', '1') == '1'
+                                                           and not (ho.hd[h].get('hflags', 0x800000) & 0x800000))
+            m = dict(m, twosided=two,
                      bake=a.env == 'bake' and bool(ho.hd[h]['hflags'] & 0x0E),
                      hflags=m.get('hflags', 0) & ~0x0E)
             blob, slots, pairs, sph = hierobject(m, 1.0, [tb.gs_ctx(k) for k in m['texrefs']])

@@ -383,6 +383,10 @@ def build(path, outdir, name, scale=1.15, donor=None):
     missing = [k for k in keys if k not in T]
     nwhite = 0
     for m in meshes:
+        if os.environ.get('LV_WHITE', '1') != '1':          # (test switch: drop them again, as before 2026-10-27)
+            if not m['texrefs'] or any(k not in T for k in m['texrefs']):
+                m['texrefs'] = []; nwhite += 1
+            continue
         if not m['texrefs'] or any(k not in T for k in m['texrefs']):
             m['texrefs'] = [k if k in T else WHITE for k in m['texrefs']] or [WHITE]; nwhite += 1
     print('  meshes given the white texture (untextured / missing texture)', nwhite)
