@@ -405,7 +405,7 @@ extern void bossInitBefore(char* b) __asm__("func_00111E48");
 extern void bossInitAfter(char* b) __asm__("func_00111ED8");
 extern void bossUpdate(char* b) __asm__("func_001123C0");
 extern void ffInitBefore(void) __asm__("func_001360D8");
-extern void ffUpdate(void) __asm__("func_00136508");
+extern void ffUpdate(void) __asm__("forceFieldUpdate__Fv");
 extern int tmbr_levelSerial;
 static int bossSer = -1;
 static int bossOn(void)
