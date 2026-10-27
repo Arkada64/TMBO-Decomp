@@ -408,6 +408,17 @@ extern void ffInitBefore(void) __asm__("func_001360D8");
 extern void ffUpdate(void) __asm__("forceFieldUpdate__Fv");
 extern int tmbr_levelSerial;
 static int bossSer = -1;
+/* GetVehicleFromName(g, name, dup) matches +0x20F0 == dup, but TMBO's +0x20F0 is the load index (vehicle 1 = 0x200 is
+ * load 1), so retail's (0x200, 0) / (0x220, 0) lookups in the boss code find nothing: those calls (InitBossAfter,
+ * forceField, UpdateBoss, TakeHit) come here - the boss cars by name only, the first one (the bots get slots 1 / 2) */
+char* tmbr_BossVehName(char* g, int name, int dup)
+{
+    int k;
+    char* v = vehFromName(g, name, dup);
+    if (v || (name != 0x200 && name != 0x220)) return v;
+    for (k = 0; k < 8; k++) if (F(g + k * 0x31B0, 0x20F4) == name) return g + k * 0x31B0;
+    return 0;
+}
 static int bossOn(void)
 {
     char* g = D_004FA030;
@@ -421,7 +432,7 @@ void tmbr_LevelInitAfter(void)
     if (!bossOn()) return;
     {
         char* b = g + 0x97120;
-        char *v0 = vehFromName(g, 0x200, 0), *v1 = vehFromName(g, 0x220, 0);
+        char *v0 = tmbr_BossVehName(g, 0x200, 0), *v1 = tmbr_BossVehName(g, 0x220, 0);
         int hier = F(b, 0x9C);
         scePrintf("TMBR boss: roof init, boss car %x tanker %x hier %x\n", (int)v0, (int)v1, hier);
         if (!v0 || !v1 || !hier) return;     /* InitBossAfter dereferences vehicle 0x200 without a check */
@@ -448,4 +459,18 @@ void tmbr_BossWon(int a, int b)
     extern void tmbr_TeamsForceWin(int team);
     scePrintf("TMBR boss: down\n");
     tmbr_TeamsForceWin(0);
+}
+/* the tanker (vehicle 0x220): TMBO's vehicleTakeHit (func_001E1C40) still tests "0x220 on level 20" but lost retail's
+ * tankerTakeHit call; hooked at the interactive hit dispatch (0x14F184): after the normal hit, tankerTakeHit
+ * (func_001E3188) - near the boss it blows up into the boss (damage 0x29A: one of the three shield hits) */
+extern void vehTakeHit(char* v, int a1, int a2, int a3) __asm__("func_001E1C40");
+extern void tankerTakeHit(char* v) __asm__("func_001E3188");
+void tmbr_VehTakeHit(char* v, int a1, int a2, int a3)
+{
+    vehTakeHit(v, a1, a2, a3);
+    if (v && F(v, 0x20F4) == 0x220 && bossSer >= 0 && bossSer == tmbr_levelSerial && bossOn()) {
+        int was = F(v, 0x450);
+        tankerTakeHit(v);
+        scePrintf("TMBR boss: tanker hit %d (+0x450 %d -> %d), shield hits %d\n", a2, was, F(v, 0x450), F(D_004FA030 + 0x97120, 0x3C));
+    }
 }
