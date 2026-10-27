@@ -135,6 +135,14 @@ extern void levelLoadCars(char* shell, int a) __asm__("func_00188248");
 void tmbr_LevelLoadCars(char* shell, int a)
 {
     int k;
+    if (tmbr_Opt(0x20))     /* story: the level loader takes AI slots' cars from D_00313F00 (the session's earlier
+                             * roll), not slot +0xB4 where the story set them (reference/wip/BOSS_CARIDS.md) */
+        for (k = 0; k < 8; k++) {
+            int c = F(D_003156C0 + k * 0x220, 0xB4);
+            if (F(D_003156C0 + k * 0x220, 0x214) != 0 || tmbr_GuestSlot(k) || c <= 0 || c == D_00313F00[k]) continue;
+            scePrintf("TMBR story: level load, slot %d car %x -> %x\n", k, D_00313F00[k], c);
+            D_00313F00[k] = c;
+        }
     for (k = 1; k <= 3; k++)
         if (joinCar[k] && joinSlot[k] >= 0) {
             scePrintf("TMBR guests: level load, slot %d car %d -> %d\n", joinSlot[k], D_00313F00[joinSlot[k]] >> 5, joinCar[k] >> 5);
