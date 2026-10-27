@@ -77,16 +77,21 @@ def _xf(n, o):
 
 
 def donor_mounts(car):
-    """mount transforms of the donor: {node: dict(op, ids, sub, kind, pos (car space), M (parent frame), path)}"""
+    """mount transforms of the donor: {node: dict(op, ids, sub, kind, pos, M, Mown, char, Mchar, ep)}
+    pos = car-space position in the exported pose (op17 bones evaluated from their stored channel values, see
+    bone_local: several donors' weapon bones carry a constant offset, e.g. Outlaw's 4001 bone t(0.27 -6.66 1.10),
+    Junkyard Dog's 4005 x 12.97 at bind -> 2.89 posed); M = rotation of the frame the mount sits in, Mown = the
+    mount's own rotation (its model's orientation), char = the nearest op25 character above it on the drawn path
+    (None for the machine guns), Mchar = rotation of the frame that character sits in."""
     from hcbuild import kids
     n = car.n
     R = u32(n, u32(n, 4) - BASE) >> 18
     out = {}
     ne = u32(n, 0)
     for ep in range(ne):                       # entry 0 first: the drawn car; op7 (characters) as fallback
-        st = [(u32(n, 4 + 4 * ep) - BASE, np.eye(3), np.zeros(3), (), None, np.eye(3))]
+        st = [(u32(n, 4 + 4 * ep) - BASE, np.eye(3), np.zeros(3), (), None, np.eye(3), None)]
         while st:
-            o, M, t, ch, sw, Mab = st.pop()   # Mab: frame the last transform above sits in
+            o, M, t, ch, sw, Mab, chr_ = st.pop()   # Mab: frame the last transform above sits in
             if o in ch or len(ch) > 40:
                 continue
             ch = ch + (o,)
@@ -97,7 +102,9 @@ def donor_mounts(car):
                     d = out.setdefault(p, dict(op=u32(n, p) & 0x3f, ids=set(), sub=None, kind=None, pos=None, M=None, ep=ep))
                     d['ids'].add(h >> 18)
                     if d['pos'] is None:
-                        d['pos'], d['M'] = t.copy(), Mab.copy()
+                        d['pos'], d['M'], d['Mown'] = t.copy(), Mab.copy(), M.copy()
+                        d['grp'] = o
+                        d['char'], d['Mchar'] = chr_ if chr_ and ep == 0 else (None, None)
                         if sw is not None:
                             sh = u32(n, sw)
                             d['kind'] = (sh >> 18) - R
@@ -105,6 +112,8 @@ def donor_mounts(car):
                 continue
             if op == 6:
                 sw = o
+            if op == 25:
+                chr_ = (o, M.copy())
             x = _xf(n, o)
             if x is not None:
                 Rm, tt = x
@@ -112,7 +121,7 @@ def donor_mounts(car):
                 t = tt @ M + t
                 M = Rm @ M
             for k in kids(car, o):
-                st.append((k, M, t, ch, sw, Mab))
+                st.append((k, M, t, ch, sw, Mab, chr_))
     return out
 
 
@@ -164,10 +173,11 @@ def mg_points(L, name=''):
     return None, None, None
 
 
-def move(car, rec, node, target):
-    """add (target - rest pos) to the mount's translation, in its parent's frame"""
+def move(car, rec, node, target, extra=None):
+    """add (target - rest pos [- extra]) to the mount's translation, in its parent's frame (extra: the part of the
+    move already done by a translate above its character)"""
     d = rec[node]
-    dw = np.asarray(target, float) - d['pos']
+    dw = np.asarray(target, float) - d['pos'] - (0 if extra is None else extra)
     dl = dw @ np.linalg.inv(d['M'])
     off = 0x10 if d['op'] == 3 else 0x40
     t = np.array(struct.unpack_from('<3f', car.n, node + off)) + dl
@@ -175,12 +185,76 @@ def move(car, rec, node, target):
     return dw
 
 
-def apply(car, rec, L, to_donor, box_d, box_n, name='', log=print):
+def move_char(car, char, Mchar, delta, skip_slots=()):
+    """put a translate (op3) by delta (car space) above every drawn reference to the op25 character (the op7 list's
+    entries stay): the whole launcher skeleton moves, pivots included, so its animations keep their shape"""
+    n = car.n
+    op7s = [u32(n, 4 + 4 * i) - BASE for i in range(u32(n, 0)) if (u32(n, u32(n, 4 + 4 * i) - BASE) & 0x3f) == 7]
+    lists = [(o + 8, o + 8 + 4 * u32(n, o + 4)) for o in op7s]
+    refs = [sl for sl in sorted(set(car.slots)) if car.P(sl) == char and not any(a <= sl < b for a, b in lists)
+            and sl not in skip_slots]
+    dl = np.asarray(delta, float) @ np.linalg.inv(Mchar)
+    for sl in refs:
+        t = car.append(struct.pack('<IIIIfffI', 3, 0, 1, 0, *dl, 0))
+        car.setp(t + 0x1c, char)
+        car.setp(sl, t)
+    return refs
+
+
+def group_zmin(car, d):
+    """lowest point of a mount's weapon model below its origin, in car-space orientation (0 if unknown)"""
+    from hcbuild import meshes_under
+    from tmbmesh import decode
+    z = []
+    for m in meshes_under(car, d['grp']):
+        try:
+            P = np.asarray(decode(bytes(car.n), m)['pos'], float)
+        except Exception:
+            continue
+        if len(P):
+            z.append((P @ d['Mown'])[:, 2].min())
+    return min(z) if z else 0.0
+
+
+def on_body(p, pts, box, zmin=0.0, inset=0.8):
+    """a point moved onto / into the new body: x / y clamped inside the body box (x to inset * half width), then
+    if it is above the body's top at that spot (vertices within 0.6 in x / y) it drops onto that top (its model's
+    lowest point on the surface), below the bottom it rises to it. Without body points: the clamp only."""
+    lo, hi = np.asarray(box[0], float), np.asarray(box[1], float)
+    q = np.asarray(p, float).copy()
+    hw = max(-lo[0], hi[0]) * inset
+    q[0] = np.clip(q[0], -hw, hw)
+    q[1] = np.clip(q[1], lo[1] + 0.3, hi[1] - 0.3)
+    q[2] = np.clip(q[2], lo[2], hi[2])
+    if pts is None or not len(pts):
+        return q, 'clamped'
+    for _ in range(12):                          # no body under it (narrow spot): step in towards the centre line
+        near = pts[(np.abs(pts[:, 0] - q[0]) < 0.6) & (np.abs(pts[:, 1] - q[1]) < 0.6)]
+        if len(near) >= 3:
+            break
+        q[0] *= 0.8
+    else:
+        return q, 'clamped (no body under it)'
+    top, bot = near[:, 2].max(), near[:, 2].min()
+    if q[2] > top:
+        q[2] = top - min(zmin, 0.0) * 0.8 if zmin < 0 else top
+        return q, 'on the body top (z %.2f)' % top
+    if q[2] < bot:
+        q[2] = bot
+        return q, 'raised to the body bottom (z %.2f)' % bot
+    return q, 'inside the body (top %.2f)' % top
+
+
+def apply(car, rec, L, to_donor, box_d, box_n, name='', log=print, pts=None, skip_chars=()):
     """rec: donor_mounts() of the original donor; L: ho_list(); to_donor(p) maps Head-On space -> donor space;
-    box_d / box_n: (lo, hi) of the donor's body and of the new body in donor space. Returns report rows."""
+    box_d / box_n: (lo, hi) of the donor's body and of the new body in donor space; pts: the new body's vertices
+    (donor space, kept state-0 meshes) for on_body(); skip_chars: op25 characters the caller already placed (12 Pak's
+    rack / antenna). Mounts inside a weapon character move with the whole character (move_char; Ark 2026-10-26:
+    weapons floated beside the cars when only the mount under the animated bones moved). Returns report rows."""
     mode = os.environ.get('HC_MOUNTS', '1')
     if mode == '0':
         return []
+    pts = None if pts is None else np.asarray(pts, float)
     over = {}
     for spec in filter(None, os.environ.get('HC_MOUNT_POS', '').split(';')):
         i, _, v = spec.partition(':')
@@ -196,15 +270,18 @@ def apply(car, rec, L, to_donor, box_d, box_n, name='', log=print):
         return c, h
     (cd, hd_), (cn, hn) = ch(box_d), ch(box_n)
     boxmap = lambda p: cn + (p - cd) * hn / np.maximum(hd_, 1e-3)
-    rows = []
+    tg = {}
     for node, d in sorted(rec.items()):
         ids = sorted(d['ids'])
         if 4100 in ids:
             if r is not None:
                 tgt, how = to_donor(r if d['pos'][0] > 0 else l), src
             else:
-                tgt, how = boxmap(d['pos']), 'box map (no Head-On points)'
+                tgt, how = on_body(boxmap(d['pos']), pts, box_n)
+                how = 'box map (no Head-On points), ' + how
         elif mode == 'mg':
+            continue
+        elif d.get('char') in skip_chars and d.get('char') is not None:
             continue
         else:
             tgt, how = None, None
@@ -212,17 +289,36 @@ def apply(car, rec, L, to_donor, box_d, box_n, name='', log=print):
             if hit:
                 tgt, how = to_donor(over[hit[0]]), 'HC_MOUNT_POS'
             elif mode == 'ho' and d['sub'] in SUB_SLOT:
-                pts = [p for p in L.get(SUB_SLOT[d['sub']], []) if p is not None]
-                if pts:
-                    p = min(pts, key=lambda q: abs(np.sign(q[0]) - np.sign(d['pos'][0])) * 10 + abs(q[1] - d['pos'][1]) * 0.01)
+                pts_ = [p for p in L.get(SUB_SLOT[d['sub']], []) if p is not None]
+                if pts_:
+                    p = min(pts_, key=lambda q: abs(np.sign(q[0]) - np.sign(d['pos'][0])) * 10 + abs(q[1] - d['pos'][1]) * 0.01)
                     tgt, how = to_donor(np.array(p)), 'Head-On slot %d' % SUB_SLOT[d['sub']]
             if tgt is None:
-                tgt, how = boxmap(d['pos']), 'box map'
+                tgt, how = on_body(boxmap(d['pos']), pts, box_n, group_zmin(car, d))
+                how = 'box map, ' + how
+        tg[node] = (np.asarray(tgt, float), how)
+    # characters: one translate for all of a character's mounts (their mean move), the rest on the mounts themselves
+    bychar = {}
+    for node in tg:
+        c = rec[node].get('char')
+        if c is not None:
+            bychar.setdefault(c, []).append(node)
+    shift = {}
+    for c, nodes in bychar.items():
+        dl = np.mean([tg[k][0] - rec[k]['pos'] for k in nodes], axis=0)
+        refs = move_char(car, c, rec[nodes[0]]['Mchar'], dl)
+        for k in nodes:
+            shift[k] = dl if refs else np.zeros(3)
+        log('mount char %#x (%d drawn refs): moved by (%.2f %.2f %.2f) for %s' % (c, len(refs), *dl, [hex(k) for k in nodes]))
+    rows = []
+    for node, (tgt, how) in sorted(tg.items()):
+        d = rec[node]
         old = d['pos'].copy()
-        move(car, rec, node, tgt)
-        rows.append((ids, node, d['kind'], d['sub'], old, np.asarray(tgt, float), how))
-        log('mount %-10s node %#x (switch type %s sub %s): (%.2f %.2f %.2f) -> (%.2f %.2f %.2f)  %s' % (
-            '/'.join(map(str, ids)), node, d['kind'], d['sub'], *old, *tgt, how))
+        res = move(car, rec, node, tgt, shift.get(node))
+        rows.append((sorted(d['ids']), node, d['kind'], d['sub'], old, tgt, how))
+        log('mount %-10s node %#x (switch type %s sub %s): (%.2f %.2f %.2f) -> (%.2f %.2f %.2f)  %s%s' % (
+            '/'.join(map(str, sorted(d['ids']))), node, d['kind'], d['sub'], *old, *tgt, how,
+            '; on the mount %.2f' % np.linalg.norm(res) if node in shift else ''))
     return rows
 
 

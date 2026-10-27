@@ -764,7 +764,7 @@ def build(a, rd, own16):
     print('mounts: Head-On list %s, donor body box %s..%s, new body box %s..%s' % (
         {k: [None if p is None else tuple(round(x, 2) for x in p) for p in v] for k, v in sorted(L.items())} or 'none',
         np.round(box_d[0], 2), np.round(box_d[1], 2), np.round(box_n[0], 2), np.round(box_n[1], 2)))
-    hcmounts.apply(car, mount_rec, L, to_donor, box_d, box_n, name=os.path.basename(a.bdd))
+    hcmounts.apply(car, mount_rec, L, to_donor, box_d, box_n, name=os.path.basename(a.bdd), pts=to_donor(P0))
 
     # ---- hide the donor's own parts (empty packet, no texture slots)
     dead = [r for r in dead if r]

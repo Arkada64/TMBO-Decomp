@@ -350,6 +350,7 @@ def main(rkdir, bddpath, outdir, scale=1.0):
                 struct.pack_into('<I', car.n, nd + 0xc, u32(car.n, nd + 0xc) & 0xFFFF)
                 nb += 1
         print('Roadkill parts hidden:', nb, 'meshes (wheels kept:', len(wheels), ')')
+    pak_moved = set()                  # characters placed here (hcmounts.apply leaves them alone)
     if os.environ.get('PAK_MOUNTS', '1') == '1':
         # Roadkill's roof reticle (antenna character, its meshes up to z 4) sits above 12 Pak's lower roof, and his
         # power missiles come out of his front rocket rack (character with a mesh at y 7.2, hidden here): both
@@ -381,6 +382,7 @@ def main(rkdir, bddpath, outdir, scale=1.0):
                 t = car.append(struct.pack('<IIIIfffI', 3, 0, 1, 0, dx, dy, dz, 0))
                 car.setp(t + 0x1c, c)
                 car.setp(r, t)
+            pak_moved.add(c)
             print('moved', kind, hex(c), 'refs', len(refs))
     # HC_MOUNTS (default 1, tools/lost/hcmounts.py): Roadkill's machine guns (4100) go to 12 Pak's own guns (HC_STOCK's
     # mount list, slot 4 mirrored: x +-3.09, y 7.02, z 1.76 + lift) and his weapon models / launch points (4001..4006)
@@ -396,7 +398,7 @@ def main(rkdir, bddpath, outdir, scale=1.0):
     print('mounts: Head-On list %s, donor body box %s..%s, new body box %s..%s' % (
         {k: [None if p is None else tuple(round(x, 2) for x in p) for p in v] for k, v in sorted(ML.items())},
         np.round(mount_box[0], 2), np.round(mount_box[1], 2), np.round(box_n[0], 2), np.round(box_n[1], 2)))
-    hcmounts.apply(car, mount_rec, ML, to_donor, mount_box, box_n, name='HC_STOCK')
+    hcmounts.apply(car, mount_rec, ML, to_donor, mount_box, box_n, name='HC_STOCK', pts=to_donor(P0), skip_chars=pak_moved)
     before = len(car.n)
     dropped = car.compact(sorted(set(dead)))
     if OWN and rim_cb is not None:     # the rim's new CLUT moves into a Roadkill wheel CLUT nothing uses any more

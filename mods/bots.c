@@ -1864,25 +1864,24 @@ static void extraLines(int row)
     int teams = tmbr_Opt(OPT_TEAMS);
     lobbyLine(row + 1, -1, tmbr_Opt(OPT_TRAFFIC) ? "TRAFFIC : ON" : "TRAFFIC : OFF");
     lobbyLine(row + 2, -1, !teams ? "TEAMS : OFF" : tmbr_Opt(OPT_TEAMS4) ? "TEAMS : 4" : "TEAMS : 2");
-    lobbyLine(row + 3, -1, tmbr_Opt(OPT_MINION) ? "MINION : ON" : "MINION : OFF");
-    lobbyLine(row + 4, -1, tmbr_Opt(OPT_HEALTH) ? "HEALTH : ON" : "HEALTH : OFF");
+    /* (MINION / HEALTH are on the GAME MODS page now, modspage.c - Ark 2026-10-26: not listed here any more) */
     row++;
     if (teams) {
         if (tmbr_botTeamMode) sprintf(b, "HUMANS VS BOTS");
         else sprintf(b, "YOU : %s TEAM", tmbr_TeamName(tmbr_MyTeam()));
-        lobbyLine(row + 4, tmbr_MyTeam(), b);
+        lobbyLine(row + 2, tmbr_MyTeam(), b);
     }
     {   /* split-screen guests (guests.c): "P2 SPECTRE P3 ..." */
         extern void tmbr_GuestsLine(char* b);
         char gb[64];
         tmbr_GuestsLine(gb);
-        if (gb[0]) { lobbyLine(row + (teams ? 5 : 4), -1, gb); row++; }
+        if (gb[0]) { lobbyLine(row + (teams ? 3 : 2), -1, gb); row++; }
     }
     {   /* story run (story.c): "STAGE 2: SUBURBS" */
         extern void tmbr_StoryLine(char* b);
         char sb[40];
         tmbr_StoryLine(sb);
-        if (sb[0]) lobbyLine(row + (teams ? 5 : 4), -1, sb);
+        if (sb[0]) lobbyLine(row + (teams ? 3 : 2), -1, sb);
     }
     fontSetColor(0, 0x50, 0x44, 0x2C);
 }
