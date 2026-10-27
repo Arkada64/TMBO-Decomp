@@ -44,6 +44,9 @@ extern int tmbr_TeamsWinner(void);                 /* teams.c: 0 = humans' team,
 #define OPT_TEAMS4 4
 #define END 21
 #define LIVES 3
+#ifndef STORY_OFF
+#define STORY_OFF 1
+#endif
 #define LEVEL() F(D_004FA03C + 0x18000, 0x23AC)
 
 static const signed char NEXT[21][2] = {           /* retail m_nextLevelMap (21 = the end) */
@@ -152,6 +155,11 @@ void tmbr_StoryLobby(void)
     char* gi = *(char**)(D_003156C0 + 0x3148);
     int pad, pressed, on, n;
     if (!gi || !D_004FA03C || !netIsHost(D_003156C0)) return;
+    /* online-focused build (Ark 2026-10-27): no story run, no ally bot - both forced off, nothing below runs */
+    if (tmbr_Opt(OPT_STORY)) tmbr_OptSet(OPT_STORY, 0);
+    if (tmbr_Opt(0x40)) tmbr_OptSet(0x40, 0);
+    if (wasOn) { tmbr_TeamsBotMode(0); wasOn = 0; }
+    if (STORY_OFF) return;
     pad = inputGetPadButtons(0) & 0x8006;            /* L3 0x2, R3 0x4, Square 0x8000 */
     pressed = pad & ~prevPad;
     prevPad = pad;

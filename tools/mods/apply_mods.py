@@ -245,8 +245,8 @@ PATCHES = [
     (A("nonmatchings/tmb/ai/aiUpdateAttack__7Vehicle.s"), "00105BB0", "jal", "jal        tmbr_AiPickWeapon"),
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B3CA4", "jal", "jal        tmbr_LoadScreen"),   # loading screen crash (guests.c)
     (A("nonmatchings/tmb/input/inputSetActuator__FiUcUci.s"), "002175E8", "addiu", "j          tmbr_Actuator"),   # no rumble with vibration off (rumble.s)
-    (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B331C", "jal", "jal        tmbr_MainMenu"),   # main menu pages (menu.c)
-    (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B40D4", "jal", "jal        tmbr_PlayMovie"),   # story movies (story.c)
+    # (removed 2026-10-27, online-focused build: 001B331C)
+    # (removed 2026-10-27, online-focused build: 001B40D4)
     (A("nonmatchings/online/after_trafficdirector_56/func_001B2B68.s"), "001B3BA8", "jal", "jal        tmbr_ModsPage"),   # MINION / HEALTH rows on GAME MODS (modspage.c)
     (A("tmb/ui.s"), "001C6BCC", "jal", "jal        tmbr_RoomInput"),                      # waiting room input: hidden while R3 is held (menu.c)
     (A("tmb/ui.s"), "001CB004", "jal", "jal        tmbr_ModsInput"),                     # GAME MODS input read: our rows hide it (modspage.c)

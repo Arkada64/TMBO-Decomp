@@ -22,7 +22,7 @@ extern char* shellPtr __asm__("D_004FA03C");
 extern char D_003156C0[];
 extern int D_004FA8AC, D_004FA8B0, D_004FA8B4, D_004FA8B8, D_004FA8C8;
 #define CUR F(shellPtr + 0x18000, 0x1BE4 + 0x25 * 4)
-#define NROW 4
+#define NROW 2           /* MINION, HEALTH (ALLY BOT / STORY MODE rows removed 2026-10-27: online-focused build) */
 static const char* const LABEL[NROW] = { "           MINION: %s", "           HEALTH: %s", "         ALLY BOT: %s", "       STORY MODE: %s" };
 static const int BIT[NROW] = { 8, 16, 0x40, 0x20 };   /* STORY (story.c): online co-op story - humans together vs the story bots */
 

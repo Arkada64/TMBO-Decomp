@@ -554,7 +554,7 @@ def build(a, rd, own16):
             # --env bake: an env-mapped part (Gold Tooth's gold body) gets its reflection-map lookup baked into UVs
             # both faces: a mirrored wheel, and every mesh Head-On draws without backface culling (hflags bit 23
             # clear; Ark 2026-10-27: Gold Tooth's head / cab windows see-through - only their front faces were built)
-            two = bool(local is not None and local[2]) or (os.environ.get('HC_TWOSIDED', '0') == '1'
+            two = bool(local is not None and local[2]) or (os.environ.get('HC_TWOSIDED', '1') == '1'
                                                            and not (ho.hd[h].get('hflags', 0x800000) & 0x800000))
             m = dict(m, twosided=two,
                      bake=a.env == 'bake' and bool(ho.hd[h]['hflags'] & 0x0E),
@@ -714,8 +714,8 @@ def build(a, rd, own16):
         # (Sweet Tooth's truck bed and its variants, 30+ verts) gets the new meshes inside its normalized box that sit
         # on the same bone (same frame: drawn the same, wherever the animation takes it); with none it is emptied
         # (the new robot's own parts there already show). Small Sweet Tooth parts (pistons) stay, gold.
-        # (Ark 2026-10-27 05:24: this and the doubled faces made Gold Tooth worse - both off unless asked for)
-        slot_of = {h: j for j, hl in by_slot.items() for h in hl} if os.environ.get('HC_ROBOT_OWN', '0') == '1' else {}
+        # (both back on 2026-10-27 05:41: the complaint was about an old disc; the LOSTSLOTS Gold Tooth had these)
+        slot_of = {h: j for j, hl in by_slot.items() for h in hl} if os.environ.get('HC_ROBOT_OWN', '1') == '1' else {}
         same = lambda i, j: np.allclose(tm[i][2], tm[j][2], atol=1e-3) and np.allclose(tm[i][3], tm[j][3], atol=1e-2)
         for j in range(len(tm)):
             if j in by_slot or len(tm[j][5]) < 30 or not slot_of:
