@@ -467,6 +467,8 @@ static int vehSkinF(char* v)
     return k;
 }
 
+int tmbr_VehSkinAi(char* v) { return v ? vehSkinF(v) : -1; }   /* bots.c: per-car AI of the bonus cars */
+
 /* Twister: the shockwave weapon (0x1B) needs D_0045FFD8[slot] (its EP node 0xFB0) else InitWeapon drops it. The
  * level files fill slots 0..4; a slot without one borrows another slot's node + animation (D_00460000, 0xC each).
  * Run at vehicleInit, before each shockwave and every frame (InitWeaponsAfter clears the table; the weapon is

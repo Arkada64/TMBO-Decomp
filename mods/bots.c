@@ -284,7 +284,11 @@ static int lastLife(char* v)
 #define CH_DARKSIDE 13
 #define CH_MANSLAUGHTER 14
 static int charOf(char* v) { return (F(v, 0x20F4) >> 5) & 0x1F; }
-static int fragile(char* v) { int c = charOf(v); return c == CH_SPECTRE || c == CH_GRIMM; }
+extern int tmbr_VehSkinAi(char* v);    /* skins.c: the bonus car a vehicle is (0 Gold Tooth .. 6 Twister), -1 none */
+#define SKX_12PAK 1
+#define SKX_PITVIPER 3
+#define SKX_TWISTER 6
+static int fragile(char* v) { int c = charOf(v), x = tmbr_VehSkinAi(v); return c == CH_SPECTRE || c == CH_GRIMM || x == SKX_PITVIPER || x == SKX_TWISTER; }
 /* Per-car guidelines (Ark, 2026-10-25) - tendencies, not scripts: role odds (brawler / sniper / roamer %, the rest
  * cruiser), mid (1: a mid-weight car, prefers smaller fights), and when the special is worth firing: alone on a
  * target solo_min..solo_max away, or at a group (2+ cars round the target) up to grp_max; aim 1 = only when
@@ -306,13 +310,26 @@ static const CarAi carAi[32] = {
     /*  9 Shadow: bomb for snipes and groups */                         { 1, 35, 20, 30, 0, 0, 0, 250, 600, 600, 33 },
     /* 10 Mr. Grimm: lines it up */                                     { 1, 0, 45, 40, 0, 1, 0, 150, 600, 600, 42 },
     /* 11 Axel: groups (War Wheel solo: later) */                       { 1, 40, 10, 35, 0, 0, 0, 0, 300, 350, 22 },
-    /* 12 Warthog: weaken / finish */                                   { 1, 55, 5, 25, 0, 0, 2, 0, 300, 300, 120 },
+    /* 12 Warthog: weaken / finish, dead on (Ark 2026-10-27: he used it willy nilly) */ { 1, 55, 5, 25, 0, 1, 2, 0, 300, 300, 120 },
     /* 13 Darkside (rammer) */                                          { 1, 60, 0, 25, 0, 0, 0, 0, 0, 0, 38 },
     /* 14 Manslaughter: dead on, into groups */                         { 1, 55, 5, 25, 0, 1, 0, 0, 400, 400, 90 },
     { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
     /* 31 12 Pak (0x7E0): mid, sniper special */                        { 1, 25, 20, 40, 1, 1, 0, 250, 700, 700, 36 },
 };
-#define CAI(v) (&carAi[charOf(v)])
+/* the bonus cars (Ark 2026-10-27): role odds / mid from the donor chassis (its brawl rules; Pit Viper and Twister
+ * are squishy: one-on-one, fragile()), the special's use from the car whose special it carries. aim 2 = lined up
+ * AND in sight (confident it will hit). Index = skins.c skin (0 Gold Tooth .. 6 Twister). */
+static const CarAi xAi[7] = {
+    /* Gold Tooth: as Sweet Tooth */                                   { 1, 55, 5, 25, 0, 0, 0, 150, 450, 450, 50 },
+    /* 12 Pak: sniper, charges it fully (charging()) */                 { 1, 25, 20, 40, 1, 1, 0, 250, 700, 700, 36 },
+    /* Old Pickup: Junkyard Dog's odds, Minion turret dead on */        { 1, 50, 10, 25, 0, 1, 0, 0, 350, 350, 40 },
+    /* Pit Viper: Spectre's odds, special with sight + lined up */      { 1, 0, 45, 40, 0, 2, 0, 100, 700, 700, 28 },
+    /* Outlaw 2: as Crazy 8 */                                          { 1, 45, 10, 30, 0, 0, 1, 0, 450, 450, 40 },
+    /* Thumper: Brimstone's odds, Warthog's special dead on */          { 1, 25, 20, 40, 1, 1, 2, 0, 300, 300, 120 },
+    /* Twister: one on one (squishy), Axel's special into groups only */ { 1, 0, 45, 40, 0, 0, 0, 0, 0, 350, 22 },
+};
+static const CarAi* cai(char* v) { int x = tmbr_VehSkinAi(v); return x >= 0 && x < 7 ? &xAi[x] : &carAi[charOf(v)]; }
+#define CAI(v) cai(v)
 static int rammer(char* v) { int c = charOf(v); return c == CH_DARKSIDE || c == CH_YELLOWJ; }
 static int cpx[8], cpy[8], cvx[8], cvy[8]; static unsigned char cok[8];   /* every car, per frame (x4 units) */
 static int iabs(int x) { return x < 0 ? -x : x; }
@@ -885,6 +902,7 @@ static int charging(char* g, char* v, int idx)
             char* t = drv ? (char*)F(drv, 0xB4) : 0;
             int tk = t ? (int)(t - g) / 0x31B0 & 7 : 0;
             if (t && cok[tk] && iabs(cvx[tk]) + iabs(cvy[tk]) < 8) chWant[idx] = CH_MAX;
+            if (tmbr_VehSkinAi(v) == SKX_12PAK) chWant[idx] = CH_MAX;       /* 12 Pak: as much charge as he can */
         }
         chLost[idx] = 0;
         scePrintf("TMBR charge: car %d armed, holding %d\n", idx, chWant[idx]);
@@ -1768,6 +1786,7 @@ void tmbr_AiPickWeapon(char* v)
             int a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF, good;
             good = t && dist > 0 && ((dist >= c->smin && dist <= c->smax) || (crowd[tk] >= 2 && dist <= c->gmax));
             if (c->aim && a >= 0x3E19999A) good = 0;                      /* 0.15 rad: squarely lined up */
+            if (c->aim == 2 && !los) good = 0;                            /* and in sight: confident it hits */
             if (c->hp == 1 && t && hpPct(t) < 50) good = 0;               /* to weaken */
             if (c->hp == 2 && t && hpPct(t) >= 50) good = 0;              /* to finish */
             {   /* the special would finish it: sometimes (a third of the time) - not when anything finishes it */
