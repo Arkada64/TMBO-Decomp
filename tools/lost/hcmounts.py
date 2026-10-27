@@ -40,8 +40,34 @@ MG_TABLE = {'PVIPER': (1.31, 7.30, 0.00)}      # Pit Viper: the outer front bump
 def u32(d, o): return struct.unpack_from('<I', d, o)[0]
 
 
+def rot_prh(a, b, c):
+    """mathfRotMatrixPRH (0x0021E1D0-ish, rows for row vectors) of the angles it is given"""
+    sa, ca, sb, cb, sc, cc = np.sin(a), np.cos(a), np.sin(b), np.cos(b), np.sin(c), np.cos(c)
+    return np.array([[cb * cc, -cb * sc, sb],
+                     [sa * sb * cc + ca * sc, -sa * sb * sc + ca * cc, -sa * cb],
+                     [-ca * sb * cc + sa * sc, ca * sb * sc + sa * cc, ca * cb]])
+
+
+def bone_local(n, o):
+    """an op17 bone's local transform as skeletonTraverse builds it from the stored channel values (the exported pose):
+    R = RotPRH(-P, -R, -H) at +0x20; flags +0xC0: 0x10000 -> A40 * R, 0x20000 -> * A80 (A40 / A80 = -pivot / +pivot);
+    then + the translation at +0x30. Returns (3x3, t) for row vectors (world = local @ parent)."""
+    R = rot_prh(*(-np.array(struct.unpack_from('<3f', n, o + 0x20))))
+    M = np.eye(4); M[:3, :3] = R
+    fl = u32(n, o + 0xc0)
+    if fl & 0x10000:
+        M = np.array(struct.unpack_from('<16f', n, o + 0x40)).reshape(4, 4) @ M
+        if fl & 0x20000:
+            M = M @ np.array(struct.unpack_from('<16f', n, o + 0x80)).reshape(4, 4)
+    elif fl & 0x20000:
+        M = M @ np.array(struct.unpack_from('<16f', n, o + 0x80)).reshape(4, 4)
+    return M[:3, :3], M[3, :3] + np.array(struct.unpack_from('<3f', n, o + 0x30))
+
+
 def _xf(n, o):
     op = u32(n, o) & 0x3f
+    if op == 17:
+        return bone_local(n, o)
     if op == 3:
         return np.eye(3), np.array(struct.unpack_from('<3f', n, o + 0x10))
     if op == 4:
