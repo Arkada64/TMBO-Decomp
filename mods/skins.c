@@ -62,12 +62,14 @@ extern char* D_004FA030;
 extern int netSlotVehicle(void* net, int client) __asm__("func_00174268");
 extern void createWeapon(void* w, int type, char* v, void* t, void* tp) __asm__("func_001ED8D0");
 static unsigned char remote[8][NSKIN]; /* per client, from their chat messages */
-/* 12 Pak bots (TODO 6, 2026-10-26): the host gives some bot slots 12 Pak (tmbr_BotPakSet from tmbr_BotCars: car =
- * Roadkill, bit set); the mask goes to everyone with the skins ("\x01SB<2 hex>"). A slot counts as a 12 Pak bot
- * only while no human holds it (client +0x10 == -1). */
-static unsigned char botPak;
+/* Bonus cars for bots (Ark 2026-10-27, extends the 12 Pak bots): the host gives bot slots a bonus car
+ * (tmbr_BotSkinSet from guests.c tmbr_BotCars: the slot's car = the donor type, botSkin[slot] = the extra) and sends
+ * the table to everyone ("\x01SV" + 8 digits, '0' = none, '1' + k); every console then loads that slot's files with
+ * the extra's code and runs its special / AI / names like a player's. A slot counts only while no human holds it. */
+static signed char botSkin[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
 extern int tmbr_GuestSlot(int s);   /* guests.c */
 static int prevPad, resendTick;
+static void checkAvail(void);
 
 static int skinOfType(int type)
 {
@@ -75,27 +77,36 @@ static int skinOfType(int type)
     for (k = 0; k < NSKIN; k++) if (skinType[k] == type) return k;
     return -1;
 }
-
-static void sendBotPak(void)
+static int botSlot(int c)
 {
-    static const char hx[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
-    char m[8];
+    return c >= 0 && c < 8 && *(int*)(netState + c * 0x220 + 0x10) == -1 && !tmbr_GuestSlot(c);
+}
+int tmbr_SkinDonor(int k) { checkAvail(); return k >= 0 && k < NSKIN && (k == 1 || avail[k]) ? skinType[k] : 0; }
+int tmbr_BotSkin(int slot) { return slot >= 0 && slot < 8 && botSlot(slot) ? botSkin[slot] : -1; }
+
+static void sendBotSkins(void)
+{
+    char m[16];
+    int i;
     extern int netIsHost(void* net) __asm__("func_001734B8");
     if (!netIsHost(netState)) return;
-    m[0] = 1; m[1] = 'S'; m[2] = 'B'; m[3] = hx[botPak >> 4]; m[4] = hx[botPak & 15]; m[5] = 0;
+    m[0] = 1; m[1] = 'S'; m[2] = 'V';
+    for (i = 0; i < 8; i++) m[3 + i] = (char)('0' + botSkin[i] + 1);
+    m[11] = 0;
     netChatSend(netState, m);
 }
-void tmbr_BotPakSet(int mask)
+void tmbr_BotSkinSet(const signed char* t)
 {
-    if (botPak != (unsigned char)mask) scePrintf("TMBR skins: 12 Pak bots %02x\n", mask & 0xFF);
-    botPak = (unsigned char)mask;
-    sendBotPak();
+    int i, ch = 0;
+    for (i = 0; i < 8; i++) if (botSkin[i] != t[i]) { botSkin[i] = t[i]; ch = 1; }
+    if (ch) for (i = 0; i < 8; i++) if (botSkin[i] >= 0) scePrintf("TMBR skins: bot slot %d drives %s\n", i, skinName[(int)botSkin[i]]);
+    sendBotSkins();
 }
 static void sendSkins(void)
 {
     char m[8];
     int k;
-    sendBotPak();
+    sendBotSkins();
     for (k = 0; k < NSKIN; k++) {
         m[0] = 1; m[1] = 'S'; m[2] = 'K'; m[3] = '0' + skinType[k]; m[4] = '0' + (tmbr_skin[k] != 0); m[5] = 0;
         netChatSend(netState, m);
@@ -121,10 +132,14 @@ int tmbr_ChatHandler(int a0, int a1, int client, char* msg)
         tmbr_LostRecv(client, msg + 3);
         return 0x44;
     }
-    if (msg && msg[0] == 1 && msg[1] == 'S' && msg[2] == 'B') {
-        int h = msg[3] >= 'A' ? msg[3] - 'A' + 10 : msg[3] - '0', l = msg[4] >= 'A' ? msg[4] - 'A' + 10 : msg[4] - '0';
-        if (botPak != (unsigned char)(h << 4 | l)) scePrintf("TMBR skins: 12 Pak bots %02x (from %d)\n", h << 4 | l, client);
-        botPak = (unsigned char)(h << 4 | l);
+    if (msg && msg[0] == 1 && msg[1] == 'S' && msg[2] == 'V') {
+        int i;
+        for (i = 0; i < 8 && msg[3 + i]; i++) {
+            int k = msg[3 + i] - '1';
+            if (k >= NSKIN) k = -1;
+            if (botSkin[i] != k && k >= 0) scePrintf("TMBR skins: bot slot %d drives %s (from %d)\n", i, skinName[k], client);
+            botSkin[i] = (signed char)k;
+        }
         return 0x44;
     }
     if (msg && msg[0] == 1 && msg[1] == 'S' && msg[2] == 'K') {
@@ -159,7 +174,7 @@ static int skinOn(int client, int k)
 {
     checkAvail();
     if (!avail[k]) return 0;                         /* no car files on this disc (Gold Tooth removed 2026-10-23) */
-    if (k == 1 && client >= 0 && client < 8 && (botPak >> client & 1) && *(int*)(netState + client * 0x220 + 0x10) == -1 && !tmbr_GuestSlot(client)) return 1;
+    if (botSlot(client)) return botSkin[client] == k;  /* a bot's slot: only the host's bonus car table (not a former player's) */
     if (client == netGetMyClientIndex(netState)) return tmbr_skin[k];
     return client >= 0 && client < 8 && remote[client][k];
 }
@@ -193,9 +208,9 @@ static void setCodes(int client)
 }
 
 void tmbr_LoadOwnCar(void* shell, int client) { setCodes(client); loadOwnCar(shell, client); setCodes(-1); }
-void tmbr_LoadCar268(void* s, int c, int ai) { setCodes(ai ? -1 : c); loadCar268(s, c, ai); setCodes(-1); }
-void tmbr_LoadCar478(void* s, int c, int ai) { setCodes(ai ? -1 : c); loadCar478(s, c, ai); setCodes(-1); }
-void tmbr_LoadCar680(void* s, int c, int ai) { setCodes(ai ? -1 : c); loadCar680(s, c, ai); setCodes(-1); }
+void tmbr_LoadCar268(void* s, int c, int ai) { setCodes(c); loadCar268(s, c, ai); setCodes(-1); }
+void tmbr_LoadCar478(void* s, int c, int ai) { setCodes(c); loadCar478(s, c, ai); setCodes(-1); }
+void tmbr_LoadCar680(void* s, int c, int ai) { setCodes(c); loadCar680(s, c, ai); setCodes(-1); }
 void tmbr_LoadCar0F0(void* s, int c) { setCodes(c); loadCar0F0(s, c); setCodes(-1); }
 
 /* car select frame: highlighted car value (type << 5) */

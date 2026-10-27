@@ -210,6 +210,18 @@ void tmbr_LevelLoadCars(char* shell, int a)
         for (k = 0; k < 8; k++) {
             int c = D_00313F00[k], c2;
             if (F(D_003156C0 + k * 0x220, 0x214) != 0 || tmbr_GuestSlot(k) || c <= 0) continue;
+            {   /* a bonus car: load its donor (the loader goes by D_00313F00, not the slot's car - why no 12 Pak bot
+                 * was ever seen, Ark 2026-10-27) */
+                extern int tmbr_BotSkin(int slot); extern int tmbr_SkinDonor(int k);
+                int b = tmbr_BotSkin(k);
+                if (b >= 0 && tmbr_SkinDonor(b)) {
+                    D_00313F00[k] = tmbr_SkinDonor(b) << 5;
+                    F(D_003156C0 + k * 0x220, 0xB4) = D_00313F00[k];
+                    scePrintf("TMBR bots: level load, slot %d bonus car %d (donor %d)\n", k, b, tmbr_SkinDonor(b));
+                    used[nu++] = D_00313F00[k];
+                    continue;
+                }
+            }
             c2 = k == allyK ? c : freeCarSeq(c, used, nu, !tmbr_MinionOff());
             if (c2 != c) {
                 scePrintf("TMBR bots: level load, slot %d car %d repeats, now %d\n", k, c >> 5, c2 >> 5);
@@ -389,17 +401,27 @@ void tmbr_GuestsLobby(void)
  * the room is made and again in func_0016FA30; a guest's reserved slot is an empty slot, so its car must be put back
  * after it (test 2026-10-26: P2 picked Junkyard Dog and came in as Yellow Jacket) */
 extern void netRandomBotCars(void* net) __asm__("func_00174598");
-extern void tmbr_BotPakSet(int mask);   /* skins.c */
+extern void tmbr_BotSkinSet(const signed char* t);   /* skins.c */
+extern int tmbr_SkinDonor(int k);                   /* skins.c: the extra's donor type, 0 = not on this disc */
 void tmbr_BotCars(void* net)
 {
-    int k, s, pak = 0;
+    int k, s;
+    signed char bs[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
+    unsigned taken = 0;
     netRandomBotCars(net);
     { extern int tmbr_StoryCars(void); if (tmbr_StoryCars()) s = 8; else s = 0; }   /* story.c: its own rule */
-    for (; s < 8; s++) {          /* bots' cars: 12 Pak as often as any other car (1 in 16; TODO 6, 2026-10-26) */
+    /* bots' cars: every bonus car as often as any regular one (Ark 2026-10-27: 7 extras next to the 14 regular cars,
+     * each extra at most once; was 12 Pak only, 1 in 16) */
+    for (; s < 8; s++) {
+        int r;
         if (F(D_003156C0 + s * 0x220, 0x10) != -1 || tmbr_GuestSlot(s)) continue;
-        if (mathfRandI(0, 15) == 0) { F(D_003156C0 + s * 0x220, 0xB4) = 0x20; pak |= 1 << s; }
+        r = mathfRandI(0, 20) - 14;
+        if (r < 0 || (taken >> r & 1) || !tmbr_SkinDonor(r)) continue;
+        taken |= 1u << r;
+        bs[s] = (signed char)r;
+        F(D_003156C0 + s * 0x220, 0xB4) = tmbr_SkinDonor(r) << 5;
     }
-    tmbr_BotPakSet(pak);
+    tmbr_BotSkinSet(bs);
     for (k = 1; k <= 3; k++) {
         if (!joinCar[k] || joinSlot[k] < 0) continue;
         scePrintf("TMBR guests: slot %d car %d -> %d (+0x10 %d)\n", joinSlot[k], F(D_003156C0 + joinSlot[k] * 0x220, 0xB4) >> 5,

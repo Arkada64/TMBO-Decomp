@@ -132,9 +132,10 @@ static int addBot(void)
         F(D_003156C0 + s * 0x220, 0xB4) = mathfRandI(1, 14) << 5;
     {   /* bots avoid cars already in the match (players' and other bots') - Ark 2026-10-27 */
         extern int tmbr_FreeCar(int car, const int* used, int n, int minionOk);
+        extern int tmbr_BotSkin(int slot);
         int used[8], nu = 0, k, c = F(D_003156C0 + s * 0x220, 0xB4), c2;
         for (k = 0; k < 8; k++) if (F(g + k * 0x31B0, 0x20D0) != 0) used[nu++] = F(g + k * 0x31B0, 0x20F4);
-        c2 = tmbr_FreeCar(c, used, nu, !tmbr_MinionOff());
+        c2 = tmbr_BotSkin(s) >= 0 ? c : tmbr_FreeCar(c, used, nu, !tmbr_MinionOff());   /* (a bonus car keeps its donor type) */
         if (c2 != c) { scePrintf("TMBR bots: car %d already in, slot %d gets %d\n", c >> 5, s, c2 >> 5); F(D_003156C0 + s * 0x220, 0xB4) = c2; }
     }
     veh = gameMakeAI(g, v, F(D_003156C0 + s * 0x220, 0xB4), v, -1, 1);
