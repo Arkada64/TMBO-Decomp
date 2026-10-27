@@ -80,6 +80,8 @@ def build(out, files):
         print(f"  \\PCAR\\{name}: LBA {lba}, {len(data)} bytes")
         lba += (len(data) + S - 1) // S
     iso.seek((pl + last) * S); iso.write(sec)
+    pad = int(os.environ.get("DISC_PAD", "512"))   # zero sectors after the last file: streams read past their end (Ark 2026-10-27 hang leaving a match)
+    iso.seek(lba * S); iso.write(bytes(pad * S)); lba += pad
     struct.pack_into("<I", pvd, 80, lba); struct.pack_into(">I", pvd, 84, lba)
     iso.seek(16 * S); iso.write(pvd)
     iso.seek(lba * S - 1); iso.write(b"\0") if os.path.getsize(out) < lba * S else None

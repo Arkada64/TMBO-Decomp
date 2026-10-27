@@ -4,7 +4,7 @@ Draws entry point 0 with: LOD kid 0, op31 kid 0 (damage state 0 etc.), op6 switc
 (weapon switches on the weapon), op17 bones in the exported pose (or the character animations at time T),
 op3 / op4 transforms. Colours: grey = car, red = weapon models (op1 id 4001..), orange = machine guns (4100),
 yellow dots = op5 lights, blue = other character meshes still drawn."""
-import sys, struct, argparse
+import sys, struct, argparse, os
 import numpy as np
 from tmbcar import Car, u32, BASE
 from hcbuild import kids
@@ -40,6 +40,11 @@ def collect(car, t_anim=None):
             if not m['pos']:
                 continue
             P = np.asarray(m['pos'], float) @ M + t
+            if os.environ.get('CV_FLAGS'):
+                fl_ = struct.unpack_from('<I', n, o + 0xC)[0]
+                al_ = [c[3] for s_ in m['strips'] for c in s_.get('col', [])]
+                print('mesh %#x flags %#x alpha %s valpha %s..%s tids %s box %s %s' % (o, fl_, bool(fl_ & 0x8000), min(al_) if al_ else '-', max(al_) if al_ else '-',
+                      [struct.unpack_from('<H', n, o + 0x50 + 2 * i)[0] for i in range(struct.unpack_from('<H', n, o + 0x5a)[0])], P.min(0).round(1).tolist(), P.max(0).round(1).tolist()))
             tr = [(a, b, c) for a, b, c, s, _ in triangles(m)]
             nt_ = struct.unpack_from('<H', n, o + 0x5a)[0]
             tids_ = [struct.unpack_from('<H', n, o + 0x50 + 2 * i)[0] for i in range(min(nt_, 4))]

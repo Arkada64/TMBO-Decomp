@@ -2,6 +2,8 @@
 tex RGBA array or None, col rgb)."""
 import numpy as np
 from PIL import Image
+import os
+CULL=int(os.environ.get('TR_CULL','0')); ALPHA=os.environ.get('TR_ALPHA')=='1'
 VIEWS={'side':(1,2,0,1),'front':(0,2,1,1),'top':(0,1,2,1),'iso':None}
 def _proj(P,view):
     if view=='iso':
@@ -10,6 +12,9 @@ def _proj(P,view):
         Rx=np.array([[1,0,0],[0,np.cos(b),-np.sin(b)],[0,np.sin(b),np.cos(b)]])
         Q=P@Rz.T@Rx.T
         return np.stack([Q[:,0],Q[:,2],-Q[:,1]],1)
+    if view=='side2': return np.stack([-P[:,1],P[:,2],-P[:,0]],1)
+    if view=='back': return np.stack([-P[:,0],P[:,2],-P[:,1]],1)
+    if view=='iso2': return _proj(P*np.array([-1,-1,1]),'iso')
     ua,va,da,_=VIEWS[view]
     return np.stack([P[:,ua],P[:,va],P[:,da]],1)
 def render(meshes,out,size=400,views=('side','front','top','iso')):
@@ -32,6 +37,7 @@ def render(meshes,out,size=400,views=('side','front','top','iso')):
                 if x1<x0 or y1<y0: continue
                 den=(y[1]-y[2])*(x[0]-x[2])+(x[2]-x[1])*(y[0]-y[2])
                 if abs(den)<1e-9: continue
+                if CULL and (den>0)==(CULL>0): continue
                 gx,gy=np.meshgrid(np.arange(x0,x1+1)+0.5,np.arange(y0,y1+1)+0.5)
                 w0=((y[1]-y[2])*(gx-x[2])+(x[2]-x[1])*(gy-y[2]))/den; w1=((y[2]-y[0])*(gx-x[2])+(x[0]-x[2])*(gy-y[2]))/den; w2=1-w0-w1
                 msk=(w0>=-1e-6)&(w1>=-1e-6)&(w2>=-1e-6)
@@ -47,6 +53,8 @@ def render(meshes,out,size=400,views=('side','front','top','iso')):
                     th,tw=tex.shape[:2]
                     tx=(np.floor(U*tw).astype(int))%tw; ty=(np.floor(V*th).astype(int))%th
                     colr=tex[ty,tx,:3].astype(float)*sh
+                    if ALPHA: msk&=tex[ty,tx,3]>=48
+                    if os.environ.get('TR_AVIS'): a_=tex[ty,tx,3]; colr[(a_<0x78)]=(255,0,255); colr[(a_<0x30)]=(0,255,255)
                 else:
                     colr=np.ones(msk.shape+(3,))*np.array(m.get('col',(0.8,0.8,0.8)))*255*sh
                 sub[msk]=zz[msk]
