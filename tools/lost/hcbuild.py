@@ -819,7 +819,9 @@ def build(a, rd, own16):
         k, v = next(iter(hq.items()))
         hq[-k] = v * np.array([-1.0, 1, 1])
     light_hide = hcmounts.fix_lights(car, to_donor(P0), box_n, ho_heads=hq)  # HC_LIGHTS: light bars off, headlights moved
-    shells = hcmounts.refit_shells(car, box_d, box_n)            # HC_SHELLS: shield / freeze shells onto the new body
+    Pw = [np.asarray(c_) + np.array([sx, sy, 0]) * np.array([0.7, r_, 0]) for _, c_, r_, _ in wheel_report
+          for sx in (-1, 1) for sy in (-1, 1)]          # the own wheels count too (x / y; z: their centres)
+    shells = hcmounts.refit_shells(car, np.concatenate([to_donor(P0)] + ([np.array(Pw)] * 20 if Pw else [])))  # HC_SHELLS
 
     # ---- hide the donor's own parts (empty packet, no texture slots)
     dead = [r for r in dead if r]

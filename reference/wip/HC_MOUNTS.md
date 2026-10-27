@@ -5,7 +5,102 @@
 (new: both 12 Pak copies, `PAK_OWNWHEELS=1`, A = `PAK_ACAR=1`; with `HC_MOUNTS=0` it reproduces the earlier
 `/tmp/claude-0/pak_own/out/ZY?.*` byte for byte).
 
-## Where the donor's guns / weapons are (TMB car NGP)
+## Round 2: Ark's in-game test 2026-10-26 (floating weapons, donor lights, Thumper textures, Gold Tooth, shields)
+Builds: `tools/lost/hc_buildall.sh` (Gold Tooth lines gained `--head`) and `tools/lost/pak_buildall.sh`, outputs as
+before (`/tmp/claude-0/hc_*/out`, `/tmp/claude-0/pak_own/out`). Checker: `tools/lost/carview.py DIR CODE out.png
+[--time T] [--tex] [--rear] [--robot]` draws a built (or retail) car as the game would at rest (weapons red, guns
+orange, op5 lights yellow, character meshes blue), `--time 100000` = every animation at its last key.
+
+### Floating weapons: why
+- **op17 bones are not the identity at rest.** skeletonTraverse (charanim 0x00247580) builds each bone as
+  `A40 * RotPRH(-P,-R,-H) * A80` (flags +0xC0 0x10000 / 0x20000; A40 / A80 = -pivot / +pivot rows at +0x70 / +0xB0)
+  plus the translation at +0x30; the angles / translation come from animation channels (+0x12..+0x1C = channel index
+  per field, +0x10 = weight channel: 0 skips the bone). Several weapon bones carry constant offsets (Outlaw's 4001
+  bone t(0.27 -6.66 1.10), Junkyard Dog's 4005: x 12.97 at bind, 2.89 posed). Round 1 read positions with the bones
+  as identity, so the box map started from wrong places.
+- **Round 1 moved the mount under the animated bones.** The launcher animations turn bones about their (donor)
+  pivots, e.g. Outlaw's 4006 bone yaws -90 degrees, its 4005 arm 180 degrees about a hinge at x -4.2; a mount pushed
+  4 units down / sideways inside such a bone swings with it, up to ~2x the push away from the car.
+- **The deployed poses swing out past the body, and the launcher hardware is hidden** (hcbuild hides the id != 0
+  characters' meshes), so a deployed weapon hangs in the air beside a narrower car (the red missiles left of Gold
+  Tooth / Old Pickup in Ark's pictures: Sweet Tooth's 4002 / 4004 slide out to x -5.1 / -7.4).
+  Animation data: op25 +0x10 -> op33, +4 -> header (+0xC channel count, +0x18 one track per channel); track =
+  u16 nkeys, u16 flags, u32 channel, keys of 5 floats (t, c3, c2, c1, c0), value c0 + c1 u + c2 u^2 + c3 u^3
+  (evaluateBetweenKeyframes, u = t - key time); ends hold. mathfRotMatrixPRH rows (row vectors) are in hcmounts.rot_prh.
+
+### Floating weapons: what the builds do now (hcmounts.py)
+1. `donor_mounts` evaluates bones in the exported pose (stored channel values) and records each mount's character.
+2. Target per mount: the box map of that posed position, then `on_body`: x clamped to 0.8 x the half width, y inside
+   the box, and if it is above the body's top at that spot (vertices within 0.6) it drops onto the top (its model's
+   lowest point on the surface); below the bottom it rises to it. Machine guns: unchanged (Head-On slots).
+3. Mounts inside a character move **with the whole character**: an op3 translate is put above every drawn
+   reference to the op25 (`move_char`; the op7 list keeps the bare character), so pivots move too. (One mount per
+   character except Junkyard Dog's 0x63c0 = 4001/4002/4003: mean move, residual <= 0.12 on the mounts.)
+4. `HC_ANIM` (default 1): each weapon character's bone channels are scaled towards the exported pose (`damp_char`,
+   key c0 -> a + f (c0 - a), c1..c3 * f) by the largest f in 1, 0.9 .. 0 that keeps every animated position of its
+   mounts inside the new body box + `HC_ANIM_TOL` (0.5). Same animations, smaller swing; Outlaw's 4005 arm on
+   Twister is frozen (f 0). Per-build factors: `grep 'mount char' /tmp/claude-0/hc_*/build_Z*.log`.
+
+Result (P copies; A copies within 0.1): rest = exported pose, anim = all key times / midpoints. Every weapon is
+inside the body box at rest (worst 0.12) and within 0.49 over its animations (round 1: up to ~5).
+| car (donor) | body box (x, y, z) | weapons at rest (x y z) | worst animated overshoot |
+|---|---|---|---|
+| Thumper (Brimstone) | +-3.06, -7.89..8.50, -2.38..1.04 | 4001 (-1.86 5.26 -0.63), 4002 (-1.82 -3.87 -1.39), 4003 (1.93 5.30 -0.68), 4004 (0 -0.60 -1.00), 4005 (-0.57 -6.27 -1.70), 4006 (-0.57 -1.13 1.16), 4011 (0 8.20 -0.55), guns (+-2.33 7.05 -1.22) | 0.49 (4002) |
+| Outlaw 2 (Crazy 8) | -3.84..3.34, -8.72..9.19, -2.16..2.77 | 4001 (0 -6.12 -0.23), 4002 (0.05 4.57 0.43), 4003 (3.07 1.63 -1.36), 4004 (0.07 -2.19 -0.09), 4005 (1.21 0.70 2.14), 4006 (-0.04 4.96 0.34), guns (+-3.29 9.15 0.46) | 0.44 (4005) |
+| Old Pickup (Junkyard Dog) | -4.03..4.22, -10.64..10.62, -3.86..5.29 | 4001 (-3.02 -3.89 0.73), 4002 (-2.45 -3.89 0.76), 4003 (-2.73 -3.76 0), 4004 (2.70 -5.95 1.45), 4005 (2.03 -6.38 -0.75), 4006 (-1.83 -0.71 2.90), guns (+-3.38 3.81 -2.59) | 0.48 (4006) |
+| Pit Viper (Spectre) | +-2.75, -6.39..7.24, -0.68..3.66 | 4001 (0.74 -0.84 1.46), 4002 (-1.18 2.30 1.31), 4003 (0 2.78 1.39), 4004 (0.29 -3.64 1.30), 4005 (0.02 -4.76 1.61), 4006 (1.08 2.31 1.32), 4028 (1.44 3.49 1.26), guns (+-1.31 7.30 -0.48) | 0.47 (4006) |
+| Twister (Outlaw) | +-2.79, -6.80..8.39, -3.71..0.11 | 4001 (0.79 -5.10 -1.47), 4002 (0.11 -3.39 -0.62), 4003 (-0.62 -5.06 -1.46), 4004 (0.17 -5.77 -2.90), 4005 (-0.47 -6.48 -2.24), 4006 (-0.61 -3.37 -0.57), guns (+-1.77 2.80 -1.67) | 0.47 (4004 / 4006) |
+| Gold Tooth (Sweet Tooth) | +-4.49, -8.36..8.30, -3.09..2.91 | 4001 (1.57 -5.28 -0.67), 4002 (-1.70 -5.08 -0.66), 4003 (-2.60 -0.11 1.37), 4004 (-1.86 -3.81 1.09), 4005 (0.53 -4.16 1.08), 4006 (0.30 -0.27 1.40), guns (4.20 / -4.05 5.04 -0.60) | 0.46 (4005) |
+| 12 Pak (Roadkill) | -3.71..3.76, -8.87..8.56, -1.85..2.26 | 4001 (-2.80 -5.95 0.04), 4002 (2.86 -6.12 0.06), 4003 (1.18 -4.86 1.05), 4004 (0 -5.89 0.01), 4005 (0.07 -5.08 0.01), 4006 (3.00 5.03 0.38), guns (+-3.09 7.02 2.28) | 0.43 (4002) |
+(12 Pak's rack / antenna characters stay where PAK_MOUNTS puts them: `skip_chars`.)
+
+### Donor lights (HC_LIGHTS, default 1; hcmounts.fix_lights)
+TMB car lights are op5 nodes (+8 range, +0x30 colour). hcbuild kept everything outside the high LOD, so on
+Twister Outlaw's 4 light-bar beacons (op5 on bones of char 0x67a80, z 5.19, red / blue: the red glow in Ark's
+picture) and on Old Pickup Junkyard Dog's 4 roof lamps (char 0x69360, z 5.56, with their lamp meshes: the blue
+box on the roof) floated above the cars; the headlight flares (op6 R+9) stayed at the donor's nose (JD's 3 units
+ahead of the Pickup). Now: op5 lights not under R+9 are unlinked (parent slot -> an op9) and the meshes of the
+character carrying them hidden; the headlight assembly gets one translate under the R+9 switch and each flare's own
+op4 its x, onto the new car's own headlight flare quads (Twister, Thumper, Outlaw 2 (left pair mirrored), Gold
+Tooth) or the front face of the body (Old Pickup, Pit Viper, 12 Pak). `--hide-node` for Twister is now redundant.
+
+### Thumper's textures
+The conversions are byte-correct (checked against Head-On's images). The trunk / rear deck mesh 0x38aa0 (and the
+damage-state shells 0x1ef50 / 0x2a270 / 0x37380) use Head-On's grime decal 0x93f5c: a 16-colour palette of pure
+black with alpha 0..89, which Head-On blends over the body; TMB drew it as solid black with holes (the black /
+pink splatter on the trunk). hcbuild now skips meshes whose textures are all alpha-only (black palette, alpha <
+0x80): 4 on Thumper, 10 on Twister, 6 on Outlaw 2, 1 on Gold Tooth (mostly damage states). Still a risk: Thumper's P
+copy keeps 3 textures in the 64 KB class (retail P cars have 2; ~+73 KB VRAM). If parts still show wrong
+textures in game, half-size its 256x128 sheet (`--half-keys b53a0` on the ZUP line).
+
+### Gold Tooth
+- Invisible parts: `env_overlay` called an env-mapped mesh a shine shell when any plain mesh had the same box.
+  Gold Tooth's chrome cargo box 0xad70 (with the back wall) shares its box with the plain sides 0xe5e0 but only 54%
+  of its vertices, so the back wall was dropped. An overlay now needs >= 90% of its vertices on the plain mesh.
+- Head: in Sweet Tooth the clown head is its own character 0x50960 (id 0, one bone 0x50800 yawing on channel 0,
+  STA: bone 0x4efc0), outside the damage states; Gold Tooth's head went in as static `--add` meshes and the donor's
+  head mesh was emptied with the high LOD. New `--head 0x1230,0x3bd0:@BONE` (head + eyes) puts them on that bone
+  (pivot moved to the new head's centre, -0.13 -4.40 3.06); the arm 0x3e0 stays static; the robot form unchanged.
+
+### Shield / freeze shells (HC_SHELLS, default 1; hcmounts.refit_shells)
+Both are meshes in the car's own NGP, nothing in the exe scales them per car: shield = op6 switch id R+15 (attach
+type 15) -> op1 -> op25 (id 0, its channels scroll the UVs) -> one shell in the donor's shape (Outlaw 0x5e930:
++-4.83, -10.1..10.2, -2.2..4.9; Sweet Tooth adds a robot-shaped one); freeze = op6 id R+14 -> character id R+14 (ice
+texture + icicle quads), which hcbuild used to hide with the weapon characters (no freeze look on the HC cars).
+Now every vertex of both is mapped in place (positions only; UVs / characters / channels untouched): per switch the
+largest shell's box -> the new body's box (0.2..99.8 percentile of the kept state-0 meshes + the own wheels' x / y)
+grown by `HC_SHELL_MARGIN` (0.4); both stay drawn. 12 Pak (pakbuild) gets the same plus the headlight move.
+
+### Needs an in-game check
+1. Weapons sit on the bodies at rest and while deploying (the damped animations look sane; Twister's 4005 arm is
+   frozen). Projectile origins follow the moved characters.
+2. No floating lights on Twister / Old Pickup; headlight flares at the new noses, beams still point forward.
+3. Thumper's trunk / rear deck no longer black; watch for other wrong textures (VRAM note above).
+4. Gold Tooth: cargo-box back wall present, head turns with Sweet Tooth's head animation (and nothing else of the
+   donor head shows); robot form still fine.
+5. Shield / freeze bubbles hug the new bodies on all 7 (freeze on the HC cars is new: check it shows and clears).
+
+## Where the donor's guns / weapons are (TMB car NGP) (round 1; the "identity at rest" claim below is wrong, see round 2)
 - **Machine guns**: `op1 id 4100` = the gun model (one group, drawn twice) under two `op4` (left / right), each under
   an `op6` with id R+13 (attach type 13, `attachAdd` stores it at vehicle +0x2A54), in the high LOD, outside the
   body damage states. Roadkill: op4 0x5cdb0 t(-2.77 3.49 -1.48) / 0x5ce30 t(2.82 3.49 -1.48), switch id 45, gun

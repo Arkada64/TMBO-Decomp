@@ -399,6 +399,8 @@ def main(rkdir, bddpath, outdir, scale=1.0):
         {k: [None if p is None else tuple(round(x, 2) for x in p) for p in v] for k, v in sorted(ML.items())},
         np.round(mount_box[0], 2), np.round(mount_box[1], 2), np.round(box_n[0], 2), np.round(box_n[1], 2)))
     hcmounts.apply(car, mount_rec, ML, to_donor, mount_box, box_n, name='HC_STOCK', pts=to_donor(P0), skip_chars=pak_moved)
+    hcmounts.fix_lights(car, to_donor(P0), box_n)      # HC_LIGHTS: Roadkill's headlight flares to 12 Pak's front
+    hcmounts.refit_shells(car, to_donor(P0))           # HC_SHELLS: shield / freeze shells around 12 Pak
     before = len(car.n)
     dropped = car.compact(sorted(set(dead)))
     if OWN and rim_cb is not None:     # the rim's new CLUT moves into a Roadkill wheel CLUT nothing uses any more

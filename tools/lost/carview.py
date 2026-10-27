@@ -67,6 +67,9 @@ def collect(car, t_anim=None):
                 trk = hcmounts.char_tracks(car, o)
                 vals = {c: hcmounts.track_value(v, t_anim) for c, v in trk.items()} if trk else None
         if op == 17:
+            vc = struct.unpack_from('<h', n, o + 0x10)[0]
+            if vals is not None and vc >= 0 and vals.get(vc, 1.0) == 0:
+                continue                         # skeletonTraverse skips a bone whose weight channel is 0
             Rm, tt = hcmounts.bone_local(n, o, vals)
             t = tt @ M + t; M = Rm @ M
         else:

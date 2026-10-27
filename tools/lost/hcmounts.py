@@ -709,25 +709,40 @@ def remap_positions(n, node, fn):
     return cnt
 
 
-def refit_shells(car, box_d, box_n, log=print):
-    """HC_SHELLS: box-map the shield / freeze shell meshes onto the new body; returns those meshes (keep them drawn)"""
+def refit_shells(car, pts, log=print, margin=None):
+    """HC_SHELLS: fit the shield / freeze shell meshes around the new body; returns those meshes (keep them drawn).
+    Per switch, the largest shell's box is mapped (per axis, x kept symmetric) onto the new body's box (pts: its
+    vertices, 0.2..99.8 percentile) grown by HC_SHELL_MARGIN (0.4) on every side; the switch's other meshes (Sweet
+    Tooth's robot-shaped shell, the icicle quads) take the same mapping."""
     if os.environ.get('HC_SHELLS', '1') == '0':
         return set()
-    def ch(b):
-        lo, hi = np.asarray(b[0], float), np.asarray(b[1], float)
-        c, h = (lo + hi) / 2, (hi - lo) / 2
-        c[0], h[0] = 0.0, max(-lo[0], hi[0])
-        return c, h
-    (cd, hd_), (cn, hn) = ch(box_d), ch(box_n)
-    k = hn / np.maximum(hd_, 1e-3)
-    fn = lambda P: cn + (P - cd) * k
+    from tmbmesh import decode
+    m_ = float(os.environ.get('HC_SHELL_MARGIN', '0.4')) if margin is None else margin
+    P0 = np.asarray(pts, float)
+    nlo, nhi = np.percentile(P0, 0.2, axis=0) - m_, np.percentile(P0, 99.8, axis=0) + m_
+    nlo[0], nhi[0] = -max(-nlo[0], nhi[0]), max(-nlo[0], nhi[0])
     done = set()
     for rel, ms in sorted(shell_meshes(car).items()):
+        boxes = {}
+        for m in ms:
+            try:
+                P = np.asarray(decode(bytes(car.n), m)['pos'], float)
+            except Exception:
+                continue
+            if len(P) > 8:
+                boxes[m] = (P.min(0), P.max(0), len(P))
+        if not boxes:
+            continue
+        main = max(boxes, key=lambda m: (boxes[m][1][1] - boxes[m][0][1], boxes[m][2]))
+        slo, shi = boxes[main][0].copy(), boxes[main][1].copy()
+        slo[0], shi[0] = -max(-slo[0], shi[0]), max(-slo[0], shi[0])
+        k = (nhi - nlo) / np.maximum(shi - slo, 1e-3)
+        fn = lambda P, k=k, slo=slo: nlo + (P - slo) * k
         for m in ms:
             if m in done:
                 continue
             try:
-                P = np.asarray(__import__('tmbmesh').decode(bytes(car.n), m)['pos'], float)
+                P = np.asarray(decode(bytes(car.n), m)['pos'], float)
                 nv = remap_positions(car.n, m, fn)
             except Exception as e:
                 log('shell R+%d mesh %#x: odd packet, left (%s)' % (rel, m, e))
