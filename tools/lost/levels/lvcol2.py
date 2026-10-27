@@ -14,6 +14,7 @@ from lvcol import orient, normalize, EMPTY, SOLID, DEPTH, SLAB
 
 LEAF = 4
 VERT_NZ = 0.25
+CHAIN_MAX = 5                 # cells with this few prisms end in a chain
 EPS = 1e-4
 
 
@@ -69,6 +70,9 @@ def convex_polys(P, N, w, tri_ids):
     return [np.array([pos[v] for v in pl]) for i, pl in enumerate(polys) if alive[i]]
 
 
+THIN = 12.0
+
+
 def extrude_dir(n_):
     """the prism's depth direction: up / down for ground and ceilings, else the face's horizontal direction
     rounded to 16 headings (so a flat wall's triangles share it)"""
@@ -94,14 +98,17 @@ def prisms_of(W, T):
         for loop in convex_polys(P, N, w, ids):
             w0 = float(n_ @ loop.mean(0))
             d = extrude_dir(n_)                       # sides contain d: neighbours with the same d share them
-            nd = float(n_ @ d)
-            hi, lo = (SLAB, SLAB) if sl else (0.0, DEPTH)
-            planes = [(n_, w0 + hi * nd), (-n_, -(w0 - lo * nd))]
+            dl = loop @ d
+            if sl:                                    # slab: both faces across d, offsets on a 4-unit grid
+                planes = [(d, math.ceil((dl.max() + SLAB) / 4) * 4.0), (-d, -math.floor((dl.min() - SLAB) / 4) * 4.0)]
+            else:                                     # the surface, and a back face across d on an 8-unit grid
+                planes = [(n_, w0), (-d, -math.floor((dl.min() - DEPTH) / 8) * 8.0)]
             for k in range(len(loop)):
                 e = loop[(k + 1) % len(loop)] - loop[k]
                 sn = np.cross(e, d); ln = np.linalg.norm(sn)
                 if ln > 1e-6: sn = sn / ln; planes.append((sn, float(sn @ loop[k])))
-            pts = np.r_[loop + d * hi, loop - d * lo]
+            pts = np.array(_prism_pts(planes))
+            if len(planes) < 5 or len(pts) < 4: continue          # degenerate (face edge-on to its depth direction)
             out.append((planes, pts.min(0), pts.max(0)))
     return out
 
@@ -191,16 +198,22 @@ def build_piece_bsp(W, T, ncand=24, seed=0):
         if (d <= 1e-3).all(): return -1
         if (d >= -1e-3).all(): return 1
         return 0
+    def chain_rem(its):
+        """union of the cell's prisms by their remaining planes: outside one -> the next prism; inside all of a
+        prism's planes -> solid; outside the last -> empty"""
+        nxt = None
+        for i, rem in reversed(its):
+            back = None
+            for j in reversed(rem):
+                nodes.append([nxt, back, EMPTY, SOLID, PL[j]]); back = len(nodes) - 1
+            nxt = back
+        return nxt
     def rec(its, depth):
         if not its: return None, EMPTY
         for i, rem in its:
             if not rem: return None, SOLID
-        if len(its) == 1 or depth > 200:
-            i, rem = its[0]
-            back = None                       # chain of the remaining planes -> solid
-            for j in reversed(rem):
-                nodes.append([None, back, EMPTY, SOLID, PL[j]]); back = len(nodes) - 1
-            if len(its) == 1: return back, None
+        if len(its) <= CHAIN_MAX or depth > 60:
+            return chain_rem(its), None
         cand = sorted({j for _, rem in its for j in rem})
         if len(cand) > ncand: cand = list(rng.choice(cand, ncand, replace=False))
         best = None
@@ -214,7 +227,9 @@ def build_piece_bsp(W, T, ncand=24, seed=0):
                 elif rev.get(j, -1) in rem: S[a, k] = 1
         nf = (S > 0).sum(1); nb = (S < 0).sum(1); ns = (S == 0).sum(1)
         sc = ns * 3 + np.abs(nf - nb) * 0.5 + ((nf == 0) | (nb == 0)) * 1e6
-        j = int(cand[int(np.argmin(sc))])
+        a_ = int(np.argmin(sc)); j = int(cand[a_])
+        if ns[a_] * 2 > len(its) or sc[a_] >= 1e6:      # nothing separates them (crossing slabs): plain union chain
+            return chain_rem(its), None
         F, B = [], []
         for i, rem in its:
             if j in rem: B.append((i, tuple(x for x in rem if x != j))); continue
@@ -267,3 +282,39 @@ def _fixleaves(nodes, root):
             raise ValueError('leaf pair')
         nodes[i] = [f, b, EMPTY, SOLID, (np.asarray(n_, float), float(w_))]
         st += [f, b]
+
+
+def hull_piece(W, T):
+    """a small piece's convex hull as one convex solid (a chain of its face planes): for small open curved parts
+    (signs, railings, statues) whose crossing slabs blow the exact union up"""
+    from scipy.spatial import ConvexHull
+    used = W[np.unique(T)]
+    try:
+        h = ConvexHull(used)
+    except Exception:
+        return None
+    pl = {}
+    for eq in h.equations:
+        n_, w_ = eq[:3], -eq[3]
+        pl.setdefault(pkey(n_, w_), (n_, float(w_)))
+    nodes = []; back = None
+    for n_, w_ in pl.values():
+        nodes.append([None, back, EMPTY, SOLID, (np.asarray(n_, float), w_)]); back = len(nodes) - 1
+    prs = [(list(pl.values()), used.min(0), used.max(0))]
+    return nodes, back, prs
+
+
+HULL_EXT = 160.0       # pieces up to this size may become their hull
+HULL_RATIO = 8         # ... when the exact tree needs more than this many nodes per prism
+
+
+def build_piece_auto(W, T):
+    r = build_piece_bsp(W, T)
+    if r is None: return None
+    nodes, root, prs = r
+    live = sum(1 for x in nodes if isinstance(x, list))
+    ext = (W[np.unique(T)].max(0) - W[np.unique(T)].min(0)).max()
+    if live > HULL_RATIO * len(prs) and ext <= HULL_EXT:
+        h = hull_piece(W, T)
+        if h is not None and len(h[0]) < live: return h
+    return r

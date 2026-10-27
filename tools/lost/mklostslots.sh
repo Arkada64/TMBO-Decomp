@@ -3,9 +3,9 @@
 # test/LOSTSLOTS.iso = the normal test disc (mktest.sh's file list) + the five converted maps under their own names.
 # Every existing level keeps its own files. The maps run as Dogpound (index 10, files DEATH4 = the conversion donor):
 #   \LVL\HC<xx>.NGP/.PTR/.TEX/.RTX   (zip-wrapped like the disc's DEATH4.<ext> when that one is zipped)
-#   \PTS\HC<xx>.PKP/.PTS/.PUP        \PCAR\ZNHC<xx>.BIN (bots' route map)
+#   \PTS\HC<xx>.PKP/.PTS/.PUP        \PCAR\ZNHC<xx>.BIN (bots' route map)   \PCAR\ZCHC<xx>.BIN (collision, 128 MB EE)
 #   xx = SC Carnival of Darkness, SU Suburban Terror, GD City of the Dead, ND Death Port, ST Stadium Slaughter
-# Sources: cloud/lost2/HC<xx>.{NGP,PTR,TEX,RTX,PKP,PTS,PUP,ZN}; staged copies in packs/lost3/ (overwritten each
+# Sources: cloud/lost2/HC<xx>.{NGP,PTR,TEX,RTX,PKP,PTS,PUP,ZN,COL}; staged copies in packs/lost3/ (overwritten each
 # run, nothing deleted). Needs test/TMBR_TEST.ELF from mktest.sh (or mods_copy_build.sh) built with these mods.
 #   bash tools/lost/mklostslots.sh            (from anywhere; works in "TMB Decomp")
 set -e -o pipefail
@@ -54,6 +54,10 @@ for m in MAPS:
     dst = f"{O}/PCAR/ZNHC{m}.BIN"
     if not same(f"{src}.ZN", dst): shutil.copyfile(f"{src}.ZN", dst)
     args.append(f"PCAR/ZNHC{m}.BIN")
+    if os.path.exists(f"{src}.COL"):            # exact collision trees, read to high RAM (lostslots.c LOSTCOL)
+        dst = f"{O}/PCAR/ZCHC{m}.BIN"
+        if not same(f"{src}.COL", dst): shutil.copyfile(f"{src}.COL", dst)
+        args.append(f"PCAR/ZCHC{m}.BIN")
 open(f"{O}/args.txt", "w").write(" ".join(args))
 PY
 B=$(grep '^B=' mktest.sh | head -1 | sed 's/^B=//'); B=$(eval echo $B)    # (evaluated in TMB Decomp, as mktest.sh does)

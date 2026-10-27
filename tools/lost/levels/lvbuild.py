@@ -15,7 +15,9 @@ from tmbcar import Car, BASE
 from textconv import tex0, join, clut_blocks, TEX1
 from pkpconv import convert as pkp_convert
 from hocol import piece, collision_objects
-from lvcol import build_piece, encode
+from lvcol import encode
+from lvcol2 import build_piece_auto
+COLBASE = 0x3000000          # mods/lostslots.c LOSTCOL: the collision trees' blob (\\PCAR\\ZCHC<xx>.BIN)
 
 TEX_BUDGET = 2654208          # level TEX slot 0x1C05670 .. 0x1E8E3F0 (0x288D80)
 CLUT_BUDGET = 0x411           # level CLUT blocks
@@ -250,6 +252,60 @@ def donor_prepare(car, drop=None, drop_c=None):
     return dict(chain_id1=chain, drop=drop, drop_c=drop_c, arena_meshes=arena_meshes, id1=id1, id14=id14, op15=op15, keep_t=keep_t, keep_r=keep_r, next_id=next_id, next_cbp=next_cbp,
                 kept_bytes=sum(len(r) for r in keep_t), dropped=len(drop))
 
+GROUND_NZ = 0.6
+def ground_pieces(meshes, pieces, tl, cell=50.0, tol=8.0):
+    """Head-On's collision table has no pieces for much of the ground (streets, lots between the blocks - spawn
+    points stood over nothing, Ark 2026-10-26 "the collision is all wrong"): the game must take that ground from
+    the render meshes. Opaque up-facing render triangles (nz > GROUND_NZ) not within tol of a collision surface
+    become extra pieces (per mesh, <= 255 triangles each)."""
+    # collision triangles binned by xy cell
+    bins = collections.defaultdict(list)
+    CT = []
+    for W, T in pieces:
+        for t in T:
+            P = W[t]; CT.append(P)
+    CT = np.array(CT) if CT else np.zeros((0, 3, 3))
+    lo, hi = CT.min(1), CT.max(1)
+    for i in range(len(CT)):
+        for gx in range(int(lo[i, 0] // cell), int(hi[i, 0] // cell) + 1):
+            for gy in range(int(lo[i, 1] // cell), int(hi[i, 1] // cell) + 1):
+                bins[(gx, gy)].append(i)
+    def covered(p):
+        ids = bins.get((int(p[0] // cell), int(p[1] // cell)))
+        if not ids: return False
+        P = CT[ids]
+        a, b, c = P[:, 0], P[:, 1], P[:, 2]
+        v0, v1, v2 = b[:, :2] - a[:, :2], c[:, :2] - a[:, :2], p[:2] - a[:, :2]
+        d = v0[:, 0] * v1[:, 1] - v0[:, 1] * v1[:, 0]
+        ok = np.abs(d) > 1e-9
+        d = np.where(ok, d, 1.0)
+        u = (v2[:, 0] * v1[:, 1] - v2[:, 1] * v1[:, 0]) / d
+        v = (v0[:, 0] * v2[:, 1] - v0[:, 1] * v2[:, 0]) / d
+        inside = ok & (u >= -0.01) & (v >= -0.01) & (u + v <= 1.01)
+        z = a[:, 2] + u * (b[:, 2] - a[:, 2]) + v * (c[:, 2] - a[:, 2])
+        return bool((inside & (np.abs(z - p[2]) < tol)).any())
+    out = []
+    for m in meshes:
+        if all(tl.get(k) for k in m['texrefs']): continue           # decals / foliage / glass (only see-through textures)
+        P = np.array(m['pos'], float)
+        if not len(P) or (P.max(0) - P.min(0)).max() > 8000: continue  # sky dome / backdrop
+        tris = []
+        for s_ in m['strips']:
+            idx = s_['idx']; brk = s_.get('brk', set())
+            for k in range(2, len(idx)):
+                if k in brk: continue
+                t = (idx[k - 2], idx[k - 1], idx[k])
+                if len(set(t)) < 3: continue
+                A = P[list(t)]; N = np.cross(A[1] - A[0], A[2] - A[0]); ln = np.linalg.norm(N)
+                if ln < 1e-6 or abs(N[2]) / ln < GROUND_NZ: continue
+                if covered(A.mean(0)): continue
+                tris.append(t)
+        for i in range(0, len(tris), 255):
+            T = np.array(tris[i:i + 255])
+            u_ = np.unique(T); remap = {v: j for j, v in enumerate(u_)}
+            out.append((P[u_], np.vectorize(remap.get)(T)))
+    return out
+
 def build(path, outdir, name, scale=1.15, donor=None):
     b = bdd(path); n = b['ngp']
     meshes, unk = placed_meshes(n, scale)
@@ -279,6 +335,7 @@ def build(path, outdir, name, scale=1.15, donor=None):
             if t2 != t:
                 tag = list(s_['tag']); tag[3] = t2; m['strips'][i] = dict(s_, tag=tuple(tag)); fixed += 1
     print('  untextured meshes dropped', nt0 - len(meshes), 'texture selectors fixed', fixed)
+    ground_src = [dict(m) for m in meshes]          # (before merging: per-object meshes for the ground pieces)
     if MERGE_CELL:
         n0 = len(meshes); meshes = merge_meshes(meshes, MERGE_CELL); print('  merged', n0, '->', len(meshes))
     if donor:
@@ -343,26 +400,33 @@ def build(path, outdir, name, scale=1.15, donor=None):
         if small: groups += kd(small)
         for off, sph in big: groups.append((car.group([off], sphere=sph), sph))
     # ---- collision: one op18 per Head-On collision piece
-    col = []; colpts = []; cn = 0
+    col = []; colpts = []; cn = 0; colblob = bytearray(16)
+    pieces = []
     for node, op, M, bb in collision_objects(n):
         if op != 26: continue
         V, Tr, F = piece(n, node)
         if not len(Tr): continue
         Wv = (np.c_[V, np.ones(len(V))] @ M)[:, :3] * scale
         if np.abs(Wv).max() > 50000: continue          # bad transform path
-        r = build_piece(Wv, Tr)
+        pieces.append((Wv, Tr))
+    gp = ground_pieces(ground_src, pieces, tl)
+    print('  collision pieces', len(pieces), '+ ground from render meshes', len(gp), '(%d triangles)' % sum(len(t) for _, t in gp))
+    for Wv, Tr in pieces + gp:
+        r = build_piece_auto(Wv, Tr)
         if r is None: continue
         nodes, broot, _ = r
         used = Wv[np.unique(Tr)]
         c = (used.max(0) + used.min(0)) / 2; rad = float(np.linalg.norm(used - c, axis=1).max()) + 1.0
-        while len(car.n) % 16: car.n.append(0)
-        base = len(car.n)
-        blob, slots, _ = encode(nodes, broot, BASE + base)
-        car.n += blob; car.slots += [base + s_ for s_ in slots]
+        # exact trees (lvcol2) go to the high-RAM blob NAME.COL (mods/lostslots.c LOSTCOL, 128 MB EE): op18 roots
+        # point there, no PTR slot (the game never relocates)
+        while len(colblob) % 16: colblob.append(0)
+        cpos = len(colblob)
+        blob, slots, _ = encode(nodes, broot, COLBASE + cpos)
+        colblob += blob
         cn += len(blob) // 0x20
         hdr = bytearray(0x20)
-        struct.pack_into('<IffI3fI', hdr, 0, 0x12, rad * rad, rad, BASE + base, *c, 0)
-        o18 = car.append(bytes(hdr)); car.slots.append(o18 + 0xC)
+        struct.pack_into('<IffI3fI', hdr, 0, 0x12, rad * rad, rad, COLBASE + cpos, *c, 0)
+        o18 = car.append(bytes(hdr))
         wrap = car.group([o18], sphere=(*c, rad), flags=2)   # alone in an op1 (the grid's path leaf); flag 2 = holds collision
         col.append((wrap, (*c, rad))); colpts.append(used)
     colgroups = []
@@ -429,12 +493,14 @@ def build(path, outdir, name, scale=1.15, donor=None):
     os.makedirs(outdir, exist_ok=True)
     files = {'NGP': car.ngp_bytes(), 'PTR': car.ptr_bytes(),
              'TEX': LT.tex_bytes(dn['keep_t'] if dn else ()), 'RTX': LT.rtx_bytes(dn['keep_r'] if dn else ())}
+    struct.pack_into('<4I', colblob, 0, 0x314C4F43, COLBASE, len(colblob), 0)
+    files['COL'] = bytes(colblob) + b'\0' * (-len(colblob) % 2048)
     pk, seen = pkp_convert(b['pkp'], scale); files['PKP'] = pk
     for ext, d in files.items(): open(f'{outdir}/{name}.{ext}', 'wb').write(d)
     import meshconv as _mc
     rep = dict(color_scale=round(_mc.COLOR_SCALE, 3), donor_compacted=dn.get('compacted', 0) if dn else 0, donor_dropped_tex=dn['dropped'] if dn else 0, to4=len(LT.to4), meshes=len(meshes), groups=len(groups), textures=len(LT.map), halved=len(LT.half), missing_tex=len(missing),
                tex_bytes=len(files['TEX']), tex_budget=TEX_BUDGET, clut_blocks=LT.next_cbp, clut_budget=CLUT_BUDGET,
-               ngp=len(files['NGP']), ptr=len(files['PTR']), col_pieces=len(col), bsp_nodes=cn, grid=(cols, rows), grid_entries=sum(map(len, cells)), unhandled=dict(unk), pickups=dict(sorted(seen.items())))
+               ngp=len(files['NGP']), ptr=len(files['PTR']), col=len(files['COL']), col_pieces=len(col), bsp_nodes=cn, grid=(cols, rows), grid_entries=sum(map(len, cells)), unhandled=dict(unk), pickups=dict(sorted(seen.items())))
     return rep
 
 if __name__ == '__main__':

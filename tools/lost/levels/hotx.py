@@ -2,6 +2,14 @@
 import sys, struct, collections, numpy as np
 sys.path.insert(0, '/home/claude/lost')
 KNOWN = {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 17, 18, 19, 20, 24, 26, 27, 31}
+def op31_matrix(n, o):
+    """Head-On op31 {0x1f, 0, 0, u32 yaw, f32 x, y, z, child}: rotate about z by -yaw (0x10000 = 360 deg), then move
+    (checked against the collision object table's world boxes: 95% of the pieces under op31 match, none without)"""
+    import math
+    a = -struct.unpack_from('<I', n, o + 0xc)[0] / 65536.0 * 2 * math.pi; c, s = math.cos(a), math.sin(a)
+    L = np.eye(4); L[0, 0] = c; L[0, 1] = s; L[1, 0] = -s; L[1, 1] = c
+    L[3, :3] = struct.unpack_from('<3f', n, o + 0x10)
+    return L
 def instances(n):
     """world-object records {1, 0, node, 0, 4x4 matrix} (a table near the end of the ngp): extra roots"""
     N = len(n); u = lambda o: struct.unpack_from('<I', n, o)[0]; out = []
@@ -38,7 +46,8 @@ def children(n, o):
     elif op == 19:
         c = n[o + 8]; kids = [u(o + 0x10 + 0xc * i) for i in range(c)] if c < 16 else []; alt = list(range(1, len(kids)))
     elif op == 20: kids = [u(o + 8)]
-    elif op == 31: kids = [u(o + 0x1c)]
+    elif op == 31:                  # placed instance: yaw (u32, 0x10000 = a full turn, clockwise) + position
+        L = op31_matrix(n, o); kids = [u(o + 0x1c)]
     if len(kids) > 512: return []
     return [(k, L, i in alt) for i, k in enumerate(kids) if ok(k)]
 

@@ -25,6 +25,9 @@ def node_matrix(n, o):
     if op == 18:
         tr = struct.unpack_from('<3f', n, o + 0x10); sc = struct.unpack_from('<3f', n, o + 0x20)
         S = np.diag([sc[0], sc[1], sc[2], 1.0]); S[3, :3] = tr; return S
+    if op == 31:
+        from hotx import op31_matrix
+        return op31_matrix(n, o)
     if op == 13 and u(o + 0x20) == 0x3f800000:
         return np.array(struct.unpack_from('<16f', n, o + 0x20), float).reshape(4, 4)
     return np.eye(4)

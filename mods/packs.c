@@ -202,7 +202,7 @@ void tmbr_LevelDbLoaded(int ngp, int vram, int slot)
     Manifest* m;
     u32 i, j, n, texBase, *p, *hdr, *lvl, *tab, *chr;
     int saveDb, before, p0 = pack;
-    if (slot == 0) tmbr_NavLoad(tmbr_levelIndex);
+    if (slot == 0) { extern void tmbr_LostColLoad(void); tmbr_NavLoad(tmbr_levelIndex); tmbr_LostColLoad(); }
     if (slot != 0 || p0 < 0 || !(m = readPack(p0))) { dbInitSlot(ngp, vram, slot); return; }
     pack = -1;
     /* textures: file slot 9, ids after the level's */

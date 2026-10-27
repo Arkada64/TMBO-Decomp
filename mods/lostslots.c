@@ -222,6 +222,26 @@ extern void viewGetAmbient(float* r, float* g, float* b) __asm__("func_00243C50"
 extern void viewSetAmbient(float r, float g, float b) __asm__("viewSetAmbient__Ffff");
 extern void doFogVolume(int a, void* v, void* p) __asm__("doFogVolume__FiP14_hierfogvolumeP8_fvector");
 extern void doAmbientVolume(int a, void* v, void* p) __asm__("doAmbientVolume__FiP18_hierambientvolumeP8_fvector");
+/* Exact collision trees (tools/lost/levels/colfix.py): too big for the level NGP's fixed slot (0x980000, 0xC7EA80
+ * reserved), so the op18 roots point into \PCAR\ZCHC<xx>.BIN, read here to LOSTCOL (needs the 128 MB EE setting:
+ * the address is past 32 MB). Called at level db load (packs.c tmbr_LevelDbLoaded, slot 0), before any collision
+ * test. Header: 'COL1', u32 base, u32 size, u32 pad; the tree nodes follow (absolute pointers for that base). */
+#define LOSTCOL 0x3000000
+extern int lostFileRead(const char* name, void* dst) __asm__("func_002006D0");
+void tmbr_LostColLoad(void)
+{
+    char n[32];
+    unsigned* h = (unsigned*)LOSTCOL;
+    if (!active()) return;
+    sprintf(n, "%cPCAR%cZCHC%s.BIN;1", 92, 92, LCODE[tmbr_lostMap]);
+    h[0] = 0;
+    lostFileRead(n, (void*)LOSTCOL);
+    if (h[0] != 0x314C4F43 || h[1] != LOSTCOL)          /* "COL1" */
+        scePrintf("TMBR lost: %s missing or bad - this map's collision is not there (128 MB EE needed)\n", n);
+    else
+        scePrintf("TMBR lost: collision %s, %d KB at %08x\n", n, (int)(h[2] >> 10), LOSTCOL);
+}
+
 int tmbr_lostDbg;
 static float amb0[3], dbgK[4] = { 20000.0f, 30000.0f, 0.0f, 2.5f };
 static int ambSaved;

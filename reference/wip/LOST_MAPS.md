@@ -152,3 +152,22 @@ op15 grid + op7 list built, spawn points found, then a test disc (swap into a le
   the TEX bins are an LRU cache (texmAllocateBinSpace scales bin counts to the free VRAM, texmFindVramSpace), so
   2.6 MB of level textures does not overlap anything - at worst more uploads per frame. RTX (<= 452 KB) is read
   into the TEX slot first (func_00188688 -> 0x1C05670) and uploaded before the TEX load, so it has its own room.
+
+## Collision rebuilt (2026-10-27, g143)
+Offline checks at the spawn points showed three faults:
+- **op31 placement ignored**: Head-On op31 = {0x1f, 0, 0, u32 yaw (0x10000 = a turn), f32 x, y, z, child}: rotate
+  about z by -yaw then move. hotx.children / hocol.node_matrix ignored it, so ~40% of SU's collision pieces (75% of
+  ND's) and every render object under an op31 sat at the origin or off by kilometres. Checked against the collision
+  table's world boxes (now ~95% match; the rest are slightly loose boxes).
+- **Trees solid outside their pieces**: lvcol labelled BSP cells that held no sample points as solid behind any face
+  plane (up to a third of a piece's bounding box). lvcol2 builds an exact BSP of the union of convex prisms
+  (coplanar neighbours merged into convex polygons; up-facing ground extruded straight down so neighbours share
+  their vertical side planes; slab / back faces on a grid), checked against the prisms on random points; small
+  pieces whose crossing slabs blow up become their convex hull.
+- **Missing ground**: much of the ground (streets, lots) has no Head-On collision piece - the game must use the
+  render meshes. lvbuild.ground_pieces adds opaque up-facing render triangles (nz > 0.6) that no collision surface
+  covers (SU +21K triangles).
+The exact trees are 2-4x the old size, too big for the fixed level NGP slot, so they live in \PCAR\ZCHC<xx>.BIN,
+read at level db load to 0x3000000 (mods/lostslots.c tmbr_LostColLoad, 128 MB EE needed); op18 roots point there.
+Every converted map's spawn points now have ground right below and free space above (spawncheck). Route maps rebuilt
+from the new collision (curbs over 2 units split the lawns from the streets: bots keep to the roads for now).
