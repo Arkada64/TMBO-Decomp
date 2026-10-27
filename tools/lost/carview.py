@@ -13,6 +13,7 @@ import hcmounts
 from trender import render
 
 
+TEXS = None                                    # --tex: (texture id, CBP) -> RGBA image
 FORM = 0                                       # Sweet Tooth's op6 R+25: 0 truck, 1 robot (--robot)
 
 
@@ -37,7 +38,22 @@ def collect(car, t_anim=None):
                 continue
             P = np.asarray(m['pos'], float) @ M + t
             tr = [(a, b, c) for a, b, c, s, _ in triangles(m)]
-            if tr:
+            if tr and TEXS is not None:                  # textured: one part per texture select
+                nt = struct.unpack_from('<H', n, o + 0x5a)[0]
+                imgs = [TEXS(struct.unpack_from('<H', n, o + 0x50 + 2 * i)[0],
+                             (struct.unpack_from('<Q', n, o + 0x70 + 0x30 * i)[0] >> 37) & 0x3fff) for i in range(nt)]
+                sel, cur = {}, 0
+                for s_ in m['strips']:
+                    if s_['tag'][3]:
+                        cur = (s_['tag'][3] - 1) // 3
+                    sel[id(s_)] = cur
+                grp = {}
+                for a_, b_, c_, s_, (i0, i1, i2) in triangles(m):
+                    grp.setdefault(sel[id(s_)], []).append(((a_, b_, c_), [(-s_['uv'][j][0] / 4096, -s_['uv'][j][1] / 4096)
+                                                                       if j < len(s_['uv']) else (0, 0) for j in (i0, i1, i2)]))
+                for k_, lst in grp.items():
+                    out.append((P, [x[0] for x in lst], kind, [x[1] for x in lst], imgs[k_] if k_ < len(imgs) else None))
+            elif tr:
                 out.append((P, tr, kind))
             continue
         if op == 5:
@@ -83,18 +99,30 @@ def main():
     ap.add_argument('--time', type=float, default=None)
     ap.add_argument('--views', default='side,top,front,iso')
     ap.add_argument('--size', type=int, default=360)
+    ap.add_argument('--tex', action='store_true', help='textured (TEX / RTX of the car)')
     ap.add_argument('--rear', action='store_true', help='turned 180 degrees (the front view shows the back)')
     ap.add_argument('--robot', action='store_true', help="Sweet Tooth donors: draw the robot form")
     a = ap.parse_args()
     rd = lambda e: open('%s/%s.%s' % (a.dir, a.code, e), 'rb').read()
     car = Car(rd('NGP'), rd('PTR'), b'', b'')
+    if a.tex:
+        global TEXS
+        from textconv import records, tex_rec_size, rtx_records
+        from tmbprev import image
+        t_, r_ = rd('TEX'), rd('RTX')
+        byid = {gs & 0xffff: dict(off=o, bytes=b, gs=gs, tw=(gs >> 40) & 15, th=(gs >> 44) & 15)
+                for o, b, gs, k in records(t_, tex_rec_size)}
+        rr, _ = rtx_records(r_)
+        clut = {a_: (o, sz, tw, th) for o, sz, a_, tw, th in rr}
+        TEXS = lambda tid, cbp: image(t_, r_, byid, clut, tid, cbp)
     global FORM
     FORM = 1 if a.robot else 0
     parts, lights = collect(car, a.time)
     if a.rear:
-        parts = [(P * np.array([-1, -1, 1]), tr, k) for P, tr, k in parts]
+        parts = [(p[0] * np.array([-1, -1, 1]),) + tuple(p[1:]) for p in parts]
         lights = [L * np.array([-1, -1, 1]) for L in lights]
-    ms = [dict(pos=P, tris=tr, col=COL[k]) for P, tr, k in parts]
+    ms = [dict(pos=p[0], tris=p[1], col=COL[p[2]], **(dict(uvs=p[3], tex=p[4]) if len(p) > 3 and p[2] == 'car' else {}))
+          for p in parts]
     for L in lights:                           # a small yellow octahedron per light
         r = 0.35
         P = np.array([[r, 0, 0], [-r, 0, 0], [0, r, 0], [0, -r, 0], [0, 0, r], [0, 0, -r]]) + L

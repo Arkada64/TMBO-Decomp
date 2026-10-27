@@ -165,9 +165,54 @@ def donor_mounts(car):
     return out
 
 
-def mount_envelope(car, rec, node, extra=np.zeros(3)):
+def char_anchors(car, char):
+    """{channel: stored value} for the channels that drive the rotation / translation fields of the character's
+    op17 bones (the exported pose: the anchor HC_ANIM damping scales towards)"""
+    from hcbuild import kids
+    n = car.n
+    out, seen, st = {}, set(), [char]
+    while st:
+        o = st.pop()
+        if o in seen:
+            continue
+        seen.add(o)
+        if (u32(n, o) & 0x3f) == 17:
+            ci = struct.unpack_from('<6h', n, o + 0x12)
+            v = struct.unpack_from('<3f', n, o + 0x20) + struct.unpack_from('<3f', n, o + 0x30)
+            for c, x in zip(ci, v):
+                if c >= 0:
+                    out.setdefault(c, x)
+        st += [k for k in kids(car, o) if (u32(n, k) & 0x3f) != 0]
+    return out
+
+
+def damp_char(car, char, f):
+    """scale the character's bone channels towards their stored values by f (key c0 -> a + f (c0 - a), c1..c3 * f):
+    the same animation, smaller (f 0 = frozen in the exported pose)"""
+    anc = char_anchors(car, char)
+    n = car.n
+    c33 = car.P(char + 0x10)
+    hdr = car.P(c33 + 4)
+    done = 0
+    for i in range(min(u32(n, hdr + 0xc), 256)):
+        tp = car.P(hdr + 0x18 + 4 * i)
+        if tp is None:
+            continue
+        k, chn = u32(n, tp) & 0xffff, u32(n, tp + 4)
+        if chn not in anc or not 0 < k < 4096:
+            continue
+        a = anc[chn]
+        for j in range(k):
+            t, c3, c2, c1, c0 = struct.unpack_from('<5f', n, tp + 8 + 20 * j)
+            struct.pack_into('<5f', n, tp + 8 + 20 * j, t, c3 * f, c2 * f, c1 * f, a + f * (c0 - a))
+        done += 1
+    return done
+
+
+def mount_envelope(car, rec, node, extra=np.zeros(3), f=1.0):
     """car-space positions of a mount over its character's animation (every key time and the midpoints, all
-    channels evaluated), plus its exported-pose position; extra: a translate put above the character"""
+    channels evaluated), plus its exported-pose position; extra: a translate put above the character; f: the
+    bone channels scaled towards their stored values (damp_char)"""
     from hcbuild import kids
     d = rec[node]
     n = car.n
@@ -188,9 +233,12 @@ def mount_envelope(car, rec, node, extra=np.zeros(3)):
                 st.append((k, ch + (k,)))
     if path is None:
         return np.array([d['pos']])
+    anc = char_anchors(car, d['char']) if f != 1.0 else {}
     out = []
     for t in ([None] + ts):
         vals = None if t is None else {c: track_value(v, t) for c, v in trk.items()}
+        if vals is not None and anc:
+            vals = {c: (anc[c] + f * (v - anc[c]) if c in anc else v) for c, v in vals.items()}
         M, tt, hidden = d['Mchar'], np.zeros(3), False
         for o in path:
             if (u32(n, o) & 0x3f) == 17:
@@ -396,6 +444,30 @@ def apply(car, rec, L, to_donor, box_d, box_n, name='', log=print, pts=None, ski
         for k in nodes:
             shift[k] = dl if refs else np.zeros(3)
         log('mount char %#x (%d drawn refs): moved by (%.2f %.2f %.2f) for %s' % (c, len(refs), *dl, [hex(k) for k in nodes]))
+    # HC_ANIM (default 1): the donor's launcher animations swing / raise the weapon models by up to ~5 units
+    # (Outlaw's 4005 arm turns 180 degrees about a hinge at x -4.2, Sweet Tooth's 4004 slides out to x -7.4); with
+    # the launcher hardware hidden and a smaller body the deployed weapon hangs in the air beside the car. Each
+    # weapon character's bone channels are scaled towards the exported pose (damp_char) by the largest factor
+    # (1, 0.9 .. 0) that keeps every animated position of its mounts within the new body box + HC_ANIM_TOL (0.5).
+    if os.environ.get('HC_ANIM', '1') == '1':
+        tol = float(os.environ.get('HC_ANIM_TOL', '0.5'))
+        lo_b, hi_b = np.asarray(box_n[0], float) - tol, np.asarray(box_n[1], float) + tol
+        damped = set()
+        for c, nodes in sorted(bychar.items()):
+            def fits(f):
+                for k in nodes:
+                    E = mount_envelope(car, rec, k, f=f)
+                    P_ = tg[k][0] + (E - E[0])
+                    if (P_ < lo_b - 1e-6).any() or (P_ > hi_b + 1e-6).any():
+                        return False
+                return True
+            f = next((x for x in np.round(np.arange(1.0, -0.01, -0.1), 2) if fits(x)), 0.0)
+            if f < 1.0:
+                nt = damp_char(car, c, f)
+            E = np.concatenate([tg[k][0] + (lambda E: E - E[0])(mount_envelope(car, rec, k)) for k in nodes])
+            log('mount char %#x: animation %s (animated range x %.2f..%.2f y %.2f..%.2f z %.2f..%.2f)' % (
+                c, 'kept' if f >= 1.0 else 'scaled by %.1f (%d channels)' % (f, nt), E[:, 0].min(), E[:, 0].max(),
+                E[:, 1].min(), E[:, 1].max(), E[:, 2].min(), E[:, 2].max()))
     rows = []
     for node, (tgt, how) in sorted(tg.items()):
         d = rec[node]
@@ -519,8 +591,9 @@ def donor_lights(car):
     return out
 
 
-def fix_lights(car, pts, box_n, log=print):
-    """HC_LIGHTS: returns the donor meshes to hide (light bars). pts: new body vertices (donor space)."""
+def fix_lights(car, pts, box_n, log=print, ho_heads=None):
+    """HC_LIGHTS: returns the donor meshes to hide (light bars). pts: new body vertices (donor space); ho_heads: the
+    new car's own headlight points {+1: right, -1: left} (donor space, from its flare quads) when it has them."""
     from hcbuild import meshes_under
     if os.environ.get('HC_LIGHTS', '1') == '0':
         return set()
@@ -547,17 +620,18 @@ def fix_lights(car, pts, box_n, log=print):
     hw = max(-lo[0], hi[0])
     for sw, lights in heads.items():
         tg = []
+        F = P[P[:, 1] >= hi[1] - 1.5]                   # the front 1.5 of the body
+        if len(F) < 3:
+            F = P
         for o, p, ch in lights:
-            x = np.sign(p[0]) * min(abs(p[0]), 0.75 * hw)
-            z = np.clip(p[2], lo[2] + 0.4, hi[2] - 0.4)
-            q = None
-            for r in (0.4, 0.7, 1.0, 1.5, 2.5):          # the body's front face around (x, z)
-                near = P[(np.abs(P[:, 0] - x) < r) & (np.abs(P[:, 2] - z) < r)]
+            if ho_heads and np.sign(p[0]) in ho_heads:
+                tg.append(np.asarray(ho_heads[np.sign(p[0])], float)); continue
+            x = np.sign(p[0]) * min(abs(p[0]), 0.8 * np.abs(F[:, 0]).max())
+            for r in (0.4, 0.7, 1.0, 1.5, 3.0, 99.0):    # the front face around x: its foremost y, z kept inside it
+                near = F[np.abs(F[:, 0] - x) < r]
                 if len(near) >= 3:
-                    j = near[:, 1].argmax()
-                    q = np.array([x, near[j, 1] + 0.05, near[j, 2] if r > 0.7 else z]); break
-            if q is None:
-                q = np.array([x, hi[1], z])
+                    break
+            q = np.array([x, near[:, 1].max() + 0.05, np.clip(p[2], near[:, 2].min(), near[:, 2].max())])
             tg.append(q)
         d = np.mean([q - p for q, (o, p, ch) in zip(tg, lights)], axis=0)
         # one translate between the switch and its drawn kids (its op9 'off' kid stays)

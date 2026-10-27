@@ -62,7 +62,15 @@ class HoCar:
         n = self.n
         self.hd = {}
         from hotex import textures as ho_textures
-        tkeys = set(ho_textures(self.tex))
+        htex = ho_textures(self.tex)
+        tkeys = set(htex)
+        # alpha-only textures (a black palette with partial alpha: Thumper's grime / damage decal 0x93f5c): Head-On
+        # blends them over the body, TMB drew them as solid black with holes (Ark 2026-10-26: Thumper's trunk)
+        self.alpha_only = set()
+        for k, t in htex.items():
+            c = np.frombuffer(t['clutraw'], np.uint8).reshape(-1, 4)
+            if c[:, :3].max() < 8 and c[:, 3].max() < 0x80:
+                self.alpha_only.add(k)
         self.texfixed = []
         for o in find_packets(n):
             m = decode(n, o)
@@ -176,6 +184,8 @@ class HoCar:
     def skip_reason(self, h, wheel_ground, far=False, env='skip', own=False):
         m = self.hd[h]
         lo, hi = box(m['pos'])
+        if m['texrefs'] and set(m['texrefs']) <= self.alpha_only and h not in self.brake:
+            return 'alpha-only grime / shadow decal'
         if far and own:              # --own-wheels: the far LOD keeps its wheels (the donor's far wheels go)
             if not m['nrm'] and h not in self.brake:
                 return 'no normals (light cone / flame / sprite)'
@@ -795,7 +805,20 @@ def build(a, rd, own16):
         {k: [None if p is None else tuple(round(x, 2) for x in p) for p in v] for k, v in sorted(L.items())} or 'none',
         np.round(box_d[0], 2), np.round(box_d[1], 2), np.round(box_n[0], 2), np.round(box_n[1], 2)))
     hcmounts.apply(car, mount_rec, L, to_donor, box_d, box_n, name=os.path.basename(a.bdd), pts=to_donor(P0))
-    light_hide = hcmounts.fix_lights(car, to_donor(P0), box_n)      # HC_LIGHTS: donor light bars off, headlights moved
+    # the new car's headlight flares (no-normal quads ahead of the front axle: Twister, Thumper, Outlaw 2): their
+    # back edge centre per side is where the donor's headlight flares go (else the front of the body)
+    hq = {}
+    for h, m in ho.hd.items():
+        if not m['nrm'] and len(m['pos']) == 4:
+            lo_, hi_ = box(m['pos'])
+            if lo_[1] >= ho.wheel['front'] - 0.5 and abs(lo_[0] + hi_[0]) / 2 > 0.5:
+                hq.setdefault(float(np.sign(lo_[0] + hi_[0])), []).append(
+                    to_donor(np.array([(lo_[0] + hi_[0]) / 2, lo_[1], (lo_[2] + hi_[2]) / 2])))
+    hq = {k: np.mean(v, axis=0) for k, v in hq.items()}
+    if len(hq) == 1:                   # one side only (Outlaw 2's left pair): mirrored
+        k, v = next(iter(hq.items()))
+        hq[-k] = v * np.array([-1.0, 1, 1])
+    light_hide = hcmounts.fix_lights(car, to_donor(P0), box_n, ho_heads=hq)  # HC_LIGHTS: light bars off, headlights moved
 
     # ---- hide the donor's own parts (empty packet, no texture slots)
     dead = [r for r in dead if r]
