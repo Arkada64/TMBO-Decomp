@@ -212,3 +212,36 @@ int tmbr_FileSearch(void* f, const char* name)
     }
     return fileSearch(f, name);
 }
+
+/* ---- Lost map look debug (Ark 2026-10-26: the maps run with Dogpound's dark fog / lighting; is the map itself
+ * broken?). On a Lost map, L3 + SELECT steps: 0 off -> 1 fog off + brighter ambient -> 2 the same + free camera
+ * (freecam.c: left stick move, right stick look, R1 fast) -> 0. The level's fog / ambient volumes (func_0013D0C0
+ * 0x13D574 / 0x13D594) are skipped while it is on. */
+extern void fogSet(float nearz, float farz, float maxd, float f15, int r, int g, int b) __asm__("func_002023B0");
+extern void viewGetAmbient(float* r, float* g, float* b) __asm__("func_00243C50");
+extern void viewSetAmbient(float r, float g, float b) __asm__("viewSetAmbient__Ffff");
+extern void doFogVolume(int a, void* v, void* p) __asm__("doFogVolume__FiP14_hierfogvolumeP8_fvector");
+extern void doAmbientVolume(int a, void* v, void* p) __asm__("doAmbientVolume__FiP18_hierambientvolumeP8_fvector");
+int tmbr_lostDbg;
+static float amb0[3], dbgK[4] = { 20000.0f, 30000.0f, 0.0f, 2.5f };
+static int ambSaved;
+int tmbr_LostActive(void) { return active(); }
+/* freecam.c, every camera update: L3 + SELECT pressed (edge) on a Lost map */
+int tmbr_LostDebug(int toggle)
+{
+    if (!active()) { tmbr_lostDbg = 0; ambSaved = 0; return 0; }
+    if (toggle) {
+        tmbr_lostDbg = (tmbr_lostDbg + 1) % 3;
+        scePrintf("TMBR lost: look debug %d\n", tmbr_lostDbg);
+        if (!tmbr_lostDbg && ambSaved) { viewSetAmbient(amb0[0], amb0[1], amb0[2]); ambSaved = 0; }
+    }
+    if (tmbr_lostDbg) {
+        if (!ambSaved) { viewGetAmbient(&amb0[0], &amb0[1], &amb0[2]); ambSaved = 1;
+            scePrintf("TMBR lost: ambient was %d %d %d (x1000)\n", (int)(amb0[0] * 1000), (int)(amb0[1] * 1000), (int)(amb0[2] * 1000)); }
+        fogSet(dbgK[0], dbgK[1], dbgK[2], dbgK[1], 60, 60, 60);
+        viewSetAmbient(amb0[0] * dbgK[3], amb0[1] * dbgK[3], amb0[2] * dbgK[3]);
+    }
+    return tmbr_lostDbg;
+}
+void tmbr_DoFogVolume(int a, void* v, void* p) { if (!tmbr_lostDbg) doFogVolume(a, v, p); }
+void tmbr_DoAmbientVolume(int a, void* v, void* p) { if (!tmbr_lostDbg) doAmbientVolume(a, v, p); }

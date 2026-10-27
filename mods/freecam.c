@@ -27,6 +27,7 @@ static int fc_on;          /* spectator turned it on with R3 */
 static int fc_init;
 static int fc_anytime;
 static int prev_buttons;
+static int lostFc;           /* lostslots.c look debug 2: free camera on a Lost map */
 static fvec fc_pos, fc_ang;
 /* float constants in one table (no compiler literal pool: the SN assembler would put it in gp-relative .lit4) */
 static float K[12] = { 1.0f / 128.0f, 0.2f, 0.04f, 0.03f, 1.5f, 2.0f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f };
@@ -563,6 +564,14 @@ void tmbr_CameraUpdate(char *cam)
     b = pad & (IN_SELECT | IN_L3 | IN_R3);
     pressed = b & ~prev_buttons;
     prev_buttons = b;
+#ifndef TMBR_PNACH
+    {   /* Lost maps: L3 + SELECT steps the look debug (lostslots.c); 2 = free camera anytime */
+        extern int tmbr_LostDebug(int toggle), tmbr_LostActive(void);
+        int lt = tmbr_LostActive() && (b & IN_L3) && (pressed & IN_SELECT);
+        lostFc = tmbr_LostDebug(lt) == 2;
+        if (lt) pressed = 0;
+    }
+#endif
 #ifdef TMBR_FREECAM_ANYTIME
     if ((b & IN_L3) && (pressed & IN_SELECT)) { fc_anytime = !fc_anytime; pressed = 0; }
 #endif
@@ -578,7 +587,7 @@ void tmbr_CameraUpdate(char *cam)
         }
         if (!spec) fc_on = 0;
         else if (pressed & IN_R3) fc_on = !fc_on;
-        if (!((spec && fc_on) || fc_anytime)) { fc_init = 0; return; }
+        if (!((spec && fc_on) || fc_anytime || lostFc)) { fc_init = 0; return; }
     }
     cs = *(char **)(cam + 0x42A0);
     if (cs == 0) return;

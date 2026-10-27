@@ -256,6 +256,8 @@ PATCHES = [
     (A("nonmatchings/tmb/game/func_00138358.s"), "001387FC", "jal", "jal        tmbr_LevelInitAfter"),         # Warhawk's roof boss init (story.c)
     (A("nonmatchings/tmb/boss/func_00114B78.s"), "00114D5C", "jal", "jal        tmbr_BossWon"),                # the roof boss down: stage won (story.c)
     (A("nonmatchings/tmb/interact/func_0014F108.s"), "0014F184", "jal", "jal        tmbr_VehTakeHit"),             # the roof tanker's hits (story.c)
+    (A("nonmatchings/tmb/game/func_0013D0C0.s"), "0013D574", "jal", "jal        tmbr_DoFogVolume"),           # Lost map look debug: fog volumes off (lostslots.c)
+    (A("nonmatchings/tmb/game/func_0013D0C0.s"), "0013D594", "jal", "jal        tmbr_DoAmbientVolume"),       # ... ambient volumes off
     (A("nonmatchings/online/after_blimp_06/func_00111ED8.s"), "00111F0C", "jal", "jal        tmbr_BossVehName"),      # boss cars by name (story.c)
     (A("nonmatchings/tmb/forceField/func_00136100.s"), "001361B4", "jal", "jal        tmbr_BossVehName"),      # boss cars by name (story.c)
     (A("nonmatchings/tmb/boss/func_00114B78.s"), "00114CEC", "jal", "jal        tmbr_BossVehName"),      # boss cars by name (story.c)
