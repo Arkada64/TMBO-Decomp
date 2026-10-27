@@ -61,7 +61,7 @@ static const char LCODE[NLOST + 1][3] = { "", "SC", "SU", "GD", "ND", "ST" };
 static const char* const LNAME[NLOST + 1] = { "", "CARNIVAL OF DARKNESS", "SUBURBAN TERROR", "CITY OF THE DEAD",
     "DEATH PORT", "STADIUM SLAUGHTER" };
 
-int tmbr_lostMap;                 /* the game's Lost map (host: its pick; clients: the host's), 0 = none */
+int tmbr_lostMap = TMBR_LOSTMAP;                 /* the game's Lost map (host: its pick; clients: the host's), 0 = none */
 static int avail[NLOST + 1], availDone, al[NLOST], an;
 static int pos;                   /* level select: 0 = a normal level, 1..an = al[pos - 1] highlighted */
 static int resendTick, quietTick;
@@ -82,7 +82,8 @@ static void checkAvail(void)
 
 static int active(void)
 {
-    return tmbr_lostMap > 0 && tmbr_lostMap <= NLOST && shellPtr && LEVEL() == DONOR && !tmbr_Opt(OPT_STORY);
+    return tmbr_lostMap > 0 && tmbr_lostMap <= NLOST && shellPtr && LEVEL() == DONOR &&
+           (TMBR_LOSTMAP > 0 || !tmbr_Opt(OPT_STORY));   /* (test builds: also as story level 10) */
 }
 
 static void sendLost(void)
