@@ -2,7 +2,9 @@
 the far LOD body are replaced; Roadkill's wheels, weapon mounts, characters, destroyed debris and shadow stay.
 The two cars share their wheel layout (12 Pak's wheels sit at +-3.6, 5.6 / -4.6, Roadkill's at +-3.2, 5.5 / -4.6).
   python3 pakbuild.py RKDIR HC_STOCK.BDD OUTDIR      (RKDIR holds the car as STP.NGP/PTR/TEX/RTX, P or A files)
-PAK_HALF=1 stores every new texture at half size (ACAR budget)."""
+PAK_HALF=1 stores every new texture at half size (ACAR budget).
+HC_MOUNTS (default 1, hcmounts.py): Roadkill's machine guns go to 12 Pak's gun points, his weapon models box-map onto
+12 Pak's body. Both copies: pak_buildall.sh."""
 import sys, os, struct
 from bdd import bdd
 from homesh import find_packets, decode
@@ -56,6 +58,9 @@ def strip_filter(m, skip=None):
 def main(rkdir, bddpath, outdir, scale=1.0):
     rd = lambda e: open(os.path.join(rkdir, 'STP.' + e), 'rb').read()
     car = Car(rd('NGP'), rd('PTR'), rd('TEX'), rd('RTX'))
+    import hcmounts
+    mount_rec = hcmounts.donor_mounts(car)          # Roadkill's weapon mounts at rest (HC_MOUNTS, see below)
+    mount_box = hcmounts.body_box_tmb(car, STATES[0])
     s = bdd(bddpath); n = s['ngp']
     half = [0x1003a0, 0x1004a4, 0x890e4] if os.environ.get('PAK_HALF') else []
     tb = TexBuilder(car.tex, car.rtx, s['tex'], car.max_tex_id() + 1, {}, half, [0x1004a4])   # 16 colours: CLUT room
@@ -377,6 +382,21 @@ def main(rkdir, bddpath, outdir, scale=1.0):
                 car.setp(t + 0x1c, c)
                 car.setp(r, t)
             print('moved', kind, hex(c), 'refs', len(refs))
+    # HC_MOUNTS (default 1, tools/lost/hcmounts.py): Roadkill's machine guns (4100) go to 12 Pak's own guns (HC_STOCK's
+    # mount list, slot 4 mirrored: x +-3.09, y 7.02, z 1.76 + lift) and his weapon models / launch points (4001..4006)
+    # box-map onto 12 Pak's body (HC_MOUNTS=ho: onto HC_STOCK's slots; mg: guns only; 0: off)
+    from hcbuild import HoCar
+    import numpy as np
+    _, ML = hcmounts.ho_list(n)
+    to_donor = lambda p: np.asarray(p, float) * scale + np.array([0.0, 0.0, LIFT])
+    P0 = np.concatenate([np.asarray(hd[h]['pos'], float) for h in meshes(ROOT_HI, 0) if hd[h]['pos']])
+    if LIFT:                           # hd positions already carry the lift (in model units)
+        P0 = P0 - np.array([0.0, 0.0, LIFT / scale])
+    box_n = (to_donor(np.percentile(P0, 1, axis=0)), to_donor(np.percentile(P0, 99, axis=0)))
+    print('mounts: Head-On list %s, donor body box %s..%s, new body box %s..%s' % (
+        {k: [None if p is None else tuple(round(x, 2) for x in p) for p in v] for k, v in sorted(ML.items())},
+        np.round(mount_box[0], 2), np.round(mount_box[1], 2), np.round(box_n[0], 2), np.round(box_n[1], 2)))
+    hcmounts.apply(car, mount_rec, ML, to_donor, mount_box, box_n, name='HC_STOCK')
     before = len(car.n)
     dropped = car.compact(sorted(set(dead)))
     if OWN and rim_cb is not None:     # the rim's new CLUT moves into a Roadkill wheel CLUT nothing uses any more

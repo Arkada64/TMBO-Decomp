@@ -23,6 +23,8 @@ What is found automatically (printed):
   - brake lights = 3 meshes outside the roots with one shared, flat box at the rear (darkest = off).
   - skipped: meshes without normals (light cones, flames), env-map shine shells (hflags & 0x0E), parts reaching
     below the wheels' ground or out past the body sides (stray poles / exhaust).
+ Weapon mounts (HC_MOUNTS, default 1): the donor's machine guns / weapon models move onto the new body (hcmounts.py,
+ reference/wip/HC_MOUNTS.md). HC_FLAME (default 1): Old Pickup's roof flamethrower becomes a 5-frame yaw switch.
  Placement: scale = donor wheelbase / new wheelbase (both measured), y offset centres the axles, z offset puts the
  wheel centres on the donor's (+ --lift); the donor's wheels stay.
  Relight (HC fan-build cars are unfinished: most meshes carry no vertex colours, so TMB drew them at the 0xFFFF
@@ -756,7 +758,8 @@ def build(a, rd, own16):
     _, L = hcmounts.ho_list(ho.n)
     to_donor = lambda p: np.asarray(p, float) * s + np.array([0.0, dy, dz])
     # new body box: every kept state-0 mesh (1st..99th percentile: stray poles / aerials don't stretch it)
-    P0 = np.concatenate([np.asarray(ho.hd[h]['pos'], float) for h in state0_hs if ho.hd[h]['pos']])
+    P0 = np.concatenate([np.asarray(ho.hd[h]['pos'], float) for h in state0_hs
+                         if ho.hd[h]['pos'] and h not in add_meshes])   # --add parts (Gold Tooth's head) left out
     box_n = (to_donor(np.percentile(P0, 1, axis=0)), to_donor(np.percentile(P0, 99, axis=0)))
     print('mounts: Head-On list %s, donor body box %s..%s, new body box %s..%s' % (
         {k: [None if p is None else tuple(round(x, 2) for x in p) for p in v] for k, v in sorted(L.items())} or 'none',
