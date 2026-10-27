@@ -387,6 +387,8 @@ def build(a, rd, own16):
     car = Car(rd('NGP'), rd('PTR'), rd('TEX'), rd('RTX'))
     orig_ngp = len(car.n)
     n = car.n
+    import hcmounts
+    mount_rec = hcmounts.donor_mounts(car)     # weapon mounts at rest, read before anything is edited (HC_MOUNTS)
     ho = HoCar(a.bdd)
     print('Head-On: LOD %s high %#x far %#x; wheels %s; brake %s' % (hex(ho.lod) if ho.lod else None, ho.hi, ho.lo,
           {k: (round(v, 2) if isinstance(v, float) else [hex(x) for x in v]) for k, v in ho.wheel.items()}, [hex(x) for x in ho.brake]))
@@ -548,17 +550,42 @@ def build(a, rd, own16):
         return out
 
     add_meshes = [int(x, 16) for x in a.add.split(',') if x]   # Head-On meshes outside the LOD roots, every state
+    box_d = hcmounts.body_box_tmb(car, STATES[0])              # donor body (state 0), for the mount box map
+    # HC_FLAME (default 1 for Old Pickup): its roof flamethrower leaves the body mesh and becomes a 5-frame yaw switch
+    # (attach type 7, sub hcmounts.FLAME_SUB) a code hook can turn; frame 0 = the model as built
+    flame_sw, FLAME_SRC = None, 0x8c30
+    if os.environ.get('HC_FLAME', '1') == '1' and 'PICKUP' in os.path.basename(a.bdd).upper() and FLAME_SRC in ho.hd:
+        lo_, hi_ = hcmounts.FLAME_BOX
+        gun, rest = hcmounts.split_mesh(ho.hd[FLAME_SRC], lambda p: (p >= lo_).all() and (p <= hi_).all())
+        ho.hd[0x10000000 | FLAME_SRC] = rest
+        for i, deg in enumerate(hcmounts.FLAME_YAW):
+            ho.hd[0x20000000 | (i << 24) | FLAME_SRC] = hcmounts.turned(gun, hcmounts.FLAME_PIVOT, deg)
+        kids_ = [node(0x20000000 | (i << 24) | FLAME_SRC) for i in range(len(hcmounts.FLAME_YAW))]
+        nk_ = len(kids_)
+        flame_sw = car.append(struct.pack('<IIBBBB', 6 | (hcmounts.FLAME_SUB << 7) | ((R + 7) << 18), 0, 0, 0, 0, nk_)
+                              + b'\0' * (4 * nk_ + 8))
+        for i, k_ in enumerate(kids_):
+            car.setp(flame_sw + 0xc + 4 * i, k_)
+        print('flamethrower: %d of %d body triangles -> switch id %d sub %d, %d yaw frames %s about (%.2f %.2f) '
+              '(Head-On space)' % (sum(max(0, len(s_['idx']) - 2) for s_ in gun['strips']),
+                                   len(triangles(ho.hd[FLAME_SRC])), R + 7, hcmounts.FLAME_SUB, nk_,
+                                   hcmounts.FLAME_YAW, *hcmounts.FLAME_PIVOT))
     dead = []
     for stn, g in enumerate(STATES):
         k = u32(car.n, g + 8) & 0xffff
         dead += [mesh_range(car, t) for t in meshes_under(car, g)]
         hs = ho_meshes(ho.hi, 0 if a.one_state else stn)
         hs += [h for h in add_meshes if h not in hs]
-        newg = car.group([node(h) for h in hs], sphere=struct.unpack_from('<3ff', car.n, g + 0x10))
+        if flame_sw is not None:
+            hs = [(0x10000000 | h) if h == FLAME_SRC else h for h in hs]
+        newg = car.group([node(h) for h in hs] + ([flame_sw] if flame_sw is not None else []),
+                         sphere=struct.unpack_from('<3ff', car.n, g + 0x10))
         struct.pack_into('<H', car.n, g + 8, 1)
         car.setp(g + 0x20, newg)
         for i in range(1, k):
             struct.pack_into('<I', car.n, g + 0x20 + 4 * i, 0)
+        if stn == 0:
+            state0_hs = hs
         print('state', stn, len(hs), 'meshes')
     # far LOD: the donor's meshes -> the new car's far LOD, except the donor's far wheels / underside (a mesh centred
     # at or below the wheel centres, Brimstone 0x4aa30, Roadkill 0x5e310), which stays like the near wheels
@@ -573,6 +600,8 @@ def build(a, rd, own16):
     if not hs:                         # far LOD with nothing but wheels (Twister): the high LOD's state 0 (shared nodes)
         hs = ho_meshes(ho.hi, 0)
         print('far LOD: the new car\'s far LOD is wheels only, using its high LOD')
+    if flame_sw is not None and FLAME_SRC in hs:   # far LOD (the Pickup has one tree): split body + gun at rest
+        hs = [h for h in hs if h != FLAME_SRC] + [0x10000000 | FLAME_SRC, 0x20000000 | FLAME_SRC]
     newk = [car.group([node(h) for h in hs], sphere=struct.unpack_from('<3ff', car.n, lo + 0x10))] + lokeep
     struct.pack_into('<H', car.n, lo + 8, len(newk))
     for i in range(k):
@@ -721,6 +750,18 @@ def build(a, rd, own16):
     print('skipped Head-On meshes:', {hex(h): w for h, w in sorted(skipped.items())})
     if not a.no_relight:
         print('relight: %d of %d vertices got a geometric normal' % tuple(fixed))
+
+    # ---- weapon mounts (HC_MOUNTS, tools/lost/hcmounts.py): the donor's machine guns / weapon models move onto the
+    # new model (its Head-On mount list, placed like the body: scale s, offset (0, dy, dz))
+    _, L = hcmounts.ho_list(ho.n)
+    to_donor = lambda p: np.asarray(p, float) * s + np.array([0.0, dy, dz])
+    # new body box: every kept state-0 mesh (1st..99th percentile: stray poles / aerials don't stretch it)
+    P0 = np.concatenate([np.asarray(ho.hd[h]['pos'], float) for h in state0_hs if ho.hd[h]['pos']])
+    box_n = (to_donor(np.percentile(P0, 1, axis=0)), to_donor(np.percentile(P0, 99, axis=0)))
+    print('mounts: Head-On list %s, donor body box %s..%s, new body box %s..%s' % (
+        {k: [None if p is None else tuple(round(x, 2) for x in p) for p in v] for k, v in sorted(L.items())} or 'none',
+        np.round(box_d[0], 2), np.round(box_d[1], 2), np.round(box_n[0], 2), np.round(box_n[1], 2)))
+    hcmounts.apply(car, mount_rec, L, to_donor, box_d, box_n, name=os.path.basename(a.bdd))
 
     # ---- hide the donor's own parts (empty packet, no texture slots)
     dead = [r for r in dead if r]
