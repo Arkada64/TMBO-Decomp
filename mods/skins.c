@@ -44,6 +44,7 @@ extern void loadCar0F0(void* shell, int client) __asm__("func_001890F0");
 static const int skinType[NSKIN] = { 6, 1, 8, 4, 5, 7, 3 };    /* Sweet Tooth, Roadkill, Junkyard Dog, Spectre, Crazy 8, Brimstone, Outlaw
                                                                  * (Twister: Outlaw's chassis, Mr. Grimm's stats, Axel's shockwave - Ark 2026-10-26) */
 #define SK_PICKUP 2      /* Old Pickup: Junkyard Dog chassis, Minion's special (nerfed, front arc only) */
+#define SK_OUTLAW2 4      /* Outlaw 2: Crazy 8 chassis, his own siren lights */
 #define SK_THUMPER 5     /* Thumper: Brimstone chassis, Warthog's special */
 #define SK_TWISTER 6
 static const char skinCode[NSKIN][2] = { { 'z', 'z' }, { 'z', 'y' }, { 'z', 'x' }, { 'z', 'w' }, { 'z', 'v' }, { 'z', 'u' }, { 'z', 't' } };
@@ -742,10 +743,14 @@ void tmbr_SkinsFrame(void)
         int id = *(int*)(v + 0x20F4), k;
         if (!*(int*)(v + 0x590)) continue;
         if (isPak(v)) pakHatches(v, i);
-        if (id != 3 << 5 && id != 8 << 5) continue;
+        if (id != 3 << 5 && id != 8 << 5 && id != 5 << 5) continue;
         k = vehSkinF(v);
         if (k == SK_TWISTER) tmbr_ShockFix(v);
         else if (k == SK_PICKUP) pickupTurret(v, i);
+        else if (k == SK_OUTLAW2) {   /* siren lights (tools/lost/sirens.py: R+7 sub 12 switch): red / blue, 8 frames each */
+            int* sw = *(int**)(v + 0x2A20 + 12 * 4);
+            if (sw) hierSetSwitch(sw, (pakFrames >> 3) & 1);
+        }
     }
     if (pakGame != D_004FA030) {
         pakGame = D_004FA030;

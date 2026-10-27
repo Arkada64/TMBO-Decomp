@@ -7,11 +7,13 @@ run() { name=$1; shift; mkdir -p /tmp/claude-0/hc_$name/out; out=$5
   python3 hcbuild.py "$@" --own-wheels > /tmp/claude-0/hc_$name/build_$out.log 2>&1 || echo "FAIL $out"; }
 # Thumper (Ark 2026-10-26): guns at its own two barrels (front, on the hood), Brimstone's special / zealot hidden
 export HC_MG_DONOR=2.35,7.40,0.37
-run thumper  $H PCP $H/THUMP.BDD  /tmp/claude-0/hc_thumper/out ZUP --hide-ids 4006,4011
-run thumper  $H PCA $H/THUMP.BDD  /tmp/claude-0/hc_thumper/out ZUA --half --hide-ids 4006,4011
+run thumper  $H PCP $H/THUMP.BDD  /tmp/claude-0/hc_thumper/out ZUP --hide-ids 4006,4011 --hide-node 0x427b0
+run thumper  $H PCA $H/THUMP.BDD  /tmp/claude-0/hc_thumper/out ZUA --half --hide-ids 4006,4011 --hide-node 0x3bd30
 unset HC_MG_DONOR
 run cop      $H DCP $H/COP.BDD    /tmp/claude-0/hc_cop/out ZVP
 run cop      $H DCA $H/COP.BDD    /tmp/claude-0/hc_cop/out ZVA --half
+# Outlaw 2's siren lights: Outlaw's beacons on his light bar, alternated by mods/skins.c (Ark 2026-10-27)
+python3 sirens.py /tmp/claude-0/hc_cop/out ZVP; python3 sirens.py /tmp/claude-0/hc_cop/out ZVA
 # Old Pickup (Ark 2026-10-26: "still has pieces of Junkyard Dog"): JD's roof lamp box and its long roof beam hidden
 # (Ark 2026-10-26 23:09: the spawn shield hides parts of it) shells 1.0 outside the body box instead of 0.4
 export HC_SHELL_MARGIN=1.0

@@ -247,6 +247,7 @@ static float amb0[3], dbgK[4] = { 20000.0f, 30000.0f, 0.0f, 2.5f };
 static int ambSaved;
 int tmbr_LostActive(void) { return active(); }
 /* freecam.c, every camera update: L3 + SELECT pressed (edge) on a Lost map */
+static void lostSky(void);
 int tmbr_LostDebug(int toggle)
 {
     if (!active()) { tmbr_lostDbg = 0; ambSaved = 0; return 0; }
@@ -261,7 +262,24 @@ int tmbr_LostDebug(int toggle)
         fogSet(dbgK[0], dbgK[1], dbgK[2], dbgK[1], 60, 60, 60);
         viewSetAmbient(amb0[0] * dbgK[3], amb0[1] * dbgK[3], amb0[2] * dbgK[3]);
     }
+    else lostSky();
     return tmbr_lostDbg;
 }
-void tmbr_DoFogVolume(int a, void* v, void* p) { if (!tmbr_lostDbg) doFogVolume(a, v, p); }
+/* Lost maps' sky (Ark 2026-10-27: "the black sky is a whole void thing"): they run with Dogpound's view distance,
+ * which clips Head-On's sky domes (radius up to ~23500), and its black background showed instead. Far clip 30000
+ * (fog pushed out with it, as the look debug's) and the background / fog in the sky's horizon colour. */
+extern void viewSetBgColor(unsigned long r, unsigned long g, unsigned long b, unsigned long a) __asm__("viewSetBgColor__FUlUlUlUl");
+/* horizon colours of the skies Ark picked (2026-10-27; tools/lost/levels/lvbuild.py SKY_PICK): Carnival = Junkyard's,
+ * Suburban Terror = Prison's, City of the Dead = City's, Death Port = Prison's, Stadium Slaughter = Suburb's */
+static const unsigned char SKYCOL[NLOST + 1][3] = { { 0, 0, 0 }, { 70, 36, 12 }, { 58, 64, 72 }, { 80, 74, 62 }, { 58, 64, 72 }, { 82, 76, 62 } };
+static float skyK[3] = { 20000.0f, 30000.0f, 0.0f };
+static void lostSky(void)
+{
+    const unsigned char* c;
+    if (!active() || tmbr_lostDbg) return;
+    c = SKYCOL[tmbr_lostMap];
+    fogSet(skyK[0], skyK[1], skyK[2], skyK[1], c[0], c[1], c[2]);
+    viewSetBgColor(c[0], c[1], c[2], 0x80);
+}
+void tmbr_DoFogVolume(int a, void* v, void* p) { if (!tmbr_lostDbg) doFogVolume(a, v, p); lostSky(); }
 void tmbr_DoAmbientVolume(int a, void* v, void* p) { if (!tmbr_lostDbg) doAmbientVolume(a, v, p); }

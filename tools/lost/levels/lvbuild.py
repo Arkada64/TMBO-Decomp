@@ -19,6 +19,7 @@ from lvcol import encode
 from lvcol2 import build_piece_auto
 COLBASE = 0x3000000          # mods/lostslots.c LOSTCOL: the collision trees' blob (\\PCAR\\ZCHC<xx>.BIN)
 
+WHITE = 0x7FFFFFF0           # key of the plain white texture for untextured meshes
 TEX_BUDGET = 2654208          # level TEX slot 0x1C05670 .. 0x1E8E3F0 (0x288D80)
 CLUT_BUDGET = 0x411           # level CLUT blocks
 LEAF = 24                     # meshes per leaf render group (retail: 12-49)
@@ -306,6 +307,58 @@ def ground_pieces(meshes, pieces, tl, cell=50.0, tol=8.0):
             out.append((P[u_], np.vectorize(remap.get)(T)))
     return out
 
+SKY_DIR = '/mnt/user-data/uploads/cloud/out/sky'
+SKY_PICK = {'HCSC': 'JUNKYARD', 'HCSU': 'PRISON', 'HCGD': 'CITY', 'HCND': 'PRISON', 'HCST': 'SUBURB'}   # Ark 2026-10-27
+def retail_sky(level):
+    """a retail outdoor level's sky dome: [(mesh node bytes, packet rel offset, [(tex key, image)])] + the textures
+    as LevelTex entries. The dome = the meshes over 5000 units across whose textures are VRAM-resident RTX records
+    (the retail skies'; a level's far terrain sheets live in its TEX). Their textures become ordinary PSMT8 records."""
+    sys.path.insert(0, os.path.dirname(HERE))
+    from tmbmesh import decode as tdecode
+    from tmbcar import mesh_extent
+    from hcbuild import traverse_check
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('skytex', os.path.join(HERE, 'skytex.py'))
+    sk = importlib.util.module_from_spec(spec); spec.loader.exec_module(sk)
+    p = f'{SKY_DIR}/{level}'
+    n = open(p + '.NGP', 'rb').read(); t = open(p + '.TEX', 'rb').read(); r = open(p + '.RTX', 'rb').read()
+    c = Car(n, open(p + '.PTR', 'rb').read(), b'', b'')
+    res, _ = sk.rtx_all(r)
+    seen, _ = traverse_check(bytes(c.n), c.slots)
+    meshes, tex = [], {}
+    from hotex import clut_unswizzle
+    for o in sorted(seen):
+        if struct.unpack_from('<I', n, o)[0] & 0x3f: continue
+        try: m = tdecode(n, o)
+        except Exception: continue
+        if not m['pos']: continue
+        P = np.array(m['pos'])
+        if (P.max(0) - P.min(0)).max() < 5000: continue
+        nt = struct.unpack_from('<H', n, o + 0x5a)[0]
+        ids = [struct.unpack_from('<H', n, o + 0x50 + 2 * i)[0] for i in range(nt)]
+        if not ids or not all(i in res for i in ids): continue
+        keys = []
+        for i, tid in enumerate(ids):
+            cbp = (struct.unpack_from('<Q', n, o + 0x70 + 0x30 * i)[0] >> 37) & 0x3fff
+            key = 0x7F000000 | (tid << 12) | (cbp & 0xfff)
+            if key not in tex:
+                img = sk.tex_image(n, t, r, tid, cbp)
+                h, w = img.shape[:2]
+                flat = img.reshape(-1, 4)
+                pal, idx = np.unique(flat, axis=0, return_inverse=True)
+                if len(pal) > 256:                                  # (the retail ones are 8-bit: never)
+                    pal = pal[:256]; idx = np.minimum(idx, 255)
+                pal = np.concatenate([pal, np.zeros((256 - len(pal), 4), np.uint8)])
+                pal[:, 3] = (pal[:, 3].astype(int) + 1) // 2          # TMB alpha -> LevelTex's Head-On range (x2 later)
+                raw = np.array(clut_unswizzle([tuple(x) for x in pal]), np.uint8).tobytes()
+                tex[key] = dict(w=w, h=h, bpp=8, idx=idx.reshape(-1).astype(np.uint8), img=img, clutraw=raw, ctw=4, cth=4,
+                                mips=0, pal=pal)
+            keys.append(key)
+        a, b = mesh_extent(n, o)
+        pk = struct.unpack_from('<I', n, o + 4)[0] - BASE
+        meshes.append((bytes(n[a:b]), pk - a, keys, o - a))
+    return meshes, tex
+
 def build(path, outdir, name, scale=1.15, donor=None):
     b = bdd(path); n = b['ngp']
     meshes, unk = placed_meshes(n, scale)
@@ -319,9 +372,20 @@ def build(path, outdir, name, scale=1.15, donor=None):
                 cols.append(((c_ & 31) << 3) + (((c_ >> 5) & 31) << 3) + (((c_ >> 10) & 31) << 3) if c_ <= 0xFFFF else (c_ & 255) + ((c_ >> 8) & 255) + ((c_ >> 16) & 255))
     meshconv.COLOR_SCALE = min(1.0, 33.0 * 3 / max(1.0, float(np.mean(cols)))) if cols else 0.5
     T = textures(b['tex'])
+    # untextured Head-On meshes (plain vertex-coloured walls, rails, rock: 332 on SU) and references to textures
+    # that are not in the file used to be dropped = holes all over the maps (Ark 2026-10-27). They get a plain
+    # white texture instead: TMB draws texture x vertex colour, so they show their own colours.
+    T[WHITE] = dict(w=16, h=16, bpp=4, idx=np.zeros(256, np.uint8), img=np.full((16, 16, 4), 255, np.uint8),
+                    clutraw=bytes([255, 255, 255, 0x80]) * 16, ctw=3, cth=1, mips=0,
+                    pal=np.tile(np.array([255, 255, 255, 0x80], np.uint8), (16, 1)))
     keys = sorted({k for m in meshes for k in m['texrefs']})
     missing = [k for k in keys if k not in T]
-    meshes = [m for m in meshes if all(k in T for k in m['texrefs'])]
+    nwhite = 0
+    for m in meshes:
+        if not m['texrefs'] or any(k not in T for k in m['texrefs']):
+            m['texrefs'] = [k if k in T else WHITE for k in m['texrefs']] or [WHITE]; nwhite += 1
+    print('  meshes given the white texture (untextured / missing texture)', nwhite)
+    keys = sorted({k for m in meshes for k in m['texrefs']})
     # strip texture selectors: TMB's VU1 code reads GS context 1 + 3*k (k < texture count); Head-On meshes also have
     # untextured meshes (no context at all), first strips that select nothing (inherit the previous object's
     # context), out-of-range and flagged (0x8000) selectors - any of these feed the GS a garbage context
@@ -351,6 +415,11 @@ def build(path, outdir, name, scale=1.15, donor=None):
         dn = None
         LT = LevelTex(T)
         car = Car(struct.pack('<4I', 3, 0, 0, 0), struct.pack('<II', 0, 0), b'', b'')
+    sky = None
+    if os.environ.get('LV_SKY', '1') == '1' and SKY_PICK.get(name):
+        sky = retail_sky(SKY_PICK[name])
+        T.update(sky[1]); keys = sorted(set(keys) | set(sky[1]))
+        print('  sky from', SKY_PICK[name], len(sky[0]), 'meshes', len(sky[1]), 'textures')
     tex_total, clut_total = LT.plan(keys)
     tiles = collections.defaultdict(list)
     def translucent(k):
@@ -396,7 +465,21 @@ def build(path, outdir, name, scale=1.15, donor=None):
                 part = lst[i:i + 250]
                 groups.append((car.group([o for o, _ in part], sphere=(*c, r)), (*c, r)))
     else:
+        if sky:                                         # Head-On's own dome (drawn out of range anyway) goes
+            placed = [e for e in placed if e[1][3] <= 9000]
         big = [e for e in placed if e[1][3] > 3000]; small = [e for e in placed if e[1][3] <= 3000]
+        if sky:                                         # the retail dome, centred on the map
+            P_ = np.array([s_[:3] for _, s_ in placed]); mc = (P_.max(0) + P_.min(0)) / 2
+            for blob, pk, kk, _ in sky[0]:
+                sb = bytearray(blob)
+                for i, k in enumerate(kk):
+                    tid, ctx = LT.gs_ctx(k)
+                    struct.pack_into('<H', sb, 0x50 + 2 * i, tid); sb[0x70 + 0x30 * i:0x70 + 0x30 * i + 0x30] = ctx
+                struct.pack_into('<I', sb, 4, pk)
+                mo = car.append(bytes(sb), (4,), [(0x50 + 2 * i, 0x70 + 0x30 * i) for i in range(len(kk))])
+                t3 = car.append(struct.pack('<IIiI3fI', 3, 0, 1, 0, mc[0], mc[1], 0.0, 0))
+                car.setp(t3 + 0x1c, mo)
+                groups.append((car.group([t3], sphere=(mc[0], mc[1], 0.0, 40000.0)), (mc[0], mc[1], 0.0, 40000.0)))
         if small: groups += kd(small)
         for off, sph in big: groups.append((car.group([off], sphere=sph), sph))
     # ---- collision: one op18 per Head-On collision piece

@@ -864,6 +864,12 @@ def build(a, rd, own16):
         hn = set(meshes_under(car, int(x, 16)))
         hide |= hn
         print('hidden on request: donor node %s (%d meshes)' % (x, len(hn)))
+        o_ = int(x, 16)
+        if u32(car.n, o_) & 0x3f == 25:
+            # a character's skinned meshes are odd packets the empty-packet trick does not stop (Ark 2026-10-27:
+            # Brimstone's zealot still rode in Thumper's bed): no children at all
+            struct.pack_into('<i', car.n, o_ + 0x28, 0)
+            print('  character %s: child count 0' % x)
     for c in chars_of(car.n, op7):
         if (u32(car.n, c) >> 18) != 0:
             hide |= set(meshes_under(car, c))
