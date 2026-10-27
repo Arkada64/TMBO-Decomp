@@ -335,7 +335,7 @@ PATCHES = [
     (A("nonmatchings/online/after_game_19/func_0013EED0.s"), "0013EED0", "addiu", "j          tmbr_BotRemove"),
     (A("nonmatchings/online/after_game_19/func_0013EED0.s"), "0013EED4", "sq", "nop"),
     # ... deathmatch settings: "USE BOTS" row removed (bots.c settingsRows), bots no longer exclude sync entry
-    (A("tmb/ui.s"), "001C7C3C", "addiu", "addiu      $s7, $zero, 0x7"),
+    (A("tmb/ui.s"), "001C7C3C", "addiu", "addiu      $s7, $zero, 0x6"),   # 6 rows: the sync entry row (row 6 since the USE BOTS row went) is gone too - sync is the standard (bots.c tmbr_LobbyFrame)
     # skip the use-bots / sync exclusion but keep $s0 = &net (.L001C8364): branching to .L001C8368 left $s0 = row
     # index and the next lw 0x3148($s0) faulted (TLB miss at 0x1C8368, addr 0x314E): sync entry could not be set
     (A("tmb/ui.s"), "001C8334", "bne", "b          .L001C8364"),

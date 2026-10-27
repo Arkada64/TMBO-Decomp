@@ -1956,6 +1956,16 @@ void tmbr_LobbyFrame(void)
     int pad = 0, pressed, host, teams;
     char ra[40], rb[40];
     settingsRows();
+    {   /* synchronous entry is the standard (Ark 2026-10-27: competitive online - everyone starts together, the host
+         * no longer gets in before the clients have loaded). Game info word bit 5 (the settings editor's D_004FB54C,
+         * 0x1C83E0); the editor's row is gone (apply_mods.py 0x1C7C3C: 6 rows). The host sets it and resends. */
+        char* gi = *(char**)(D_003156C0 + 0x3148);
+        if (gi && netIsHost(D_003156C0) && !(*(int*)gi & 0x20)) {
+            *(int*)gi |= 0x20;
+            netSendGameInfo(D_003156C0, -1);
+            scePrintf("TMBR lobby: synchronous entry set\n");
+        }
+    }
     { extern int tmbr_GuestNaming(void);   /* guests.c: while a guest types a name the keyboard has the screen
                                             * (Ark 2026-10-26: the room's text showed through the keys) */
       if (tmbr_GuestNaming()) { tmbr_GuestsName(); return; } }
