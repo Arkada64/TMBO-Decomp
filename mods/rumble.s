@@ -14,6 +14,8 @@ tmbr_Actuator:
     lui     $2, %hi(D_004FA878)          # vibration option (non-zero = on)
     lw      $2, %lo(D_004FA878)($2)
     bnez    $2, 1f
+    or      $2, $5, $6                   # (delay slot) off: a stop (both motors 0) still goes through -
+    beqz    $2, 1f                       # blocking those left a running motor on for good (Ark 2026-10-27)
     nop
     jr      $31                          # off: never start a motor
     nop

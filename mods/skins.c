@@ -785,7 +785,29 @@ static void pakHatches(char* v, int car)
         hierSetSwitch(sw, hatchPos[car][h] / 4 > 2 ? 2 : hatchPos[car][h] / 4);
     }
 }
-void tmbr_SkinsFrame(void)
+/* Rumble timers (Ark 2026-10-27: the pad kept vibrating). The game's per-frame actuator update (func_002165A0
+ * 0x216628) counts down and stops only pad 0's timers (its pointers restart at pad 0 for every port / slot), but
+ * online a car rumbles the pad index of its slot (rumble.s): any other slot's motor never stopped. Pads 1..7 here,
+ * the same way: a timer reaching 0 clears its motor byte and sends the pad's motors. */
+extern int D_00612D40[];               /* per pad: small / big motor timers (frames) */
+extern unsigned char D_00612D10[];     /* per pad: 6 actuator bytes (0 small, 1 big) */
+extern int D_00612B60[], D_00612B80[]; /* per pad: port / slot */
+extern int scePadSetActDirect(int port, int slot, const unsigned char* data) __asm__("scePadSetActDirect");
+static void rumbleTick(void)
+{
+    int k, m;
+    for (k = 1; k < 8; k++) {
+        int send = 0;
+        for (m = 0; m < 2; m++) {
+            int* t = &D_00612D40[k * 2 + m];
+            if (*t > 0 && --*t == 0) { D_00612D10[k * 6 + m] = 0; send = 1; }
+        }
+        if (send) scePadSetActDirect(D_00612B60[k], D_00612B80[k], D_00612D10 + k * 6);
+    }
+}
+static void skinsFrame(void);
+void tmbr_SkinsFrame(void) { rumbleTick(); skinsFrame(); }
+static void skinsFrame(void)
 {
     int i, any = 0;
     if (!D_004FA030) return;
