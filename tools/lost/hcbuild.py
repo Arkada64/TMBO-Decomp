@@ -377,6 +377,7 @@ def main():
                     "leave the static --add parts and turn with the bone (its pivot moves to their centre)")
     ap.add_argument('--hide-node', default='', help='donor node offsets (hex, comma separated) whose meshes get empty '
                     "packets too, e.g. Outlaw's roof light bar op31 (SUP 0x67ae0, SUA 0x5d6a0)")
+    ap.add_argument('--hide-ids', default='', help="donor op1 ids (weapon / special models, decimal, comma separated) hidden")
     ap.add_argument('--keep-part', default='', help="donor node ids kept with their subtree, ';'-separated, each "
                     "optionally ':dx,dy,dz' to move it (e.g. Outlaw's turret '124:0,0,-1.9'); '@hex' names a node offset (Sweet "
                     "Tooth's robot character '@0x91c20')")
@@ -835,7 +836,27 @@ def build(a, rd, own16):
     for c in chars_of(car.n, op7):
         if (u32(car.n, c) >> 18) != 0:
             hide |= set(meshes_under(car, c))
-    hide -= keep | deadset | set(built.values()) | shells
+    # Ark 2026-10-26: the donor's headlight lamps (op0 meshes under the headlight switch R+9, at the donor's nose)
+    # stayed visible ("Warthog's headlights" on Thumper, Outlaw's on Twister); the flares (op5) stay, moved above
+    lamps = set()
+    nodes_now, _ = traverse_check(bytes(car.n), car.slots)
+    if os.environ.get('HC_HEADLAMPS', '1') == '1':
+        for o in sorted(nodes_now):
+            h_ = u32(car.n, o)
+            if h_ & 0x3f == 6 and (h_ >> 18) == R + 9:
+                lamps |= {x for x in meshes_under(car, o) if u32(car.n, x) & 0x3f == 0}
+        print('donor headlight lamps hidden: %d meshes' % len(lamps))
+    hide |= lamps
+    # --hide-ids: the donor's weapon / special models by op1 id (Thumper: Brimstone's special 4011 and its zealot 4006)
+    gone = set()
+    for x in filter(None, a.hide_ids.split(',')):
+        for o in sorted(nodes_now):
+            h_ = u32(car.n, o)
+            if h_ & 0x3f == 1 and (h_ >> 18) == int(x):
+                gone |= set(meshes_under(car, o))
+        print('hidden on request: donor op1 id %s (%d meshes so far)' % (x, len(gone)))
+    hide |= gone
+    hide -= (keep - gone) | deadset | set(built.values()) | shells
     nopk = car.append(struct.pack('<4I', 0x60000001, 0, 0, 0) + struct.pack('<4I', 0x01000404, 0, 0, 0))
     hidepairs = set()
     odd = []

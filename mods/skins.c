@@ -494,7 +494,7 @@ void tmbr_ShockFix(char* v)
 #define PK_SHELL   3                   /* cannon shell damage (Minion D_004FAD84 = 5) */
 extern int D_004FAD84;
 static float PK_OFS[8] = { 1.1f, -1.9f, 4.73f, 0.0f, 0.0f, 6.75f, 0.0f, 0.0f };   /* pivot (car space) / muzzle (turret space) */
-static float PK_K[4] = { 0.176f, 0.577f, 0.0f, 1.0f };   /* tan 10 deg, tan 30 deg, 0, 1 (no float literals in mod code) */
+static float PK_K[5] = { 0.176f, 0.577f, 0.0f, 1.0f, 0.25f };   /* tan 10 deg, tan 30 deg, 0, 1, torch range x4 (no float literals in mod code) */
 static float pkNode[8][24] __attribute__((aligned(16)));   /* +0x10: the turret matrix (3 rows of 4) */
 static int pkAng[8][3], pkInit[8];
 static int bId, bAng[3], bNode, bShell, pickupOn;
@@ -558,6 +558,16 @@ char* tmbr_MinionLockOn(void* l, void* pos, char* v, int mode)
     char* t = lockOn(l, pos, v, mode);
     if (t && pickupOn && (!*(char**)(t + 0x2028) || bearing(v, (float*)(*(char**)(t + 0x2028) + 0x10)) < 0)) return 0;
     return t;
+}
+
+/* Minion's UpdateSpecial picks the torch only for a target within 250 (manhattan, 0x15EEE0 -> this), else his
+ * cannon shells: Ark 2026-10-26 the Old Pickup "is not shooting the flame streams from minion, just fire balls" -
+ * for the Old Pickup the distance counts a quarter, so the torch (front arc only) is what it fires */
+extern float mathfManhatDist(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
+float tmbr_PkDist(void* a, void* b)
+{
+    float d = mathfManhatDist(a, b);
+    return pickupOn ? d * PK_K[4] : d;
 }
 
 static void borrowFire(char* l, char* v, int k)

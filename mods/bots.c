@@ -487,6 +487,9 @@ void tmbr_PickupPlaceFullHealth(char* p)
  * it). TODO 10: never - the handle stays -1 from thunderstormInit, so thunderstormUpdate (func_001AC358) does
  * nothing (no cloud, no lightning, no cloud sound). The snow on Snowy Roads is separate and stays. */
 void tmbr_NoStormCloud(void* pos) { (void)pos; }
+/* ... and its sound (CloudSound::updateCloudSound, called at 0x19E86C / 0x19EA1C): with no cloud its position stays
+ * unset and the thunder played loud everywhere (Ark 2026-10-26) - never started */
+void tmbr_NoCloudSound(void* s) { (void)s; }
 static void healthFrame(void)
 {
     static int shown = -1, envShown = -1;

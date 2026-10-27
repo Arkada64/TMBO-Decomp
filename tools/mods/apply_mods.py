@@ -277,6 +277,8 @@ PATCHES = [
     # ... no storm cloud on Suburbs / Mini Suburbs / Snowy Roads (thunderstormCreate skipped, bots.c)
     (A("nonmatchings/tmb/suburb/func_001AA000.s"), "001AA01C", "jal", "jal        tmbr_NoStormCloud"),
     (A("nonmatchings/tmb/death2/func_00127BE8.s"), "00127C1C", "jal", "jal        tmbr_NoStormCloud"),
+    (A("nonmatchings/tmb/sound/func_0019E7C0.s"), "0019E86C", "jal", "jal        tmbr_NoCloudSound"),        # no storm cloud sound (bots.c)
+    (A("nonmatchings/tmb/sound/func_0019E7C0.s"), "0019EA1C", "jal", "jal        tmbr_NoCloudSound"),
     # ... team play (teams.c): team colours for every car incl. bots on markers / radar, lock-on skips teammates
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCE2C", "addiu", "jal        tmbr_TeamColorS"),
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCE30", "bne", "daddu      $4, $17, $0"),
@@ -444,6 +446,7 @@ PATCHES = [
     (A("nonmatchings/online/net/netWeaponCreateCB.s"), "0016B0CC", "jal", "jal        tmbr_NetFireSpecial"),
     (A("nonmatchings/tmb/launch/FireSpecial__8LauncherP7Vehicle.s"), "001594A8", "jal", "jal        tmbr_MinionLockOn"),
     (A("nonmatchings/tmb/launch_part2/UpdateSpecial__8LauncherP7Vehicle.s"), "0015EE50", "jal", "jal        tmbr_MinionLockOn"),
+    (A("nonmatchings/tmb/launch_part2/UpdateSpecial__8LauncherP7Vehicle.s"), "0015EEE0", "jal", "jal        tmbr_PkDist"),   # Old Pickup: Minion's torch, not his shells (skins.c)
     (A("nonmatchings/tmb/launch_part2/func_00160D80.s"), "00160E28", "jal", "jal        tmbr_MinionLockOn"),
     # traffic: weapon damage on traffic is not reported to the network as player damage
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E24C0", "jal", "jal        tmbr_NetVehicleDamage"),

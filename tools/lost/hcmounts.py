@@ -165,7 +165,7 @@ def donor_mounts(car):
     return out
 
 
-def char_anchors(car, char):
+def char_anchors(car, char, rot=False):
     """{channel: stored value} for the channels that drive the rotation / translation fields of the character's
     op17 bones (the exported pose: the anchor HC_ANIM damping scales towards)"""
     from hcbuild import kids
@@ -179,17 +179,25 @@ def char_anchors(car, char):
         if (u32(n, o) & 0x3f) == 17:
             ci = struct.unpack_from('<6h', n, o + 0x12)
             v = struct.unpack_from('<3f', n, o + 0x20) + struct.unpack_from('<3f', n, o + 0x30)
-            for c, x in zip(ci, v):
-                if c >= 0:
+            rot_ok = rot or os.environ.get('HC_ANIM_ROT', '0') == '1'   # rotations play in full (weapons point the
+            for j, (c, x) in enumerate(zip(ci, v)):                   # donor's way), only the slides are scaled
+                if c >= 0 and (j >= 3 or rot_ok):
                     out.setdefault(c, x)
         st += [k for k in kids(car, o) if (u32(n, k) & 0x3f) != 0]
+    # Ark 2026-10-26: damping towards the exported pose froze some launchers deployed (that pose is not the stowed
+    # one; Twister's weapons stayed out "when swapped off"): anchor on the animation's start instead (t = 0 = stowed)
+    if os.environ.get('HC_ANIM_ANCHOR', 'start') == 'start':
+        trk = char_tracks(car, char) or {}
+        for c in list(out):
+            if c in trk and trk[c]:
+                out[c] = track_value(trk[c], 0.0)
     return out
 
 
-def damp_char(car, char, f):
+def damp_char(car, char, f, rot=False):
     """scale the character's bone channels towards their stored values by f (key c0 -> a + f (c0 - a), c1..c3 * f):
     the same animation, smaller (f 0 = frozen in the exported pose)"""
-    anc = char_anchors(car, char)
+    anc = char_anchors(car, char, rot)
     n = car.n
     c33 = car.P(char + 0x10)
     hdr = car.P(c33 + 4)
@@ -209,7 +217,7 @@ def damp_char(car, char, f):
     return done
 
 
-def mount_envelope(car, rec, node, extra=np.zeros(3), f=1.0):
+def mount_envelope(car, rec, node, extra=np.zeros(3), f=1.0, rot=False):
     """car-space positions of a mount over its character's animation (every key time and the midpoints, all
     channels evaluated), plus its exported-pose position; extra: a translate put above the character; f: the
     bone channels scaled towards their stored values (damp_char)"""
@@ -233,7 +241,7 @@ def mount_envelope(car, rec, node, extra=np.zeros(3), f=1.0):
                 st.append((k, ch + (k,)))
     if path is None:
         return np.array([d['pos']])
-    anc = char_anchors(car, d['char']) if f != 1.0 else {}
+    anc = char_anchors(car, d['char'], rot) if f != 1.0 else {}
     out = []
     for t in ([None] + ts):
         vals = None if t is None else {c: track_value(v, t) for c, v in trk.items()}
@@ -408,7 +416,15 @@ def apply(car, rec, L, to_donor, box_d, box_n, name='', log=print, pts=None, ski
     for node, d in sorted(rec.items()):
         ids = sorted(d['ids'])
         if 4100 in ids:
-            if r is not None:
+            mgd = os.environ.get('HC_MG_DONOR', '')
+            if mgd == 'front':           # no gun on the model (Twister): at the front of the body, low / mid
+                c0, h0 = ch(box_n)
+                q = np.array([h0[0] * 0.55, box_n[1][1] - 0.3, c0[2]])
+                tgt, how = (q if d['pos'][0] > 0 else q * np.array([-1, 1, 1])), 'HC_MG_DONOR front of the body'
+            elif mgd:                    # donor-space right gun muzzle (the model's own barrels), left mirrored
+                q = np.array([float(x) for x in mgd.split(',')])
+                tgt, how = (q if d['pos'][0] > 0 else q * np.array([-1, 1, 1])), 'HC_MG_DONOR'
+            elif r is not None:
                 tgt, how = to_donor(r if d['pos'][0] > 0 else l), src
             else:
                 tgt, how = on_body(boxmap(d['pos']), pts, box_n)
@@ -454,19 +470,22 @@ def apply(car, rec, L, to_donor, box_d, box_n, name='', log=print, pts=None, ski
         lo_b, hi_b = np.asarray(box_n[0], float) - tol, np.asarray(box_n[1], float) + tol
         damped = set()
         for c, nodes in sorted(bychar.items()):
-            def fits(f):
+            def fits(f, rot):
                 for k in nodes:
-                    E = mount_envelope(car, rec, k, f=f)
+                    E = mount_envelope(car, rec, k, f=f, rot=rot)
                     P_ = tg[k][0] + (E - E[0])
                     if (P_ < lo_b - 1e-6).any() or (P_ > hi_b + 1e-6).any():
                         return False
                 return True
-            f = next((x for x in np.round(np.arange(1.0, -0.01, -0.1), 2) if fits(x)), 0.0)
+            # slides scaled first (the weapons keep the donor's turns, so they point the right way); a launcher that
+            # still swings out of the body at 0 (Outlaw's 4005 arm about its hinge) gets its turns scaled too
+            rot = not fits(0.0, False)
+            f = next((x for x in np.round(np.arange(1.0, -0.01, -0.1), 2) if fits(x, rot)), 0.0)
             if f < 1.0:
-                nt = damp_char(car, c, f)
+                nt = damp_char(car, c, f, rot)
             E = np.concatenate([tg[k][0] + (lambda E: E - E[0])(mount_envelope(car, rec, k)) for k in nodes])
-            log('mount char %#x: animation %s (animated range x %.2f..%.2f y %.2f..%.2f z %.2f..%.2f)' % (
-                c, 'kept' if f >= 1.0 else 'scaled by %.1f (%d channels)' % (f, nt), E[:, 0].min(), E[:, 0].max(),
+            log('mount char %#x: %s animation %s (animated range x %.2f..%.2f y %.2f..%.2f z %.2f..%.2f)' % (
+                c, 'slides + turns' if rot else 'slides', 'kept' if f >= 1.0 else 'scaled by %.1f (%d channels)' % (f, nt), E[:, 0].min(), E[:, 0].max(),
                 E[:, 1].min(), E[:, 1].max(), E[:, 2].min(), E[:, 2].max()))
     rows = []
     for node, (tgt, how) in sorted(tg.items()):

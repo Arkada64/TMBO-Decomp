@@ -13,8 +13,11 @@ import hcmounts
 from trender import render
 
 
-TEXS = None                                    # --tex: (texture id, CBP) -> RGBA image
-FORM = 0                                       # Sweet Tooth's op6 R+25: 0 truck, 1 robot (--robot)
+TEXS = None
+DONOR_LEN = 0                                  # --donor-len N: meshes whose texture ids are all <= N (the donor's) drawn magenta                                    # --tex: (texture id, CBP) -> RGBA image
+FORM = 0
+ALLSW = False
+#                                      # Sweet Tooth's op6 R+25: 0 truck, 1 robot (--robot)
 
 
 def collect(car, t_anim=None):
@@ -38,6 +41,10 @@ def collect(car, t_anim=None):
                 continue
             P = np.asarray(m['pos'], float) @ M + t
             tr = [(a, b, c) for a, b, c, s, _ in triangles(m)]
+            nt_ = struct.unpack_from('<H', n, o + 0x5a)[0]
+            tids_ = [struct.unpack_from('<H', n, o + 0x50 + 2 * i)[0] for i in range(min(nt_, 4))]
+            if DONOR_LEN and tids_ and max(tids_) <= DONOR_LEN and kind in ('car', 'char'):
+                out.append((P, tr, 'donor')); DONORS.append((o, P.min(0).round(2).tolist(), P.max(0).round(2).tolist(), len(tr), ch, tids_)); continue
             if tr and TEXS is not None:                  # textured: one part per texture select
                 nt = struct.unpack_from('<H', n, o + 0x5a)[0]
                 imgs = [TEXS(struct.unpack_from('<H', n, o + 0x50 + 2 * i)[0],
@@ -82,6 +89,8 @@ def collect(car, t_anim=None):
             ks = ks[:1]
         elif op == 31:
             ks = [k for k in ks if u32(n, k) & 0x3f != 9][:1]
+        elif op == 6 and ALLSW:
+            ks = [k for k in ks if u32(n, k) & 0x3f != 9]
         elif op == 6:                          # effect switches (shield / freeze shells, flames: id R+14, R+15 ..)
             rel = (h >> 18) - R                  # stay off; weapons / guns / lights / brake lights on their 1st kid
             ks = [k for k in ks if u32(n, k) & 0x3f != 9][:1] if (h >> 18) == 0 or rel in (7, 9, 10, 13) else \
@@ -93,7 +102,8 @@ def collect(car, t_anim=None):
     return out, lights
 
 
-COL = {'car': (0.75, 0.75, 0.75), 'weapon': (1.0, 0.15, 0.1), 'gun': (1.0, 0.6, 0.1), 'char': (0.3, 0.4, 1.0)}
+DONORS = []
+COL = {'donor': (1.0, 0.0, 1.0), 'car': (0.75, 0.75, 0.75), 'weapon': (1.0, 0.15, 0.1), 'gun': (1.0, 0.6, 0.1), 'char': (0.3, 0.4, 1.0)}
 
 
 def main():
@@ -105,6 +115,8 @@ def main():
     ap.add_argument('--tex', action='store_true', help='textured (TEX / RTX of the car)')
     ap.add_argument('--rear', action='store_true', help='turned 180 degrees (the front view shows the back)')
     ap.add_argument('--robot', action='store_true', help="Sweet Tooth donors: draw the robot form")
+    ap.add_argument('--donor-len', type=lambda x: int(x, 0), default=0, help="highest donor texture id: kept donor meshes magenta + listed")
+    ap.add_argument('--all-switch', action='store_true', help='op6 weapon / effect switches: draw every kid')
     a = ap.parse_args()
     rd = lambda e: open('%s/%s.%s' % (a.dir, a.code, e), 'rb').read()
     car = Car(rd('NGP'), rd('PTR'), b'', b'')
@@ -118,7 +130,8 @@ def main():
         rr, _ = rtx_records(r_)
         clut = {a_: (o, sz, tw, th) for o, sz, a_, tw, th in rr}
         TEXS = lambda tid, cbp: image(t_, r_, byid, clut, tid, cbp)
-    global FORM
+    global FORM, DONOR_LEN, ALLSW
+    DONOR_LEN = a.donor_len; ALLSW = a.all_switch
     FORM = 1 if a.robot else 0
     parts, lights = collect(car, a.time)
     if a.rear:
@@ -133,6 +146,8 @@ def main():
                        col=(1.0, 1.0, 0.0)))
     render(ms, a.out, a.size, tuple(a.views.split(',')))
     print('%d meshes, %d lights' % (len(parts), len(lights)))
+    for o, lo, hi, nt, ch, ti in DONORS:
+        print('donor mesh %#x tex %s tris %d box %s %s path %s' % (o, ti, nt, lo, hi, ' '.join('%#x:%d/%d' % (c, u32(car.n, c) & 0x3f, u32(car.n, c) >> 18) for c in ch[-5:-1])))
 
 
 if __name__ == '__main__':
