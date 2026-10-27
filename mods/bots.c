@@ -744,7 +744,8 @@ void tmbr_BotsThink(void)
                 continue;
             }
         }
-        if (F(drv, 4) != 5) driverSetMode(drv, 5);
+        /* (Ark 2026-10-27: no forced hunt any more - the game's own AI picks hunt / cruise / flee; we only pick
+         * whom it goes after) */
         if ((char*)F(drv, 0xB4) != best) driverSetTarget(drv, best);
     }
     /* debug: per-bot state every 2 s (TMBR_BOTDBG) */
@@ -1741,7 +1742,7 @@ static int aiUpdate(char* v)
             *(float*)(F(v, 0x2014) + 0x48) = FLEE[fl];
             if (fl && drv && F(drv, 4) == 3) goto keepFlee;      /* fleeing to health: leave it */
         }
-        if (drv && t && F(drv, 4) >= 2 && F(drv, 4) <= 4 && !(F(drv, 4) == 4 && (ROLE(v) == R_CRUISER || leaveT[(int)(v - g) / 0x31B0 & 7] > 0))) { driverSetMode(drv, 5); driverSetTarget(drv, t); }
+        /* (forced hunt removed, Ark 2026-10-27: the game's AI keeps its own driver mode) */
     }
 keepFlee:
     if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) {
