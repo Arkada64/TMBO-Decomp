@@ -177,7 +177,13 @@ class LevelTex:
         out = head + join(recs)
         return bytes(out + b'\0' * (-len(out) % 2048))
     def rtx_bytes(self, extra=()):
-        out = join([bytes(bytearray(r)) for r in extra] + self.cluts)
+        # donor records keep their sizew - except the donor's old LAST record, whose sizew is 0 ("runs to the end
+        # of the file"): left as is in the middle of the list, texmResRelocate stops there and none of our CLUTs
+        # (appended after it) ever reach VRAM = every converted texture drawn with a garbage palette in game
+        recs = []
+        for r in extra:
+            r = bytearray(r); struct.pack_into('<I', r, 0, len(r) // 4); recs.append(bytes(r))
+        out = join(recs + self.cluts)
         return bytes(out + b'\0' * (-len(out) % 2048))
 
 def full_walk(n, root):
@@ -233,7 +239,7 @@ def donor_prepare(car, drop=None, drop_c=None):
     keep_t = [bytes(car.tex[o:o + b]) for o, b, gs, k in tr if (gs & 0xffff) not in drop]
     used_cbp = {c for t, c in cbp_of.items() if t not in drop}
     if drop_c is None: drop_c = {cbp_of[t] for t in drop if t in cbp_of} - used_cbp
-    keep_r = [bytes(car.rtx[o:o + b]) for o, b, gs, k in rr if ((gs >> 16) & 0xffff) not in drop_c]
+    keep_r = [bytes(car.rtx[o:o + b]) for o, b, gs, k in rr if ((gs >> 48) & 0xff) != 8 or ((gs >> 16) & 0xffff) not in drop_c]   # resident textures: own address space
     next_id = max(gs & 0xffff for o, b, gs, k in tr) + 1
     next_cbp = max(((gs >> 16) & 0xffff) + clut_blocks((gs >> 40) & 15, (gs >> 44) & 15) for o, b, gs, k in rr
                    if ((gs >> 48) & 0xff) == 8)          # CLUT records (the others are VRAM-resident textures)

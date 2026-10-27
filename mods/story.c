@@ -430,11 +430,15 @@ static int bossOn(void)
     char* g = D_004FA030;
     return g && ROOF_BOSS && tmbr_Opt(OPT_STORY) && F(g, 0x9FCA0) == 20;
 }
+static void minionLevelInit(void);                 /* Minion's stadium (below) */
+static void minionFrame(void);
+static int minionHit(char* v, void* pos, int dmg, int att);
 void tmbr_LevelInitAfter(void)
 {
     char* g = D_004FA030;
     plightActivate();
     bossSer = -1;
+    minionLevelInit();
     if (!bossOn()) return;
     {
         char* b = g + 0x97120;
@@ -457,6 +461,7 @@ void tmbr_BossFrame(void)
 {
     char* g = D_004FA030;
     static int tk;
+    minionFrame();
     if (bossSer < 0 || bossSer != tmbr_levelSerial || !bossOn()) return;
     bossUpdate(g + 0x97120);
     ffUpdate();
@@ -469,19 +474,181 @@ void tmbr_BossWon(int a, int b)
     scePrintf("TMBR boss: down\n");
     tmbr_TeamsForceWin(0);
 }
-/* the tanker (vehicle 0x220): TMBO's vehicleTakeHit (func_001E1C40) still tests "0x220 on level 20" but lost retail's
- * tankerTakeHit call; hooked at the interactive hit dispatch (0x14F184): after the normal hit, tankerTakeHit
- * (func_001E3188) - near the boss it blows up into the boss (damage 0x29A: one of the three shield hits) */
-extern void vehTakeHit(char* v, int a1, int a2, int a3) __asm__("func_001E1C40");
+/* Vehicle hits, story bosses first (apply_mods.py: the interactive hit dispatch 0x14F184 and the three network hit
+ * events 0x167D38 / 0x167DA0 / 0x167EC4 come here, then go on to dmgreport.c's tmbr_TakeHit, which calls the game's
+ * vehicleTakeHit func_001E1C40(car, pos, damage, attacker id, x). Before 2026-10-26 the dispatch had two patches,
+ * this one and tmbr_TakeHit's: the later one won, so this wrapper never ran.)
+ *  - Minion's stadium: retail's minionTakeHit (below) for the shielded AI Minion; a hit it absorbs is not applied;
+ *  - the tanker (vehicle 0x220): TMBO's vehicleTakeHit still tests "0x220 on level 20" but lost retail's
+ *    tankerTakeHit call: after the normal hit, tankerTakeHit (func_001E3188) - near the boss it blows up into the
+ *    boss (damage 0x29A: one of the three shield hits) */
+extern int tmbr_TakeHit(char* v, void* pos, int dmg, int att, int x);   /* dmgreport.c */
 extern void tankerTakeHit(char* v) __asm__("func_001E3188");
-void tmbr_VehTakeHit(char* v, int a1, int a2, int a3)
+int tmbr_VehTakeHit(char* v, void* pos, int dmg, int att, int x)
 {
-    vehTakeHit(v, a1, a2, a3);
+    int r;
+    if (minionHit(v, pos, dmg, att)) return 0;
+    r = tmbr_TakeHit(v, pos, dmg, att, x);
     if (v && F(v, 0x20F4) == 0x220 && bossSer >= 0 && bossSer == tmbr_levelSerial && bossOn()) {
         int was = F(v, 0x450);
         tankerTakeHit(v);
-        scePrintf("TMBR boss: tanker hit %d (+0x450 %d -> %d), shield hits %d\n", a2, was, F(v, 0x450), F(D_004FA030 + 0x97120, 0x3C));
+        scePrintf("TMBR boss: tanker hit %d (+0x450 %d -> %d), shield hits %d\n", dmg, was, F(v, 0x450), F(D_004FA030 + 0x97120, 0x3C));
     }
+    return r;
+}
+
+/* ---- Minion's Stadium (level 14): retail's shielded Minion (reference/wip/STORY_BOSSES.md, "Minion's Stadium") ----
+ * Retail, for an AI-driven Minion (type +0x580 != 1) on level 0xE:
+ *  - vehicleInitDynamics: 250 health (a human Minion 150), big-car geometry, and forceFieldCreate(cs+0x20, cs+0x10,
+ *    dup, -14.5, 4, 30, 49, 35) + forceFieldSetState(2) around him (on every spawn: vehicleInit runs on respawn too);
+ *  - vehicleTakeHit -> minionTakeHit(v, damage) after the respawn-shield / AI-vs-AI damage cuts: four shield
+ *    generators (+0x408..+0x414 in TMBO: 35 / 5 / 25 / 25 hp, set by TMBO's InitDynamics for every Minion) take the
+ *    hits that land within 50 (manhattan) of them; while one is up the hit is absorbed (return 1, the normal hit is
+ *    skipped); when the last one goes, aggressiveness 100 and "shield down", then hits do damage;
+ *  - level 14 InitBefore: forceFieldInitBefore; Update: forceFieldUpdate every frame.
+ * TMBO lost all of it (InitDynamics' Minion case has no AI / level branch; minionTakeHit func_001E2A00 has no caller;
+ * no level-14 case calls the force field). Here, host only (bots run there), story on, game level 14:
+ *  - aiInit's vehicleInit call (0x10011C) -> tmbr_MinionVehInit: after it, an AI Minion gets 250 health (aiInit
+ *    copies +0x400 to +0x404 and applies the difficulty after) and the force field (state 2);
+ *  - tmbr_VehTakeHit -> minionHit -> func_001E2A00 for the shielded one;
+ *  - tmbr_BossFrame (bots.c, every frame) -> minionFrame: forceFieldUpdate; the field follows another AI Minion
+ *    when its car is gone / is the ally bot (the ally is only known after its first aiInit);
+ *  - tmbr_LevelInitAfter -> minionLevelInit: forceFieldInitBefore.
+ * The force-field globals (D_004FB45C theBoss, D_004FB448 mat, D_004FB44C pos, D_004FB46C/70 the shield model,
+ * D_004F9770 state) are the ones Warhawk's roof uses; one level never runs both. Clients run none of it. */
+#ifndef MINION_SHIELD
+#define MINION_SHIELD 1
+#endif
+#ifndef MINION_BIG               /* retail's big-car geometry for the AI Minion: off (TMBO's model may not match it) */
+#define MINION_BIG 0
+#endif
+extern void vehicleInit(char* v) __asm__("func_001D6F78");
+extern void ffCreate(void* mat, void* pos, int dup, float a, float b, float c, float d, float e) __asm__("func_00136100");
+extern void ffSetState(int s) __asm__("forceFieldSetState__Fi");
+extern int minionTakeHit(char* v, int dmg) __asm__("func_001E2A00");
+extern void vehRecomputeDeltas(char* v, int b) __asm__("vehicleRecomputeDeltas__7Vehicleb");
+extern int ffBoss __asm__("D_004FB45C");          /* 1 = Minion, 2 = Warhawk, 0 = none */
+extern int ffModel __asm__("D_004FB46C");         /* the boss car's shield model switch (+0x2068) */
+extern int ffState __asm__("D_004F9770");
+extern int tmbr_IsAlly(char* v);                   /* teams.c */
+extern int tmbr_SameTeam(char* a, char* b);
+static float MINION_FF[5] = { -14.5f, 4.0f, 30.0f, 49.0f, 35.0f };   /* retail's forceFieldCreate floats (f12..f16) */
+#if MINION_BIG
+static const unsigned MINION_GEO[12][2] = {        /* retail AI Minion (offsets +0x10 for TMBO), float bits */
+    { 0x3A4, 0xC10AE560 }, { 0x3A8, 0x41948312 }, { 0x3AC, 0x41948312 }, { 0x3B0, 0x41948312 },
+    { 0x3B4, 0x411A8F5C }, { 0x3B8, 0x416570A4 }, { 0x3BC, 0xC23345A2 }, { 0x3C0, 0x41E4D917 },
+    { 0x3C4, 0xC2593333 }, { 0x3C8, 0x4209DEDE }, { 0x3D0, 0x40AE4DD3 }, { 0x3D4, 0x40E66666 } };
+#endif
+#define VEH(k) (D_004FA030 + (k) * 0x31B0)
+static char* minV;                                 /* the Minion the field is on */
+static int minSer = -1;
+static int minionLevel(void)
+{
+    char* g = D_004FA030;
+    return MINION_SHIELD && g && tmbr_Opt(OPT_STORY) && F(g, 0x9FCA0) == 14 && netIsHost(D_003156C0);
+}
+static int minionAi(char* v)
+{
+    return v && F(v, 0x20F4) == 0x1E0 && F(v, 0x590) == 2 && F(v, 0x2028) && !tmbr_IsAlly(v);
+}
+static void minionShield(char* v, const char* why)
+{
+    char* cs = (char*)F(v, 0x2028);
+    ffCreate(cs + 0x20, cs + 0x10, F(v, 0x20F0), MINION_FF[0], MINION_FF[1], MINION_FF[2], MINION_FF[3], MINION_FF[4]);
+    ffSetState(2);
+    minV = v;
+    minSer = tmbr_levelSerial;
+    scePrintf("TMBR minion: shield up (%s), car %d dup %d, boss %d model %x state %d, generators %d %d %d %d, health %d (shell level %d)\n",
+        why, (int)(v - D_004FA030) / 0x31B0, F(v, 0x20F0), ffBoss, ffModel, ffState,
+        F(v, 0x408), F(v, 0x40C), F(v, 0x410), F(v, 0x414), (int)*(float*)(v + 0x400), LEVEL());
+    if (ffBoss != 1) scePrintf("TMBR minion: forceFieldCreate made no field (shell level not 14 or no shield model +0x2068)\n");
+}
+static void minionLevelInit(void)
+{
+    char* g = D_004FA030;
+    minV = 0;
+    minSer = -1;
+    if (!MINION_SHIELD || !g || !tmbr_Opt(OPT_STORY) || F(g, 0x9FCA0) != 14) return;
+    ffInitBefore();                                /* retail's level-14 InitBefore */
+    scePrintf("TMBR minion: stadium init, force field reset\n");
+}
+/* aiInit's vehicleInit (0x10011C): every AI spawn and respawn (gameMakeAI, the death sequence func_001E3800) */
+void tmbr_MinionVehInit(char* v)
+{
+    vehicleInit(v);
+    if (!minionLevel() || F(v, 0x20F4) != 0x1E0 || F(v, 0x590) != 2) return;
+    *(unsigned*)(v + 0x400) = 0x437A0000;           /* 250.0: retail's AI Minion health (TMBO gives every Minion 160) */
+#if MINION_BIG
+    {   int i;
+        for (i = 0; i < 12; i++) *(unsigned*)(v + MINION_GEO[i][0]) = MINION_GEO[i][1];
+        vehRecomputeDeltas(v, 1); }
+#endif
+    if (!F(v, 0x2028)) return;
+    if (tmbr_IsAlly(v)) { scePrintf("TMBR minion: car %d is the ally bot, no shield\n", (int)(v - D_004FA030) / 0x31B0); return; }
+    if (minV && minV != v && minSer == tmbr_levelSerial && minionAi(minV)) {
+        scePrintf("TMBR minion: car %d is a second AI Minion, the shield stays on car %d\n", (int)(v - D_004FA030) / 0x31B0, (int)(minV - D_004FA030) / 0x31B0);
+        return;
+    }
+    minionShield(v, minV == v && minSer == tmbr_levelSerial ? "respawn" : "spawn");
+}
+/* every frame (tmbr_BossFrame) */
+static void minionFrame(void)
+{
+    static int tk;
+    int k;
+    if (!minionLevel()) return;
+    if (minSer != tmbr_levelSerial) minV = 0;
+    if (!minionAi(minV)) {
+        char* n = 0;
+        for (k = 0; k < 8 && !n; k++) if (minionAi(VEH(k))) n = VEH(k);
+        if (n) minionShield(n, minV ? "moved" : "late");
+        else if (minV) {
+            scePrintf("TMBR minion: the shielded Minion is gone (type %d), field off\n", F(minV, 0x590));
+            minV = 0;
+            ffInitBefore();
+        }
+    }
+    if (!minV) return;
+    if (ffBoss) ffUpdate();
+    if (++tk % 600 == 0)
+        scePrintf("TMBR minion: state %d, generators %d %d %d %d, health %d\n", ffState,
+            F(minV, 0x408), F(minV, 0x40C), F(minV, 0x410), F(minV, 0x414), (int)*(float*)(minV + 0x404));
+}
+/* a hit on a car (tmbr_VehTakeHit): 1 = the shielded Minion's generators absorbed it (skip the normal hit) */
+static int minionHit(char* v, void* pos, int dmg, int att)
+{
+    char *g = D_004FA030, *a = 0, *info;
+    int k, d = dmg, scr = 0, up, s210C, sPos, r, g0;
+    if (!v || v != minV || minSer != tmbr_levelSerial || !minionLevel() || F(v, 0x590) != 2 || F(v, 0x20B4) == 2) return 0;
+    info = g + 0x2BC10;                            /* the hit info: +0 the hit position (pointer), +8 1 = a local hit */
+    for (k = 0; k < 8; k++)                        /* the attacker, as vehicleTakeHit finds it */
+        if (F(VEH(k), 0x20FC) == att && F(VEH(k), 0x20D0)) { a = VEH(k); break; }
+    if (a && a != v && tmbr_SameTeam(a, v)) return 0;              /* a teammate's hit: tmbr_TakeHit drops it */
+    /* vehicleTakeHit's cuts before retail's minionTakeHit call: respawn shield (the mod's rule: byte 0x497 set) -> 0;
+     * AI vs AI: the mod lets bots hurt each other in full, the ally bot for half (dmgreport.c) */
+    if (*(signed char*)(v + 0x497)) d = 0;
+    else if (a && a != v && F(a, 0x590) == 2 && tmbr_IsAlly(a)) d = d / 2 > 0 ? d / 2 : (d > 0);
+    up = F(v, 0x408) > 0 || F(v, 0x40C) > 0 || F(v, 0x410) > 0 || F(v, 0x414) > 0;
+    sPos = F(info, 0);
+    if (!(F(info, 8) == 1 && sPos) && !pos) {      /* nowhere to measure from: the shield just holds */
+        scePrintf("TMBR minion: hit %d without a position, %s\n", dmg, up ? "absorbed" : "through");
+        return up;
+    }
+    /* minionTakeHit's HUD messages go to hud +0x210C (the car's screen; a bot has none): the attacker's screen when it
+     * is a player on this console, else screen 0. Its generators are measured from *(info+0): network hits leave
+     * that stale (the event handler does not set it), so the hit's own position stands in for any non-local hit. */
+    s210C = F(v, 0x210C);
+    if (a && F(a, 0x20B4) == 1 && (unsigned)F(a, 0x210C) <= 3) scr = F(a, 0x210C);
+    F(v, 0x210C) = scr;
+    if (!(F(info, 8) == 1 && sPos)) F(info, 0) = (int)pos;
+    g0 = F(v, 0x408) + F(v, 0x40C) + F(v, 0x410) + F(v, 0x414);
+    r = minionTakeHit(v, d);
+    F(v, 0x210C) = s210C;
+    F(info, 0) = sPos;
+    if (g0 != F(v, 0x408) + F(v, 0x40C) + F(v, 0x410) + F(v, 0x414) || (!r && up))
+        scePrintf("TMBR minion: hit %d (%d) by car %d: generators %d %d %d %d, %s\n", dmg, d,
+            a ? (int)(a - g) / 0x31B0 : -1, F(v, 0x408), F(v, 0x40C), F(v, 0x410), F(v, 0x414), r ? "absorbed" : "through");
+    return r;
 }
 
 #if BOSSTRACE

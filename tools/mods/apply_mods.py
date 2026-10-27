@@ -255,7 +255,8 @@ PATCHES = [
     (A("nonmatchings/tmb/game/func_00138358.s"), "001386C8", "jal", "jal        tmbr_PrisonInitAfter"),        # Prison Passage story sequence (story.c)
     (A("nonmatchings/tmb/game/func_00138358.s"), "001387FC", "jal", "jal        tmbr_LevelInitAfter"),         # Warhawk's roof boss init (story.c)
     (A("nonmatchings/tmb/boss/func_00114B78.s"), "00114D5C", "jal", "jal        tmbr_BossWon"),                # the roof boss down: stage won (story.c)
-    (A("nonmatchings/tmb/interact/func_0014F108.s"), "0014F184", "jal", "jal        tmbr_VehTakeHit"),             # the roof tanker's hits (story.c)
+    # (the dispatch 0x14F184 -> tmbr_VehTakeHit: one entry, with the hit-function hooks below)
+    (A("nonmatchings/tmb/ai/aiInit__7Vehicle.s"), "0010011C", "jal", "jal        tmbr_MinionVehInit"),          # Minion's stadium: AI Minion health + force field (story.c)
     (A("nonmatchings/tmb/game/func_0013D0C0.s"), "0013D574", "jal", "jal        tmbr_DoFogVolume"),           # Lost map look debug: fog volumes off (lostslots.c)
     (A("nonmatchings/tmb/game/func_0013D0C0.s"), "0013D594", "jal", "jal        tmbr_DoAmbientVolume"),       # ... ambient volumes off
     (A("nonmatchings/online/after_blimp_06/func_00111ED8.s"), "00111F0C", "jal", "jal        tmbr_BossVehName"),      # boss cars by name (story.c)
@@ -452,13 +453,16 @@ PATCHES = [
     # ... and rams on remote cars (sent to the victim's console as a game event instead of applied here)
     (A("tmb/collis.s"), "00121744", "jal", "jal        tmbr_RamSent"),
     # every call of the hit function: team play without friendly fire, real damage for the reports (dmgreport.c)
+    # The weapon dispatch and the three network hit events go through story.c's tmbr_VehTakeHit first (Minion's
+    # shield, the roof tanker), which then calls tmbr_TakeHit. (One patch per site: a second patch at the same
+    # address silently replaces the first.)
     (A("nonmatchings/tmb/fodder/fodderTakeHit__7VehicleP8_fvectorii.s"), "00134AA8", "jal", "jal        tmbr_TakeHit"),
-    (A("nonmatchings/tmb/interact/func_0014F108.s"), "0014F184", "jal", "jal        tmbr_TakeHit"),
+    (A("nonmatchings/tmb/interact/func_0014F108.s"), "0014F184", "jal", "jal        tmbr_VehTakeHit"),
     (A("nonmatchings/tmb/vehicle/func_001DC760.s"), "001DC7C4", "jal", "jal        tmbr_TakeHit"),
     (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167938", "jal", "jal        tmbr_TakeHit"),
-    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167D38", "jal", "jal        tmbr_TakeHit"),
-    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167DA0", "jal", "jal        tmbr_TakeHit"),
-    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167EC4", "jal", "jal        tmbr_TakeHit"),
+    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167D38", "jal", "jal        tmbr_VehTakeHit"),
+    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167DA0", "jal", "jal        tmbr_VehTakeHit"),
+    (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167EC4", "jal", "jal        tmbr_VehTakeHit"),
     # 12 Pak's reticle special: the reticle's slot-5 ammo calls
     (A("nonmatchings/tmb/launch/func_001549A0.s"), "00155240", "jal", "jal        tmbr_ReticleUsed"),
     (A("nonmatchings/tmb/launch/func_00156118.s"), "00156268", "jal", "jal        tmbr_ReticleUsed"),

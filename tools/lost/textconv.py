@@ -30,12 +30,19 @@ def records(d, payload_size):
 def tex_rec_size(gs):
     psm, tw, th = (gs >> 32) & 0x3f, (gs >> 40) & 15, (gs >> 44) & 15
     n = (1 << tw) * (1 << th)
-    return 0x80 + (n // 2 if psm == 0x14 else n)
+    return 0x80 + {0x13: n, 0x1b: n, 0x14: n // 2, 0x24: n // 2, 0x2c: n // 2, 0x02: 2 * n, 0x0a: 2 * n}.get(psm, 4 * n)
 
 
 def rtx_rec_size(gs):
+    """CLUT records (kind byte 0x08 at bits 48-55): 16-byte header + 4 bytes per colour. The other RTX records are
+    VRAM-resident textures (retail levels: PSMT8H / PSMT4HL / PSMT4HH, kind 0x20 / 0x40) with a 0x80 header like a
+    TEX record. (Getting this wrong for a level whose last RTX record is a resident texture broke the Lost merge.)"""
     tw, th = (gs >> 40) & 15, (gs >> 44) & 15
-    return 16 + 4 * (1 << tw) * (1 << th)
+    n = (1 << tw) * (1 << th)
+    if ((gs >> 48) & 0xff) == 0x08:
+        return 16 + 4 * n
+    psm = (gs >> 32) & 0x3f
+    return 0x80 + {0x13: n, 0x1b: n, 0x14: n // 2, 0x24: n // 2, 0x2c: n // 2, 0x02: 2 * n, 0x0a: 2 * n}.get(psm, 4 * n)
 
 
 def rtx_records(rtx):

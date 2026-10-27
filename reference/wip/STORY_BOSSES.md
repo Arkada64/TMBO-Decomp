@@ -71,6 +71,7 @@ Read-only research for STORY_PLAN phase 4. Retail addresses are from /home/claud
     (`forceFieldCreate`, state 2).
   - `vehicleTakeHit` -> `minionTakeHit__7Vehiclei` (0x1AD9A0) for an AI Minion on level 0xE (the shield phases).
   - Level 14 InitBefore (game types 1, 2, 4) calls `forceFieldInitBefore`, and Update calls `forceFieldUpdate`.
+  - Details and the mod's port: section "Minion's Stadium (level 14)" at the end.
 - **Prison Ship (15):** `prisonShipInitBefore/InitAfter/Update` hold level props only, no boss.
 - **Prison Passage (3):** in non-zero game types, the inner-doors and drawbridge updates call `SetAICar` on the caged cars at
   game +UpdateTranslation+0x310/0x314. These are prisoners released mid-level, not a boss.
@@ -103,7 +104,8 @@ Read-only research for STORY_PLAN phase 4. Retail addresses are from /home/claud
   - Only VehicleParse -> AddEpNode survives. TMBO's FinalBoss is at **game+0x97120**.
   - `tankerTakeHit` (func_001E3188) has no caller. TMBO's vehicle hit code (likely func_001E1C40) lost the 0x220 branch.
   - `tankerUpdateDeathSequence` is gone, so the tanker would not respawn as a boss AI.
-  - `minionTakeHit` (func_001E2A00) has no caller, and the Minion force-field setup is gone.
+  - `minionTakeHit` (func_001E2A00) has no caller, and the Minion force-field setup is gone (ported 2026-10-26, see the
+    Minion section).
   - Still present: TakeHit (func_00114B78, still reached through interactive dispatch func_0014F108 for type 0xC),
     UpdateTanker (called from UpdateLauncher), CheckCollision, RegenBoss (func_00114FE0), the 0x220 checks in ai func_001002C0,
     game func_0013D0C0 and launch, and the FinalBossSound and HelicopterSound functions.
@@ -163,3 +165,117 @@ Read-only research for STORY_PLAN phase 4. Retail addresses are from /home/claud
   TLBs at 0x14AC64 / 0x14B778). A trampoline on InitBossAfter's first call (0x11206C, tmbr_BT0) never printed, and
   nothing between its entry and that call jumps - unexplained. Next: check that 0x111ED8 in the built ELF really is
   this code (shift build?), single-step with PCSX2's debugger, or call the pieces (csCreate func_00213F80 etc.) from C.
+
+## Minion's Stadium (level 14): retail's shielded Minion (2026-10-26, not tested yet)
+
+### What retail does (AI Minion = vehicle id 0x1E0 with type +0x580 != 1, level index 0xE)
+- **`vehicleInitDynamics`** (0x1A4238, case 0x1E0 at 0x1A6DA8). It runs from `vehicleInit`, so on every spawn and respawn.
+  - Health +0x3F0: 250 for an AI Minion, 150 for a human one.
+  - Shield generator hit points +0x3F8..+0x404: 35 / 5 / 25 / 25, or 100 / 75 / 75 / 75 in game type 4.
+    Generator models at +0x2058..+0x2064 are switched to 0 (intact).
+  - AI branch only, big-car geometry (retail offset = TMBO offset):
+
+    | Retail | TMBO | Value (AI) | Value (human) |
+    |---|---|---|---|
+    | 0x394 | 0x3A4 | -8.681 | -4.401 |
+    | 0x398 / 0x39C / 0x3A0 | 0x3A8 / 0x3AC / 0x3B0 | 18.564 | 9.282 |
+    | 0x3A4 | 0x3B4 | 9.66 | 4.7 |
+    | 0x3A8 | 0x3B8 | 14.34 | 6.8 |
+    | 0x3AC | 0x3BC | -44.818 | -22 |
+    | 0x3B0 | 0x3C0 | 28.606 | 14 |
+    | 0x3B4 | 0x3C4 | -54.3 | -27 |
+    | 0x3B8 | 0x3C8 | 34.468 | 15.79 |
+    | 0x3C0 | 0x3D0 | 5.447 | 3.6 |
+    | 0x3C4 | 0x3D4 | 7.2 | 2.7 |
+
+    These are ride height, half track and axle positions (skins.c ownWheels), roughly 2x. That is the giant Minion.
+  - Then `forceFieldCreate(cs+0x20, cs+0x10, v+0x20A4 (dup), -14.5, 4, 30, 49, 35)` and `forceFieldSetState(2)`.
+    - The int argument is the dup that forceFieldCreate passes to `GetVehicleFromName(game, 0x1E0, dup)`.
+    - f12/f13 go to the shield model's scale node +0x14/+0x18. f14..f16 are the ellipsoid size.
+- **`vehicleTakeHit`** (0x1AD208): after the respawn-shield cut (damage 0) and the AI-vs-AI cut (0 or half), an AI
+  Minion on 0xE calls `minionTakeHit(v, damage)`. If it returns non-zero, vehicleTakeHit returns: the hit is skipped.
+- **`minionTakeHit`** (0x1AD9A0, TMBO func_001E2A00, same logic):
+  - Damage 1000 kills all four generators (state 0).
+  - It always calls `forceFieldTakeHit(*(hitinfo+0))` (TMBO func_00136300). The hit info is game+0x150560 in retail and
+    game+0x2BC10 in TMBO: +0 is a pointer to the hit position, +8 = 1 for a local hit.
+  - A generator (local offsets on the stack table, through the cs matrix) takes the damage when the hit lands within 50
+    (manhattan) of it and it still has hit points.
+    - At 0: its model switch, `figureOutForceField` (TMBO func_001E4F40: state 4/6/7/3 by the number of dead
+      generators), particles, a HUD message and a sound.
+    - Otherwise: a "generator hit" message.
+  - While any generator is up it returns 1, with the shield-impact sound if +8 == 1.
+  - When none is up: `aiSetAggressiveness(100)`, the "shield down" message if one died now, and it returns 0.
+  - TMBO's version sends messages through `AddMessage__3Hudiii(game+0x97B50 + v[+0x210C]*0xA20, 0xBD..0xC5, 1, 1)`, the
+    car's own screen index.
+- **Level 14 InitBefore** (game types 1, 2, 4) = `forceFieldInitBefore`. **Update** (types 1, 2, 4) =
+  `forceFieldUpdate`. It also sets the `UpdatePlasmaBallTrans+0x30` game flag, which vehicleUpdatePosition uses to switch
+  the car hier switches +0x202C/+0x2030 (lights?). That flag is not ported.
+
+### What TMBO lost
+- InitDynamics' 0x1E0 case (func_001D72D8 .L001DAB40) has no AI/level test. Every Minion gets the human values plus 160
+  health. The generator hit points are 35 / 5 / 25 / 25 at +0x408..+0x414 (TMBO = retail + 0x10).
+- `minionTakeHit` (func_001E2A00) has no caller.
+- No level case calls the force field. forceFieldCreate (func_00136100) is intact and tests the **shell** level
+  +0x18000+0x23AC == 0xE.
+
+### Mod (story.c, host only, story on, game level 14 (game+0x9FCA0))
+- **`tmbr_MinionVehInit`**: aiInit's `jal vehicleInit` at **0x10011C** (new hook). Every AI spawn and respawn passes
+  here: gameMakeAI, and the death sequence func_001E3800 -> aiInit. skins.c already owns 0x1D7020 (InitDynamics).
+  After vehicleInit, an AI Minion (0x1E0, +0x590 == 2) gets these:
+  - Health +0x400 = 250. aiInit then copies it to +0x404 and applies the difficulty scaling.
+  - The force field: `func_00136100(cs+0x20, cs+0x10, +0x20F0, ...)` + `forceFieldSetState(2)`. GetVehicleFromName
+    inside it is already routed to tmbr_BossVehName, and the right dup makes the normal lookup succeed.
+  - The ally bot (teams.c tmbr_IsAlly) gets no field. A second AI Minion does not take it over.
+  - `MINION_BIG` (default 0) also writes retail's big-car geometry and calls vehicleRecomputeDeltas. It is off because
+    TMBO's Minion model is probably the normal size.
+- **`tmbr_VehTakeHit`** now hooks the weapon dispatch **0x14F184** and the network hit events **0x167D38 / 0x167DA0 /
+  0x167EC4**, then calls dmgreport.c's `tmbr_TakeHit`.
+  - Bug fixed: 0x14F184 had two entries in apply_mods.py (story's and dmgreport's). The later one won, so the Warhawk
+    tanker hook never ran.
+  - For the shielded Minion, `minionHit` does these steps:
+    - Finds the attacker by +0x20FC.
+    - Drops teammates' hits to tmbr_TakeHit.
+    - Applies the mod's damage cuts: respawn shield byte 0x497 -> 0; the ally bot -> half. The mod already removed
+      TMBO's AI-vs-AI cut.
+    - Points hit info +0 at the hit position, unless it is a local hit (+8 == 1) with +0 set. Network events leave +0
+      stale.
+    - Sets the Minion's +0x210C to the attacker's screen (a local player, 0..3) or 0, so the HUD messages land on a
+      real HUD.
+    - Calls `func_001E2A00`, then restores both.
+    - Returns 1 = absorbed: no tmbr_TakeHit, no damage, no damage report.
+- **`minionFrame`** (from tmbr_BossFrame, bots.c tmbr_BotsThink, every frame):
+  - Calls `forceFieldUpdate` while the field is on.
+  - Moves the field to another AI Minion if its car is no longer one. This covers the ally bot's first spawn, before
+    teams.c knows it is the ally.
+  - Turns the field off (forceFieldInitBefore) when no AI Minion is left.
+- **`minionLevelInit`** (from tmbr_LevelInitAfter, 0x1387FC): `forceFieldInitBefore` on level 14.
+- Log lines start with `TMBR minion:`. Among them: shield up (spawn / respawn / moved / late) with theBoss
+  (D_004FB45C, must be 1), the shield model pointer (D_004FB46C, must be non-zero), state and generators; each
+  generator hit; state every 600 frames.
+
+### Risks
+- **Shared force-field globals** with Warhawk's roof: theBoss, mat/pos pointers, model switch, state, CLUT, fx
+  handles. One level never runs both. Both paths reset on level init (minionLevelInit, and the roof's own
+  forceFieldInitBefore).
+- **Model.** If TMBO's Minion car file has no shield model at +0x2068, forceFieldCreate clears theBoss. Then there is no
+  bubble and no forceFieldUpdate, but the generators still absorb (minionTakeHit only needs the generator switches
+  +0x2074..+0x2080, which TMBO's InitDynamics already sets).
+- **Clients** run none of it. Hits on the host's bot are applied on the host (dispatch or network event), so health
+  stays synced: a client sees a Minion that shrugs off hits until the generators are down. But a client sees no
+  bubble, its generator models stay intact, and the HUD messages show on the host's screen 0 only. A client's own
+  local hits on the remote Minion still play the normal hit effects.
+- **Messages and sounds.** HUD message ids 0xBD..0xC5 and the Minion shield sounds must exist in TMBO's data.
+- **Respawn shield.** A hit during the respawn shield does 0 damage to the generators but still shows "generator hit"
+  (retail does the same).
+
+### Check in game (story run at Minion's Stadium, host)
+1. The log shows `TMBR minion: stadium init`, then `shield up (spawn) ... boss 1 model <non-zero> state 2,
+   generators 35 5 25 25, health 250`.
+2. A bubble with electric arcs is drawn around Minion and follows him.
+3. Shots near a generator log `hit ... generators ...` with the numbers going down. HUD messages appear and his health
+   does not drop.
+4. After the four generators are down: the "shield down" message, `through` in the log, and normal damage.
+5. Kill him: on respawn the log shows `shield up (respawn)` with full generators.
+6. With ALLY BOT on: the ally Minion has no bubble (`ally bot, no shield` or `moved`).
+7. On other levels: no `TMBR minion` lines.
+8. Warhawk tanker hook: `tmbr_VehTakeHit` now really runs, which matters for ROOF_BOSS builds.
