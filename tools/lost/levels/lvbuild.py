@@ -308,6 +308,7 @@ def ground_pieces(meshes, pieces, tl, cell=50.0, tol=8.0):
     return out
 
 SKY_DIR = '/mnt/user-data/uploads/cloud/out/sky'
+SKY_R = 9000.0                 # dome radius (inside mods/lostslots.c LOSTCLIP)
 SKY_PICK = {'HCSC': 'JUNKYARD', 'HCSU': 'PRISON', 'HCGD': 'CITY', 'HCND': 'PRISON', 'HCST': 'SUBURB'}   # Ark 2026-10-27
 def retail_sky(level):
     """a retail outdoor level's sky dome: [(mesh node bytes, packet rel offset, [(tex key, image)])] + the textures
@@ -470,6 +471,16 @@ def build(path, outdir, name, scale=1.15, donor=None):
         big = [e for e in placed if e[1][3] > 3000]; small = [e for e in placed if e[1][3] <= 3000]
         if sky:                                         # the retail dome, centred on the map
             P_ = np.array([s_[:3] for _, s_ in placed]); mc = (P_.max(0) + P_.min(0)) / 2
+            # the dome scaled to SKY_R across (Ark 2026-10-27: a 30000 view distance to reach the retail-size domes
+            # stalled the game's draw list - nothing but the sky colour on screen): lostslots.c keeps the view at
+            # LOSTCLIP, the dome sits inside it
+            from tmbmesh import decode as tdecode
+            rmax = 1.0
+            for blob, pk, kk, _ in sky[0]:
+                bb = bytearray(blob); struct.pack_into('<I', bb, 4, BASE + pk)
+                Pd = np.array(tdecode(bytes(bb), 0)['pos']); rmax = max(rmax, float(np.abs(Pd[:, :2]).max()))
+            ssc = SKY_R / rmax
+            print('  sky dome radius %.0f -> %.0f' % (rmax, SKY_R))
             for blob, pk, kk, _ in sky[0]:
                 sb = bytearray(blob)
                 for i, k in enumerate(kk):
@@ -477,9 +488,10 @@ def build(path, outdir, name, scale=1.15, donor=None):
                     struct.pack_into('<H', sb, 0x50 + 2 * i, tid); sb[0x70 + 0x30 * i:0x70 + 0x30 * i + 0x30] = ctx
                 struct.pack_into('<I', sb, 4, pk)
                 mo = car.append(bytes(sb), (4,), [(0x50 + 2 * i, 0x70 + 0x30 * i) for i in range(len(kk))])
-                t3 = car.append(struct.pack('<IIiI3fI', 3, 0, 1, 0, mc[0], mc[1], 0.0, 0))
-                car.setp(t3 + 0x1c, mo)
-                groups.append((car.group([t3], sphere=(mc[0], mc[1], 0.0, 40000.0)), (mc[0], mc[1], 0.0, 40000.0)))
+                t4 = car.append(struct.pack('<IIiI16fI', 4, 0, 1, 0, ssc, 0, 0, 0, 0, ssc, 0, 0, 0, 0, ssc, 0,
+                                            mc[0], mc[1], 0.0, 1.0, 0) + b'\0' * 12)
+                car.setp(t4 + 0x50, mo)
+                groups.append((car.group([t4], sphere=(mc[0], mc[1], 0.0, SKY_R * 1.5)), (mc[0], mc[1], 0.0, SKY_R * 1.5)))
         if small: groups += kd(small)
         for off, sph in big: groups.append((car.group([off], sphere=sph), sph))
     # ---- collision: one op18 per Head-On collision piece

@@ -384,7 +384,26 @@ def on_body(p, pts, box, zmin=0.0, inset=0.8):
     if q[2] < bot:
         q[2] = bot
         return q, 'raised to the body bottom (z %.2f)' % bot
-    return q, 'inside the body (top %.2f)' % top
+    # inside the body: the weapon model was hidden in it (Ark 2026-10-27: zoomy / power missiles not seen on some
+    # extras): up onto the top there, like a point above it
+    q[2] = top - min(zmin, 0.0) * 0.8 if zmin < 0 else top
+    return q, 'raised out of the body onto its top (z %.2f)' % top
+
+
+def rear_point(pts, box):
+    """right turbo point: at the body's back end, half way out to its side there, 40% up its height there"""
+    lo, hi = np.asarray(box[0], float), np.asarray(box[1], float)
+    if pts is None or not len(pts):
+        return np.array([hi[0] * 0.4, lo[1] + 0.3, lo[2] + 0.4 * (hi[2] - lo[2])])
+    P = np.asarray(pts, float)
+    ymin = P[:, 1].min()
+    rear = P[P[:, 1] < ymin + 1.2]
+    x = 0.5 * np.abs(rear[:, 0]).max()
+    band = rear[np.abs(np.abs(rear[:, 0]) - x) < 0.6]
+    if len(band) < 3:
+        band = rear
+    z0, z1 = band[:, 2].min(), band[:, 2].max()
+    return np.array([x, band[:, 1].min() + 0.2, z0 + 0.4 * (z1 - z0)])
 
 
 def apply(car, rec, L, to_donor, box_d, box_n, name='', log=print, pts=None, skip_chars=()):
@@ -416,19 +435,16 @@ def apply(car, rec, L, to_donor, box_d, box_n, name='', log=print, pts=None, ski
     for node, d in sorted(rec.items()):
         ids = sorted(d['ids'])
         if 4100 in ids:
-            mgd = os.environ.get('HC_MG_DONOR', '')
-            if mgd == 'front':           # no gun on the model (Twister): at the front of the body, low / mid
-                c0, h0 = ch(box_n)
-                q = np.array([h0[0] * 0.55, box_n[1][1] - 0.3, c0[2]])
-                tgt, how = (q if d['pos'][0] > 0 else q * np.array([-1, 1, 1])), 'HC_MG_DONOR front of the body'
-            elif mgd:                    # donor-space right gun muzzle (the model's own barrels), left mirrored
-                q = np.array([float(x) for x in mgd.split(',')])
-                tgt, how = (q if d['pos'][0] > 0 else q * np.array([-1, 1, 1])), 'HC_MG_DONOR'
-            elif r is not None:
-                tgt, how = to_donor(r if d['pos'][0] > 0 else l), src
+            # id 4100 under the attach kind 13 switch is the TURBO flame (attachAdd kind 13 -> func_0010B498 ->
+            # vehicle +0x3160 / +0x30E0, func_001E4500 particle 0x27), not the machine gun (the gun muzzles are the
+            # launcher's own table, +0x610 / +0x620; mods/skins.c XMG). Ark 2026-10-27: the flames sat at the front
+            # (they had been put on the guns): at the back of the new body, low, either side (HC_TURBO x,y,z overrides)
+            tv = os.environ.get('HC_TURBO', '')
+            if tv:
+                q = np.array([float(x) for x in tv.split(',')]); how = 'HC_TURBO'
             else:
-                tgt, how = on_body(boxmap(d['pos']), pts, box_n)
-                how = 'box map (no Head-On points), ' + how
+                q, how = rear_point(pts, box_n), 'back of the body'
+            tgt = q if d['pos'][0] > 0 else q * np.array([-1, 1, 1])
         elif mode == 'mg':
             continue
         elif d.get('char') in skip_chars and d.get('char') is not None:

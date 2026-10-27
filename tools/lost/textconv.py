@@ -110,7 +110,12 @@ class TexBuilder:
                 h, w = h // 2, w // 2
             img = im.reshape(-1, 4).astype(float)
             img[:, 3] = np.minimum(255, img[:, 3])
-            idx = ((img[:, None, :3] - P[None, :, :3]) ** 2).sum(2).argmin(1).astype(np.uint8)
+            # alpha counts too (both 0..255 here): Gold Tooth's eye glow (pure red, alpha
+            # ramp) went onto Sweet Tooth's red ramp palette by colour alone - every texel the alpha-2 entry, unseen
+            d = ((img[:, None, :3] - P[None, :, :3]) ** 2).sum(2)
+            if np.ptp(P[:, 3]) > 0:
+                d = d + 4 * (img[:, None, 3] - P[None, :, 3]) ** 2
+            idx = d.argmin(1).astype(np.uint8)
             bpp = 8 if len(P) == 256 else 4
         elif key in self.own16:                     # own 16-colour palette: 1 CLUT block instead of 4
             from PIL import Image

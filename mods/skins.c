@@ -221,7 +221,8 @@ static void applyX(void)
     if (!shellPtr) return;
     for (p = 0; p < PAK_POS; p++) if (*(int*)(shellPtr + 0x1A2F0 + p * 4) == skinType[k] << 5) dp = p;
     *(int*)(shellPtr + 0x1A2F0 + PAK_POS * 4) = skinType[k] << 5;
-    carClip[PAK_POS] = k == 1 || dp < 0 ? 0 : 5 + dp;        /* an extra: its donor's stand (12 Pak: keeps the picture) */
+    carClip[PAK_POS] = 0;     /* every bonus car shows 12 Pak's picture (Ark 2026-10-27: so you know they are bonus) */
+    (void)dp;
 }
 /* Minion's car select position while the lobby has Minion off (bots.c OPT_MINION clear), else -1 */
 static int minionSkipPos(void)
@@ -801,10 +802,12 @@ static void pakMounts(char* l, int i)
  * (tools/lost/hc_buildall.sh HC_MG_DONOR, right gun; left mirrored). Brimstone (Thumper's chassis) has one gun:
  * both of its muzzles were the same point, so Thumper fired from one side only and away from his barrels
  * (Ark 2026-10-26). */
-static float XMG[2][3] = { { 2.35f, 7.40f, 0.37f }, { 0.9f, 7.2f, -2.7f } };   /* Thumper, Twister */
+static float XMG[3][3] = { { 2.35f, 7.40f, 0.37f }, { 0.9f, 7.2f, -2.7f },     /* Thumper, Twister */
+                           { 1.31f, 7.30f, -0.48f } };                         /* Pit Viper (Head-On's gun points; Ark 2026-10-27: shots out of line) */
+#define SK_PITVIPER 3
 static void xMounts(char* l, char* v)
 {
-    int k = vehSkinF(v), g = k == SK_THUMPER ? 0 : k == SK_TWISTER ? 1 : -1, j;
+    int k = vehSkinF(v), g = k == SK_THUMPER ? 0 : k == SK_TWISTER ? 1 : k == SK_PITVIPER ? 2 : -1, j;
     if (g < 0) return;
     for (j = 0; j < 2; j++) {
         float* e = (float*)(l + 0x610 + 16 * j);
@@ -815,6 +818,15 @@ static void xMounts(char* l, char* v)
 void tmbr_LauncherUpdate(void* l, char* v)
 {
     xMounts((char*)l, v);
+    if (vehSkinF(v) == SK_THUMPER) {
+        /* the whole launcher update as Warthog (Ark 2026-10-27: Brimstone's special-ready zealot showed on Thumper's
+         * hood while the special was selected - the launcher draws the car id's special model) */
+        int sv = *(int*)(v + 0x20F4);
+        *(int*)(v + 0x20F4) = WARTHOG_ID;
+        launcherUpdate(l, v);
+        *(int*)(v + 0x20F4) = sv;
+        return;
+    }
     if (isPak(v)) {
         int i = vidx(v);
         if (i >= 0) pakMounts((char*)l, i);

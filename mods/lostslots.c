@@ -272,11 +272,20 @@ extern void viewSetBgColor(unsigned long r, unsigned long g, unsigned long b, un
 /* horizon colours of the skies Ark picked (2026-10-27; tools/lost/levels/lvbuild.py SKY_PICK): Carnival = Junkyard's,
  * Suburban Terror = Prison's, City of the Dead = City's, Death Port = Prison's, Stadium Slaughter = Suburb's */
 static const unsigned char SKYCOL[NLOST + 1][3] = { { 0, 0, 0 }, { 70, 36, 12 }, { 58, 64, 72 }, { 80, 74, 62 }, { 58, 64, 72 }, { 82, 76, 62 } };
-static float skyK[3] = { 20000.0f, 30000.0f, 0.0f };
+/* LOSTCLIP: view distance (Ark 2026-10-27: 30000 stalled the game's draw list - only the sky colour on screen);
+ * the sky domes are built 9000 across (tools/lost/levels/lvbuild.py SKY_R). Fog from skyK[0] to the far clip. */
+static float skyK[3] = { 7000.0f, 12000.0f, 0.0f };
+extern float D_004FAE58, D_004FAE5C, D_004FAE64;
+static int skyLogged = -1;
 static void lostSky(void)
 {
     const unsigned char* c;
     if (!active() || tmbr_lostDbg) return;
+    if (skyLogged != tmbr_lostMap) {
+        skyLogged = tmbr_lostMap;
+        scePrintf("TMBR lost: level fog %d..%d far clip %d -> %d..%d far clip %d\n", (int)D_004FAE58, (int)D_004FAE5C,
+                  (int)D_004FAE64, (int)skyK[0], (int)skyK[1], (int)skyK[1]);
+    }
     c = SKYCOL[tmbr_lostMap];
     fogSet(skyK[0], skyK[1], skyK[2], skyK[1], c[0], c[1], c[2]);
     viewSetBgColor(c[0], c[1], c[2], 0x80);

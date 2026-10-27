@@ -704,6 +704,32 @@ def build(a, rd, own16):
         # cargo box / its sides: same rest box, other bones or switch frames); a variant no new mesh landed on stayed
         # empty. It gets the part of the covered slot with the closest rest box (same meshes, re-framed for its bone)
         bx = [(x[5].min(0), x[5].max(0)) for x in tm]
+        for j in sorted(by_slot):
+            print('robot: slot %d (%#x) box %s..%s <- %s' % (j, tm[j][1], bx[j][0].round(1), bx[j][1].round(1), [hex(h) for h in by_slot[j]]))
+        # Ark 2026-10-27: "lower parts are normal Sweet Tooth's, not his gold robot form": an uncovered big slot
+        # (Sweet Tooth's truck bed and its variants, 30+ verts) gets the new meshes inside its normalized box that sit
+        # on the same bone (same frame: drawn the same, wherever the animation takes it); with none it is emptied
+        # (the new robot's own parts there already show). Small Sweet Tooth parts (pistons) stay, gold.
+        slot_of = {h: j for j, hl in by_slot.items() for h in hl}
+        same = lambda i, j: np.allclose(tm[i][2], tm[j][2], atol=1e-3) and np.allclose(tm[i][3], tm[j][3], atol=1e-2)
+        for j in range(len(tm)):
+            if j in by_slot or len(tm[j][5]) < 30:
+                continue
+            lo_, hi_ = norm_t(bx[j][0]), norm_t(bx[j][1])
+            pad = (hi_ - lo_) * 0.1 + 0.02
+            inb = [h for h in hs if ((norm_g(gc[h]) >= lo_ - pad) & (norm_g(gc[h]) <= hi_ + pad)).all()]
+            if not inb:
+                continue                   # nothing of the new robot there: Sweet Tooth's part stays (gold)
+            hl = [h for h in inb if same(slot_of[h], j)]
+            s_, k_ = tm[j][:2]
+            if hl:
+                nodes_ = [node(h, frame=tm[j][2:4]) for h in hl]
+                car.setp(s_, nodes_[0] if len(nodes_) == 1 else car.group(nodes_, sphere=(0, 0, 0, 20.0)))
+                print('robot: donor slot %d (%#x) given the %d new meshes on its bone inside its box' % (j, k_, len(hl)))
+            else:
+                car.setp(s_, car.group([], sphere=(0, 0, 0, 1.0)))
+                print('robot: donor slot %d (%#x, Sweet Tooth part, %d verts) emptied (%d new meshes inside, on other bones)' % (j, k_, len(tm[j][5]), len(inb)))
+            by_slot[j] = hl
         for j in range(len(tm)):
             if j in by_slot:
                 continue

@@ -668,3 +668,12 @@ __asm__(".text; .align 3; .set noreorder; .globl tmbr_BT10; tmbr_BT10: addiu $29
 __asm__(".text; .align 3; .set noreorder; .globl tmbr_BT11; tmbr_BT11: addiu $29, $29, -0xA0; sq $4, 0($29); sq $5, 0x10($29); sq $6, 0x20($29); sq $7, 0x30($29); sq $31, 0x40($29); sq $8, 0x50($29); sq $9, 0x60($29); swc1 $f12, 0x70($29); swc1 $f13, 0x74($29); swc1 $f14, 0x78($29); swc1 $f15, 0x7C($29); swc1 $f16, 0x80($29); swc1 $f20, 0x84($29); jal tmbr_BossTrace; addiu $4, $0, 11; lq $4, 0($29); lq $5, 0x10($29); lq $6, 0x20($29); lq $7, 0x30($29); lq $31, 0x40($29); lq $8, 0x50($29); lq $9, 0x60($29); lwc1 $f12, 0x70($29); lwc1 $f13, 0x74($29); lwc1 $f14, 0x78($29); lwc1 $f15, 0x7C($29); lwc1 $f16, 0x80($29); lwc1 $f20, 0x84($29); j func_001FBCF8; addiu $29, $29, 0xA0; .set reorder");
 __asm__(".text; .align 3; .set noreorder; .globl tmbr_BT12; tmbr_BT12: addiu $29, $29, -0xA0; sq $4, 0($29); sq $5, 0x10($29); sq $6, 0x20($29); sq $7, 0x30($29); sq $31, 0x40($29); sq $8, 0x50($29); sq $9, 0x60($29); swc1 $f12, 0x70($29); swc1 $f13, 0x74($29); swc1 $f14, 0x78($29); swc1 $f15, 0x7C($29); swc1 $f16, 0x80($29); swc1 $f20, 0x84($29); jal tmbr_BossTrace; addiu $4, $0, 12; lq $4, 0($29); lq $5, 0x10($29); lq $6, 0x20($29); lq $7, 0x30($29); lq $31, 0x40($29); lq $8, 0x50($29); lq $9, 0x60($29); lwc1 $f12, 0x70($29); lwc1 $f13, 0x74($29); lwc1 $f14, 0x78($29); lwc1 $f15, 0x7C($29); lwc1 $f16, 0x80($29); lwc1 $f20, 0x84($29); j func_001FBCF8; addiu $29, $29, 0xA0; .set reorder");
 #endif
+
+/* Warhawk's roof outside the story (Ark 2026-10-27: "on warhawk i can hear warhawk flying around even tho he isnt
+ * spawned"): TMBO's ambient manager runs a level-20-only stream (+0x5A0, updateAmbientSound 0x1A4AF0: Warhawk's
+ * rotor loop) whatever the mode. Multiplayer gets the roof as a plain arena: that stream is only evaluated (so only
+ * started) in a story run. */
+extern void ambPrep(char* m, char* s) __asm__("func_001A47B8");
+extern void ambEval(char* m, char* s) __asm__("evaluateStreamState__19AmbientSoundManagerP14StreamingSound");
+void tmbr_RoofAmbPrep(char* m, char* s) { if (tmbr_Opt(OPT_STORY)) ambPrep(m, s); }
+void tmbr_RoofAmbEval(char* m, char* s) { if (tmbr_Opt(OPT_STORY)) ambEval(m, s); }
