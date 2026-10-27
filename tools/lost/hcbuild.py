@@ -382,6 +382,8 @@ def main():
     ap.add_argument('--keep-part', default='', help="donor node ids kept with their subtree, ';'-separated, each "
                     "optionally ':dx,dy,dz' to move it (e.g. Outlaw's turret '124:0,0,-1.9'); '@hex' names a node offset (Sweet "
                     "Tooth's robot character '@0x91c20')")
+    ap.add_argument('--gild', default='', help="donor mesh nodes kept and coated in the new car's baked gold (hex, "
+                    "comma separated: Sweet Tooth's side compartment shutters under Gold Tooth's open compartments)")
     ap.add_argument('--skip', default='', help='extra Head-On mesh headers to leave out (hex, comma separated)')
     a = ap.parse_args()
 
@@ -512,6 +514,11 @@ def build(a, rd, own16):
     skip_tex = {int(x, 16) for x in a.skip_tex.split(',') if x}
     built, skipped, fixed = {}, {}, [0, 0]
 
+    gold_keys = []
+    # HC_TWO=hex,...: Head-On meshes built with both faces whatever their flags (Ark 2026-10-27: Gold Tooth's head
+    # still see-through)
+    two_force = {int(x, 16) for x in filter(None, os.environ.get('HC_TWO', '').split(','))}
+    gild = {int(x, 16) for x in filter(None, a.gild.split(','))}
     def node(h, cols=None, local=None, frame=None):
         """local = (car-space centre, inverse rotation, mirror): a wheel mesh in its tire node's space"""
         key = (h, cols, None if local is None else (tuple(np.round(local[0], 4)), tuple(np.round(local[1], 4).ravel()), local[2]),
@@ -554,8 +561,10 @@ def build(a, rd, own16):
             # --env bake: an env-mapped part (Gold Tooth's gold body) gets its reflection-map lookup baked into UVs
             # both faces: a mirrored wheel, and every mesh Head-On draws without backface culling (hflags bit 23
             # clear; Ark 2026-10-27: Gold Tooth's head / cab windows see-through - only their front faces were built)
-            two = bool(local is not None and local[2]) or (os.environ.get('HC_TWOSIDED', '1') == '1'
+            two = bool(local is not None and local[2]) or h in two_force or (os.environ.get('HC_TWOSIDED', '1') == '1'
                                                            and not (ho.hd[h].get('hflags', 0x800000) & 0x800000))
+            if a.env == 'bake' and ho.hd[h]['hflags'] & 0x0E and m['texrefs']:
+                gold_keys.append(m['texrefs'][0])
             m = dict(m, twosided=two,
                      bake=a.env == 'bake' and bool(ho.hd[h]['hflags'] & 0x0E),
                      hflags=m.get('hflags', 0) & ~0x0E)
@@ -756,6 +765,8 @@ def build(a, rd, own16):
         for j, (s_, k_, M, t, c, P) in enumerate(tm):
             if j not in by_slot:               # (Sweet Tooth's own robot part stays, its palettes turned gold:
                 keep.add(k_)                   # Gold Tooth is a gold Sweet Tooth)
+                if os.environ.get('HC_ROBOT_GILD', '1') == '1':
+                    gild.add(k_)               # Ark 2026-10-27: coated in Gold Tooth's own gold instead
                 for i_ in range(min(4, struct.unpack_from('<H', car.n, k_ + 0x5a)[0])):
                     cb_ = (struct.unpack_from('<Q', car.n, k_ + 0x70 + 0x30 * i_)[0] >> 37) & 0x3fff
                     if cb_ not in set(reuse.values()):
@@ -886,6 +897,41 @@ def build(a, rd, own16):
           for sx in (-1, 1) for sy in (-1, 1)]          # the own wheels count too (x / y; z: their centres)
     shells = hcmounts.refit_shells(car, np.concatenate([to_donor(P0)] + ([np.array(Pw)] * 20 if Pw else [])))  # HC_SHELLS
 
+    # ---- --gild: donor meshes kept, their UVs baked from their normals onto the new car's gold reflection map (the
+    # same lookup meshconv bakes for the Head-On gold body) and every texture slot pointed at that map
+    if gild:
+        assert gold_keys, '--gild: no baked gold mesh built'
+        from collections import Counter
+        gk = Counter(gold_keys).most_common(1)[0][0]
+        gtid, gctx = tb.gs_ctx(gk)
+        from vif import parse as vparse
+        ng = 0
+        for nd in sorted(gild):
+            if u32(car.n, nd) & 0x3f != 0 or car.P(nd + 4) is None:
+                continue
+            pk = car.P(nd + 4)
+            qwc = u32(car.n, pk) & 0xffff
+            nv = None
+            for r in vparse(bytes(car.n), pk + 8, pk + 16 + qwc * 16, log=lambda *x: None):
+                if r[1] == 'BAD':
+                    nv = None; break
+                off, cmd, num, imm, pp, pl = r
+                if cmd == 0x6e and (imm & 0x3ff) == 1:
+                    nv = [struct.unpack_from('<3b', car.n, pp + 4 * i) for i in range(num)]
+                elif cmd == 0x75 and nv is not None:
+                    for i in range(min(num, len(nv))):
+                        nx, ny, nz = (np.array(nv[i], float) / 127.0)
+                        u = 0.5 + 0.45 * (0.85 * nx + 0.15 * ny)
+                        v = 0.66 - 0.30 * nz + 0.05 * ny
+                        struct.pack_into('<2h', car.n, pp + 4 * i, max(-32768, int(-u * 4096)), max(-32768, int(-v * 4096)))
+            nt = struct.unpack_from('<H', car.n, nd + 0x5a)[0]
+            for i in range(nt):
+                struct.pack_into('<H', car.n, nd + 0x50 + 2 * i, gtid)
+                car.n[nd + 0x70 + 0x30 * i:nd + 0xa0 + 0x30 * i] = gctx
+                if (nd + 0x50 + 2 * i, nd + 0x70 + 0x30 * i) not in car.pairs:
+                    car.pairs.append((nd + 0x50 + 2 * i, nd + 0x70 + 0x30 * i))
+            keep.add(nd); ng += 1
+        print('gilded donor meshes: %d (gold map tid %d)' % (ng, gtid))
     # ---- hide the donor's own parts (empty packet, no texture slots)
     dead = [r for r in dead if r]
     deadset = {x for x, _ in dead}
