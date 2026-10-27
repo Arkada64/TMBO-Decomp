@@ -41,7 +41,7 @@ extern void boundAngle(float* a) __asm__("boundFAngle__FPf");
 
 /* 0 zero, 1 ray height, 2 min cell, 3 max cell, 4 arrive (cells), 5 steer dead zone, 6 handbrake angle,
  * 7 waypoint height, 8 half, 9 steep (cells), 10 probe down (cells) */
-static float K[12] = { 0.0f, 3.0f, 14.0f, 40.0f, 0.8f, 0.12f, 1.6f, 2.0f, 0.5f, 0.7f, 2.0f, 0.0f };
+static float K[12] = { 0.0f, 3.0f, 14.0f, 40.0f, 0.8f, 0.12f, 1.6f, 2.0f, 0.5f, 0.7f, 2.0f, 260.0f };   /* 11: unreachable (path end this far off) */
 
 typedef struct {
     int st;          /* 0 idle, 1 waiting for the planner, 2 following */
@@ -50,6 +50,7 @@ typedef struct {
     fvec goal;
     int n, i;        /* waypoints, current */
     int timer, cool, tick, lastD, noProg;
+    int unr; char* unrTgt;   /* the target could not be reached on the route map: roam instead for `unr` frames */
     int al, alT;     /* aligning to a waypoint behind: 1 handbrake pivot, 2 reverse (3-point turn); frames left */
     char* tgt;
     fvec wp[MAXWP];
@@ -260,6 +261,17 @@ void tmbr_NavFrame(void)
             nb[cur].n = n; nb[cur].i = 0; nb[cur].timer = 0;
             nb[cur].st = n ? 2 : 0;
             if (!n) nb[cur].cool = 180;
+            /* (Ark 2026-10-27, Freeway: a target up on the stadium ring - reachable only over jumps, which the route
+             * map has no link for - gave a partial path to the nearest point, under a jump, and the bot parked
+             * there driving at it.) A hunt whose path ends far from the target: give up on it for a while. */
+            if (!nb[cur].roam && live(nb[cur].tgt) && (!full || !n)) {
+                fvec* tp = POSV(nb[cur].tgt);
+                fvec* e = n ? &nb[cur].wp[n - 1] : POSV(g + cur * 0x31B0);
+                if (fabs_(e->x - tp->x) + fabs_(e->y - tp->y) > K[11]) {
+                    nb[cur].unr = 420; nb[cur].unrTgt = nb[cur].tgt; nb[cur].st = 0; nb[cur].far = 1;
+                    scePrintf("TMBR nav: car %d cannot reach its target, roaming 7 s\n", cur);
+                }
+            }
             if (NAVDBG) scePrintf("TMBR nav: car %d baked plan %d pts %s\n", cur, n, full ? "to target" : "partial");
             cur = -1;
         }
@@ -359,7 +371,9 @@ int tmbr_NavDrive(char* g, char* v, char* t)
     b = &nb[i];
     mode = F(drv, 4);
     if (b->cool > 0) b->cool--;
-    if (tmbr_NavBaked() && (mode == 4 || mode == 3 || !live(t))) {
+    if (b->unr > 0) b->unr--;
+    if (tmbr_NavBaked() && (mode == 4 || mode == 3 || !live(t) || (b->unr > 0 && t == b->unrTgt))) {
+        if (b->unr > 0 && t == b->unrTgt && b->st == 2 && b->roam) return follow(b, v);   /* (also over the fight steering) */
         if (!b->roam) { b->roam = 1; b->st = 0; }
         if (b->st == 2) return follow(b, v);
         if (b->st == 0 && !b->cool) {

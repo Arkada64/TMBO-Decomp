@@ -40,15 +40,17 @@ def largest(G):
 # areas the bots must not plan into: (x0, x1, y0, y1, below z) - surfaces lower than z in the box are dropped
 # FREEWAY: the dead-end ramp by the hospital (drops from the road at y -2080, z 11 to z -63 at y -2880 and ends;
 # Ark 2026-10-27: bots got stuck down there)
-EXCLUDE = dict(freeway=[(-90, 150, -2910, -2070, 10.5)])
+# FREEWAY 2: the jump by the stadium (x -620..-400, y 1600..1760): its deck (z 120-165) sits over the road the
+# bots drive under; planned onto it from below, they got stuck there (Ark 2026-10-27)
+EXCLUDE = dict(freeway=[(-90, 150, -2910, -2070, -1e9, 10.5), (-640, -380, 1580, 1780, 100, 1e9)])
 def exclude(name, H, R):
-    for xa, xb, ya, yb, zt in EXCLUDE.get(name, []):
+    for xa, xb, ya, yb, zl, zt in EXCLUDE.get(name, []):
         ia, ib = int((xa - R["x0"]) / R["step"]), int((xb - R["x0"]) / R["step"]) + 1
         ja, jb = int((ya - R["y0"]) / R["step"]), int((yb - R["y0"]) / R["step"]) + 1
         sub = H[:, ja:jb, ia:ib]
-        n = int((np.isfinite(sub) & (sub < zt)).sum())
-        sub[np.isfinite(sub) & (sub < zt)] = np.nan
-        print(f"{name}: excluded {n} cells in x {xa}..{xb} y {ya}..{yb} below z {zt}")
+        cut = np.isfinite(sub) & (sub < zt) & (sub > zl)
+        n = int(cut.sum()); sub[cut] = np.nan
+        print(f"{name}: excluded {n} cells in x {xa}..{xb} y {ya}..{yb} z {zl}..{zt}")
     return H
 table = []
 ONLY = os.environ.get("NAV_ONLY")
