@@ -856,10 +856,15 @@ static void pakMounts(char* l, int i)
 static float XMG[3][3] = { { 2.35f, 7.40f, 0.37f }, { 1.08f, 8.64f, -2.34f },  /* Thumper, Twister (x1.2 model, Ark 2026-10-27) */
                            { 1.31f, 7.30f, -0.48f } };                         /* Pit Viper (Head-On's gun points; Ark 2026-10-27: shots out of line) */
 #define SK_PITVIPER 3
+/* Thumper's special (Warthog's torch) leaves from the special mount, launcher +0x640: Brimstone's, mid front bumper,
+ * where a faint piece of the torch showed (Ark 2026-10-27). Head-On's own fire-breath point instead (HO mount slot 0
+ * (-0.24 7.96 1.82), z -2.957 placement): inside his face. */
+static float XSP[3] = { -0.24f, 7.96f, -1.14f };
 static void xMounts(char* l, char* v)
 {
     int k = vehSkinF(v), g = k == SK_THUMPER ? 0 : k == SK_TWISTER ? 1 : k == SK_PITVIPER ? 2 : -1, j;
     if (g < 0) return;
+    if (k == SK_THUMPER) { float* e = (float*)(l + 0x640); e[0] = XSP[0]; e[1] = XSP[1]; e[2] = XSP[2]; }
     for (j = 0; j < 2; j++) {
         float* e = (float*)(l + 0x610 + 16 * j);
         e[0] = j ? -XMG[g][0] : XMG[g][0]; e[1] = XMG[g][1]; e[2] = XMG[g][2];
