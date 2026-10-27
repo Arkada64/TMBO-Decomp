@@ -30,6 +30,9 @@ extern int tmbr_TeamsWinner(void);                 /* teams.c: 0 = humans' team,
 #endif
 /* Warhawk's boss cars (0x200 / 0x220) as AI: TMBO's gameMakeAI turns both into Roadkill (test g116: vehicle id 0x20),
  * so the roof keeps 6 ordinary bots until the boss code is wired (phase 4) */
+#ifndef BOSSSTEP
+#define BOSSSTEP 9
+#endif
 #ifndef BOSSTRACE
 #define BOSSTRACE 0
 #endif
@@ -439,11 +442,12 @@ void tmbr_LevelInitAfter(void)
         int hier = F(b, 0x9C);
         scePrintf("TMBR boss: roof init, boss car %x tanker %x hier %x\n", (int)v0, (int)v1, hier);
         if (!v0 || !v1 || !hier) return;     /* InitBossAfter dereferences vehicle 0x200 without a check */
-        bossInitBefore(b);
+        if (BOSSSTEP >= 1) bossInitBefore(b);
         scePrintf("TMBR boss: init before done\n");
         F(b, 0x9C) = hier;                   /* (retail runs InitBossBefore before the db load fills it) */
-        ffInitBefore();
+        if (BOSSSTEP >= 2) ffInitBefore();
         scePrintf("TMBR boss: force field before done\n");
+        if (BOSSSTEP < 3) return;            /* (test builds: stop here) */
         bossInitAfter(b);
         bossSer = tmbr_levelSerial;
         scePrintf("TMBR boss: up, state %d health %d cs %x\n", F(b, 0x10), F(b, 0x1C), F(b, 0xE0));
