@@ -450,6 +450,15 @@ PATCHES = [
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E278C", "jal", "jal        tmbr_KillMessage"),
     # 12 Pak: launcher update without Roadkill's charge special
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCD90", "jal", "jal        tmbr_LauncherUpdate"),
+    # Lost / Harbor City maps in their own level-select entries, run as Dogpound (mods/lostslots.c)
+    (A("tmb/ui.s"), "001CA9E0", "jal", "jal        tmbr_LevelSelStep"),       # level select step: entries after 20
+    (A("tmb/ui.s"), "001CA7CC", "jal", "jal        tmbr_LevelSelFrame"),      # ... frame: the entry's name
+    (A("tmb/ui.s"), "001CAB20", "jal", "jal        tmbr_LevelSelConfirm"),    # ... confirm: record + sync the pick
+    (A("tmb/ui.s"), "001C5FD0", "jal", "jal        tmbr_LevelShowName"),      # waiting room "LEVEL : <name>"
+    (A("online/after_drawc_66.s"), "002006F8", "jal", "jal        tmbr_FileSearch"),   # raw reader: RTX, PTS/PKP/PUP, ZN
+    (A("online/after_drawc_66.s"), "002007C0", "jal", "jal        tmbr_FileSearch"),   # zip reader: NGP, TEX
+    (A("tmb/shell.s"), "001883C4", "jal", "jal        tmbr_FileSearch"),             # loading bar: NGP size
+    (A("tmb/shell.s"), "001883FC", "jal", "jal        tmbr_FileSearch"),             # loading bar: TEX size
 ]
 # (file, address, label) - global label placed right before that instruction (return points)
 LABELS = [
@@ -498,6 +507,7 @@ GROUPS = {
     "freecam": {"001395E0", "00139218"},
     "tick": {"00249F2C"},
     "qm": {"0017BF78", "0017BF00"},
+    "lost": {"001CA9E0", "001CA7CC", "001CAB20", "001C5FD0", "002006F8", "002007C0", "001883C4", "001883FC"},
     "packs": {"0018890C", "001889E4"},
     "shield": {
         "001DC07C",

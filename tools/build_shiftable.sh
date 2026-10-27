@@ -44,6 +44,7 @@ if [ "$MODS" = 1 ]; then
     o=build/mods/$(basename $c).o
     tools/sn_cc.sh -c -Iinclude -isystem include/gcc -isystem include/gcc/gcc-lib -isystem include/sdk \
       -isystem include/sdk/common -isystem include/sdk/ee -O2 -G0 -fno-common $( [ "${TMBR_TEST:-0}" = 1 ] && echo -DTMBR_FREECAM_ANYTIME ) \
+      $( [ -n "${TMBR_LOSTMAP:-}" ] && echo -DTMBR_LOSTMAP=$TMBR_LOSTMAP ) \
       $c -o $o
     TXT="$TXT        $o(.text);\n        $o(.rodata);\n        $o(.lit4);\n        $o(.lit8);\n        $o(.data);\n        $o(.sdata);\n"
     BSS="$BSS        $o(.bss);\n        $o(.sbss);\n"

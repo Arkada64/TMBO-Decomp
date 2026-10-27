@@ -113,6 +113,11 @@ int tmbr_ChatHandler(int a0, int a1, int client, char* msg)
         tmbr_TeamsRecv(client, msg + 1);
         return 0x44;
     }
+    if (msg && msg[0] == 1 && msg[1] == 'L' && msg[2] == 'M') {   /* lostslots.c: the host's Lost map */
+        extern void tmbr_LostRecv(int client, const char* d);
+        tmbr_LostRecv(client, msg + 3);
+        return 0x44;
+    }
     if (msg && msg[0] == 1 && msg[1] == 'S' && msg[2] == 'B') {
         int h = msg[3] >= 'A' ? msg[3] - 'A' + 10 : msg[3] - '0', l = msg[4] >= 'A' ? msg[4] - 'A' + 10 : msg[4] - '0';
         if (botPak != (unsigned char)(h << 4 | l)) scePrintf("TMBR skins: 12 Pak bots %02x (from %d)\n", h << 4 | l, client);

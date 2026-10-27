@@ -1900,6 +1900,7 @@ void tmbr_LobbyFrame(void)
     { extern void tmbr_GuestsRows(void); tmbr_GuestsRows(); }     /* guests.c: their rows in the player list */
     tmbr_GuestsName();     /* guests.c: a new guest types a name (opened by the car pick) */
     tmbr_SkinsLobby();
+    { extern void tmbr_LostLobby(void); tmbr_LostLobby(); }      /* lostslots.c: Lost map sync (+ test forcing) */
     tmbr_PedNamesInit();
     host = netIsHost(D_003156C0);
     teams = tmbr_Opt(OPT_TEAMS);
