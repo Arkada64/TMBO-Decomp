@@ -51,3 +51,11 @@
   Twister) with working AI; specials touched up later.
 - Repetition check: story mode - the same car never twice in one match; multiplayer - bots avoid cars already
   taken (players' and other bots'), repeats only when the pool runs out.
+
+## Lost maps on the level select (Ark 2026-10-26 23:42: "their own picture like the bonus cars with name plates")
+- Name: the level-name plates are SHELL1 switch id 9052 (node 0x6c600, 22 children = level index, child 21 a blank;
+  each child = 1-2 typewriter-font name meshes on textures 48-54 + a small tex-47 label). Same method as
+  platesx.py: new plate textures from the existing glyphs + a sub-switch under a spare child, lostslots.c sets it
+  (drop the printed font name).
+- Picture: the level preview is a movie clip (LS<level>.PSS, nextMovie 0x46 + level), not a texture. A clean own
+  picture = a short PSS per map (MPEG-2 + PS2 stream mux) from in-game footage once the maps render right.
