@@ -515,7 +515,7 @@ void tmbr_BotsThink(void)
 {
     char* g = D_004FA030;
     int i, k;
-    if (g) { tmbr_TeamsFrame(); healthFrame(); }
+    if (g) { extern void tmbr_BossFrame(void); tmbr_TeamsFrame(); healthFrame(); tmbr_BossFrame(); }
 #if TMBR_WEAPTEST
     if (g) weapTest(g);
 #endif

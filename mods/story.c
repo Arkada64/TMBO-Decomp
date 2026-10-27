@@ -393,3 +393,59 @@ void tmbr_PrisonState2(char* p)
         for (i = 4; i < n && i < 8; i++) prisonPlace(i, 4, F(PTS, 0x24C));
     }
 }
+
+/* ---- phase 4: Warhawk's roof boss (reference/wip/STORY_BOSSES.md) ----
+ * TMBO keeps retail's FinalBoss code (game+0x97120) but never calls it: InitAfterDbLoad's level-20 case is gone. Hooked at
+ * the switch's common tail (0x1387FC, plightActivate): on the roof with the story on and both boss cars loaded (0x200 the
+ * boss body, 0x220 the tanker), run retail's InitBossBefore / forceFieldInitBefore / InitBossAfter; then every frame
+ * UpdateBoss + forceFieldUpdate (tmbr_BossFrame from bots.c). */
+extern void plightActivate(void) __asm__("plightActivate__Fv");
+extern char* vehFromName(char* g, int name, int dup) __asm__("GetVehicleFromName__7TheGameii");
+extern void bossInitBefore(char* b) __asm__("func_00111E48");
+extern void bossInitAfter(char* b) __asm__("func_00111ED8");
+extern void bossUpdate(char* b) __asm__("func_001123C0");
+extern void ffInitBefore(void) __asm__("func_001360D8");
+extern void ffUpdate(void) __asm__("func_00136508");
+extern int tmbr_levelSerial;
+static int bossSer = -1;
+static int bossOn(void)
+{
+    char* g = D_004FA030;
+    return g && ROOF_BOSS && tmbr_Opt(OPT_STORY) && F(g, 0x9FCA0) == 20;
+}
+void tmbr_LevelInitAfter(void)
+{
+    char* g = D_004FA030;
+    plightActivate();
+    bossSer = -1;
+    if (!bossOn()) return;
+    {
+        char* b = g + 0x97120;
+        char *v0 = vehFromName(g, 0x200, 0), *v1 = vehFromName(g, 0x220, 0);
+        int hier = F(b, 0x9C);
+        scePrintf("TMBR boss: roof init, boss car %x tanker %x hier %x\n", (int)v0, (int)v1, hier);
+        if (!v0 || !v1 || !hier) return;     /* InitBossAfter dereferences vehicle 0x200 without a check */
+        bossInitBefore(b);
+        F(b, 0x9C) = hier;                   /* (retail runs InitBossBefore before the db load fills it) */
+        ffInitBefore();
+        bossInitAfter(b);
+        bossSer = tmbr_levelSerial;
+        scePrintf("TMBR boss: up, state %d health %d cs %x\n", F(b, 0x10), F(b, 0x1C), F(b, 0xE0));
+    }
+}
+void tmbr_BossFrame(void)
+{
+    char* g = D_004FA030;
+    static int tk;
+    if (bossSer < 0 || bossSer != tmbr_levelSerial || !bossOn()) return;
+    bossUpdate(g + 0x97120);
+    ffUpdate();
+    if (++tk % 600 == 0) scePrintf("TMBR boss: state %d health %d shield hits %d\n", F(g + 0x97120, 0x10), F(g + 0x97120, 0x1C), F(g + 0x97120, 0x3C));
+}
+/* FinalBoss TakeHit's end (0x114D5C, rtReturnToShell(0, 0xF0)): the boss is down -> the humans' team wins the stage */
+void tmbr_BossWon(int a, int b)
+{
+    extern void tmbr_TeamsForceWin(int team);
+    scePrintf("TMBR boss: down\n");
+    tmbr_TeamsForceWin(0);
+}
