@@ -479,3 +479,110 @@ def turned(m, piv, deg):
         nx, ny = N[:, 0].copy(), N[:, 1].copy()
         N[:, 0], N[:, 1] = c * nx - s * ny, s * nx + c * ny
     return dict(m, pos=[tuple(p) for p in P], nrm=[tuple(q) for q in N])
+
+
+# ---------------------------------------------------------------- donor lights (HC_LIGHTS, default 1)
+# TMB car lights are op5 nodes (+8 range, +0x30 colour; a flare / glow drawn at the node's place). Headlights: two op5
+# under the op6 switch id R+9 (with glow quads and long beam cones, all under op4s below it), Outlaw's light bar
+# beacons (4 op5 on bones of char 0x67a80, z 5.19) and Junkyard Dog's roof lamps (4 op5 on char 0x69360, z 5.56,
+# with the lamp meshes) hang outside the high LOD, so hcbuild kept them: floating lights on the new cars (Ark
+# 2026-10-26, Twister / Old Pickup). HC_LIGHTS=1: lights that are not headlights are unlinked and the meshes of the
+# character carrying them hidden; the headlight assembly moves (one translate under the R+9 switch, plus x on each
+# flare's own op4) to the front of the new body. HC_LIGHTS=0: as before.
+
+def donor_lights(car):
+    """[(op5 node, car-space pos, parent slots, headlight switch or None, nearest op25 above or None)] on entry 0"""
+    from hcbuild import kids
+    n = car.n
+    R = u32(n, u32(n, 4) - BASE) >> 18
+    out, seen = [], set()
+    st = [(u32(n, 4) - BASE, np.eye(3), np.zeros(3), ())]
+    while st:
+        o, M, t, ch = st.pop()
+        if o in ch or len(ch) > 60:
+            continue
+        ch = ch + (o,)
+        if (u32(n, o) & 0x3f) == 5:
+            if o not in seen:
+                seen.add(o)
+                sw = next((x for x in reversed(ch) if (u32(n, x) & 0x3f) == 6 and (u32(n, x) >> 18) == R + 9), None)
+                c25 = next((x for x in reversed(ch) if (u32(n, x) & 0x3f) == 25), None)
+                out.append((o, t.copy(), [sl for sl in car.slots if car.P(sl) == o], sw, c25, ch))
+            continue
+        x = _xf(n, o)
+        if x is not None:
+            Rm, tt = x
+            t = tt @ M + t
+            M = Rm @ M
+        for k in kids(car, o):
+            st.append((k, M, t, ch))
+    return out
+
+
+def fix_lights(car, pts, box_n, log=print):
+    """HC_LIGHTS: returns the donor meshes to hide (light bars). pts: new body vertices (donor space)."""
+    from hcbuild import meshes_under
+    if os.environ.get('HC_LIGHTS', '1') == '0':
+        return set()
+    n = car.n
+    L = donor_lights(car)
+    hide = set()
+    empty = None
+    heads = {}
+    for o, p, slots, sw, c25, ch in L:
+        if sw is None:
+            if empty is None:
+                empty = car.append(struct.pack('<4I', 9, 0, 0, 0))
+            for sl in slots:
+                car.setp(sl, empty)
+            hm = set(meshes_under(car, c25)) if c25 is not None else set()
+            hide |= hm
+            log('light %#x at (%.2f %.2f %.2f) colour (%.2f %.2f %.2f): unlinked (%d refs)%s' % (
+                o, *p, *struct.unpack_from('<3f', n, o + 0x30), len(slots),
+                ', meshes of its character %#x hidden (%d)' % (c25, len(hm)) if c25 is not None else ''))
+        else:
+            heads.setdefault(sw, []).append((o, p, ch))
+    P = np.asarray(pts, float)
+    lo, hi = np.asarray(box_n[0], float), np.asarray(box_n[1], float)
+    hw = max(-lo[0], hi[0])
+    for sw, lights in heads.items():
+        tg = []
+        for o, p, ch in lights:
+            x = np.sign(p[0]) * min(abs(p[0]), 0.75 * hw)
+            z = np.clip(p[2], lo[2] + 0.4, hi[2] - 0.4)
+            q = None
+            for r in (0.4, 0.7, 1.0, 1.5, 2.5):          # the body's front face around (x, z)
+                near = P[(np.abs(P[:, 0] - x) < r) & (np.abs(P[:, 2] - z) < r)]
+                if len(near) >= 3:
+                    j = near[:, 1].argmax()
+                    q = np.array([x, near[j, 1] + 0.05, near[j, 2] if r > 0.7 else z]); break
+            if q is None:
+                q = np.array([x, hi[1], z])
+            tg.append(q)
+        d = np.mean([q - p for q, (o, p, ch) in zip(tg, lights)], axis=0)
+        # one translate between the switch and its drawn kids (its op9 'off' kid stays)
+        from hcbuild import kids
+        ks = [(i, car.P(sw + 0xc + 4 * i)) for i in range(n[sw + 0xb])]
+        for i, k in ks:
+            if k is None or (u32(n, k) & 0x3f) == 9:
+                continue
+            t3 = car.append(struct.pack('<IIIIfffI', 3, 0, 1, 0, *d, 0))
+            car.setp(t3 + 0x1c, k)
+            car.setp(sw + 0xc + 4 * i, t3)
+        # x of each flare on its own op4 / op3 parent (in that parent's frame: rotation only matters, the op4s here
+        # are translations)
+        for q, (o, p, ch) in zip(tg, lights):
+            par = ch[-2]
+            dx = q[0] - (p[0] + d[0])
+            if (u32(n, par) & 0x3f) in (3, 4) and abs(dx) > 0.01:
+                M = np.eye(3)                                # rotation of the frame par sits in
+                for a in ch[:-2]:
+                    x_ = _xf(n, a)
+                    if x_ is not None:
+                        M = x_[0] @ M
+                off = 0x10 if (u32(n, par) & 0x3f) == 3 else 0x40
+                tl = np.array(struct.unpack_from('<3f', n, par + off)) + np.array([dx, 0, 0]) @ np.linalg.inv(M)
+                struct.pack_into('<3f', n, par + off, *tl)
+            log('headlight %#x: (%.2f %.2f %.2f) -> (%.2f %.2f %.2f)' % (o, *p, *q))
+        log('headlight switch %#x: assembly moved by (%.2f %.2f %.2f)' % (sw, *d))
+    return hide

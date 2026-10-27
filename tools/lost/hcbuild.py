@@ -160,11 +160,17 @@ class HoCar:
     def env_overlay(self, h):
         """an env-mapped mesh laid over a plain mesh of the same box (Thumper's shine shell) - not a part by itself"""
         lo, hi = box(self.hd[h]['pos'])
+        A = np.asarray(self.hd[h]['pos'], float)
         for k, m in self.hd.items():
             if k != h and m['pos'] and not m['hflags'] & 0x0E:
                 l2, h2 = box(m['pos'])
                 if np.abs(l2 - lo).max() < 0.05 and np.abs(h2 - hi).max() < 0.05:
-                    return True
+                    # same box is not enough: Gold Tooth's chrome cargo box 0xad70 (with the back wall) shares its
+                    # box with the plain sides 0xe5e0 but only 54% of its vertices (Ark: invisible parts)
+                    B = np.asarray(m['pos'], float)
+                    d = np.sqrt(((A[:, None, :] - B[None, :, :]) ** 2).sum(-1)).min(1)
+                    if (d < 0.03).mean() >= 0.9:
+                        return True
         return False
 
     def skip_reason(self, h, wheel_ground, far=False, env='skip', own=False):
@@ -356,6 +362,9 @@ def main():
                     "(Gold Tooth on STP: 0x45a60:@0x91c20, STA: 0x45a60:@0x8a210)")
     ap.add_argument('--robot-far', default='', help="new car's far alternate form onto a donor group, 'SRC:@GROUP' "
                     "(Gold Tooth on STP: 0x2a820:@0x94160)")
+    ap.add_argument('--head', default='', help="new car's meshes onto a donor bone, 'SRC,SRC:@BONE' (hex; Gold Tooth's "
+                    "head + eyes onto Sweet Tooth's swivelling head bone: STP 0x1230,0x3bd0:@0x50800, STA @0x4efc0): they "
+                    "leave the static --add parts and turn with the bone (its pivot moves to their centre)")
     ap.add_argument('--hide-node', default='', help='donor node offsets (hex, comma separated) whose meshes get empty '
                     "packets too, e.g. Outlaw's roof light bar op31 (SUP 0x67ae0, SUA 0x5d6a0)")
     ap.add_argument('--keep-part', default='', help="donor node ids kept with their subtree, ';'-separated, each "
@@ -552,6 +561,9 @@ def build(a, rd, own16):
         return out
 
     add_meshes = [int(x, 16) for x in a.add.split(',') if x]   # Head-On meshes outside the LOD roots, every state
+    head_specs = [(([int(x, 16) for x in sp.partition(':@')[0].split(',') if x]), int(sp.partition(':@')[2], 16))
+                  for sp in filter(None, a.head.split(';'))]
+    head_meshes = {h for hl, _ in head_specs for h in hl}
     box_d = hcmounts.body_box_tmb(car, STATES[0])              # donor body (state 0), for the mount box map
     # HC_FLAME (default 1 for Old Pickup): its roof flamethrower leaves the body mesh and becomes a 5-frame yaw switch
     # (attach type 7, sub hcmounts.FLAME_SUB) a code hook can turn; frame 0 = the model as built
@@ -577,7 +589,7 @@ def build(a, rd, own16):
         k = u32(car.n, g + 8) & 0xffff
         dead += [mesh_range(car, t) for t in meshes_under(car, g)]
         hs = ho_meshes(ho.hi, 0 if a.one_state else stn)
-        hs += [h for h in add_meshes if h not in hs]
+        hs += [h for h in add_meshes if h not in hs and h not in head_meshes]
         if flame_sw is not None:
             hs = [(0x10000000 | h) if h == FLAME_SRC else h for h in hs]
         newg = car.group([node(h) for h in hs] + ([flame_sw] if flame_sw is not None else []),
@@ -680,6 +692,24 @@ def build(a, rd, own16):
                 if r: dead.append(r)
         print('robot: %d new meshes onto %d of %d donor bone meshes of %#x (new box %s..%s, donor rest box %s..%s)' % (
             len(hs), len(by_slot), len(tm), ch, g0.round(1), g1.round(1), t0.round(1), t1.round(1)))
+    # --head SRC,SRC:@BONE: the new car's head on the donor's animated head bone (Sweet Tooth's head turns on op17
+    # 0x50800, one channel: its yaw); the bone's meshes are in model space at rest, so the new meshes go in as built
+    # for the body, and the bone's pivot (A40 / A80 rows) moves to the new head's centre (x / y) and bottom (z)
+    for hl, bone in head_specs:
+        assert u32(car.n, bone) & 0x3f == 17, 'not an op17 bone: %#x' % bone
+        old_k = [car.P(bone + 0xcc + 4 * i) for i in range(struct.unpack_from('<i', car.n, bone + 4)[0])]
+        hn = [node(h) for h in hl if h in ho.hd]
+        car.setp(bone + 0xcc, hn[0] if len(hn) == 1 else car.group(hn, sphere=(0, 0, 0, 12.0)))
+        for i in range(1, len(old_k)):
+            struct.pack_into('<I', car.n, bone + 0xcc + 4 * i, 0)
+        struct.pack_into('<i', car.n, bone + 4, 1)
+        dead += [mesh_range(car, k_) for k_ in old_k if k_ is not None and u32(car.n, k_) & 0x3f == 0]
+        P = np.concatenate([np.asarray(ho.hd[h]['pos'], float) for h in hl if h in ho.hd]) * s + xform[1]
+        c = np.array([(P[:, 0].min() + P[:, 0].max()) / 2, (P[:, 1].min() + P[:, 1].max()) / 2, P[:, 2].min()])
+        struct.pack_into('<3f', car.n, bone + 0x70, *(-c))
+        struct.pack_into('<3f', car.n, bone + 0xb0, *c)
+        print('head: %s onto bone %#x (was %s), pivot -> (%.2f %.2f %.2f)' % ([hex(h) for h in hl], bone,
+                                                                       [hex(k_) for k_ in old_k if k_], *c))
     for spec in filter(None, a.robot_far.split(';')):
         src, _, grp = spec.partition(':@')
         src, grp = int(src, 16), int(grp, 16)

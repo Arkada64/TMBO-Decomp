@@ -13,6 +13,9 @@ import hcmounts
 from trender import render
 
 
+FORM = 0                                       # Sweet Tooth's op6 R+25: 0 truck, 1 robot (--robot)
+
+
 def collect(car, t_anim=None):
     n = car.n
     R = u32(n, u32(n, 4) - BASE) >> 18
@@ -62,7 +65,8 @@ def collect(car, t_anim=None):
             ks = [k for k in ks if u32(n, k) & 0x3f != 9][:1]
         elif op == 6:                          # effect switches (shield / freeze shells, flames: id R+14, R+15 ..)
             rel = (h >> 18) - R                  # stay off; weapons / guns / lights / brake lights on their 1st kid
-            ks = [k for k in ks if u32(n, k) & 0x3f != 9][:1] if (h >> 18) == 0 or rel in (7, 9, 10, 13) else []
+            ks = [k for k in ks if u32(n, k) & 0x3f != 9][:1] if (h >> 18) == 0 or rel in (7, 9, 10, 13) else \
+                [k for k in ks if u32(n, k) & 0x3f != 9][FORM:FORM + 1] if rel == 25 else []
         if op == 1 and (h >> 18) == R + 5:       # shadow
             ks = []
         for k in ks:
@@ -79,10 +83,17 @@ def main():
     ap.add_argument('--time', type=float, default=None)
     ap.add_argument('--views', default='side,top,front,iso')
     ap.add_argument('--size', type=int, default=360)
+    ap.add_argument('--rear', action='store_true', help='turned 180 degrees (the front view shows the back)')
+    ap.add_argument('--robot', action='store_true', help="Sweet Tooth donors: draw the robot form")
     a = ap.parse_args()
     rd = lambda e: open('%s/%s.%s' % (a.dir, a.code, e), 'rb').read()
     car = Car(rd('NGP'), rd('PTR'), b'', b'')
+    global FORM
+    FORM = 1 if a.robot else 0
     parts, lights = collect(car, a.time)
+    if a.rear:
+        parts = [(P * np.array([-1, -1, 1]), tr, k) for P, tr, k in parts]
+        lights = [L * np.array([-1, -1, 1]) for L in lights]
     ms = [dict(pos=P, tris=tr, col=COL[k]) for P, tr, k in parts]
     for L in lights:                           # a small yellow octahedron per light
         r = 0.35
