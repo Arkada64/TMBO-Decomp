@@ -50,7 +50,6 @@ typedef struct {
     fvec goal;
     int n, i;        /* waypoints, current */
     int timer, cool, tick, lastD, noProg;
-    int unr; char* unrTgt;   /* the target could not be reached on the route map: roam instead for `unr` frames */
     int al, alT;     /* aligning to a waypoint behind: 1 handbrake pivot, 2 reverse (3-point turn); frames left */
     char* tgt;
     fvec wp[MAXWP];
@@ -267,9 +266,12 @@ void tmbr_NavFrame(void)
             if (!nb[cur].roam && live(nb[cur].tgt) && (!full || !n)) {
                 fvec* tp = POSV(nb[cur].tgt);
                 fvec* e = n ? &nb[cur].wp[n - 1] : POSV(g + cur * 0x31B0);
+                /* -> the game's own driving for 7 s (its attractor graph has the jumps the route map lacks).
+                 * (Forcing a roam instead ran bots off the Skyscrapers roofs, Ark 2026-10-27: their targets were
+                 * across jumps, "unreachable" on the route map, and the roam overrode the game's jump driving.) */
                 if (fabs_(e->x - tp->x) + fabs_(e->y - tp->y) > K[11]) {
-                    nb[cur].unr = 420; nb[cur].unrTgt = nb[cur].tgt; nb[cur].st = 0; nb[cur].far = 1;
-                    scePrintf("TMBR nav: car %d cannot reach its target, roaming 7 s\n", cur);
+                    nb[cur].st = 0; nb[cur].cool = 420;
+                    scePrintf("TMBR nav: car %d cannot reach its target on the route map, game driving 7 s\n", cur);
                 }
             }
             if (NAVDBG) scePrintf("TMBR nav: car %d baked plan %d pts %s\n", cur, n, full ? "to target" : "partial");
@@ -371,9 +373,7 @@ int tmbr_NavDrive(char* g, char* v, char* t)
     b = &nb[i];
     mode = F(drv, 4);
     if (b->cool > 0) b->cool--;
-    if (b->unr > 0) b->unr--;
-    if (tmbr_NavBaked() && (mode == 4 || mode == 3 || !live(t) || (b->unr > 0 && t == b->unrTgt))) {
-        if (b->unr > 0 && t == b->unrTgt && b->st == 2 && b->roam) return follow(b, v);   /* (also over the fight steering) */
+    if (tmbr_NavBaked() && (mode == 4 || mode == 3 || !live(t))) {
         if (!b->roam) { b->roam = 1; b->st = 0; }
         if (b->st == 2) return follow(b, v);
         if (b->st == 0 && !b->cool) {
