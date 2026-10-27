@@ -159,3 +159,74 @@ Consequences:
   Grimm's special code against a model without his animations.
 * A 2-wheel model on a 4-wheel type: physics is fine, the missing tire nodes are skipped, but there is no lean
   and the bike is not tilted. Usable for a skin, it just looks like a balanced 4-point vehicle.
+
+## 4. Borrowed specials, implemented (mods/skins.c, 2026-10-26)
+
+Requirements (Ark): Twister = Axel's shockwave, Thumper = Warthog's special, Old Pickup = Minion's special
+(nerfed, front arc only), Outlaw 2 = Crazy 8's and Pit Viper = Spectre's (their donors' own, unchanged).
+
+### How specials are reached (TMBO)
+* Local press: func_001549A0 (launcher update) -> func_00156E08 (FireCurrentWeapon, slot 1) -> **0x157D10** jal
+  FireSpecial (hooked: tmbr_FireSpecial). This is the only local call site.
+* Network replay: netWeaponCreateCB **0x16B0CC** calls FireSpecial for message id 0x1E0 / type 1 (Minion) and
+  func_00159C98 (Warthog) for id 0x180 / type 1 directly. The message id is the sender's +0x20F4 at send time
+  (func_00171818 reads w+0x130 = vehicle).
+* Per frame, outside FireSpecial, keyed on +0x20F4 in func_001549A0: 0x60 Outlaw **0x155B84 func_0015FCA8** (special
+  selected + ammo: turret auto-aim + targeting laser / laser sound), 0xE0 Brimstone 0x155BC8.. (anim 0xFAB),
+  0x100 JD 0x155D20 UpdateTowTruck, 0x1E0 Minion 0x155D3C func_00160D80 (turret aim), and **0x155D84 UpdateSpecial**
+  while launcher +0x27C is set (timer +0x280).
+
+### Twister (what was wrong)
+The FireSpecial hook sent Twister to twisterSpecial, but Outlaw's own special code still ran for him outside
+FireSpecial: func_0015FCA8 every frame while the special is selected (Outlaw's turret targeting / laser sight and
+laser sound). A shockwave with a null D_0045FFD8[slot] does nothing, so all that was visible was Outlaw's. Also,
+if vehSkin() failed at fire time, tmbr_FireSpecial fell through to Outlaw's FireSpecial (turret bursts, weapon
+0x14). Fixes: hook 0x155B84 -> tmbr_OutlawAim (skipped for Twister); vehSkinF() = vehSkin with a per-vehicle
+fallback recorded at vehicleInit (tmbr_SkinAtInit) so an extra never falls through to its donor's special;
+tmbr_ShockFix (D_0045FFD8[slot] null -> copy node + D_00460000 anim from slot 4, else any filled slot) at
+vehicleInit, before each shockwave and every frame (tmbr_SkinsFrame) on every console. Log lines:
+"Twister shockwave (slot N node X)", "shockwave node for slot N from slot M".
+
+### Warthog's special (for Thumper)
+TMBO / retail: Warthog ("tank car", 0x180) special is a **flame torch**, not missiles: FireSpecial case 0x180 ->
+func_00159C98 (owner only): +0x27C = 1, +0x280 = D_004F9B9C (3) * 60, particle fx 0x48 from the special mount
+(launcher +0x640), net message (id 0x180); UpdateSpecial case 0x180 (0x15E560): ray hits forward, damage
+D_004F9B94 (1, doubled by a 0x20E0 test), SetCarOnFire, sound updateTankCarTorchSound, decrement at the end.
+No turret node needed. Thumper: FireSpecial and UpdateSpecial run with +0x20F4 = 0x180 for the call
+(borrowIn / borrowOut); remote consoles replay it via the id-0x180 message and run UpdateSpecial borrowed too.
+
+### Minion's special (for Old Pickup)
+FireSpecial case 0x1E0 (0x159434): needs |roll| < 90 deg; +0x27C = 1, +0x280 = 0xF0 (4 s); lock-on
+func_0015AE98 -> +0x2F8 (vehicle) / +0x300 (its hier); target within 250: torch (particle 0x48, +0x284 = 1,
+net message id 0x1E0); else cannon shell weapon 0x1F (InitWeapon: damage D_004FAD84 = 5) every rand(20..65)
+frames (+0x98). UpdateSpecial case 0x1E0 (0x15EE28): torch hits (D_004F9B94 per hit, 50 %/frame), shells,
+decrement + terminateMinionTorchSound at the end. Per-frame turret aim func_00160D80 (UpdateMinion): angles
++0x290..0x298 relative to the car (pitch clamped +-20 deg), matrix written to *(launcher+0x2A0)+0x10. Turret
+pivot / muzzle: launcher +0x5E0 / +0x5F0 (Minion-only fields). attachAdd: kind 0x1F -> v+0x2450 (= launcher
++0x2A0) for Minion; for Junkyard Dog +0x2A0 is the tow arm (kind 0x1E) and +0x290.. its angles, used by
+UpdateTowTruck (towing branch when +0x27C is set uses +0x2A4).
+
+Old Pickup implementation: borrowIn swaps id 0x1E0, its own turret matrix (pkNode, identity at first) into
++0x2A0, its own angles into +0x290..0x298, writes +0x5E0 = (1.1, -1.9, 4.73) roof-gun post, +0x5F0 = (0, 6.75, 0)
+muzzle (HC_MOUNTS.md HC_FLAME numbers), D_004FAD84 = 3 for the call. Calls: FireSpecial (tmbr_FireSpecial, and
+tmbr_NetFireSpecial at 0x16B0CC for the remote replay), UpdateSpecial (0x155D84 tmbr_UpdateSpecial), turret aim
+func_00160D80 from the JD tow hook (0x155D20 tmbr_UpdateTowTruck, which then runs UpdateTowTruck with +0x27C hidden).
+Front arc: Minion's three lock-on calls (0x1594A8, 0x15EE50, 0x160E28 -> tmbr_MinionLockOn) return no target while
+an Old Pickup call is running when the target is outside +-45 deg of straight ahead (x right / y forward from the
+car matrix rows at hier +0x20). Without a target in the arc Minion's code fires the shell straight ahead.
+
+Nerf (Old Pickup vs Minion): duration 120 frames (2 s) instead of 240 (half the torch damage per special; the torch
+hit is D_004F9B94 = 1, cannot be halved); cannon shell damage 3 instead of 5; shell interval doubled (40..130
+frames instead of 20..65). Roof flamethrower switch (+0x2A44, op6 263 sub 9): frame from the target's bearing
+while +0x27C is set (0 ahead, 1/2 = 20/40 deg left, 3/4 = 20/40 deg right), one 20-deg step per 4 frames, back to
+0 afterwards (tmbr_SkinsFrame -> pickupTurret).
+
+### Needs an in-game check
+1. Twister: special press shows the shockwave (log line node != 0), no Outlaw laser while the special is selected.
+   Outlaw's turret pop-up animation / sound on selecting the special (weapon toggle, func_00156118) still runs.
+2. Thumper: flame torch from Brimstone's special mount (+0x640) for 3 s, damage + fire on cars in front; the
+   torch sound (Warthog's LauncherSound) may need Warthog's sound bank. Same on the other console.
+3. Old Pickup: torch from the roof gun (pivot / muzzle sign of x: if the flame starts on the wrong side, flip
+   PK_OFS[0]); no target outside +-45 deg; switch turns the right way (if mirrored, swap frames 1/2 with 3/4 in
+   pickupTurret); JD's tow arm is not disturbed; the other console sees the torch (remote replay id 0x1E0).
+4. Remote damage of the halved shell: InitWeapon on the other console (network-created) uses the full D_004FAD84.
