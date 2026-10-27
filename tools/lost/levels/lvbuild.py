@@ -573,6 +573,25 @@ def build(path, outdir, name, scale=1.15, donor=None):
         e7 = car.append(struct.pack('<4I', 7, 0, 0, 0))
         hdr = struct.pack('<4I', 3, BASE + root, BASE + e15, BASE + e7)
         car.n[0:16] = hdr
+    if dn:
+        # donor meshes still drawn whose textures were dropped as arena-only (the sun flare and other effects:
+        # drawn black - Ark 2026-10-27, a black slab when looking toward the sun): their records come back
+        from hcbuild import traverse_check
+        from textconv import records, tex_rec_size, rtx_rec_size
+        live, _ = traverse_check(bytes(car.n), car.slots)
+        used = {}
+        for a, g in car.pairs:
+            for back in range(0x50, 0x70, 2):
+                if a - back in live and (struct.unpack_from('<I', car.n, a - back)[0] & 0x3f) == 0:
+                    used[struct.unpack_from('<H', car.n, a)[0]] = (struct.unpack_from('<Q', car.n, g)[0] >> 37) & 0x3fff; break
+        back_t = {t for t in used if t in dn['drop'] and t < dn['next_id']}
+        back_c = {used[t] for t in back_t} & dn['drop_c']
+        if back_t:
+            dn['keep_t'] = dn['keep_t'] + [bytes(car.tex[o:o + b]) for o, b, gs, k in records(bytes(car.tex), tex_rec_size)
+                                           if (gs & 0xffff) in back_t]
+            dn['keep_r'] = dn['keep_r'] + [bytes(car.rtx[o:o + b]) for o, b, gs, k in records(bytes(car.rtx), rtx_rec_size)
+                                           if ((gs >> 48) & 0xff) == 8 and ((gs >> 16) & 0xffff) in back_c]
+            print('  donor textures kept after all (still drawn):', sorted(back_t), 'CLUTs', sorted(back_c))
     os.makedirs(outdir, exist_ok=True)
     files = {'NGP': car.ngp_bytes(), 'PTR': car.ptr_bytes(),
              'TEX': LT.tex_bytes(dn['keep_t'] if dn else ()), 'RTX': LT.rtx_bytes(dn['keep_r'] if dn else ())}
