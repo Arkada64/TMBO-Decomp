@@ -43,6 +43,8 @@ extern void loadCar0F0(void* shell, int client) __asm__("func_001890F0");
  * (tmbr_SkinsAvail), so the list can name cars whose models are not built yet. */
 static const int skinType[NSKIN] = { 6, 1, 8, 4, 5, 7, 3 };    /* Sweet Tooth, Roadkill, Junkyard Dog, Spectre, Crazy 8, Brimstone, Outlaw
                                                                  * (Twister: Outlaw's chassis, Mr. Grimm's stats, Axel's shockwave - Ark 2026-10-26) */
+#define SK_PICKUP 2      /* Old Pickup: Junkyard Dog chassis, Minion's special (nerfed, front arc only) */
+#define SK_THUMPER 5     /* Thumper: Brimstone chassis, Warthog's special */
 #define SK_TWISTER 6
 static const char skinCode[NSKIN][2] = { { 'z', 'z' }, { 'z', 'y' }, { 'z', 'x' }, { 'z', 'w' }, { 'z', 'v' }, { 'z', 'u' }, { 'z', 't' } };
 static const char* const skinName[NSKIN] = { "GOLD TOOTH", "12 PAK", "OLD PICKUP", "PIT VIPER", "OUTLAW 2", "THUMPER", "TWISTER" };
@@ -220,18 +222,37 @@ static void applyX(void)
     *(int*)(shellPtr + 0x1A2F0 + PAK_POS * 4) = skinType[k] << 5;
     carClip[PAK_POS] = k == 1 || dp < 0 ? 0 : 5 + dp;        /* an extra: its donor's stand (12 Pak: keeps the picture) */
 }
-/* the car select's move (0x1CB768: func_001CE628 runs once per step, before the game moves the position) */
+/* Minion's car select position while the lobby has Minion off (bots.c OPT_MINION clear), else -1 */
+static int minionSkipPos(void)
+{
+    extern int tmbr_Opt(int bit);
+    int k;
+    if (tmbr_Opt(8) || !shellPtr) return -1;
+    for (k = 0; k < PAK_POS; k++) if (*(int*)(shellPtr + 0x1A2F0 + k * 4) == (15 << 5)) return k;
+    return -1;
+}
+/* the car select's move (0x1CB768: func_001CE628 runs once per step, before the game moves the position; the game
+ * then steps one position: right 15 -> 0, left 0 -> 15). One press = one entry: an extra after 12 Pak is a sub-step
+ * of position 15; Minion (when off) is stepped over here, before the game's step, by moving the position onto his
+ * spot so the game's own step lands on the entry behind him (Ark 2026-10-26: the old after-the-fact hop in
+ * tmbr_CarSelectSound jumped onto 15 with a stale extra, i.e. past 12 Pak and other extras). */
 void tmbr_CarSelStep(void)
 {
-    int dir = D_004FA8B0 ? 1 : -1;
+    int dir = D_004FA8B0 ? 1 : -1, mpos = minionSkipPos();
     uiStepSound();
     buildX();
     if (dir > 0) {
-        if (carSelPos == PAK_POS - 1) xsel = 0;
-        else if (carSelPos == PAK_POS && xsel < xn - 1) { xsel++; carSelPos = PAK_POS - 1; }
+        if (carSelPos == PAK_POS && xsel < xn - 1) { xsel++; carSelPos = PAK_POS - 1; }   /* next extra */
+        else {
+            if (mpos >= 0 && (carSelPos + 1) % (PAK_POS + 1) == mpos) carSelPos = mpos;  /* step over Minion */
+            if (carSelPos == PAK_POS - 1) xsel = 0;                                      /* entering 15: 12 Pak */
+        }
     } else {
-        if (carSelPos == 0) xsel = xn - 1;
-        else if (carSelPos == PAK_POS && xsel > 0) { xsel--; carSelPos = 0; }
+        if (carSelPos == PAK_POS && xsel > 0) { xsel--; carSelPos = 0; }               /* previous extra */
+        else {
+            if (mpos >= 0 && (carSelPos + PAK_POS) % (PAK_POS + 1) == mpos) carSelPos = mpos;
+            if (carSelPos == 0) xsel = xn - 1;                                           /* wrapping to 15: last extra */
+        }
     }
     applyX();
 }
@@ -243,17 +264,15 @@ void tmbr_CarSelectSound(void* snd, int car)
     applyX();                                         /* the 16th spot = the chosen extra's donor */
     if (carSelPos == PAK_POS || car <= 0) car = skinType[xlist[xsel]] << 5;  /* (first frame back from a match: the 16th
                                                          * slot still read 0 -> engine-sound stream index -1) */
-    {   /* Minion off (lobby option, bots.c OPT_MINION clear): the highlight hops over his spot, in the direction it came */
-        extern int tmbr_Opt(int bit);
-        static int lastSel = -1;
-        int mpos = -1;
-        for (k = 0; k < PAK_POS; k++) if (shellPtr && *(int*)(shellPtr + 0x1A2F0 + k * 4) == (15 << 5)) { mpos = k; break; }
-        if (!tmbr_Opt(8) && mpos >= 0 && carSelPos == mpos) {
-            carSelPos = lastSel == (mpos + 1) % (PAK_POS + 1) ? (mpos + PAK_POS) % (PAK_POS + 1) : (mpos + 1) % (PAK_POS + 1);
+    {   /* Minion off: steps go over his spot in tmbr_CarSelStep. This only catches landing on it without a step
+         * (car select opened on Minion's spot): one entry on, to the right (12 Pak when that is position 15) */
+        int mpos = minionSkipPos();
+        if (mpos >= 0 && carSelPos == mpos) {
+            carSelPos = (mpos + 1) % (PAK_POS + 1);
+            if (carSelPos == PAK_POS) { xsel = 0; applyX(); }
             car = *(int*)(shellPtr + 0x1A2F0 + carSelPos * 4);
             if (car <= 0) car = 0x20;
         }
-        lastSel = carSelPos;
     }
     playCarSound(snd, car);
     { extern void tmbr_GuestPickTitle(void); tmbr_GuestPickTitle(); }   /* guests.c: "PLAYER n" while a guest picks */
@@ -355,6 +374,7 @@ void tmbr_VehInitDynamics(char* v, int a1, int a2, char* a3)
     int id, k;
     vehInitDynamics(v, a1, a2, a3);              /* (the caller's $7 passes through, as before the hook) */
     k = vehSkin(v);
+    {   extern void tmbr_SkinAtInit(char* v, int k); tmbr_SkinAtInit(v, k); }
     if (k != SK_TWISTER) { ownWheels(v, k); return; }
     id = *(int*)(v + 0x20F4);
     keepRange(v, s1, 0x380, 0x398, 0); keepRange(v, s2, 0x3A4, 0x3F0, 0); keepRange(v, s3, 0x478, 0x47C, 0); keepRange(v, s4, 0x1F40, 0x2010, 0);
@@ -363,16 +383,7 @@ void tmbr_VehInitDynamics(char* v, int a1, int a2, char* a3)
     *(int*)(v + 0x20F4) = id;
     keepRange(v, s1, 0x380, 0x398, 1); keepRange(v, s2, 0x3A4, 0x3F0, 1); keepRange(v, s3, 0x478, 0x47C, 1); keepRange(v, s4, 0x1F40, 0x2010, 1);
     ownWheels(v, k);
-    {   /* the shockwave's model (EP 0xFB0) comes from the level files for slots 0..4 only (the extra copies all carry
-         * index 4): a higher slot borrows slot 4's node and animation (every console runs this) */
-        extern void* shockNode[] __asm__("D_0045FFD8");
-        extern char shockAnim[] __asm__("D_00460000");
-        int sl = *(int*)(v + 0x20F0), b;
-        if (sl > 4 && sl < 8 && !shockNode[sl] && shockNode[4]) {
-            shockNode[sl] = shockNode[4];
-            for (b = 0; b < 0xC; b++) shockAnim[sl * 0xC + b] = shockAnim[4 * 0xC + b];
-        }
-    }
+    {   extern void tmbr_ShockFix(char* v); tmbr_ShockFix(v); }
     scePrintf("TMBR skins: Twister stats (Mr. Grimm) for car %d, health %d\n", vidx(v), (int)*(float*)(v + 0x400));
 }
 
@@ -426,6 +437,212 @@ static void pakMissileValues(int on)
  * reticle overlay and countdown (hud.s 0x14E19C: slot 5, type 0xB, ammo > 0) and the game arms / releases /
  * times it out itself. The round it uses is charged to his special instead (tmbr_ReticleUsed); afterwards his
  * own slot-5 pickup and his previous weapon come back (tmbr_SkinsFrame). */
+/* ---- Specials from another car (Ark 2026-10-26): the extra keeps its donor chassis / stats / weapons, only the
+ * special is another car's. Which extra a vehicle is (vehSkin) is decided from the synced choices on every console;
+ * the result at vehicleInit is kept per vehicle as a fallback (initSkin) in case the slot table does not match at
+ * fire time (tmbr_FireSpecial must never fall through to the donor's own special for an extra with a borrowed one). */
+static signed char initSkin[8];
+static int initId[8];
+void tmbr_SkinAtInit(char* v, int k)
+{
+    int i = vidx(v);
+    if (i < 0) return;
+    initSkin[i] = (signed char)k; initId[i] = *(int*)(v + 0x20F4);
+}
+static int vehSkinF(char* v)
+{
+    int k = vehSkin(v), i = vidx(v);
+    if (k < 0 && i >= 0 && initId[i] && initId[i] == *(int*)(v + 0x20F4)) k = initSkin[i];
+    return k;
+}
+
+/* Twister: the shockwave weapon (0x1B) needs D_0045FFD8[slot] (its EP node 0xFB0) else InitWeapon drops it. The
+ * level files fill slots 0..4; a slot without one borrows another slot's node + animation (D_00460000, 0xC each).
+ * Run at vehicleInit, before each shockwave and every frame (InitWeaponsAfter clears the table; the weapon is
+ * networked and each console runs InitWeapon with its own table). */
+extern void* shockNode[] __asm__("D_0045FFD8");
+extern char shockAnim[] __asm__("D_00460000");
+void tmbr_ShockFix(char* v)
+{
+    int sl = *(int*)(v + 0x20F0), s, b;
+    if (sl < 0 || sl > 7 || shockNode[sl]) return;
+    for (s = 4; s >= 0 && !shockNode[s]; s--) ;
+    if (s < 0) for (s = 7; s > 4 && !shockNode[s]; s--) ;
+    if (s < 0 || !shockNode[s]) return;
+    shockNode[sl] = shockNode[s];
+    for (b = 0; b < 0xC; b++) shockAnim[sl * 0xC + b] = shockAnim[s * 0xC + b];
+    scePrintf("TMBR skins: shockwave node for slot %d from slot %d\n", sl, s);
+}
+
+/* Thumper = Warthog's special, Old Pickup = Minion's: the game's own code runs with the vehicle id (+0x20F4)
+ * temporarily set to the lender's (Warthog 0x180, Minion 0x1E0) around FireSpecial (tmbr_FireSpecial, and the
+ * network replay of Minion's in netWeaponCreateCB: tmbr_NetFireSpecial) and UpdateSpecial (tmbr_UpdateSpecial,
+ * every console). Their net messages carry the id at send time, so other consoles replay the lender's special too.
+ * Warthog (FireSpecial case 0x180 -> func_00159C98; UpdateSpecial case 0x180): a flame torch from the special
+ * mount (launcher +0x640) for D_004F9B9C = 3 s, ray hits of D_004F9B94 each, sets cars on fire.
+ * Minion (FireSpecial case 0x1E0; UpdateSpecial case 0x1E0; per-frame turret aim func_00160D80): 4 s (0xF0
+ * frames); a target within 250 gets the torch from his turret, else his cannon shell (weapon 0x1F, damage
+ * D_004FAD84 = 5) every 20..65 frames. His turret code needs the turret node at launcher +0x2A0 (Junkyard Dog has
+ * his tow arm there) and its angles at +0x290..0x298 (Junkyard Dog's tow arm angles): the Old Pickup gets its own
+ * node (a matrix only: pkNode) and angles, swapped in for these calls, and its turret pivot / muzzle (+0x5E0 /
+ * +0x5F0, Minion-only fields) at the roof flamethrower (tools/lost HC_FLAME, reference/wip/HC_MOUNTS.md).
+ * Old Pickup's nerf: 2 s instead of 4 (half the torch), cannon shell damage 3 instead of 5, shells half as often;
+ * targets only within +-45 deg of straight ahead (tmbr_MinionLockOn, Minion's three lock-on calls). */
+#define WARTHOG_ID (12 << 5)
+#define MINION_ID  (15 << 5)
+#define PK_TIME    120                 /* frames (Minion 240) */
+#define PK_SHELL   3                   /* cannon shell damage (Minion D_004FAD84 = 5) */
+extern int D_004FAD84;
+static float PK_OFS[8] = { 1.1f, -1.9f, 4.73f, 0.0f, 0.0f, 6.75f, 0.0f, 0.0f };   /* pivot (car space) / muzzle (turret space) */
+static float PK_K[4] = { 0.176f, 0.577f, 0.0f, 1.0f };   /* tan 10 deg, tan 30 deg, 0, 1 (no float literals in mod code) */
+static float pkNode[8][24] __attribute__((aligned(16)));   /* +0x10: the turret matrix (3 rows of 4) */
+static int pkAng[8][3], pkInit[8];
+static int bId, bAng[3], bNode, bShell, pickupOn;
+
+static void borrowIn(char* l, char* v, int k)
+{
+    int i = vidx(v), j;
+    bId = *(int*)(v + 0x20F4);
+    *(int*)(v + 0x20F4) = k == SK_THUMPER ? WARTHOG_ID : MINION_ID;
+    if (k != SK_PICKUP) return;
+    if (i < 0) i = 0;
+    if (!pkInit[i]) {
+        for (j = 0; j < 24; j++) pkNode[i][j] = PK_K[2];
+        pkNode[i][4] = pkNode[i][9] = pkNode[i][14] = PK_K[3];
+        pkAng[i][0] = pkAng[i][1] = pkAng[i][2] = 0;
+        pkInit[i] = 1;
+    }
+    for (j = 0; j < 3; j++) { bAng[j] = *(int*)(l + 0x290 + 4 * j); *(int*)(l + 0x290 + 4 * j) = pkAng[i][j]; }
+    bNode = *(int*)(l + 0x2A0); *(int*)(l + 0x2A0) = (int)pkNode[i];
+    for (j = 0; j < 8; j++) *(float*)(l + 0x5E0 + 4 * j) = PK_OFS[j];
+    bShell = D_004FAD84; D_004FAD84 = PK_SHELL;
+    pickupOn = 1;
+}
+static void borrowOut(char* l, char* v, int k)
+{
+    int i = vidx(v), j;
+    *(int*)(v + 0x20F4) = bId;
+    if (k != SK_PICKUP) return;
+    if (i < 0) i = 0;
+    for (j = 0; j < 3; j++) { pkAng[i][j] = *(int*)(l + 0x290 + 4 * j); *(int*)(l + 0x290 + 4 * j) = bAng[j]; }
+    *(int*)(l + 0x2A0) = bNode;
+    D_004FAD84 = bShell;
+    pickupOn = 0;
+}
+static int borrows(int k) { return k == SK_THUMPER || k == SK_PICKUP; }
+
+/* where p lies seen from the car (x right, y forward - the launch offsets' frame; car matrix rows at hier +0x20):
+ * -1 = outside the front 90 deg arc, else the Old Pickup roof gun frame (0 ahead, 1 / 2 = 20 / 40 deg left,
+ * 3 / 4 = 20 / 40 deg right) */
+static int bearing(char* v, float* p)
+{
+    char* h = *(char**)(v + 0x2028);
+    float *m, *o = (float*)(v + 0x1D0), dx, dy, dz, lx, ly, ax;
+    if (!h || !p) return -1;
+    m = (float*)(h + 0x20);
+    dx = p[0] - o[0]; dy = p[1] - o[1]; dz = p[2] - o[2];
+    lx = dx * m[0] + dy * m[1] + dz * m[2];
+    ly = dx * m[4] + dy * m[5] + dz * m[6];
+    ax = lx < PK_K[2] ? -lx : lx;
+    if (ly <= PK_K[2] || ax > ly) return -1;
+    if (ax < ly * PK_K[0]) return 0;
+    if (ax < ly * PK_K[1]) return lx < PK_K[2] ? 1 : 3;
+    return lx < PK_K[2] ? 2 : 4;
+}
+
+/* Minion's lock-on (func_0015AE98) in his FireSpecial (0x1594A8), UpdateSpecial (0x15EE50) and turret aim
+ * (0x160E28): for the Old Pickup a target outside the front arc counts as none */
+extern char* lockOn(void* l, void* pos, char* v, int mode) __asm__("func_0015AE98");
+char* tmbr_MinionLockOn(void* l, void* pos, char* v, int mode)
+{
+    char* t = lockOn(l, pos, v, mode);
+    if (t && pickupOn && (!*(char**)(t + 0x2028) || bearing(v, (float*)(*(char**)(t + 0x2028) + 0x10)) < 0)) return 0;
+    return t;
+}
+
+static void borrowFire(char* l, char* v, int k)
+{
+    int was = *(int*)(l + 0x27C), t = *(int*)(l + 0x98);
+    if (k == SK_PICKUP) scePrintf("TMBR skins: Old Pickup special (Minion's)\n");
+    else scePrintf("TMBR skins: Thumper special (Warthog's)\n");
+    borrowIn(l, v, k);
+    fireSpecial(l, v);
+    borrowOut(l, v, k);
+    if (k == SK_PICKUP) {
+        if (!was && *(int*)(l + 0x27C)) *(int*)(l + 0x280) = PK_TIME;
+        if (*(int*)(l + 0x98) != t) *(int*)(l + 0x98) *= 2;          /* first shell: twice the wait */
+    }
+}
+
+/* the special's per-frame part (func_001549A0 0x155D84, while launcher +0x27C is set) */
+extern void updateSpecial(void* l, char* v) __asm__("UpdateSpecial__8LauncherP7Vehicle");
+void tmbr_UpdateSpecial(void* l, char* v)
+{
+    int k = vehSkinF(v), t;
+    if (!borrows(k)) { updateSpecial(l, v); return; }
+    t = *(int*)((char*)l + 0x98);
+    borrowIn((char*)l, v, k);
+    updateSpecial(l, v);
+    borrowOut((char*)l, v, k);
+    if (k == SK_PICKUP && *(int*)((char*)l + 0x98) > t) *(int*)((char*)l + 0x98) *= 2;   /* shells half as often */
+}
+
+/* a remote Minion special (netWeaponCreateCB 0x16B0CC: message id 0x1E0, type 1 -> FireSpecial on our copy) */
+void tmbr_NetFireSpecial(void* l, char* v)
+{
+    int k = vehSkinF(v);
+    if (k == SK_PICKUP) { borrowFire((char*)l, v, k); return; }
+    fireSpecial(l, v);
+}
+
+/* Junkyard Dog's per-frame tow update (0x155D20, type 0x100 only): for the Old Pickup first Minion's turret aim
+ * (func_00160D80, normally run for 0x1E0 at 0x155D3C), then the tow update without seeing the borrowed special's
+ * running flag (+0x27C would send it into the towing branch, which uses the tow hook node +0x2A4) */
+extern void minionAim(void* l, char* v) __asm__("func_00160D80");
+extern void towUpdate(void* l, char* v) __asm__("UpdateTowTruck__8LauncherP7Vehicle");
+void tmbr_UpdateTowTruck(void* l, char* v)
+{
+    int r;
+    if (vehSkinF(v) != SK_PICKUP) { towUpdate(l, v); return; }
+    borrowIn((char*)l, v, SK_PICKUP);
+    minionAim(l, v);
+    borrowOut((char*)l, v, SK_PICKUP);
+    r = *(int*)((char*)l + 0x27C);
+    *(int*)((char*)l + 0x27C) = 0;
+    towUpdate(l, v);
+    *(int*)((char*)l + 0x27C) = r;
+}
+
+/* Outlaw's special-selected turret aim / laser (func_0015FCA8, 0x155B84, type 0x60 with the special selected):
+ * not for Twister (his special is the shockwave) */
+extern void outlawAim(void* l, char* v) __asm__("func_0015FCA8");
+void tmbr_OutlawAim(void* l, char* v)
+{
+    if (vehSkinF(v) == SK_TWISTER) return;
+    outlawAim(l, v);
+}
+
+/* Old Pickup's roof flamethrower (op6 switch, 5 frames, vehicle +0x2A44): points at the target while its special
+ * runs, one 20 deg step per 4 frames, back to straight ahead after */
+static signed char pkSw[8], pkTick[8];
+static void pickupTurret(char* v, int i)
+{
+    int* sw = *(int**)(v + 0x2A44);
+    char* l = v + 0x21B0;
+    int want = 0, f;
+    if (!sw) return;
+    if (*(int*)(l + 0x27C) && *(char**)(l + 0x300)) {
+        f = bearing(v, (float*)(*(char**)(l + 0x300) + 0x10));
+        want = f == 1 ? 1 : f == 2 ? 2 : f == 3 ? -1 : f == 4 ? -2 : 0;
+    }
+    if (++pkTick[i] >= 4) {
+        pkTick[i] = 0;
+        if (pkSw[i] < want) pkSw[i]++;
+        else if (pkSw[i] > want) pkSw[i]--;
+    }
+    hierSetSwitch(sw, pkSw[i] >= 0 ? pkSw[i] : 2 - pkSw[i]);
+}
+
 /* Axel's primary special, the shockwave (CAR_STATS_SPECIALS.md: online func_001599A0's plain-press branch): weapon
  * 0x1B, its sound, one special used. Its model node (EP id 0xFB0) must be loaded for the slot (Twister's files carry
  * slots 0..4 from the level files, higher slots borrow slot 4's - tmbr_VehInitDynamics), else the weapon does nothing. Only the owning console fires (+0x20B4 1 or 4), like Axel. */
@@ -436,7 +653,8 @@ static void twisterSpecial(char* l, char* v)
 {
     int own = *(int*)(v + 0x20B4);
     if (*(int*)(l + 0x27C) || L_AMMO(l, 1) <= 0 || (own != 1 && own != 4)) return;
-    { extern void* shockNode[] __asm__("D_0045FFD8"); scePrintf("TMBR skins: Twister shockwave (slot %d node %x)\n", *(int*)(v + 0x20F0), (int)shockNode[*(int*)(v + 0x20F0) & 7]); }
+    tmbr_ShockFix(v);
+    scePrintf("TMBR skins: Twister shockwave (slot %d node %x)\n", *(int*)(v + 0x20F0), (int)shockNode[*(int*)(v + 0x20F0) & 7]);
     createWeapon2(D_004FA030 + 0x6C310, 0x1B, v, 0, 0);
     shockSound(v + 0x2AD0, v + 0x1D0);
     weaponUsedSpecial(D_004FA030 + 0x6C310, v, 1);
@@ -445,8 +663,9 @@ static void twisterSpecial(char* l, char* v)
 
 void tmbr_FireSpecial(void* l, char* v)
 {
-    int i = vidx(v);
-    if (i >= 0 && vehSkin(v) == SK_TWISTER) { twisterSpecial((char*)l, v); return; }
+    int i = vidx(v), k = i >= 0 ? vehSkinF(v) : -1;
+    if (k == SK_TWISTER) { twisterSpecial((char*)l, v); return; }   /* (never Outlaw's own FireSpecial) */
+    if (borrows(k)) { borrowFire((char*)l, v, k); return; }
     if (i < 0 || !isPak(v)) { fireSpecial(l, v); return; }
     if (L_ARMED(l) && !pakRet[i]) return;               /* a pickup reticle is up: leave it alone */
     if (!pakRet[i]) {
@@ -497,7 +716,13 @@ void tmbr_SkinsFrame(void)
     tmbr_DamageReportTick();
     for (i = 0; i < 8; i++) {
         char* v = D_004FA030 + i * 0x31B0;
-        if (*(int*)(v + 0x590) && isPak(v)) pakHatches(v, i);
+        int id = *(int*)(v + 0x20F4), k;
+        if (!*(int*)(v + 0x590)) continue;
+        if (isPak(v)) pakHatches(v, i);
+        if (id != 3 << 5 && id != 8 << 5) continue;
+        k = vehSkinF(v);
+        if (k == SK_TWISTER) tmbr_ShockFix(v);
+        else if (k == SK_PICKUP) pickupTurret(v, i);
     }
     if (pakGame != D_004FA030) {
         pakGame = D_004FA030;

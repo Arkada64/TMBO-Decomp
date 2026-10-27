@@ -268,6 +268,14 @@ PATCHES = [
     (A("tmb/collis.s"), "0011F0DC", "jal", "jal        tmbr_PickupHit"),                       # HEALTH : OFF (bots.c)
     (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167378", "jal", "jal        tmbr_PickupHit"),
     (A("nonmatchings/online/net/netMsgGameEventHandler.s"), "00167454", "jal", "jal        tmbr_PickupHit"),
+    # ... UpdatePickups (func_001798A8): no respawn of health / full health (OFF) or environment pickups,
+    #     no full-health placing with OFF (bots.c)
+    (A("nonmatchings/online/after_highwayptool_32/func_001798A8.s"), "00179A10", "jal", "jal        tmbr_PickupPlaceFullHealth"),
+    (A("nonmatchings/online/after_highwayptool_32/func_001798A8.s"), "00179A64", "jal", "jal        tmbr_PickupRegen"),
+    (A("nonmatchings/online/after_highwayptool_32/func_001798A8.s"), "00179AF8", "jal", "jal        tmbr_PickupRegen"),
+    # ... no storm cloud on Suburbs / Mini Suburbs / Snowy Roads (thunderstormCreate skipped, bots.c)
+    (A("nonmatchings/tmb/suburb/func_001AA000.s"), "001AA01C", "jal", "jal        tmbr_NoStormCloud"),
+    (A("nonmatchings/tmb/death2/func_00127BE8.s"), "00127C1C", "jal", "jal        tmbr_NoStormCloud"),
     # ... team play (teams.c): team colours for every car incl. bots on markers / radar, lock-on skips teammates
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCE2C", "addiu", "jal        tmbr_TeamColorS"),
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCE30", "bne", "daddu      $4, $17, $0"),
@@ -427,6 +435,15 @@ PATCHES = [
     (A("tmb/ui.s"), "001CB694", "jal", "jal        tmbr_PreviewSwitch"),
     (A("tmb/ui.s"), "001CB8AC", "jal", "jal        tmbr_PreviewSwitch"),
     (A("nonmatchings/tmb/launch/func_00156E08.s"), "00157D10", "jal", "jal        tmbr_FireSpecial"),
+    # extras' borrowed specials (skins.c, Ark 2026-10-26): Thumper = Warthog's, Old Pickup = Minion's (front arc), Twister
+    # without Outlaw's special-selected turret aim / laser
+    (A("nonmatchings/tmb/launch/func_001549A0.s"), "00155B84", "jal", "jal        tmbr_OutlawAim"),
+    (A("nonmatchings/tmb/launch/func_001549A0.s"), "00155D20", "jal", "jal        tmbr_UpdateTowTruck"),
+    (A("nonmatchings/tmb/launch/func_001549A0.s"), "00155D84", "jal", "jal        tmbr_UpdateSpecial"),
+    (A("nonmatchings/online/net/netWeaponCreateCB.s"), "0016B0CC", "jal", "jal        tmbr_NetFireSpecial"),
+    (A("nonmatchings/tmb/launch/FireSpecial__8LauncherP7Vehicle.s"), "001594A8", "jal", "jal        tmbr_MinionLockOn"),
+    (A("nonmatchings/tmb/launch_part2/UpdateSpecial__8LauncherP7Vehicle.s"), "0015EE50", "jal", "jal        tmbr_MinionLockOn"),
+    (A("nonmatchings/tmb/launch_part2/func_00160D80.s"), "00160E28", "jal", "jal        tmbr_MinionLockOn"),
     # traffic: weapon damage on traffic is not reported to the network as player damage
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E24C0", "jal", "jal        tmbr_NetVehicleDamage"),
     # damage reports (mods/dmgreport.c): every hit by the local player, before the car-owner check

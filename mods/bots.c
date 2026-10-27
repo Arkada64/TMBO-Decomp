@@ -435,33 +435,63 @@ extern void tmbr_TeamsLobby(char* lineA, char* lineB);
 extern void tmbr_TeamsBotJoined(int slot, int car);
 extern void tmbr_TeamsBotLeft(char* v);
 
-/* ---- HEALTH : OFF (TODO 9, Ark 2026-10-26: no health on the map at all; ON = as the game has it). Pickups live
- * at game +0x86340 (Pickups): slot i (0..0x68) in use when its word at +4i is set, its cs at +0x60 + i*0x18; the
- * type is the cs's hier node id - 5000 (TakeHit: 7 health, 17 full health). With health off their cs is not drawn
- * (cs +0xC = 0, every frame - the respawn would show them again) and touching one does nothing (TakeHit wrapped at
- * its three calls: collis 0x11F0DC, net events 0x167378 / 0x167454). */
+/* ---- HEALTH : OFF (TODO 9, Ark 2026-10-26: no health on the map at all; ON = as the game has it) and no
+ * environment pickups ever (TODO 10). Pickups object = game +0x86340 (online layout, CreatePickup func_0017A270):
+ * +4*type   hierhead (model) per type, +0x48 the full-health spawn glow model
+ * +0x4C + i*0x18  pickup i (i < count at +0x284C, max 0x69): +0x10 type, +0x14 cs (cs +0xC = draw / takeable)
+ * +0xA24 + k*0x2C full-health spawn slot k (k < 2): +0x14 slot on (+0xA38), +0x20 glow cs (+0xA44), +0x24 sound
+ * Types (TakeHit 0x17B170 jump table, amounts D_003303C0): 7 energy (+0x420, 100), 8 HEALTH (add-health
+ * func_001E32D8, 15), 9 ENVIRONMENT weapon (launcher slot 8; the TMA "No ENV" rule zeroes its amount
+ * 0x3303E4), 17 FULL HEALTH (online's roaming mega health: the host turns a random pickup into type 17 at the
+ * spawn slot, with the glow model + hum while it counts down).
+ * Before 2026-10-26 (b): the loop took "+4*i" as an in-use flag (it is the hierhead table, then pickup fields),
+ * so most pickups were skipped, and the types were off by one (7 energy / 8 health hidden as "environment"),
+ * so health stayed on the map with OFF and could never be taken with ON. Now:
+ *  - every frame: the cs of each health / full-health (OFF) and environment (always) pickup is not drawn, the
+ *    full-health spawn slots are switched off (+0xA38 = 0) and their glow cs hidden;
+ *  - the host never respawns those types (RegenPickup calls in UpdatePickups 0x179A64 / 0x179AF8 wrapped) and
+ *    never places the full health (0x179A10 wrapped), so clients get no respawn events for them either;
+ *  - TakeHit ignores them (collis 0x11F0DC, net events 0x167378 / 0x167454). Pickup indexes stay as created,
+ *    so host and clients keep the same pickup table. */
 extern int pickupsTakeHit(char* p, char* v, char* cs, int b) __asm__("TakeHit__7PickupsP7VehicleP3_csb");
+extern void pickupsRegen(char* p, int type) __asm__("func_0017A408");
+extern void pickupsPlaceFullHealth(char* p) __asm__("readHighwaysFromDisk__12HighwayPToolP7Highwayi");  /* misnamed: 0x1796B8 */
+#define PK_HEALTH 8
+#define PK_ENV 9
+#define PK_FULLHEALTH 17
 static int pickupType(char* cs)
 {
     char* hh = cs ? *(char**)cs : 0;
     return hh ? (int)(*(unsigned*)hh >> 18) - 5000 : -1;
 }
-static int healthType(int t) { return t == 7 || t == 17; }
-/* environment pickups (type 8) are gone for good (TODO 10, Ark: no option) - on Suburbs / Snowy Roads / Mini
- * Suburbs that pickup is the storm cloud, so the cloud goes with it */
-#define ENV_PICKUP 8
+static int healthType(int t) { return t == PK_HEALTH || t == PK_FULLHEALTH; }
+static int pickupGone(int t) { return t == PK_ENV || (healthType(t) && !tmbr_Opt(OPT_HEALTH)); }
+static int csOk(char* cs) { return (u32)cs >= 0x100000 && (u32)cs < 0x2000000; }
 int tmbr_PickupHit(char* p, char* v, char* cs, int b)
 {
-    int t = pickupType(cs);
-    if (t == ENV_PICKUP) return 0;
-    if (!tmbr_Opt(OPT_HEALTH) && healthType(t)) return 0;
+    if (pickupGone(pickupType(cs))) return 0;
     return pickupsTakeHit(p, v, cs, b);
 }
+void tmbr_PickupRegen(char* p, int type)
+{
+    if (pickupGone(type)) return;
+    pickupsRegen(p, type);
+}
+void tmbr_PickupPlaceFullHealth(char* p)
+{
+    if (!tmbr_Opt(OPT_HEALTH)) return;
+    pickupsPlaceFullHealth(p);
+}
+/* Suburbs / Mini Suburbs (SuburbInitAfter 0x1AA01C) and Snowy Roads (Death2InitAfter 0x127C1C) make the storm
+ * cloud with thunderstormCreate (particle fx 0x24 over the map; the environment weapon's lightning comes out of
+ * it). TODO 10: never - the handle stays -1 from thunderstormInit, so thunderstormUpdate (func_001AC358) does
+ * nothing (no cloud, no lightning, no cloud sound). The snow on Snowy Roads is separate and stays. */
+void tmbr_NoStormCloud(void* pos) { (void)pos; }
 static void healthFrame(void)
 {
     static int shown = -1, envShown = -1;
     char* p;
-    int i, n = 0, e = 0, off = !tmbr_Opt(OPT_HEALTH);
+    int i, k, cnt, n = 0, e = 0, off = !tmbr_Opt(OPT_HEALTH);
     {   /* the baked TMA rule "No Health Pickups (always on)" makes the add-health function (func_001E32D8) return at
          * once (jr ra; nop): HEALTH : ON puts its first two instructions back, OFF the rule's again */
         extern void FlushCache(int mode) __asm__("FlushCache");
@@ -477,18 +507,24 @@ static void healthFrame(void)
     }
     if (!D_004FA030) return;
     p = D_004FA030 + 0x86340;
-    for (i = 0; i < 0x68; i++) {
-        char* cs;
-        if (!F(p, 4 * i)) continue;
-        cs = (char*)F(p, 0x60 + i * 0x18);
-        if ((u32)cs < 0x100000 || (u32)cs >= 0x2000000) continue;
-        {
-            int t = pickupType(cs);
-            if (t == ENV_PICKUP) { cs[0xC] = 0; e++; }
-            else if (off && healthType(t)) { cs[0xC] = 0; n++; }
-        }
+    cnt = F(p, 0x284C);
+    if (cnt < 0 || cnt > 0x69) return;
+    for (i = 0; i < cnt; i++) {
+        char* cs = (char*)F(p, 0x60 + i * 0x18);
+        int t = F(p, 0x5C + i * 0x18);
+        if (!csOk(cs)) continue;
+        if (!pickupGone(t)) t = pickupType(cs);   /* the cs model is what TakeHit goes by */
+        if (!pickupGone(t)) continue;
+        cs[0xC] = 0;
+        if (t == PK_ENV) e++; else n++;
     }
-    if (off && n != shown) { shown = n; scePrintf("TMBR health: off, %d health pickups hidden\n", n); }
+    if (off)
+        for (k = 0; k < 2; k++) {
+            char* glow = (char*)F(p, 0xA44 + k * 0x2C);
+            F(p, 0xA38 + k * 0x2C) = 0;   /* full-health spawn slot off: no placing, no countdown glow / hum */
+            if (csOk(glow)) glow[0xC] = 0;
+        }
+    if (off && n != shown) { shown = n; scePrintf("TMBR health: off, %d of %d pickups are health (hidden)\n", n, cnt); }
     if (e != envShown) { envShown = e; scePrintf("TMBR pickups: %d environment pickups hidden\n", e); }
 }
 

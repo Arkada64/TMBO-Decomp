@@ -107,13 +107,33 @@
      behind, Outlaw at 100-350 now and then; the special consumes the flag - tested; the special-up energy combo did
      not set it for them). Outlaw turret secondary / Manslaughter drop-behind (Launcher::UpdateSpecial 0x15CD80).
   8. DONE (see 6f). Minion toggle on the native game mods page.
-  9. DONE 2026-10-26 (lobby HEALTH : ON / OFF, host R3 + Circle, OFF by default = the baked TMA rule (mods/tmbr.pnach
-     makes func_001E32D8, the add-health function, return at once); ON writes its first two instructions back. OFF
-     also hides health / full-health pickups and TakeHit ignores them). HEALTH lobby option: ON = health pickups spawn and can be picked up (overrides the TMA ruleset's no-health);
-     OFF = no health on the map at all (replaces the TMA health rule; the respawn shield stays).
-  10. DONE 2026-10-26 (pickup type 8 hidden every frame and can't be taken; 5 hidden on the test map).
-      Environment pickups removed for good (no option), with the clouds on maps whose cloud is an environment pickup
-      (Suburbs, Snowy Roads, Mini Suburbs).
+  9. CODED 2026-10-26 (b), needs an in-game check. HEALTH lobby option: ON = health pickups spawn and can be picked
+     up (overrides the TMA ruleset's no-health); OFF = no health on the map at all (replaces the TMA health rule; the
+     respawn shield stays). Lobby toggle (host R3 + Circle, OFF by default) and the add-health patch (func_001E32D8:
+     OFF = the baked TMA rule's jr ra, ON = its first two instructions back) work. The first pickup hiding did NOT
+     work (Ark: health still on Suburbs): its loop read "+4*i" as an in-use flag (that is the per-type model table,
+     then pickup fields), so most pickups were skipped, and the types were off by one (7 is energy, 8 is health,
+     9 environment, 17 full health), so with ON health was hidden and untakeable too. Now (mods/bots.c, pickup
+     section): every frame the health / full-health pickups (entry type at Pickups +0x5C + i*0x18 or the cs
+     model, i < count +0x284C) are not drawn (cs +0xC = 0), the online full-health spawn slots are switched off
+     (+0xA38 + k*0x2C = 0) and their glow cs (+0xA44) hidden; the host never respawns them (RegenPickup calls in
+     UpdatePickups 0x179A64 / 0x179AF8 -> tmbr_PickupRegen) or places the full health (0x179A10 ->
+     tmbr_PickupPlaceFullHealth); TakeHit ignores them (0x11F0DC, 0x167378, 0x167454). Pickup indexes are kept
+     (no skipped creation), so host / client tables stay in step. Check in game: Suburbs with OFF - no health
+     boxes, no full-health glow / hum, log "TMBR health: off, N of M pickups are health" (N should be all the
+     health spots); with ON - health shows, heals, respawns, full health roams. Known edge: a pickup the game
+     flips between energy and health (helicopter pickup, func_001406B8) stays hidden after it flips back to
+     energy until energy respawns.
+  10. CODED 2026-10-26 (b), needs an in-game check. Environment pickups removed for good (no option) and the storm
+      cloud never shown. The first try hid type 8 (that was health) and claimed the cloud is an environment
+      pickup - wrong: the environment pickup is type 9 (launcher slot 8; the TMA "No ENV" rule zeroes its amount
+      0x3303E4) and the cloud is a particle effect (fx 0x24) made by thunderstormCreate in SuburbInitAfter
+      (func_001AA000, levels 0 Suburbs and 18 Mini Suburbs) and Death2InitAfter (func_00127BE8, level 8 Snowy
+      Roads). Now: both thunderstormCreate calls (0x1AA01C, 0x127C1C) go to an empty tmbr_NoStormCloud, so the
+      handle stays -1 and thunderstormUpdate does nothing (no cloud, lightning or cloud sound; the Snowy Roads
+      snow is separate and stays); type 9 pickups are hidden every frame, never respawned, and TakeHit ignores
+      them. Check in game: no cloud on Suburbs / Mini Suburbs / Snowy Roads, no environment pickup, log
+      "TMBR pickups: N environment pickups hidden".
   11. (Plan: reference/wip/STORY_PLAN.md, 2026-10-26 - phases: offline story run, movies, story level files, bosses,
       co-op.) Story mode (single player) with retail's cutscenes: ~2.9 GB of retail movies onto the disc (fine for PCSX2), the
       story flow rebuilt in online's menus, each level's story events / bosses checked (retail decomp to compare).

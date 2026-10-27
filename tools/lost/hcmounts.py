@@ -48,11 +48,51 @@ def rot_prh(a, b, c):
                      [-ca * sb * cc + sa * sc, ca * sb * sc + sa * cc, ca * cb]])
 
 
-def bone_local(n, o):
+def char_tracks(car, char):
+    """animation tracks of an op25 character: {channel: [(time, c3, c2, c1, c0), ...]} (op25 +0x10 -> op33 node, its
+    +4 -> header: +0xC channel count, +0x18 one pointer per channel -> nkeys, channel, keys of 5 floats; a key's value
+    at time t >= its time T is c0 + c1 u + c2 u^2 + c3 u^3, u = t - T, as evaluateBetweenKeyframes)"""
+    n = car.n
+    c33 = car.P(char + 0x10)
+    hdr = car.P(c33 + 4) if c33 is not None and (u32(n, c33) & 0x3f) == 33 else None
+    out = {}
+    if hdr is None:
+        return out
+    for i in range(min(u32(n, hdr + 0xc), 256)):
+        tp = car.P(hdr + 0x18 + 4 * i)
+        if tp is None:
+            continue
+        k, chn = u32(n, tp) & 0xffff, u32(n, tp + 4)
+        if not 0 < k < 4096:
+            continue
+        out[chn] = [struct.unpack_from('<5f', n, tp + 8 + 20 * j) for j in range(k)]
+    return out
+
+
+def track_value(keys, t):
+    """value at time t; before the first / after the last key the end value holds"""
+    if t <= keys[0][0]:
+        return keys[0][4]
+    if t >= keys[-1][0]:
+        return keys[-1][4]
+    k = max((kk for kk in keys if kk[0] <= t), key=lambda kk: kk[0])
+    u = t - k[0]
+    return k[4] + u * (k[3] + u * (k[2] + u * k[1]))
+
+
+def bone_local(n, o, vals=None):
     """an op17 bone's local transform as skeletonTraverse builds it from the stored channel values (the exported pose):
     R = RotPRH(-P, -R, -H) at +0x20; flags +0xC0: 0x10000 -> A40 * R, 0x20000 -> * A80 (A40 / A80 = -pivot / +pivot);
     then + the translation at +0x30. Returns (3x3, t) for row vectors (world = local @ parent)."""
-    R = rot_prh(*(-np.array(struct.unpack_from('<3f', n, o + 0x20))))
+    ang = np.array(struct.unpack_from('<3f', n, o + 0x20))
+    tr = np.array(struct.unpack_from('<3f', n, o + 0x30))
+    if vals is not None:                         # channel values replace the stored ones (+0x12.. index per field)
+        ci = struct.unpack_from('<6h', n, o + 0x12)
+        for j, c in enumerate(ci):
+            if c >= 0 and c in vals:
+                if j < 3: ang[j] = vals[c]
+                else: tr[j - 3] = vals[c]
+    R = rot_prh(*(-ang))
     M = np.eye(4); M[:3, :3] = R
     fl = u32(n, o + 0xc0)
     if fl & 0x10000:
@@ -61,7 +101,7 @@ def bone_local(n, o):
             M = M @ np.array(struct.unpack_from('<16f', n, o + 0x80)).reshape(4, 4)
     elif fl & 0x20000:
         M = M @ np.array(struct.unpack_from('<16f', n, o + 0x80)).reshape(4, 4)
-    return M[:3, :3], M[3, :3] + np.array(struct.unpack_from('<3f', n, o + 0x30))
+    return M[:3, :3], M[3, :3] + tr
 
 
 def _xf(n, o):
@@ -123,6 +163,52 @@ def donor_mounts(car):
             for k in kids(car, o):
                 st.append((k, M, t, ch, sw, Mab, chr_))
     return out
+
+
+def mount_envelope(car, rec, node, extra=np.zeros(3)):
+    """car-space positions of a mount over its character's animation (every key time and the midpoints, all
+    channels evaluated), plus its exported-pose position; extra: a translate put above the character"""
+    from hcbuild import kids
+    d = rec[node]
+    n = car.n
+    if d.get('char') is None:
+        return np.array([d['pos']])
+    trk = char_tracks(car, d['char'])
+    ts = sorted({k[0] for v in trk.values() for k in v})
+    ts = sorted(set(ts) | {(a + b) / 2 for a, b in zip(ts, ts[1:])})
+    # path from the character down to the mount
+    path = None
+    st = [(d['char'], (d['char'],))]
+    while st and path is None:
+        o, ch = st.pop()
+        for k in kids(car, o):
+            if k == node:
+                path = ch + (k,); break
+            if k not in ch and len(ch) < 40 and (u32(n, k) & 0x3f) != 0:
+                st.append((k, ch + (k,)))
+    if path is None:
+        return np.array([d['pos']])
+    out = []
+    for t in ([None] + ts):
+        vals = None if t is None else {c: track_value(v, t) for c, v in trk.items()}
+        M, tt, hidden = d['Mchar'], np.zeros(3), False
+        for o in path:
+            if (u32(n, o) & 0x3f) == 17:
+                vc = struct.unpack_from('<h', n, o + 0x10)[0]
+                if vals is not None and vc >= 0 and vc in vals and vals[vc] == 0:
+                    hidden = True
+                Rm, t3 = bone_local(n, o, vals)
+            else:
+                x = _xf(n, o)
+                if x is None:
+                    continue
+                Rm, t3 = x
+            tt = t3 @ M + tt
+            M = Rm @ M
+        if not hidden:
+            out.append(tt)
+    base = d['pos'] - out[0] if out else 0      # car-space offset of the character (transforms above it)
+    return np.array(out) + base + extra
 
 
 def ho_list(n):
