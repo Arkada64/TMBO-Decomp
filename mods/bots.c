@@ -1709,9 +1709,13 @@ static int egOk[8], egLog[8];
 static float egQ[4] __attribute__((aligned(16)));
 /* Rooftop maps (Skyscrapers 4, Mini Skyscrapers 13, Warhawk's roof 20): the game's own bot driving only - our fight
  * steering, route-map driving, dodging, turbo and unstick drove bots off the roofs (Ark 2026-10-27) */
-/* (g178, Ark 2026-10-28: jump links helped - our driving is back on the roof maps too; ROOF_GAME_DRIVING 1 = old rule) */
+/* g179 (Ark 2026-10-28: with all our driving back on the roofs it sent them off the edges again): on the roof
+ * maps our ROUTE driving runs (route map kept 24 units back from the drops, jump links), but the free steering
+ * that knows nothing of drops stays off - fight steering, dodging, evading, turbo, avoiding, unsticking - and
+ * the edge guard brakes for every drop it sees ahead. ROOF_GAME_DRIVING 1 = the game's own driving only. */
 #define ROOF_GAME_DRIVING 0
-static int roofMap(void) { return ROOF_GAME_DRIVING && (tmbr_levelIndex == 4 || tmbr_levelIndex == 13 || tmbr_levelIndex == 20); }
+static int roofMap(void) { return tmbr_levelIndex == 4 || tmbr_levelIndex == 13 || tmbr_levelIndex == 20; }
+static int roofNoNav(void) { return ROOF_GAME_DRIVING && roofMap(); }
 extern int tmbr_NavJumping(char* v);   /* nav.c: on a jump link (run-up or the jump itself) */
 static void edgeGuard(char* g, char* v)
 {
@@ -1728,7 +1732,7 @@ static void edgeGuard(char* g, char* v)
     if (dx * dx + dy * dy < EG[3] * EG[3]) return;
     egQ[0] = p[0]; egQ[1] = p[1]; egQ[2] = p[2] + EG[2]; egQ[3] = p[3];
     if (!(hdHat(egQ, 0, 0) < EG[1])) return;                   /* in the air (a jump under way): leave it */
-    for (k = 12; k <= 24; k += 12) {
+    for (k = 8; k <= 40; k += 8) {     /* 8..40 frames ahead (g179: 12 / 24 was too late at speed) */
         egQ[0] = p[0] + dx * (float)k; egQ[1] = p[1] + dy * (float)k; egQ[2] = p[2] + EG[2];
         if (hdHat(egQ, 0, 0) > EG[0]) {
             pad[4] = 0; pad[7] = 0; pad[8] = 0; pad[2] = 0; pad[6] = 1;
@@ -1744,15 +1748,17 @@ int tmbr_AiUpdate(char* v)
     if (F(D_003156C0, 0x1BB4) == 0xA && F(v, 0x2014)) { padClear(v); return 0; }   /* sync hold: bots frozen */
     r = aiUpdate(v);
     /* match over (game type 1): the game stops every car - no dodging / unsticking then (log 2026-10-24) */
-    if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030 && !roofMap() && !(GINFO() && ((F(GINFO(), 0) >> 1) & 0xF) == 1)) {
+    if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030 && !(GINFO() && ((F(GINFO(), 0) >> 1) & 0xF) == 1)) {
         int ev = 0;
         if (tmbr_NavJumping(v)) return r;   /* a jump link under way: no dodging / avoiding / edge brakes */
-        dodge(D_004FA030, v);
-        if (!dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]) ev = evade(D_004FA030, v);   /* (a dodge in progress wins) */
-        turboUse(D_004FA030, v, ev || dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]);
-        energyUse(D_004FA030, v, ev);
-        avoid(D_004FA030, v);
-        unstick(D_004FA030, v);
+        if (!roofMap()) {
+            dodge(D_004FA030, v);
+            if (!dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]) ev = evade(D_004FA030, v);   /* (a dodge in progress wins) */
+            turboUse(D_004FA030, v, ev || dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]);
+            energyUse(D_004FA030, v, ev);
+            avoid(D_004FA030, v);
+            unstick(D_004FA030, v);
+        }
         edgeGuard(D_004FA030, v);
     }
     return r;
@@ -1774,7 +1780,7 @@ static int aiUpdate(char* v)
         if (++shieldT[si] > 600) { shieldOff(v); shieldT[si] = 0; scePrintf("TMBR shield: bot %d off\n", si); }    /* 10 s, like the players' shield */
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
 #if TMBR_NAV
-        if (!roofMap()) tmbr_NavDrive(g, v, 0);          /* roam the route map */
+        if (!roofNoNav()) tmbr_NavDrive(g, v, 0);          /* roam the route map */
 #endif
         return r;
     }
@@ -1796,7 +1802,7 @@ keepFlee:
     if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) {
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
 #if TMBR_NAV
-        if (tmbr_botCount >= 0 && F(v, 0x2014) && !roofMap()) tmbr_NavDrive(g, v, 0);
+        if (tmbr_botCount >= 0 && F(v, 0x2014) && !roofNoNav()) tmbr_NavDrive(g, v, 0);
 #endif
         return r;
     }
@@ -1812,7 +1818,7 @@ keepFlee:
     if (swap) F(g, 0x9FD40 + k * 4) = save;
     t0 = tmbr_Cycles();
 #if TMBR_NAV
-    if (!roofMap() && tmbr_NavDrive(g, v, t)) { tmbr_PerfAdd(2, t0); return r; }
+    if (!roofNoNav() && tmbr_NavDrive(g, v, t)) { tmbr_PerfAdd(2, t0); return r; }
 #endif
     if (!roofMap()) aggressiveTurn(g, v, t);
     tmbr_PerfAdd(2, t0);

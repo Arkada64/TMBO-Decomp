@@ -98,6 +98,8 @@ def exclude(name, H, R):
         n = int(cut.sum()); sub[cut] = np.nan
         print(f"{name}: excluded {n} cells in x {xa}..{xb} y {ya}..{yb} z {zl}..{zt}")
     return H
+# drop margin in fine cells (4 units): the roof maps keep the route map 24 units back from the edges (g179)
+MARGIN = dict(rooftop=6, rooftop2=6, roofboss=6)
 table = []
 ONLY = os.environ.get("NAV_ONLY")
 for name, lvl in LEVEL.items():
@@ -106,7 +108,7 @@ for name, lvl in LEVEL.items():
     H = exclude(name, H, R)
     addr, cap = region(name)
     for lat in (8, 9, 10, 12, 14, 16, 20):
-        G = parts_with_jumps(build(H, R, lat), name, R)
+        G = parts_with_jumps(build(H, R, lat, margin=MARGIN.get(name, 1)), name, R)
         b = pack(G, R)
         if len(b) <= cap: break
     fn = f"ZN{lvl:02d}.BIN"
@@ -114,6 +116,7 @@ for name, lvl in LEVEL.items():
     preview(H, G, R, f"{name}_nav.png")
     table.append((lvl, name, addr, cap, len(b), lat, len(G["rec"])))
     print(f"{name:9s} level {lvl:2d} lat {lat*4:3d} units, {len(G['rec']):6d} nodes, {len(b)//1024:4d} KB at 0x{addr:X} (room {cap//1024} KB)", flush=True)
+if ONLY: raise SystemExit   # partial run: navlevels.inc / navtable.pkl stay as they are
 pickle.dump(table, open("navtable.pkl", "wb"))
 
 with open("navlevels.inc", "w") as f:
