@@ -4,13 +4,13 @@
 tools/mods/apply_mods.py apply|revert : patch the split asm for TMB-Reloaded mods (shiftable build only).
 build_shiftable.sh runs `apply` before linking and `revert` after, so the normal build stays byte-identical.
 Mods:
-  traffic: level loader func_00127650 sends db nodes 0x401..0xBB7 to tmbr_FodderParse (mods/traffic.s)
+  traffic: removed 2026-10-28 (traffic.c / traffic.s / traffic_nodes.c in mods/_to_delete)
   peds:    loader sends nodes 0xBB8..0xF9F to func_00178248 (addPedEpNode), and func_00138358 no longer
            clears the pedestrian 'enabled' flag (was the "Pedestrians online v2" pnach)
   shield:  Respawn Shield hooks into mods/shield.s (was the community "TMA Ruleset/ Respawn Shield" pnach)
 Rules: patches replace an instruction 1:1 (j/jal to a mod routine) or add labels. Inserted code inside
 the game's .text must be a multiple of 0x80 bytes (see HOOKS).
-TMBR_DEBUG_LOADER=1 also routes the db traversal callback through tmbr_LoaderDbg (prints node ids).
+(TMBR_DEBUG_LOADER=1 needed tmbr_LoaderDbg from traffic.s, removed 2026-10-28: don't set it.)
 """
 
 import sys, shutil, os, re
@@ -21,23 +21,17 @@ A = lambda p: R / "asm" / p
 LOADER = A("nonmatchings/online/after_prison_10/func_00127650.s")
 HOOKS = (
     """\
-.Ltmbr_fodder:
-    lw         $4, %gp_rel(D_004FA030)($28)
-    jal        tmbr_FodderParse
-    daddu      $5, $17, $0
-    b          .L00127AE8
-    lq         $31, 0x20($29)
 .Ltmbr_peds:
     jal        func_00178248
     daddu      $4, $17, $0
     b          .L00127AE8
     lq         $31, 0x20($29)
 """
-    + "    nop\n" * 23
+    + "    nop\n" * 28
 )
 # ^ code growth inside the game's .text must be a multiple of 0x80: some code is followed by data that is
 #   read with 128-bit lq (e.g. libmpeg's clamp mask D_002524C0), which ignores the low 4 address bits.
-#   9 hook instructions + 23 nops = 0x80. A 0x28-byte growth gave full-screen green bars.
+#   4 hook instructions + 28 nops = 0x80 (traffic's 5 removed 2026-10-28). A 0x28-byte growth gave full-screen green bars.
 assert (
     sum(1 for l in HOOKS.splitlines() if l.strip() and not l.strip().endswith(":"))
     * 4
@@ -46,7 +40,6 @@ assert (
 )
 # (file, address, expected opcode, replacement instruction)
 PATCHES = [
-    (LOADER, "0012777C", "bnez", "bnez       $2, .Ltmbr_fodder"),
     (LOADER, "00127788", "bnel", "bnel       $2, $0, .Ltmbr_peds"),
     (LOADER, "0012778C", "lq", "nop"),
     (A("nonmatchings/tmb/game/func_00138358.s"), "00138828", "sw", "nop"),
@@ -363,10 +356,6 @@ PATCHES = [
     (A("nonmatchings/tmb/vehicle/func_001DC760.s"), "001DCB64", "jal", "jal        tmbr_AiUpdate"),
     # ... specials offered less often to bots (free-for-all)
     (A("nonmatchings/tmb/ai/func_00106440.s"), "001064E8", "jal", "jal        tmbr_AiGoodWeapon"),
-    # ... traffic cars collide: collisCsToCsCollision's owner lookup also finds them (traffic.c)
-    (A("tmb/collis.s"), "00121B9C", "jal", "jal        tmbr_IsVehicleOrTraffic"),
-    (A("tmb/collis.s"), "00121F14", "jal", "jal        tmbr_CollideHit"),
-    (A("tmb/collis.s"), "00121F28", "jal", "jal        tmbr_CollideHit"),
     # ... bots 0..5 in net messages as -2..-7 (was -2 / -3 for everything else): mods/botnet.s
     (A("nonmatchings/online/net/func_00171818.s"), "0017187C", "lui", "jal        tmbr_BotCode"),
     (A("nonmatchings/online/net/func_00171818.s"), "00171880", "ori", "daddu      $4, $5, $0"),
@@ -434,8 +423,6 @@ PATCHES = [
     (A("tmb/shell.s"), "0018AB2C", "jal", "jal        tmbr_LoadCar478"),
     (A("tmb/shell.s"), "0018AB40", "jal", "jal        tmbr_LoadCar680"),
     (A("nonmatchings/online/net/func_001742B0.s"), "001744F8", "jal", "jal        tmbr_LoadCar0F0"),
-    # traffic: weapon hits on traffic cars logged (destruction work)
-    (A("nonmatchings/tmb/interact/func_0014F108.s"), "0014F1A0", "jal", "jal        tmbr_FodderTakeHit"),
     # 12 Pak: 16th car select spot (wrap 14 -> 15), preview shows Roadkill there, his special is the reticle weapon
     (A("tmb/ui.s"), "001CB784", "addiu", "addiu      $v0, $zero, 0xF"),
     (A("tmb/ui.s"), "001CB7B0", "addiu", "addiu      $v0, $zero, 0xF"),
@@ -457,8 +444,6 @@ PATCHES = [
     (A("nonmatchings/tmb/launch_part2/UpdateSpecial__8LauncherP7Vehicle.s"), "0015EE50", "jal", "jal        tmbr_MinionLockOn"),
     (A("nonmatchings/tmb/launch_part2/UpdateSpecial__8LauncherP7Vehicle.s"), "0015EEE0", "jal", "jal        tmbr_PkDist"),   # Old Pickup: Minion's torch, not his shells (skins.c)
     (A("nonmatchings/tmb/launch_part2/func_00160D80.s"), "00160E28", "jal", "jal        tmbr_MinionLockOn"),
-    # traffic: weapon damage on traffic is not reported to the network as player damage
-    (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E24C0", "jal", "jal        tmbr_NetVehicleDamage"),
     # damage reports (mods/dmgreport.c): every hit by the local player, before the car-owner check
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E2498", "lw", "j          tmbr_DmgGate"),
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E249C", "beql", "nop"),
@@ -481,7 +466,7 @@ PATCHES = [
     (A("nonmatchings/tmb/launch/func_00156118.s"), "00156698", "jal", "jal        tmbr_ReticleUsed"),
     (A("nonmatchings/tmb/launch/func_00156118.s"), "00156A88", "jal", "jal        tmbr_ReticleUsed"),
     (A("nonmatchings/tmb/launch/func_00156E08.s"), "00157BDC", "jal", "jal        tmbr_ReticleUsed"),
-    # traffic kills: no kill feed line
+    # kill feed: only the 8 real cars; remote players' cars skipped (their console decides) - skins.c
     (A("nonmatchings/tmb/vehicle/func_001E1C40.s"), "001E278C", "jal", "jal        tmbr_KillMessage"),
     # 12 Pak: launcher update without Roadkill's charge special
     (A("nonmatchings/tmb/vehicle/func_001DCD48.s"), "001DCD90", "jal", "jal        tmbr_LauncherUpdate"),
@@ -531,9 +516,9 @@ ASM_TEXT = [
 ]
 DBG = os.environ.get("TMBR_DEBUG_LOADER") == "1"
 # Traffic/peds level-loader hooks: OFF by default. They add 0x80 bytes inside the loader (moves all code and
-# data after it -> map selector crash, see above). TMBR_TRAFFIC=1 puts them back for traffic work.
+# data after it -> map selector crash, see above). (TMBR_TRAFFIC is gone with traffic.)
 # Peds in normal builds come from the baked "Pedestrians Online" pnach section (same size, stub in a dead func).
-NO_TRAFFIC = os.environ.get("TMBR_TRAFFIC") != "1"
+NO_TRAFFIC = True   # traffic removed 2026-10-28; the peds loader hooks stay off too (pnach peds)
 if NO_TRAFFIC:
     PATCHES = [p for p in PATCHES if p[0] != LOADER and p[1] != "00138828"]
 # TMBR_SKIP=group,group: leave hooks out (for bisecting). Groups by hook address:

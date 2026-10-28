@@ -414,7 +414,7 @@ static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v,
  * (D_003156C0 + slot*0x220), never set or sent by the game: every machine sets slot & 1 for all 8 slots, so no
  * sync is needed. Bots: same rule by their vehicle's slot (+0x20C0), logged at match start. */
 #define GINFO() (*(char**)(D_003156C0 + 0x3148))
-#define OPT_TRAFFIC 1      /* traffic ON (off by default) */
+#define OPT_TRAFFIC 1      /* (was traffic on; traffic removed 2026-10-28 - bit unused) */
 #define OPT_TEAMS 2
 #define OPT_TEAMS4 4      /* four teams */
 extern void netSendGameInfo(void* net, int to) __asm__("func_00174988");
@@ -1959,7 +1959,6 @@ int tmbr_AiMayShoot(char* v)
 
 extern void lobbyFrame(void) __asm__("func_001C5768");
 extern void tmbr_SkinsLobby(void);       /* skins.c */
-extern void tmbr_PedNamesInit(void);     /* packs.c */
 extern void fontSetCursorAtSubPixel(int font, int x, int y) __asm__("fontSetCursorAtSubPixel__Fiii");
 extern void fontPrint(int font, const char* s) __asm__("func_00203150");
 extern int sprintf(char* d, const char* f, ...);
@@ -2029,10 +2028,9 @@ static void extraLines(int row)
 {
     char b[40];
     int teams = tmbr_Opt(OPT_TEAMS);
-    lobbyLine(row + 1, -1, tmbr_Opt(OPT_TRAFFIC) ? "TRAFFIC : ON" : "TRAFFIC : OFF");
-    lobbyLine(row + 2, -1, !teams ? "TEAMS : OFF" : tmbr_Opt(OPT_TEAMS4) ? "TEAMS : 4" : "TEAMS : 2");
-    /* (MINION / HEALTH are on the GAME MODS page now, modspage.c - Ark 2026-10-26: not listed here any more) */
-    row++;
+    lobbyLine(row + 1, -1, !teams ? "TEAMS : OFF" : tmbr_Opt(OPT_TEAMS4) ? "TEAMS : 4" : "TEAMS : 2");
+    /* (MINION / HEALTH are on the GAME MODS page now, modspage.c - Ark 2026-10-26: not listed here any more;
+     * TRAFFIC line gone with traffic, 2026-10-28) */
     if (teams) {
         if (tmbr_botTeamMode) sprintf(b, "HUMANS VS BOTS");
         else sprintf(b, "YOU : %s TEAM", tmbr_TeamName(tmbr_MyTeam()));
@@ -2078,7 +2076,6 @@ void tmbr_LobbyFrame(void)
     tmbr_GuestsName();     /* guests.c: a new guest types a name (opened by the car pick) */
     tmbr_SkinsLobby();
     { extern void tmbr_LostLobby(void); tmbr_LostLobby(); }      /* lostslots.c: Lost map sync (+ test forcing) */
-    tmbr_PedNamesInit();
     host = netIsHost(D_003156C0);
     teams = tmbr_Opt(OPT_TEAMS);
     tmbr_TeamsLobby(ra, rb);                 /* teams.c: team pick input (R3 + Left/Right, R3 + Select) + rosters */
@@ -2089,10 +2086,10 @@ void tmbr_LobbyFrame(void)
     if (pad & 0x4) {
         if (!host) {
             lobbyLine(10, -1, teams ? "LEFT/RIGHT : PICK TEAM" : "THE HOST SETS BOTS,");
-            lobbyLine(11, -1, teams ? "SELECT : SHOW TEAMS" : "TRAFFIC AND TEAMS");
+            lobbyLine(11, -1, teams ? "SELECT : SHOW TEAMS" : "AND TEAMS");
         } else {
             lobbyLine(10, -1, teams ? "L1R1 BOT LT/RT TEAM" : "L1R1 BOT L2R2 SKILL");   /* (no story / Minion / HP hints: Ark 2026-10-27) */
-            lobbyLine(11, -1, "UP TRAF DN TEAM");
+            lobbyLine(11, -1, "DOWN : TEAMS");
         }
     } else if (teams && (pad & 0x1)) {
         lobbyLine(10, 0, ra);
@@ -2105,15 +2102,15 @@ void tmbr_LobbyFrame(void)
     fontSetColor(0, 0x50, 0x44, 0x2C);
     if (!host) return;
     { extern void tmbr_StoryLobby(void); tmbr_StoryLobby(); }   /* story.c: R3 + Square, its level rules */
-    if ((pad & 0x4) && (pressed & 0x3050)) {
+    if ((pad & 0x4) && (pressed & 0x3040)) {
         {   /* Down cycles: teams off -> 2 teams -> 4 teams -> off; Triangle: Minion on / off */
-            int f = (pressed & 0x10) ? OPT_TRAFFIC : 0;
+            int f = 0;
             if (pressed & 0x1000) f |= OPT_MINION;
             if (pressed & 0x2000) f |= OPT_HEALTH;
             if (pressed & 0x40) f |= !tmbr_Opt(OPT_TEAMS) ? OPT_TEAMS : !tmbr_Opt(OPT_TEAMS4) ? OPT_TEAMS4 : (OPT_TEAMS | OPT_TEAMS4);
             optSync(f);
         }
-        scePrintf("TMBR lobby: traffic %s, teams %s, minion %s\n", tmbr_Opt(OPT_TRAFFIC) ? "on" : "off", !tmbr_Opt(OPT_TEAMS) ? "off" : tmbr_Opt(OPT_TEAMS4) ? "4" : "2", tmbr_Opt(OPT_MINION) ? "on" : "off");
+        scePrintf("TMBR lobby: teams %s, minion %s\n", !tmbr_Opt(OPT_TEAMS) ? "off" : tmbr_Opt(OPT_TEAMS4) ? "4" : "2", tmbr_Opt(OPT_MINION) ? "on" : "off");
         scePrintf("TMBR lobby: health %s\n", tmbr_Opt(OPT_HEALTH) ? "on" : "off");
     } else optSync(0);
     if ((pad & 0x4) && (pressed & 0xF00)) {

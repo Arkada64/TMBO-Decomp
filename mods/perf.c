@@ -15,7 +15,7 @@ extern int fieldsLastFrame(void) __asm__("timerGetFieldsLastFrame__Fv");
 static unsigned int acc[NSLOT], sum[NSLOT], peak[NSLOT];
 static unsigned int last, fsum, fpeak;
 static int frames, slow;
-static const char* names[NSLOT] = { "think", "ai", "drive", "traffic", "route", "tphys" };
+static const char* names[NSLOT] = { "think", "ai", "drive", "-", "route", "-" };
 
 unsigned int tmbr_Cycles(void)
 {

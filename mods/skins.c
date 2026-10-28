@@ -122,15 +122,11 @@ static void sendSkins(void)
 }
 
 /* chat: our skin messages are recorded, not shown */
-extern void tmbr_TrafficSyncRecv(int client, const char* data);   /* traffic.c */
 extern void tmbr_TeamsRecv(int client, const char* msg);           /* teams.c */
 extern void tmbr_TeamsKill(int victim, int killer);
 int tmbr_ChatHandler(int a0, int a1, int client, char* msg)
 {
-    if (msg && msg[0] == 1 && msg[1] == 'T' && msg[2] == 'R') {
-        tmbr_TrafficSyncRecv(client, msg + 3);
-        return 0x44;
-    }
+    if (msg && msg[0] == 1 && msg[1] == 'T' && msg[2] == 'R') return 0x44;   /* (old traffic sync: hidden, ignored) */
     if (msg && msg[0] == 1 && msg[1] == 'T' && (msg[2] == 'T' || msg[2] == 'Q')) {
         tmbr_TeamsRecv(client, msg + 1);
         return 0x44;
@@ -938,7 +934,6 @@ void tmbr_LauncherUpdate(void* l, char* v)
 
 /* kill feed (0x1E278C): only for kills of the 8 real cars (traffic kills showed "UNKNOWN KILLED BY ...") */
 extern void hudKillMessage(void* hud, int victim, int killer) __asm__("func_0014E708");
-extern int tmbr_KillFeedShown(int p);
 
 void tmbr_KillMessage(void* hud, int victim, int killer)
 {
@@ -954,8 +949,6 @@ void tmbr_KillMessage(void* hud, int victim, int killer)
             return;
         }
         if (o >= 1 && o <= 5 && *(int*)(v + 0x20FC) == victim) {
-            if (tmbr_KillFeedShown((int)((char*)hud - (D_004FA030 + 0x97B50)) / 0xA20))
-                *(int*)((char*)hud + 0x9F4) = 0;                  /* clear the report so the kill message shows */
             hudKillMessage(hud, victim, killer);
             if ((char*)hud == D_004FA030 + 0x97B50) tmbr_TeamsKill(victim, killer);   /* team score, once */
             return;

@@ -294,9 +294,7 @@
   points / links, add "jump links" where linked attractors sit in unconnected route-map parts (Freeway stadium ring,
   Skyscrapers roofs, Junkyard building), follow them at speed in mods/nav.c. Step 1: attractor overlay pictures for
   Freeway, Skyscrapers, Junkyard for Ark to check.
-- (Ark 2026-10-27, for tomorrow) Remove traffic completely: mods/traffic.c + traffic_nodes.c out of the build, every
-  traffic hook out of apply_mods.py (collision owner lookup / CollideHit, kill-feed filter, traffic hit logging, net
-  damage filter, frame update, level setup), the traffic lobby option / host-control line, the traffic sync chat
-  ("TR"), SUBURB's traffic pack (ZSF*) off the disc. Then watch whether the false "killed" messages stop.
-- (same) Peds: remove from Prison Ship and Asylum (ZZSHIP.PED / ZZASYLUM.PED, their spawn-file hookup in packs.c /
-  the "spawn files for SHIP / ASYLUM" code, their packs on the disc). Keep Freeway (ZFP*) and Prison Passage (ZRP*).
+- DONE g176 (2026-10-28): traffic removed (traffic.c / .s / _nodes.c in mods/_to_delete; collision, hit, net damage,
+  loader and frame hooks out; lobby TRAFFIC line / host key gone; ZSF* off the disc; the kill-feed hook stays for the
+  remote-car skip). Peds off Prison Ship / Asylum (ZSP* / ZAP* packs, ZZSHIP / ZZASYLUM.PED, inmate retyping); the
+  maps' own retail .PED files are used again there. Freeway / Prison Passage peds kept. Watch: false "killed" messages.

@@ -59,18 +59,14 @@ typedef struct {
 static const struct { int level; const char* blob0; u32 addr; u32 classes[10]; } PACKS[] = {
     { 2, "\\PCAR\\ZFP0.BIN;1", 0x1E7F280, { 2, 0, 3, 4096, 8, 2048 } }, /* FREEWAY */
     { 3, "\\PCAR\\ZRP0.BIN;1", 0x15FB980, { 2, 0, 4, 4096, 7, 2048 } }, /* PRISON */
-    /* retail PRISON's inmates (ped types 9-11) on the two Prison Passage maps (they only have type 2) */
-    { 15, "\\PCAR\\ZSP0.BIN;1", 0x1B93480, { 2, 0, 3, 4096, 5, 2048 } }, /* SHIP */
-    { 16, "\\PCAR\\ZAP0.BIN;1", 0x1B93480, { 2, 0, 3, 4096, 5, 2048 } }, /* ASYLUM */
-    /* retail SUBURB's traffic cars (online stripped them), 2 of each model: traffic.c fod_suburb */
-    { 0, "\\PCAR\\ZSF0.BIN;1", 0x1E57C00, { 4, 0, 11, 8192, 3, 16384, 1, 4096, 3, 2048 } }, /* SUBURB */
+    /* (2026-10-28: SHIP / ASYLUM inmate packs ZSP / ZAP and SUBURB's traffic pack ZSF removed, with their .PED
+     * spawn files and the ped retyping - Ark: peds only on Freeway and Prison Passage, no traffic) */
 };
 static float zeroVec[4];
 static int pack = -1;       /* PACKS index of the level being loaded */
-int tmbr_levelSerial;       /* bumped on every level load (traffic.c sets up on the next game frame) */
+int tmbr_levelSerial;       /* bumped on every level load */
 int tmbr_levelIndex = -1;   /* shell level index of the level being loaded */
 static u32 clutStart;       /* GS block of the pack's first CLUT */
-static int retypeSerial, retypeLevel;    /* level serial whose ped groups still need the inmate types (tmbr_PedsRetype) */
 
 static Manifest* readBlob0(int p, u32 at)
 {
@@ -260,55 +256,5 @@ void tmbr_LevelDbLoaded(int ngp, int vram, int slot)
     D_004F9714 = saveDb;
     scePrintf("TMBR pack: %d blobs, %d entry points, tex ids %d.., clut %d.. (%d), anims %d+%d, peds in pool %d -> %d\n",
         m->nblobs, hdr[0], texBase + 1, clutStart, m->clutBlocks, n, m->nanims, before, D_004FB748);
-    retypeSerial = tmbr_levelSerial;
-    retypeLevel = PACKS[p0].level;   /* inmate packs: retype the ped groups on the first game frame */
 }
 
-/* Peds spawn from the level's ped groups (PedWorldManager at game+0x89FA0: u8 count, groups of 0x670 from
- * +0x10; group+1 = entry count, entries of 3 bytes {point, ped type, behavior} at group+0x630; a group fills
- * its entries with allocPedType(type) when a player comes near, func_00110338). SHIP / ASYLUM only list type 2,
- * so the packed inmates (types 9-11) sat in the pool. On the first frame after such a pack loaded, 3 of every 4
- * entries become an inmate type, round robin. Called every frame from the camera hook (cheap when idle). */
-void tmbr_PedsRetype(void)
-{
-    static int k, tick, total;
-    char* mgr;
-    int g, e, n = 0, ng;
-    if (retypeLevel != 15 && retypeLevel != 16) return;
-    if (tmbr_levelIndex != retypeLevel) { retypeLevel = 0; return; }       /* another map now */
-    if (!D_004FA030 || ++tick < 30) return;
-    tick = 0;
-    /* every 0.5 s for the whole match: the ped groups fill in after load (only 1 group existed on the first
-     * frame), so every type-2 entry found becomes an inmate (types 9-11 in turn) */
-    mgr = D_004FA030 + 0x89FA0;
-    ng = *(unsigned char*)mgr;
-    for (g = 0; g < ng; g++) {
-        unsigned char* grp = (unsigned char*)mgr + 0x10 + g * 0x670;
-        for (e = 0; e < grp[1] && e < 21; e++) {
-            unsigned char* ent = grp + 0x630 + e * 3;
-            if (ent[1] != 2) continue;
-            ent[1] = 9 + (k++ % 3);
-            n++;
-        }
-    }
-    if (n) { total += n; scePrintf("TMBR peds: %d groups, %d more inmates (types 9-11), %d total\n", ng, n, total); }
-}
-
-/* SHIP (15) and ASYLUM (16): their entries in the .PED name table (32 bytes per level, read by func_00178850 at
- * level load into PedWorldManager) name \\PTS\\SHIP.PED / ASYLUM.PED, which hold a single group with a single
- * spawn entry (logs: "1 groups, 1 more inmates"); the old check here only filled empty entries, so ours were
- * never used. Now they are always replaced. The test
- * disc carries \PTS\ZZSHIP.PED and \PTS\ZZASYLUM.PED (tools/peds/mkped.py: 20 small walking rings at
- * well spread pickup spots, inmate types 9-11 + type 2). Called from the waiting-room frame. */
-extern char pedNames[] __asm__("D_00330100");
-void tmbr_PedNamesInit(void)
-{
-    static const char ship[] = "\\PTS\\ZZSHIP.PED;1", asy[] = "\\PTS\\ZZASYLUM.PED;1";   /* Z..: sort last in \\PTS */
-    int i;
-    if (pedNames[15 * 32 + 6] == 'Z' && pedNames[16 * 32 + 6] == 'Z') return;   /* ours already */
-    for (i = 0; ship[i]; i++) pedNames[15 * 32 + i] = ship[i];
-    pedNames[15 * 32 + i] = 0;
-    for (i = 0; asy[i]; i++) pedNames[16 * 32 + i] = asy[i];
-    pedNames[16 * 32 + i] = 0;
-    scePrintf("TMBR peds: spawn files for SHIP / ASYLUM set\n");
-}

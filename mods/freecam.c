@@ -55,18 +55,16 @@ static float stick(int axis)
     return v;
 }
 
-extern void tmbr_TrafficUpdate(void);
 extern void tmbr_SkinsFrame(void);
 extern void tmbr_BotsThink(void);
 extern unsigned int tmbr_Cycles(void);              /* perf.c */
 extern void tmbr_PerfAdd(int slot, unsigned int start);
 extern void tmbr_PerfFrame(void);
-extern void tmbr_PedsRetype(void);           /* packs.c */
 extern int scePrintf(const char* fmt, ...);
 
 #define TMBR_RFDBG 1   /* rear-fire debug log */
 #ifndef TMBR_TRAFFIC_ON
-#define TMBR_TRAFFIC_ON 1   /* traffic (traffic.c) per-frame update (on since the 2026-10-23 test round) */
+#define TMBR_TRAFFIC_ON 1   /* (old name) gates the per-frame skins call; traffic itself was removed 2026-10-28 */
 #endif
 static void hudDefault(void)
 {
@@ -496,7 +494,6 @@ void tmbr_CameraUpdate(char *cam)
 
 #if TMBR_TRAFFIC_ON
     tmbr_SkinsFrame();   /* skins.c: 12 Pak's armed special */
-    { unsigned int t0 = tmbr_Cycles(); tmbr_TrafficUpdate(); tmbr_PerfAdd(3, t0); } /* traffic.c: per-frame traffic cars (after the game's vehicle loops); off in stable */
 #endif
 #ifdef TMBR_PNACH
     if (tmbr_en[1]) tmbr_DamageReportTick();
@@ -505,7 +502,6 @@ void tmbr_CameraUpdate(char *cam)
     hudDefault();
     { unsigned int t0 = tmbr_Cycles(); tmbr_BotsThink(); tmbr_PerfAdd(0, t0); } /* bots.c: free-for-all targets (not in the pnach build) */
     tmbr_PerfFrame();     /* perf.c: per-frame cost log every 5 s */
-    tmbr_PedsRetype();    /* packs.c: inmates into SHIP / ASYLUM ped groups after load */
     {   /* debug (rear fire via L1+Down does nothing, the d-pad combo works): when a human's combo state is 3
          * (rear fire) log the fields func_001E4690 / the launcher check, for 20 frames */
         extern char* D_004FA030;
