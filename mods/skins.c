@@ -140,6 +140,11 @@ int tmbr_ChatHandler(int a0, int a1, int client, char* msg)
         tmbr_LostRecv(client, msg + 3);
         return 0x44;
     }
+    if (msg && msg[0] == 1 && msg[1] == 'O' && msg[2] == 'P') {   /* bots.c: the host's lobby options */
+        extern void tmbr_OptRecv(const char* d);
+        tmbr_OptRecv(msg + 3);
+        return 0x44;
+    }
     if (msg && msg[0] == 1 && msg[1] == 'S' && msg[2] == 'V') {
         int i;
         for (i = 0; i < 8 && msg[3 + i]; i++) {

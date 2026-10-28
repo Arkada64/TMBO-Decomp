@@ -419,9 +419,38 @@ static int live(char* v) { return (F(v, 0x590) == 1 || F(v, 0x590) == 2) && F(v,
 #define OPT_TEAMS4 4      /* four teams */
 extern void netSendGameInfo(void* net, int to) __asm__("func_00174988");
 extern int tmbr_levelSerial;
+/* Lobby options to the clients (Ark 2026-10-27: a client played FFA in the host's team game and had traffic off in a
+ * traffic match). The game info carries bytes 0xC6 / 0xC7 to everyone, but a client's copy loses them when its
+ * game sets the match up. So the host also sends them as hidden chat ("\x01OP" + 4 hex digits, every 2 s) and a
+ * client answers tmbr_Opt / the bot line from the host's values. */
+extern void netChatSend(void* net, const char* text) __asm__("func_00171C08");
+static int optRx = -1;          /* client: the host's 0xC6 | 0xC7 << 8, -1 = none yet */
+static int optShareT;
+static const char HEXD[] = "0123456789ABCDEF";
+static void optShare(void)
+{
+    char* gi = GINFO();
+    char m[10];
+    if (gi && !netIsHost(D_003156C0) && optRx >= 0 && ((F(gi, 0) >> 12) & 1) != ((optRx & OPT_TEAMS) != 0))
+        F(gi, 0) ^= 0x1000;                                /* client: the game's own team flag as the host has it */
+    if (!gi || !netIsHost(D_003156C0) || ++optShareT % 120) return;
+    m[0] = 1; m[1] = 'O'; m[2] = 'P';
+    m[3] = HEXD[(gi[0xC6] >> 4) & 15]; m[4] = HEXD[gi[0xC6] & 15];
+    m[5] = HEXD[(gi[0xC7] >> 4) & 15]; m[6] = HEXD[gi[0xC7] & 15]; m[7] = 0;
+    netChatSend(D_003156C0, m);
+}
+static int hexv(char c) { return c >= '0' && c <= '9' ? c - '0' : c >= 'A' && c <= 'F' ? c - 'A' + 10 : 0; }
+void tmbr_OptRecv(const char* d)   /* skins.c chat handler: "OP" + 4 hex */
+{
+    int v = hexv(d[0]) << 4 | hexv(d[1]) | (hexv(d[2]) << 4 | hexv(d[3])) << 8;
+    if (netIsHost(D_003156C0)) return;
+    if (v != optRx) scePrintf("TMBR options: from the host %02x %02x\n", v & 0xFF, v >> 8);
+    optRx = v;
+}
 int tmbr_Opt(int bit)
 {
     char* gi = GINFO();
+    if (optRx >= 0 && !netIsHost(D_003156C0)) return (optRx & bit) != 0;
     return gi && (gi[0xC6] & bit);
 }
 int tmbr_MinionOff(void) { return !tmbr_Opt(OPT_MINION); }
@@ -429,6 +458,7 @@ int tmbr_MinionOff(void) { return !tmbr_Opt(OPT_MINION); }
 static void botsShown(int* c, int* d)
 {
     char* gi = GINFO();
+    if (!netIsHost(D_003156C0) && optRx >= 0 && (optRx >> 8 & 0x80)) { *c = optRx >> 8 & 7; *d = (optRx >> 11) & 3; return; }
     if (netIsHost(D_003156C0) || !gi || !(gi[0xC7] & 0x80)) { *c = tmbr_botCount; *d = tmbr_botDiff; return; }
     *c = gi[0xC7] & 7; *d = (gi[0xC7] >> 3) & 3;
 }
@@ -583,6 +613,7 @@ void tmbr_BotsThink(void)
 {
     char* g = D_004FA030;
     int i, k;
+    optShare();
     if (g) { extern void tmbr_BossFrame(void); tmbr_TeamsFrame(); healthFrame(); tmbr_BossFrame(); }
 #if TMBR_WEAPTEST
     if (g) weapTest(g);
@@ -2013,6 +2044,7 @@ void tmbr_LobbyFrame(void)
 {
     int pad = 0, pressed, host, teams;
     char ra[40], rb[40];
+    optShare();
     settingsRows();
     {   /* synchronous entry is the standard (Ark 2026-10-27: competitive online - everyone starts together, the host
          * no longer gets in before the clients have loaded). Game info word bit 5 (the settings editor's D_004FB54C,
