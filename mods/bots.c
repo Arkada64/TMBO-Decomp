@@ -1851,12 +1851,12 @@ static int wpnClock;               /* = thinkTick */
 static int wpnReady[8][8];         /* per car, per AI weapon: frame it can be picked again */
 /* (wpnPicked[]: frame the current weapon was picked - declared with aimShot above) */
 static signed char burstLeft[8];   /* missiles left in the current burst (fire / homing) */
-#define BURST_CHANCE 45            /* % of fire / homing picks that start a burst (2026-10-25: chip damage like players) */
-#define BURST_GAP 14               /* frames between missiles in a burst (~0.25 s) */
+#define BURST_CHANCE 75            /* % of fire / homing picks that start a burst (2026-10-25: chip damage like players; 2026-10-27 45 -> 75: harass while chasing) */
+#define BURST_GAP 10               /* frames between missiles in a burst (~0.17 s; was 14) */
 static int heavyW(int w) { return w == 1 || w >= 4; }
 static int cooldown(int w)
 {
-    static const int heavy[3] = { 520, 300, 210 }, light[3] = { 60, 35, 25 };    /* frames: easy, medium, hard (2026-10-25: was 700/450/320, 90/60/40 - bots did little damage) */
+    static const int heavy[3] = { 520, 300, 210 }, light[3] = { 45, 25, 18 };   /* (2026-10-27: 60/35/25 -> 45/25/18, more chip damage) */    /* frames: easy, medium, hard (2026-10-25: was 700/450/320, 90/60/40 - bots did little damage) */
     int d = tmbr_botDiff < 0 ? 0 : tmbr_botDiff > 2 ? 2 : tmbr_botDiff;
     if (w == 1) return heavy[d] * 3;                 /* special: ~15 s (medium) - players wait on the recharge (Ark: too many) */
     return heavyW(w) ? heavy[d] : light[d];
@@ -1871,7 +1871,7 @@ int tmbr_AiKeepWeapon(char* v, int w)
 }
 void tmbr_AiPickWeapon(char* v)
 {
-    static const int weight[8] = { 0, 1, 6, 6, 2, 1, 2, 2 };
+    static const int weight[8] = { 0, 1, 8, 8, 2, 1, 2, 2 };   /* (fire / homing 6 -> 8, 2026-10-27) */
     char* br = (char*)F(v, 0x2014);
     int k = (int)(v - D_004FA030) / 0x31B0 & 7, w, total = 0, r, ok[8], los, spBoost = 0;
     wpnClock = thinkTick;                     /* frames (tmbr_BotsThink counts every frame) */
@@ -1930,10 +1930,10 @@ void tmbr_AiPickWeapon(char* v)
         /* fire / homing missiles: sometimes a burst of 2-4 back to back, then a longer rest (both light
          * missiles share the timer, so a burst can mix them) */
         int cd;
-        if (burstLeft[k] <= 0 && los && mathfRandW(0, 99) < BURST_CHANCE) burstLeft[k] = mathfRandW(2, 4);   /* only in sight */
+        if (burstLeft[k] <= 0 && los && mathfRandW(0, 99) < BURST_CHANCE) burstLeft[k] = mathfRandW(3, 5);   /* only in sight (2026-10-27: 2-4 -> 3-5) */
         if (burstLeft[k] > 0)
             cd = --burstLeft[k] > 0 ? BURST_GAP + mathfRandW(0, 6)                    /* next missile of the burst */
-                                    : cooldown(w) * 3 + mathfRandW(0, cooldown(w));    /* burst over: rest ~2 s (medium) */
+                                    : cooldown(w) * 2 + mathfRandW(0, cooldown(w));    /* burst over: rest ~1 s (medium; was x3) */
         else cd = cooldown(w) + mathfRandW(0, cooldown(w) / 3);                       /* a single */
         wpnReady[k][2] = wpnReady[k][3] = wpnClock + cd;
     } else

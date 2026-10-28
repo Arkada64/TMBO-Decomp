@@ -288,3 +288,9 @@
   In bots.c: special damage per car (finishing blows) and the retreat point by armour. Still to use: the shield should
   answer hits >= ~20 (power, red mine, specials, satellite, reticle) and ignore light ones (needs the shot's weapon
   kind: weapon table +0x14); threat weighting (keep away from an Outlaw / Warthog / Manslaughter lined up on us).
+
+## Queued 2026-10-27 (Ark: "queue it for tomorrow")
+- Bot routing: merge the maps' attractor graph into the baked route maps (tools/nav): read each map's attractor
+  points / links, add "jump links" where linked attractors sit in unconnected route-map parts (Freeway stadium ring,
+  Skyscrapers roofs, Junkyard building), follow them at speed in mods/nav.c. Step 1: attractor overlay pictures for
+  Freeway, Skyscrapers, Junkyard for Ark to check.
