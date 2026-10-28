@@ -174,7 +174,7 @@ static void planFinish(int c)
         d = tmp[k] - tmp[k + 1];
         if (k > 0 && tmp[k - 1] - tmp[k] == d && d == dir) continue;
         dir = d;
-        b->wp[b->n].x = cx(tmp[k]); b->wp[b->n].y = cy(tmp[k]); b->wp[b->n].z = cz[tmp[k]] + K[7];
+        b->wp[b->n].x = cx(tmp[k]); b->wp[b->n].y = cy(tmp[k]); b->wp[b->n].z = cz[tmp[k]] + K[7]; b->wp[b->n].w = K[0];
         b->n++;
     }
     b->i = 0; b->timer = 0;
@@ -325,15 +325,16 @@ void tmbr_NavRoamFar(char* g, char* v) { int i = vidx(g, v); if (i >= 0) { nb[i]
 static int follow(NavBot* b, char* v)
 {
     fvec* pos = POSV(v);
-    float d;
+    float d, jw;
     if (++b->timer > 900 || b->i >= b->n || F(v, 0x444) >= 60) {
         if (F(v, 0x444) >= 60) b->cool = 120;   /* stuck: the unstick logic / the AI's own reverse takes over */
         b->st = 0;
         return 0;
     }
     d = fabs_(b->wp[b->i].x - pos->x) + fabs_(b->wp[b->i].y - pos->y);
-    if (d < (tmbr_NavBaked() ? tmbr_NavArrive() : P.cell * K[4] + K[2] * K[8])) b->i++;
-    else if ((b->timer & 7) == 0 && b->i + 1 < b->n) {   /* shortcut when the next point is in sight */
+    jw = b->wp[b->i].w;            /* jump links (navbake.c): 1 = heading for a landing, 2 = for a take-off */
+    if (d < (tmbr_NavBaked() ? tmbr_NavArrive() * (jw > K[8] * 3 ? K[10] : K[1] / K[1]) : P.cell * K[4] + K[2] * K[8])) b->i++;
+    else if ((b->timer & 7) == 0 && b->i + 1 < b->n && jw == K[0] && b->wp[b->i + 1].w == K[0]) {   /* shortcut when the next point is in sight */
         ra = *pos; ra.z += K[1]; rb = b->wp[b->i + 1];
         if (hdLos(&ra, &rb, res, 0)) b->i++;
     }
@@ -344,6 +345,11 @@ static int follow(NavBot* b, char* v)
          * off after it, a short reverse with the wheel the other way (3-point turn); then drive on */
         unsigned char* pad = PAD(v);
         float e = tmbr_NavSteer(v, b->wp[b->i].x - pos->x, b->wp[b->i].y - pos->y, 1);
+        if (b->wp[b->i].w > K[8] && b->wp[b->i].w < K[8] * 3 && e < K[6]) {   /* the jump itself: straight at it, full gas */
+            pad[2] = 0; pad[6] = 0; pad[4] = 1; pad[7] = 1; b->alT = 0; b->al = 0;   /* (+ turbo) */
+            return 1;
+        }
+        if (b->wp[b->i].w > K[8] * 3 && e < K[9]) { pad[2] = 0; pad[7] = 1; }   /* run-up to a take-off: speed */
         if (b->alT > 0) {
             b->alT--;
             if (b->al == 1) { pad[4] = 1; pad[2] = 1; pad[6] = 0; }

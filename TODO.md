@@ -294,6 +294,12 @@
   points / links, add "jump links" where linked attractors sit in unconnected route-map parts (Freeway stadium ring,
   Skyscrapers roofs, Junkyard building), follow them at speed in mods/nav.c. Step 1: attractor overlay pictures for
   Freeway, Skyscrapers, Junkyard for Ark to check.
+- g177 (2026-10-28, Ark: jump-link every map with bot work): the route maps keep every part the attractor graph
+  joins to the main one both ways, with the attractor links between parts as jump links (navbake.c A*, nav.c
+  drives them straight at full gas + turbo, run-up turbo before the take-off). Jumps: Suburb 24, Junkyard 42,
+  Freeway 18 (stadium + south block), Skyscrapers 12, Stadium 20, Loop 5, Death1 4; none on the others. Roof maps
+  still use the game's own driving (its attractor graph already has these jumps). Also fixed: the files' header
+  was 28 bytes but the game read 36 (every node one off). Overlays: tools/nav/attr_overlay.py.
 - DONE g176 (2026-10-28): traffic removed (traffic.c / .s / _nodes.c in mods/_to_delete; collision, hit, net damage,
   loader and frame hooks out; lobby TRAFFIC line / host key gone; ZSF* off the disc; the kill-feed hook stays for the
   remote-car skip). Peds off Prison Ship / Asylum (ZSP* / ZAP* packs, ZZSHIP / ZZASYLUM.PED, inmate retyping); the

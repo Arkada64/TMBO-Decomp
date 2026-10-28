@@ -83,8 +83,9 @@ def build(H, R, lat=8, max_rise=3.5, margin=1):   # 3.5 per 4 units ~ 41 deg (th
 
 def pack(G, R):
     """binary for the game, little endian:
-       header 32 bytes: 'NAV1', float x0, y0 (fine grid origin), float step (fine), float cell (lattice),
-                        u16 gw, gh (lattice), u32 N
+       header 36 bytes: 'NAV1', float x0, y0 (fine grid origin), float step (fine), float cell (lattice),
+                        u16 gw, gh (lattice), u32 N, u32 J (jump links), u32 'JMP1'
+       ... then J jump links of 8 bytes, sorted: u32 from node, u32 to node (drive there at speed: a jump)
        N nodes of 8 bytes, sorted by cell: u32 cell (gj*gw+gi), s16 z*4, u8 offset (oi | oj<<4, fine steps
        inside the cell), u8 links (bit d = edge in DIRS[d]; the neighbour is the node of that cell nearest in z)"""
     rec, z, nb = G["rec"], G["z"], G["nb"]
@@ -93,12 +94,17 @@ def pack(G, R):
     sc = (lat + 15) // 16                        # offset unit in fine steps (header "step" = step * sc)
     cell = rec[:, 0] * G["gw"] + rec[:, 1]
     order = np.lexsort((z, cell))
-    hdr = struct.pack("<4sffffHHI", b"NAV1", R["x0"], R["y0"], step * sc, step * lat, G["gw"], G["gh"], N)
+    J = sorted(G.get("jumps", []))
+    inv = np.empty(N, int); inv[order] = np.arange(N)
+    J = sorted((int(inv[a]), int(inv[b])) for a, b in J)
+    # 36 bytes: the C struct NavHdr (+ u32 jump count, u32 'JMP1'); was 28 (the game read every node one off)
+    hdr = struct.pack("<4sffffHHIII", b"NAV1", R["x0"], R["y0"], step * sc, step * lat, G["gw"], G["gh"], N, len(J), 0x31504D4A)
     body = bytearray()
     for n in order:
         oj, oi = (rec[n, 3] - rec[n, 0] * lat) // sc, (rec[n, 4] - rec[n, 1] * lat) // sc
         links = sum(1 << d for d in range(8) if nb[n, d] >= 0)
         body += struct.pack("<IhBB", int(cell[n]), int(round(z[n] * 4)), int(oi) | int(oj) << 4, links)
+    for a, b in J: body += struct.pack("<II", a, b)
     return hdr + bytes(body)
 
 def preview(H, G, R, path, marks=()):
@@ -118,6 +124,8 @@ def preview(H, G, R, path, marks=()):
             if m < 0: continue
             col = (90, 200, 255) if rec[n, 2] == 0 and rec[m, 2] == 0 else (255, 120, 255)
             d.line([rec[n, 4], ny - 1 - rec[n, 3], rec[m, 4], ny - 1 - rec[m, 3]], fill=col)
+    for a, b in G.get("jumps", []):        # jump links (attractor graph): yellow
+        d.line([rec[a, 4], ny - 1 - rec[a, 3], rec[b, 4], ny - 1 - rec[b, 3]], fill=(255, 230, 0), width=3)
     for x, y in marks:
         i = (x - R["x0"]) / R["step"]; j = ny - 1 - (y - R["y0"]) / R["step"]
         d.ellipse([i - 6, j - 6, i + 6, j + 6], outline=(255, 0, 0), width=2)

@@ -22,6 +22,50 @@ def region(name):
         return PTSBUF, (LEVEL_TEX - PTSBUF) // 2048 * 2048
     a = A128(0x1C05670 + TEX[name])
     return a, (CAR_TEX1 - a) // 2048 * 2048
+PTSDIR = os.environ.get("PTSDIR", "pts")
+def parts_with_jumps(G, name, R):
+    """keep the largest part plus every part the level's attractor graph (PTS links) joins to it both ways
+    (in by some jump, back out by some jump: no traps); the links between kept parts become jump links"""
+    import sys; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "../peds"))
+    import pts as ptsmod
+    nb = G["nb"]; N = len(nb); comp = -np.ones(N, int); sizes = []
+    for s in range(N):
+        if comp[s] >= 0: continue
+        c = len(sizes); st = [s]; comp[s] = c; n = 0
+        while st:
+            a = st.pop(); n += 1
+            for b in nb[a]:
+                if b >= 0 and comp[b] < 0: comp[b] = c; st.append(b)
+        sizes.append(n)
+    main = int(np.argmax(sizes)); keep = {main}; J = []
+    f = os.path.join(PTSDIR, name.upper() + ".PTS")
+    if os.path.exists(f):
+        rec, z = G["rec"], G["z"]
+        X = R["x0"] + rec[:, 4] * R["step"]; Y = R["y0"] + rec[:, 3] * R["step"]
+        A = ptsmod.parse(open(f, "rb").read()); snap = []
+        for a in A:
+            x, y, zp = a["p"]; dd = (X - x) ** 2 + (Y - y) ** 2 + ((z - zp) * 2) ** 2
+            m = int(dd.argmin())
+            snap.append(m if (X[m] - x) ** 2 + (Y[m] - y) ** 2 < 48 ** 2 and abs(z[m] - zp) < 24 and sizes[comp[m]] >= 6 else -1)
+        E = [(snap[i], snap[k]) for i, a in enumerate(A) for k in a["links"]
+             if k < len(A) and snap[i] >= 0 and snap[k] >= 0 and comp[snap[i]] != comp[snap[k]]
+             and (X[snap[i]] - X[snap[k]]) ** 2 + (Y[snap[i]] - Y[snap[k]]) ** 2 < 1600 ** 2]
+        def reach(fwd):
+            seen = {main}; st = [main]
+            while st:
+                c = st.pop()
+                for a, b in E:
+                    u, v = (comp[a], comp[b]) if fwd else (comp[b], comp[a])
+                    if u == c and v not in seen: seen.add(v); st.append(v)
+            return seen
+        keep = reach(True) & reach(False)
+        J = sorted(set((a, b) for a, b in E if comp[a] in keep and comp[b] in keep))
+    k = np.isin(comp, list(keep))
+    remap = -np.ones(N, int); remap[k] = np.arange(k.sum())
+    nb2 = np.where(nb[k] >= 0, remap[np.maximum(nb[k], 0)], -1)
+    G2 = dict(G, rec=G["rec"][k], z=G["z"][k], nb=nb2, jumps=[(int(remap[a]), int(remap[b])) for a, b in J])
+    print(f"{name}: {len(keep)} parts kept ({int(k.sum())} of {N} nodes), {len(J)} jump links")
+    return G2
 def largest(G):
     nb = G["nb"]; N = len(nb); comp = -np.ones(N, int); best = (0, -1); c = 0
     for s in range(N):
@@ -62,7 +106,7 @@ for name, lvl in LEVEL.items():
     H = exclude(name, H, R)
     addr, cap = region(name)
     for lat in (8, 9, 10, 12, 14, 16, 20):
-        G = largest(build(H, R, lat))
+        G = parts_with_jumps(build(H, R, lat), name, R)
         b = pack(G, R)
         if len(b) <= cap: break
     fn = f"ZN{lvl:02d}.BIN"
