@@ -450,10 +450,16 @@ void tmbr_OptRecv(const char* d)   /* skins.c chat handler: "OP" + 4 hex */
 /* targets bots leave alone (Ark 2026-10-27): Junkyard's big building (x -890..-430, y -320..440: its roof, the
  * inside and the wall strip) - nothing on the route map gets in there, and bots chasing someone in / on it rammed
  * its walls from outside and got stuck inside */
+static int roofMap(void);
+extern int tmbr_NavBaked(void);
+extern int tmbr_NavOnMap(void* p);       /* navbake.c */
 static int offLimits(char* v)
 {
     float* p;
     int x, y;
+    /* roof maps (g180, Ark 2026-10-28): only targets on the route map - the roofs bots can reach, jumps included;
+     * one on a roof the map leaves out pulled the game's driving straight off the edge */
+    if (F(v, 0x2028) && roofMap() && tmbr_NavBaked() && !tmbr_NavOnMap((void*)(F(v, 0x2028) + 0x10))) return 1;
     if (tmbr_levelIndex != 1 || !F(v, 0x2028)) return 0;
     p = (float*)(F(v, 0x2028) + 0x10);
     x = (int)p[0]; y = (int)p[1];
@@ -774,7 +780,10 @@ void tmbr_BotsThink(void)
             if (v == cur) curS = sc;
             if (sc < bestS) { bestS = sc; best = v; }
         }
-        if (!best) continue;
+        if (!best) {
+            if (cur && offLimits(cur) && F(drv, 4) != 4) cruiseFar(g, b, drv);   /* its target went out of reach */
+            continue;
+        }
         if (curS >= 0 && curS * 2 < bestS * 3) best = cur;  /* keep fighting unless clearly better */
         {
             /* Every role only hunts what is within its sight range; past that it cruises the map instead of
@@ -1695,6 +1704,65 @@ static void avoid(char* g, char* v)
     pad[9] = avDir[idx] < 0; pad[0xA] = avDir[idx] > 0;
 }
 
+/* ---- ground guard (g180, Ark 2026-10-28: our fight driving runs into walls and off drops; it has no idea of
+ * either). Every frame, for every bot on every map, after all our steering and the game's: feel along the way
+ * the car is actually moving on the baked route map (tmbr_NavFeel: drivable links straight on and 45 deg left /
+ * right, up to GD_LOOK cells - the map leaves out walls, steep slopes and drops alike). If the free run straight on
+ * is shorter than ~GDK[0] frames of travel at the current speed (+ a cell): steer to the freer side for GD_HOLD
+ * frames, no turbo, no handbrake; nothing free on any side close in: brake. Off while on a jump link (nav.c),
+ * ramming a target right ahead, or off the route map (no data there). Replaces the 4-frame wall feeler (avoid). */
+#define GD_LOOK 6
+#define GD_HOLD 6
+static float GDK[2] = { 20.0f, 0.4f };    /* frames of travel to keep free, min speed (units / frame) */
+extern float tmbr_NavCell(void);
+static float gdLast[8][2];
+static signed char gdOk[8], gdDir[8], gdT[8], gdBrake[8];
+static short gdLog[8];
+static void guard(char* g, char* v)
+{
+    unsigned char* pad = PAD(v);
+    char* br = (char*)F(v, 0x2014);
+    char* cs = (char*)F(v, 0x2028);
+    int idx = (int)(v - g) / 0x31B0, f, l, r, back;
+    float* p, dx, dy, cell, free;
+    if (idx < 0 || idx > 7) return;
+    if (!cs || !br || !tmbr_NavBaked()) { gdOk[idx] = 0; return; }
+    p = (float*)(cs + 0x10);
+    dx = p[0] - gdLast[idx][0]; dy = p[1] - gdLast[idx][1];
+    gdLast[idx][0] = p[0]; gdLast[idx][1] = p[1];
+    if (!gdOk[idx]) { gdOk[idx] = 1; return; }
+    if (gdLog[idx] > 0) gdLog[idx]--;
+    back = dx * *(float*)(cs + 0x30) + dy * *(float*)(cs + 0x34) < GDK[1] - GDK[1];   /* moving backwards */
+    if (gdT[idx] > 0) {
+        gdT[idx]--;
+        pad[7] = 0; pad[2] = 0;
+        if (gdBrake[idx]) { pad[4] = back; pad[6] = !back; }
+        else if (!back) { pad[9] = gdDir[idx] < 0; pad[0xA] = gdDir[idx] > 0; }
+        return;
+    }
+    if (dx * dx + dy * dy < GDK[1] * GDK[1]) return;
+    if (!back) {   /* ramming / shooting a target right ahead: let it */
+        int d = fbits(*(float*)(br + 0x20)), a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF;
+        if (d >= 0 && d < OR_WIDE && a < CS_AIM) return;
+    }
+    f = tmbr_NavFeel(p, dx, dy, GD_LOOK, &l, &r);
+    if (f < 0 || f >= GD_LOOK) return;
+    cell = tmbr_NavCell();
+    free = (float)f * cell - cell;
+    if (free > GDK[1] - GDK[1] && free * free >= (dx * dx + dy * dy) * GDK[0] * GDK[0]) return;
+    gdBrake[idx] = back || (l <= f && r <= f && f <= 1);
+    gdDir[idx] = l > r ? -1 : r > l ? 1 : (pad[9] ? -1 : pad[0xA] ? 1 : ((idx & 1) ? 1 : -1));
+    gdT[idx] = GD_HOLD;
+    pad[7] = 0; pad[2] = 0;
+    if (gdBrake[idx]) { pad[4] = back; pad[6] = !back; }
+    else { pad[9] = gdDir[idx] < 0; pad[0xA] = gdDir[idx] > 0; }
+    if (!gdLog[idx]) {
+        gdLog[idx] = 120;
+        scePrintf("TMBR guard: bot %d %s at %d %d %d (free %d, left %d, right %d), level %d\n", idx,
+            gdBrake[idx] ? "brakes" : gdDir[idx] < 0 ? "turns left" : "turns right", (int)p[0], (int)p[1], (int)p[2], f, l, r, tmbr_levelIndex);
+    }
+}
+
 static int aiUpdate(char* v);
 extern void padClear(char* v) __asm__("vehicleSaveAndClearPadFlags__7Vehicle");
 /* Edge guard (Ark 2026-10-27: on Skyscrapers / Mini Skyscrapers bots drove straight off the roofs - our faster
@@ -1756,9 +1824,9 @@ int tmbr_AiUpdate(char* v)
             if (!dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]) ev = evade(D_004FA030, v);   /* (a dodge in progress wins) */
             turboUse(D_004FA030, v, ev || dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]);
             energyUse(D_004FA030, v, ev);
-            avoid(D_004FA030, v);
             unstick(D_004FA030, v);
         }
+        guard(D_004FA030, v);        /* walls and drops ahead, every map (replaces avoid) */
         edgeGuard(D_004FA030, v);
     }
     return r;

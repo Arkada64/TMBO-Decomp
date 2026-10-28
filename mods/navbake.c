@@ -57,7 +57,7 @@ static const struct { int level; u32 addr, room; int late; } NAV_LEVELS[] = {
 };
 #define NLEV ((int)(sizeof(NAV_LEVELS) / sizeof(NAV_LEVELS[0])))
 
-static float KB[5] = { 1e30f, 0.25f, 16.0f, 0.75f, 0.41421f };   /* [4] tan 22.5 deg; no float literals in code (.lit4 is gp-relative) */
+static float KB[7] = { 1e30f, 0.25f, 16.0f, 0.75f, 0.41421f, -24.0f, 80.0f };   /* [4] tan 22.5 deg; no float literals in code (.lit4 is gp-relative) */
 static NavHdr* nav;            /* loaded map of the current level, or 0 */
 static NavNode* nodes;
 static u32* jumps;            /* nj pairs (from, to), sorted by from */
@@ -104,6 +104,7 @@ void tmbr_NavLateLoad(void)
 }
 int tmbr_NavBaked(void) { return nav && navLevel == tmbr_levelIndex; }
 float tmbr_NavArrive(void) { return nav->cell * KB[3]; }   /* waypoint reached within 3/4 of a cell */
+float tmbr_NavCell(void) { return nav->cell; }
 
 static void nodePos(int k, fvec* p)
 {
@@ -162,6 +163,23 @@ static int nearest(fvec* p)
                 }
             }
     return best;
+}
+
+/* is p on the route map (a node under it: within a cell sideways, from 24 below to 80 above)? Off it = a spot
+ * bots cannot route to (roofs the route map leaves out, the street under the Skyscrapers roofs) - g180 */
+int tmbr_NavOnMap(fvec* p)
+{
+    int k;
+    fvec q;
+    float dx, dy, dz;
+    if (!tmbr_NavBaked()) return 1;
+    k = nearest(p);
+    if (k < 0) return 0;
+    nodePos(k, &q);
+    dx = q.x - p->x; dy = q.y - p->y; dz = p->z - q.z;
+    if (dx < 0) dx = -dx;
+    if (dy < 0) dy = -dy;
+    return dx < nav->cell && dy < nav->cell && dz > KB[5] && dz < KB[6];
 }
 
 /* ---- obstacle feelers (bots.c avoidance): how far a car can drive from p along a heading on the route map ----
