@@ -1709,7 +1709,10 @@ static int egOk[8], egLog[8];
 static float egQ[4] __attribute__((aligned(16)));
 /* Rooftop maps (Skyscrapers 4, Mini Skyscrapers 13, Warhawk's roof 20): the game's own bot driving only - our fight
  * steering, route-map driving, dodging, turbo and unstick drove bots off the roofs (Ark 2026-10-27) */
-static int roofMap(void) { return tmbr_levelIndex == 4 || tmbr_levelIndex == 13 || tmbr_levelIndex == 20; }
+/* (g178, Ark 2026-10-28: jump links helped - our driving is back on the roof maps too; ROOF_GAME_DRIVING 1 = old rule) */
+#define ROOF_GAME_DRIVING 0
+static int roofMap(void) { return ROOF_GAME_DRIVING && (tmbr_levelIndex == 4 || tmbr_levelIndex == 13 || tmbr_levelIndex == 20); }
+extern int tmbr_NavJumping(char* v);   /* nav.c: on a jump link (run-up or the jump itself) */
 static void edgeGuard(char* g, char* v)
 {
     int i = (int)(v - g) / 0x31B0 & 7, k;
@@ -1743,6 +1746,7 @@ int tmbr_AiUpdate(char* v)
     /* match over (game type 1): the game stops every car - no dodging / unsticking then (log 2026-10-24) */
     if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030 && !roofMap() && !(GINFO() && ((F(GINFO(), 0) >> 1) & 0xF) == 1)) {
         int ev = 0;
+        if (tmbr_NavJumping(v)) return r;   /* a jump link under way: no dodging / avoiding / edge brakes */
         dodge(D_004FA030, v);
         if (!dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]) ev = evade(D_004FA030, v);   /* (a dodge in progress wins) */
         turboUse(D_004FA030, v, ev || dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]);
