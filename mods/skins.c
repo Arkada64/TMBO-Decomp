@@ -946,6 +946,13 @@ void tmbr_KillMessage(void* hud, int victim, int killer)
     for (i = 0; i < 8; i++) {
         char* v = D_004FA030 + i * 0x31B0;
         int o = *(int*)(v + 0x20B4);
+        if (o == 2 && *(int*)(v + 0x20FC) == victim) {
+            /* (Ark 2026-10-27: clients were reported killed by you / a bot without dying) A remote human's car takes
+             * no damage on this console - its owner decides - but the game's kill check here still compared the
+             * hit with its health and announced a kill. Their own console's verdict is the real one. */
+            scePrintf("TMBR kill: local kill message for remote player car %d skipped (health here %d)\n", i, (int)*(float*)(v + 0x404));
+            return;
+        }
         if (o >= 1 && o <= 5 && *(int*)(v + 0x20FC) == victim) {
             if (tmbr_KillFeedShown((int)((char*)hud - (D_004FA030 + 0x97B50)) / 0xA20))
                 *(int*)((char*)hud + 0x9F4) = 0;                  /* clear the report so the kill message shows */

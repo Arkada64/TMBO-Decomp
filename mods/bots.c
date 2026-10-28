@@ -447,6 +447,18 @@ void tmbr_OptRecv(const char* d)   /* skins.c chat handler: "OP" + 4 hex */
     if (v != optRx) scePrintf("TMBR options: from the host %02x %02x\n", v & 0xFF, v >> 8);
     optRx = v;
 }
+/* targets bots leave alone (Ark 2026-10-27): Junkyard's big building (x -890..-430, y -320..440: its roof, the
+ * inside and the wall strip) - nothing on the route map gets in there, and bots chasing someone in / on it rammed
+ * its walls from outside and got stuck inside */
+static int offLimits(char* v)
+{
+    float* p;
+    int x, y;
+    if (tmbr_levelIndex != 1 || !F(v, 0x2028)) return 0;
+    p = (float*)(F(v, 0x2028) + 0x10);
+    x = (int)p[0]; y = (int)p[1];
+    return x > -890 && x < -430 && y > -320 && y < 440;
+}
 int tmbr_Opt(int bit)
 {
     char* gi = GINFO();
@@ -741,6 +753,7 @@ void tmbr_BotsThink(void)
             int others;
             if (v == b || !live(v)) continue;
             if (tmbr_SameTeam(v, b)) continue;           /* teammate (story: the humans and the ally) */
+            if (offLimits(v)) continue;                  /* in a spot bots cannot route to (Junkyard's big building) */
             d = (int)manhat(POS(b), POS(v));
             others = hunted[k] - (k == ci);              /* other bots already on it */
             if (F(v, 0x590) == 1) {                      /* humans: never more than HUMAN_MAX_BOTS bots at once */

@@ -42,7 +42,9 @@ def largest(G):
 # Ark 2026-10-27: bots got stuck down there)
 # FREEWAY 2: the jump by the stadium (x -620..-400, y 1600..1760): its deck (z 120-165) sits over the road the
 # bots drive under; planned onto it from below, they got stuck there (Ark 2026-10-27)
-EXCLUDE = dict(freeway=[(-90, 150, -2910, -2070, -1e9, 10.5), (-640, -380, 1580, 1780, 100, 1e9)])
+# JUNKYARD: the narrow corner above the tilted trailer (x -430..-320, y -570..-450): a bot got stuck squeezing through
+EXCLUDE = dict(freeway=[(-90, 150, -2910, -2070, -1e9, 10.5), (-640, -380, 1580, 1780, 100, 1e9)],
+               junkyard=[(-430, -320, -570, -450, -1e9, 1e9)])
 def exclude(name, H, R):
     for xa, xb, ya, yb, zl, zt in EXCLUDE.get(name, []):
         ia, ib = int((xa - R["x0"]) / R["step"]), int((xb - R["x0"]) / R["step"]) + 1
