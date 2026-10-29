@@ -451,6 +451,19 @@ void tmbr_OptRecv(const char* d)   /* skins.c chat handler: "OP" + 4 hex */
  * inside and the wall strip) - nothing on the route map gets in there, and bots chasing someone in / on it rammed
  * its walls from outside and got stuck inside */
 #define ROOF_GAME_DRIVING 1   /* g182 (Ark 2026-10-29): back to the game's own driving on the roofs - only our bot-vs-bot targeting there */
+/* g183 (Ark 2026-10-29: "walk back these changes ... mostly normal driving AI with some tweaks"): SIMPLE_DRIVING 1 =
+ * the game's own driving on every map. Kept: bot-vs-bot targeting, weapon / special / energy use, turbo (not on the
+ * roofs). Gone: our fight steering, dodging, weaving, wall feeler / ground guard, unstick, edge brake. New: bots
+ * that sit still get sent cruising (idleCheck). The route map helps only on maps with a thin attractor graph
+ * (navHelpMap) - route driving when the target is out of sight - with the ground guard while it follows a route. */
+#define SIMPLE_DRIVING 1
+static int navHelpMap(void)
+{
+    switch (tmbr_levelIndex) {
+    case 6: case 7: case 8: case 10: case 11: case 14: case 15: case 16: case 17: case 18: case 19: return 1;
+    default: return 0;    /* (thin graphs, by PTS links: Loop, Death1/2/4/5, Stadium, Ship, Asylum, Mini City, Mini Suburbs, Junk2) */
+    }
+}
 static int roofMap(void);
 extern int tmbr_NavBaked(void);
 extern int tmbr_NavOnMap(void* p);       /* navbake.c */
@@ -1080,12 +1093,13 @@ static void aggressiveTurn(char* g, char* v, char* t)
      * for LOCK_T frames before a homing missile goes - like a player waiting for the red reticle */
     if (d >= 0 && d < FIRE_DIST && a < LOCK_ANG && (F(br, 0x598) || F(br, 0x4B0) < 10)) { if (lockT[idx] < 100) lockT[idx]++; }
     else lockT[idx] = 0;
-    if (aimShot(g, v, idx, b, a, d)) return;                  /* stopped, lining up a big straight shot */
+    if (!SIMPLE_DRIVING && aimShot(g, v, idx, b, a, d)) return;   /* stopped, lining up a big straight shot (not in simple driving: it parked them) */
     if (charging(g, v, idx)) { /* holding the reticle charge: no trigger */ }
     else if ((st == 5 || st == 6) && d >= 0 && (F(br, 0x598) || F(br, 0x4B0) < 10) && F(br, 0x47C) != 1 &&
         (F(br, 0x47C) == 3 ? (lockT[idx] >= LOCK_T && d < FIRE_DIST) : (a < FIRE_TIGHT && d < FIRE_NEAR))) {
         aiSetAttackState(v, 7); dbgShots[idx]++;
     }
+    if (SIMPLE_DRIVING) return;                                 /* g183: the game's own steering; only our trigger above */
     if (F(v, 0x444) >= 60) { dbgWhy[idx] = 3; return; }        /* stuck: the AI's own reverse/turn */
     if (d < 0 || d > CS_DIST) { dbgWhy[idx] = 5; ph[idx] = 0; return; }
     pad[4] = 1; pad[6] = 0; pad[8] = 0;                         /* in a fight: stay on the gas */
@@ -1796,6 +1810,28 @@ static float egQ[4] __attribute__((aligned(16)));
 /* (ROOF_GAME_DRIVING: defined at offLimits) */
 static int roofMap(void) { return tmbr_levelIndex == 4 || tmbr_levelIndex == 13 || tmbr_levelIndex == 20; }
 static int roofNoNav(void) { return ROOF_GAME_DRIVING && roofMap(); }
+static int navOn(void) { return SIMPLE_DRIVING ? navHelpMap() : !roofNoNav(); }
+/* idle check (g183): every 30 frames; a bot that moved under IDLE_MOVE units in the last 3 s while alive and not
+ * in its respawn shield is sent cruising to a far zone (the game's own driving takes it there) */
+#define IDLE_MOVE 60
+static float idlePos[8][2];
+static int idleN[8];
+static void idleCheck(char* g, char* v)
+{
+    int i = (int)(v - g) / 0x31B0 & 7;
+    char* drv = (char*)F(v, 0x2018);
+    float* p;
+    int m;
+    if ((thinkTick + i) % 30 || !F(v, 0x2028) || !drv) return;
+    p = (float*)POS(v);
+    m = (int)(p[0] - idlePos[i][0]); if (m < 0) m = -m;
+    { int my = (int)(p[1] - idlePos[i][1]); m += my < 0 ? -my : my; }
+    if (m >= IDLE_MOVE || *(signed char*)(v + 0x497) >= 4) { idlePos[i][0] = p[0]; idlePos[i][1] = p[1]; idleN[i] = 0; return; }
+    if (++idleN[i] < 6) return;
+    idleN[i] = 0; idlePos[i][0] = p[0]; idlePos[i][1] = p[1];
+    cruiseFar(g, v, drv);
+    scePrintf("TMBR idle: bot %d sat still at %d %d %d, sent cruising (level %d)\n", i, (int)p[0], (int)p[1], (int)p[2], tmbr_levelIndex);
+}
 extern int tmbr_NavJumping(char* v);   /* nav.c: on a jump link (run-up or the jump itself) */
 static void edgeGuard(char* g, char* v)
 {
@@ -1834,6 +1870,13 @@ int tmbr_AiUpdate(char* v)
     if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030 && !(GINFO() && ((F(GINFO(), 0) >> 1) & 0xF) == 1)) {
         int ev = 0;
         if (tmbr_NavJumping(v)) return r;   /* a jump link under way: no dodging / avoiding / edge brakes */
+        if (SIMPLE_DRIVING) {
+            if (!roofMap()) turboUse(D_004FA030, v, 0);
+            energyUse(D_004FA030, v, 0);
+            idleCheck(D_004FA030, v);
+            if (navHelpMap() && tmbr_NavFollowing(v)) guard(D_004FA030, v);   /* on a route: walls and drops ahead */
+            return r;
+        }
         if (!roofMap()) {
             dodge(D_004FA030, v);
             if (!dodgeT[(int)(v - D_004FA030) / 0x31B0 & 7]) ev = evade(D_004FA030, v);   /* (a dodge in progress wins) */
@@ -1865,7 +1908,7 @@ static int aiUpdate(char* v)
         if (++shieldT[si] > 600) { shieldOff(v); shieldT[si] = 0; scePrintf("TMBR shield: bot %d off\n", si); }    /* 10 s, like the players' shield */
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
 #if TMBR_NAV
-        if (!roofNoNav()) tmbr_NavDrive(g, v, 0);          /* roam the route map */
+        if (navOn()) tmbr_NavDrive(g, v, 0);          /* roam the route map */
 #endif
         return r;
     }
@@ -1887,7 +1930,7 @@ keepFlee:
     if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) {
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
 #if TMBR_NAV
-        if (tmbr_botCount >= 0 && F(v, 0x2014) && !roofNoNav()) tmbr_NavDrive(g, v, 0);
+        if (tmbr_botCount >= 0 && F(v, 0x2014) && navOn()) tmbr_NavDrive(g, v, 0);
 #endif
         return r;
     }
@@ -1903,9 +1946,9 @@ keepFlee:
     if (swap) F(g, 0x9FD40 + k * 4) = save;
     t0 = tmbr_Cycles();
 #if TMBR_NAV
-    if (!roofNoNav() && tmbr_NavDrive(g, v, t)) { tmbr_PerfAdd(2, t0); return r; }
+    if (navOn() && tmbr_NavDrive(g, v, t)) { tmbr_PerfAdd(2, t0); return r; }
 #endif
-    if (!roofMap()) aggressiveTurn(g, v, t);
+    if (SIMPLE_DRIVING || !roofMap()) aggressiveTurn(g, v, t);   /* (simple driving: the trigger only, every map) */
     tmbr_PerfAdd(2, t0);
     return r;
 }
