@@ -1713,11 +1713,14 @@ static void avoid(char* g, char* v)
  * ramming a target right ahead, or off the route map (no data there). Replaces the 4-frame wall feeler (avoid). */
 #define GD_LOOK 6
 #define GD_HOLD 6
-static float GDK[2] = { 20.0f, 0.4f };    /* frames of travel to keep free, min speed (units / frame) */
+static float GDK[4] = { 20.0f, 0.4f, 8.0f, 150.0f };    /* frames of travel to keep free, min speed (units / frame), ground band, fall depth */
+static float gdGround[8][3];
+static signed char gdFell[8];
 extern float tmbr_NavCell(void);
 static float gdLast[8][2];
 static signed char gdOk[8], gdDir[8], gdT[8], gdBrake[8];
 static short gdLog[8];
+static float EG[5];   /* (edge guard numbers, below) */
 static void guard(char* g, char* v)
 {
     unsigned char* pad = PAD(v);
@@ -1728,6 +1731,14 @@ static void guard(char* g, char* v)
     if (idx < 0 || idx > 7) return;
     if (!cs || !br || !tmbr_NavBaked()) { gdOk[idx] = 0; return; }
     p = (float*)(cs + 0x10);
+    /* fall log (g181): 150 below where it last was on solid ground = gone over an edge */
+    if (p[2] > gdGround[idx][2] - GDK[3] || !gdOk[idx]) {
+        if (p[2] > gdGround[idx][2] - GDK[2] || !gdOk[idx]) { gdGround[idx][0] = p[0]; gdGround[idx][1] = p[1]; gdGround[idx][2] = p[2]; gdFell[idx] = 0; }
+    } else if (!gdFell[idx]) {
+        gdFell[idx] = 1;
+        scePrintf("TMBR fall: bot %d went over an edge near %d %d %d (now %d %d %d), %s, level %d\n", idx, (int)gdGround[idx][0],
+            (int)gdGround[idx][1], (int)gdGround[idx][2], (int)p[0], (int)p[1], (int)p[2], tmbr_NavFollowing(v) ? "on a route" : "free driving", tmbr_levelIndex);
+    }
     dx = p[0] - gdLast[idx][0]; dy = p[1] - gdLast[idx][1];
     gdLast[idx][0] = p[0]; gdLast[idx][1] = p[1];
     if (!gdOk[idx]) { gdOk[idx] = 1; return; }
@@ -1740,7 +1751,7 @@ static void guard(char* g, char* v)
         else if (!back) { pad[9] = gdDir[idx] < 0; pad[0xA] = gdDir[idx] > 0; }
         return;
     }
-    if (dx * dx + dy * dy < GDK[1] * GDK[1]) return;
+    if (dx * dx + dy * dy < GDK[1] * GDK[1] || dx * dx + dy * dy > EG[4] * EG[4]) return;   /* still, or a respawn jump */
     if (!back) {   /* ramming / shooting a target right ahead: let it */
         int d = fbits(*(float*)(br + 0x20)), a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF;
         if (d >= 0 && d < OR_WIDE && a < CS_AIM) return;
@@ -1771,7 +1782,7 @@ extern void padClear(char* v) __asm__("vehicleSaveAndClearPadFlags__7Vehicle");
  * than EG_DROP below (hdHatTest: height above ground, > 5000 = none) while the car is on the ground: no gas, no
  * turbo, brake. The game's own jumps between roofs are lost on these maps - staying on the roof is the trade. */
 extern float hdHat(void* pos, void* n, void* c) __asm__("hdHatTest__FP8_fvectorT0P14ColorUnionType");
-static float EG[4] = { 60.0f, 15.0f, 4.0f, 0.4f };   /* drop, on-ground height, probe lift, min speed (units / frame) */
+static float EG[5] = { 60.0f, 15.0f, 4.0f, 0.4f, 40.0f };   /* drop, on-ground height, probe lift, min speed, teleport (units / frame) */
 static float egLast[8][4];
 static int egOk[8], egLog[8];
 static float egQ[4] __attribute__((aligned(16)));
@@ -1797,13 +1808,16 @@ static void edgeGuard(char* g, char* v)
     egLast[i][0] = p[0]; egLast[i][1] = p[1]; egLast[i][2] = p[2];
     if (!egOk[i]) { egOk[i] = 1; return; }
     if (egLog[i] > 0) egLog[i]--;
-    if (dx * dx + dy * dy < EG[3] * EG[3]) return;
+    if (dx * dx + dy * dy < EG[3] * EG[3] || dx * dx + dy * dy > EG[4] * EG[4]) return;   /* still, or a respawn jump */
     egQ[0] = p[0]; egQ[1] = p[1]; egQ[2] = p[2] + EG[2]; egQ[3] = p[3];
     if (!(hdHat(egQ, 0, 0) < EG[1])) return;                   /* in the air (a jump under way): leave it */
     for (k = 8; k <= 40; k += 8) {     /* 8..40 frames ahead (g179: 12 / 24 was too late at speed) */
         egQ[0] = p[0] + dx * (float)k; egQ[1] = p[1] + dy * (float)k; egQ[2] = p[2] + EG[2];
         if (hdHat(egQ, 0, 0) > EG[0]) {
-            pad[4] = 0; pad[7] = 0; pad[8] = 0; pad[2] = 0; pad[6] = 1;
+            /* g181: the brake pad is also reverse - a car rolling BACKWARDS at a drop (the game's own reverse when
+             * stuck) got more reverse here and went off backwards; that one gets gas to stop instead */
+            int back = dx * *(float*)(F(v, 0x2028) + 0x30) + dy * *(float*)(F(v, 0x2028) + 0x34) < EG[3] - EG[3];
+            pad[7] = 0; pad[8] = 0; pad[2] = 0; pad[4] = back; pad[6] = !back;
             if (!egLog[i]) { egLog[i] = 120; scePrintf("TMBR edge: bot %d brakes at a drop (%d %d %d), level %d\n", i, (int)p[0], (int)p[1], (int)p[2], tmbr_levelIndex); }
             return;
         }
