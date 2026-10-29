@@ -790,6 +790,7 @@ void tmbr_BotsThink(void)
             if (CAI(b)->mid) sc += crowd[k] * 300 + others * 200;                    /* mid cars: smaller fights */
             sc -= (100 - hpPct(v)) * (rl == R_CRUISER ? 1 : 3);   /* finish off damaged cars (up to -300) */
             if (k == leader) sc -= 250;                                /* deathmatch: someone pulling away */
+            if (d < 400) sc -= F(v, 0x590) == 1 ? 200 : 350;           /* g184: fight whoever is close, bots too */
             if (k == prey && others < PREY_CHASERS) sc -= 900;         /* Man Hunt: a couple of bots on the prey */
             if (v == cur) curS = sc;
             if (sc < bestS) { bestS = sc; best = v; }
@@ -870,6 +871,7 @@ static void shieldOff(char* v)
 #define HB_HOLD 24
 #define HB_REST 20
 #define STALL 240
+#define STALL_SIMPLE 75   /* g184: simple driving - give up a line-up after 1.25 s (they sat lining up shots) */
 #define TURBO_FAR 0x43C80000  /* 400.0: lined up and this far away -> turbo in */
 #define FIRE_ANG 0x3F19999A   /* 0.6 rad, ~34 deg (homing) */
 #define FIRE_TIGHT 0x3E851EB8 /* 0.26 rad, ~15 deg (straight weapons) */
@@ -1081,7 +1083,7 @@ static void aggressiveTurn(char* g, char* v, char* t)
     d = fbits(*(float*)(br + 0x20));
     tf = fbits(*(float*)(br + 0x28)) & 0x7FFFFFFF;
     if (hbTimer[idx] < 0) hbTimer[idx]++;
-    if (st == 6 && F(br, 0x488) > STALL) { dbgWhy[idx] = 4; aiSetAttackState(v, 1); return; }
+    if (st == 6 && F(br, 0x488) > (SIMPLE_DRIVING ? STALL_SIMPLE : STALL)) { dbgWhy[idx] = 4; aiSetAttackState(v, 1); return; }
     if (F(drv, 4) != 5) { dbgWhy[idx] = 10 + F(drv, 4); return; }
     /* Trigger-happy: the original only fires once aiLineUpShot is satisfied (aimed within 35 deg, per-weapon
      * bearing / pitch / range, fairness gate), so in a moving fight state 7 almost never comes (1 sample in
@@ -1095,8 +1097,10 @@ static void aggressiveTurn(char* g, char* v, char* t)
     else lockT[idx] = 0;
     if (!SIMPLE_DRIVING && aimShot(g, v, idx, b, a, d)) return;   /* stopped, lining up a big straight shot (not in simple driving: it parked them) */
     if (charging(g, v, idx)) { /* holding the reticle charge: no trigger */ }
-    else if ((st == 5 || st == 6) && d >= 0 && (F(br, 0x598) || F(br, 0x4B0) < 10) && F(br, 0x47C) != 1 &&
-        (F(br, 0x47C) == 3 ? (lockT[idx] >= LOCK_T && d < FIRE_DIST) : (a < FIRE_TIGHT && d < FIRE_NEAR))) {
+    else if (SIMPLE_DRIVING ? ((st >= 4 && st <= 6) && d >= 0 && (F(br, 0x598) || F(br, 0x4B0) < 10) && F(br, 0x47C) != 1 &&
+        (F(br, 0x47C) == 3 ? (lockT[idx] >= LOCK_T / 2 && d < FIRE_DIST) : (a < FIRE_ANG && d < FIRE_DIST)))   /* g184: trigger-happier */
+        : ((st == 5 || st == 6) && d >= 0 && (F(br, 0x598) || F(br, 0x4B0) < 10) && F(br, 0x47C) != 1 &&
+        (F(br, 0x47C) == 3 ? (lockT[idx] >= LOCK_T && d < FIRE_DIST) : (a < FIRE_TIGHT && d < FIRE_NEAR)))) {
         aiSetAttackState(v, 7); dbgShots[idx]++;
     }
     if (SIMPLE_DRIVING) return;                                 /* g183: the game's own steering; only our trigger above */
@@ -1861,9 +1865,33 @@ static void edgeGuard(char* g, char* v)
     }
 }
 
+/* roof-map fall rescue (g184, Ark 2026-10-29: "a HP penalty for them instead ... losing only 5% HP and resetting
+ * rather than dying, while players still die"): a bot that drops well below the lowest roof (route map minimum
+ * - ~130) is put back on a start point by the game's own placement (func_0013D7B8: start point, speed zeroed,
+ * heading set) and loses 5 % of its max health (never below 1). Humans are not touched. */
+extern int gamePlaceAtStart(char* game, char* v, int pt) __asm__("func_0013D7B8");
+static float RESC[4] = { -230.0f, 0.0f, 0.05f, 1.0f };   /* Skyscrapers / Mini Skyscrapers floor, Warhawk's roof floor, penalty, min hp */
+static void fallRescue(char* g, char* v)
+{
+    float* p, floor, *hp, mx;
+    if (!roofMap() || !F(v, 0x2028)) return;
+    if (*(float*)(v + 0x404) <= RESC[3] - RESC[3]) return;          /* dead already */
+    floor = tmbr_levelIndex == 20 ? RESC[1] : RESC[0];
+    p = (float*)(F(v, 0x2028) + 0x10);
+    if (p[2] >= floor) return;
+    hp = (float*)(v + 0x404); mx = *(float*)(v + 0x3F0);
+    scePrintf("TMBR rescue: bot %d fell off at %d %d %d, back on a start point (health %d -> ", (int)(v - g) / 0x31B0,
+        (int)p[0], (int)p[1], (int)p[2], (int)*hp);
+    *hp -= mx * RESC[2];
+    if (*hp < RESC[3]) *hp = RESC[3];
+    gamePlaceAtStart(g, v, -1);
+    scePrintf("%d), level %d\n", (int)*hp, tmbr_levelIndex);
+}
+
 int tmbr_AiUpdate(char* v)
 {
     int r;
+    if (tmbr_botCount >= 0 && F(v, 0x2014) && D_004FA030) fallRescue(D_004FA030, v);
     if (F(D_003156C0, 0x1BB4) == 0xA && F(v, 0x2014)) { padClear(v); return 0; }   /* sync hold: bots frozen */
     r = aiUpdate(v);
     /* match over (game type 1): the game stops every car - no dodging / unsticking then (log 2026-10-24) */
@@ -1994,7 +2022,7 @@ static signed char burstLeft[8];   /* missiles left in the current burst (fire /
 static int heavyW(int w) { return w == 1 || w >= 4; }
 static int cooldown(int w)
 {
-    static const int heavy[3] = { 520, 300, 210 }, light[3] = { 45, 25, 18 };   /* (2026-10-27: 60/35/25 -> 45/25/18, more chip damage) */    /* frames: easy, medium, hard (2026-10-25: was 700/450/320, 90/60/40 - bots did little damage) */
+    static const int heavy[3] = { 380, 220, 150 }, light[3] = { 40, 22, 15 };   /* (g184: was 520/300/210, 45/25/18 - more weapon use) */   /* (2026-10-27: 60/35/25 -> 45/25/18, more chip damage) */    /* frames: easy, medium, hard (2026-10-25: was 700/450/320, 90/60/40 - bots did little damage) */
     int d = tmbr_botDiff < 0 ? 0 : tmbr_botDiff > 2 ? 2 : tmbr_botDiff;
     if (w == 1) return heavy[d] * 3;                 /* special: ~15 s (medium) - players wait on the recharge (Ark: too many) */
     return heavyW(w) ? heavy[d] : light[d];
