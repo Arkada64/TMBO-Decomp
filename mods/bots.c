@@ -1862,7 +1862,13 @@ static float egQ[4] __attribute__((aligned(16)));
 static int roofMap(void) { return tmbr_levelIndex == 4 || tmbr_levelIndex == 13 || tmbr_levelIndex == 20; }
 static int roofNoNav(void) { return ROOF_GAME_DRIVING && roofMap(); }
 static int navOn(void) { return SIMPLE_DRIVING ? navHelpMap() : !roofNoNav(); }
-static int navFor(char* g, char* v) { return navOn() || idleNav[(int)(v - g) / 0x31B0 & 7] > 0; }
+/* g189 patrol: every bot in cruise mode (nothing to fight in range, or it sat still) roams the route map - all
+ * maps but the roofs; hunting stays with the game's own driving (except navHelpMap maps) */
+static int navFor(char* g, char* v)
+{
+    char* drv = (char*)F(v, 0x2018);
+    return navOn() || (!roofMap() && drv && F(drv, 4) == 4);
+}
 /* idle check (g183): every 30 frames; a bot that moved under IDLE_MOVE units in the last 3 s while alive and not
  * in its respawn shield is sent cruising to a far zone (the game's own driving takes it there) */
 #define IDLE_MOVE 60
@@ -1883,29 +1889,11 @@ static void idleCheck(char* g, char* v)
     if (m >= IDLE_MOVE || *(signed char*)(v + 0x497) >= 4) { idlePos[i][0] = p[0]; idlePos[i][1] = p[1]; idleN[i] = 0; return; }
     if (++idleN[i] < 4) return;                                /* 2 s (g186: was 3) */
     idleN[i] = 0; idlePos[i][0] = p[0]; idlePos[i][1] = p[1];
-    {   /* g186 (Ark 2026-10-29: "sits in a spot and won't move until something gets near"): cruising did not move
-         * them (the game's cruise parks at its zone) - hunt the nearest enemy instead, for 15 s, at any distance */
-        int k, bd = 0x7FFFFFFF;
-        char* best = 0;
-        for (k = 0; k < 8; k++) {
-            char* o = g + k * 0x31B0;
-            int dd;
-            if (o == v || !live(o) || tmbr_SameTeam(o, v)) continue;
-            dd = (int)manhat(POS(v), POS(o));
-            if (dd < bd) { bd = dd; best = o; }
-        }
-        if (best) {
-            driverSetTarget(drv, best);
-            driverSetMode(drv, 2);                              /* hunt (2): after the target set, not the nearest human (5) */
-            idleHunt[i] = 900;
-            /* g188 (Ark: "it isn't stuck - it sits in a spot until someone gets near"): the game's hunt waits where
-             * it is when its attractor graph has no way to the target - so our route map drives it there (it hands
-             * back to the game's own fighting once the target is in sight) */
-            if (!roofMap()) idleNav[i] = 900;
-            scePrintf("TMBR idle: bot %d sat still at %d %d %d, hunts car %d (%d away)%s, level %d\n", i, (int)p[0], (int)p[1], (int)p[2],
-                (int)(best - g) / 0x31B0, bd, idleNav[i] ? ", route map drives" : "", tmbr_levelIndex);
-        } else cruiseFar(g, v, drv);
-    }
+    /* g189 (Ark 2026-10-29: "why not just send the bot into patrol?"): a bot that sat still patrols - cruise mode,
+     * and in cruise mode our route map drives it from one random point to the next (nav.c roam, 400-1800 away)
+     * until the think tick finds it something to fight in range */
+    cruiseFar(g, v, drv);
+    scePrintf("TMBR idle: bot %d sat still at %d %d %d, patrols, level %d\n", i, (int)p[0], (int)p[1], (int)p[2], tmbr_levelIndex);
 }
 extern int tmbr_NavJumping(char* v);   /* nav.c: on a jump link (run-up or the jump itself) */
 static void edgeGuard(char* g, char* v)
