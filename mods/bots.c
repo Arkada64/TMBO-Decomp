@@ -450,6 +450,7 @@ void tmbr_OptRecv(const char* d)   /* skins.c chat handler: "OP" + 4 hex */
 /* targets bots leave alone (Ark 2026-10-27): Junkyard's big building (x -890..-430, y -320..440: its roof, the
  * inside and the wall strip) - nothing on the route map gets in there, and bots chasing someone in / on it rammed
  * its walls from outside and got stuck inside */
+#define ROOF_GAME_DRIVING 1   /* g182 (Ark 2026-10-29): back to the game's own driving on the roofs - only our bot-vs-bot targeting there */
 static int roofMap(void);
 extern int tmbr_NavBaked(void);
 extern int tmbr_NavOnMap(void* p);       /* navbake.c */
@@ -459,7 +460,7 @@ static int offLimits(char* v)
     int x, y;
     /* roof maps (g180, Ark 2026-10-28): only targets on the route map - the roofs bots can reach, jumps included;
      * one on a roof the map leaves out pulled the game's driving straight off the edge */
-    if (F(v, 0x2028) && roofMap() && tmbr_NavBaked() && !tmbr_NavOnMap((void*)(F(v, 0x2028) + 0x10))) return 1;
+    if (!ROOF_GAME_DRIVING && F(v, 0x2028) && roofMap() && tmbr_NavBaked() && !tmbr_NavOnMap((void*)(F(v, 0x2028) + 0x10))) return 1;
     if (tmbr_levelIndex != 1 || !F(v, 0x2028)) return 0;
     p = (float*)(F(v, 0x2028) + 0x10);
     x = (int)p[0]; y = (int)p[1];
@@ -1792,7 +1793,7 @@ static float egQ[4] __attribute__((aligned(16)));
  * maps our ROUTE driving runs (route map kept 24 units back from the drops, jump links), but the free steering
  * that knows nothing of drops stays off - fight steering, dodging, evading, turbo, avoiding, unsticking - and
  * the edge guard brakes for every drop it sees ahead. ROOF_GAME_DRIVING 1 = the game's own driving only. */
-#define ROOF_GAME_DRIVING 0
+/* (ROOF_GAME_DRIVING: defined at offLimits) */
 static int roofMap(void) { return tmbr_levelIndex == 4 || tmbr_levelIndex == 13 || tmbr_levelIndex == 20; }
 static int roofNoNav(void) { return ROOF_GAME_DRIVING && roofMap(); }
 extern int tmbr_NavJumping(char* v);   /* nav.c: on a jump link (run-up or the jump itself) */
@@ -1840,8 +1841,10 @@ int tmbr_AiUpdate(char* v)
             energyUse(D_004FA030, v, ev);
             unstick(D_004FA030, v);
         }
-        guard(D_004FA030, v);        /* walls and drops ahead, every map (replaces avoid) */
-        edgeGuard(D_004FA030, v);
+        if (!roofNoNav()) {          /* (roof maps on the game's driving: none of ours, as before g178) */
+            guard(D_004FA030, v);    /* walls and drops ahead, every map (replaces avoid) */
+            edgeGuard(D_004FA030, v);
+        }
     }
     return r;
 }

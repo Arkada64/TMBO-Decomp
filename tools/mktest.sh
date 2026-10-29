@@ -1,9 +1,9 @@
 #!/bin/bash
 # One test build for everything: TMB Decomp/test/TMBR_TEST.ELF (all mods: bots, peds (Freeway / Prison Passage), cameras,
 # Gold Tooth toggle) + TMBR_TEST.iso (online disc + content packs + Gold Tooth \PCAR\ZZP.*) + Run TMBR_TEST.bat.
-#   bash "/mnt/c/Users/Ark/Desktop/TMB Decomp/mktest.sh"          (CLEAN=1 also removes the old test files)
+#   bash "/mnt/d/TMB Decomp/mktest.sh"          (CLEAN=1 also removes the old test files)
 set -e -o pipefail
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"
+W="/mnt/d/TMB Decomp"
 cd "$W"
 rm -f test/TRAFFIC_TEST.ELF
 bash mods_copy_build.sh | tail -4

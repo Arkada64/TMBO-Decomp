@@ -4,7 +4,7 @@
 #  - The .bps turns the tester's OWN original SCUS_971.96 (copied off their disc) into the TMB-Reloaded ELF.
 #  - Apply with Floating IPS (Flips) or any BPS patcher; then boot with PCSX2: pcsx2-qt -elf TMBR.elf -- <disc>
 set -e
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"
+W="/mnt/d/TMB Decomp"
 cd ~/tmbo_decomp && source .venv/bin/activate
 [ -f build/TMBR.elf ] || { echo "run tools/build_shiftable.sh first"; exit 1; }
 V=$(cat build/TMBR.version); TAG=$(echo "$V" | awk '{print $2}')

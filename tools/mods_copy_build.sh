@@ -2,7 +2,7 @@
 # Build the shiftable+mods ELF in a private copy of the repo (~/modshome/tmbo_decomp) so it can run while the
 # permuter is using ~/tmbo_decomp. Results -> TMB Decomp/test/TRAFFIC_TEST.ELF and TMB Decomp/release/
 set -e -o pipefail
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"
+W="/mnt/d/TMB Decomp"
 SRC=/home/ark/tmbo_decomp; MH=/home/ark/modshome; D=$MH/tmbo_decomp
 mkdir -p $MH
 rsync -a --delete --exclude 'logs/' $SRC/ $D/
