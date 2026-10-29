@@ -267,6 +267,7 @@ extern void driverSetTarget(char* drv, char* target) __asm__("func_00130C00");
 extern int attractGroupAt(void* points, void* pos) __asm__("func_0010B950");
 extern float manhat(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
 static int thinkTick;
+static short idleHunt[8];   /* g186: frames a bot that sat still hunts its nearest enemy, whatever the distance */
 static int lives, lms, dm, alive, leader, prey;   /* this think's mode state (tmbr_BotsThink) */
 #define PREY_CHASERS 2   /* Man Hunt: bots that commit to the prey at once (the rest fight as usual) */
 static int lastLife(char* v)
@@ -810,7 +811,7 @@ void tmbr_BotsThink(void)
             int bd = (int)manhat(POS(b), POS(best)), see = HUNT_SEE(rl);
             int chase = prey >= 0 && best == g + prey * 0x31B0;   /* the prey's chasers cross the map for it */
             int keep = F(best, 0x590) == 1 ? see : rl == R_CRUISER ? see * 2 : see * 3 / 2;   /* humans: easier to lose */
-            if (!(lms && alive <= 3) && !chase && (bd > keep || (F(drv, 4) == 4 && bd > see))) {
+            if (!(lms && alive <= 3) && !chase && !idleHunt[(int)(b - g) / 0x31B0 & 7] && (bd > keep || (F(drv, 4) == 4 && bd > see))) {
                 if (F(drv, 4) != 4) cruiseFar(g, b, drv);   /* far zone: the nearest one was usually the brawl just left */
                 continue;
             }
@@ -1871,15 +1872,33 @@ static void idleCheck(char* g, char* v)
     char* drv = (char*)F(v, 0x2018);
     float* p;
     int m;
+    if (idleHunt[i] > 0) idleHunt[i]--;
     if ((thinkTick + i) % 30 || !F(v, 0x2028) || !drv) return;
     p = (float*)POS(v);
     m = (int)(p[0] - idlePos[i][0]); if (m < 0) m = -m;
     { int my = (int)(p[1] - idlePos[i][1]); m += my < 0 ? -my : my; }
     if (m >= IDLE_MOVE || *(signed char*)(v + 0x497) >= 4) { idlePos[i][0] = p[0]; idlePos[i][1] = p[1]; idleN[i] = 0; return; }
-    if (++idleN[i] < 6) return;
+    if (++idleN[i] < 4) return;                                /* 2 s (g186: was 3) */
     idleN[i] = 0; idlePos[i][0] = p[0]; idlePos[i][1] = p[1];
-    cruiseFar(g, v, drv);
-    scePrintf("TMBR idle: bot %d sat still at %d %d %d, sent cruising (level %d)\n", i, (int)p[0], (int)p[1], (int)p[2], tmbr_levelIndex);
+    {   /* g186 (Ark 2026-10-29: "sits in a spot and won't move until something gets near"): cruising did not move
+         * them (the game's cruise parks at its zone) - hunt the nearest enemy instead, for 15 s, at any distance */
+        int k, bd = 0x7FFFFFFF;
+        char* best = 0;
+        for (k = 0; k < 8; k++) {
+            char* o = g + k * 0x31B0;
+            int dd;
+            if (o == v || !live(o) || tmbr_SameTeam(o, v)) continue;
+            dd = (int)manhat(POS(v), POS(o));
+            if (dd < bd) { bd = dd; best = o; }
+        }
+        if (best) {
+            driverSetTarget(drv, best);
+            driverSetMode(drv, 2);                              /* hunt (2): after the target set, not the nearest human (5) */
+            idleHunt[i] = 900;
+            scePrintf("TMBR idle: bot %d sat still at %d %d %d, hunts car %d (%d away), level %d\n", i, (int)p[0], (int)p[1], (int)p[2],
+                (int)(best - g) / 0x31B0, bd, tmbr_levelIndex);
+        } else cruiseFar(g, v, drv);
+    }
 }
 extern int tmbr_NavJumping(char* v);   /* nav.c: on a jump link (run-up or the jump itself) */
 static void edgeGuard(char* g, char* v)
