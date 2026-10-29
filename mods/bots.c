@@ -268,6 +268,7 @@ extern int attractGroupAt(void* points, void* pos) __asm__("func_0010B950");
 extern float manhat(void* a, void* b) __asm__("mathfManhatDist__FP8_fvectorT0");
 static int thinkTick;
 static short idleHunt[8];   /* g186: frames a bot that sat still hunts its nearest enemy, whatever the distance */
+static short idleNav[8];    /* g188: frames our route map drives a bot that sat still (any map with a route map, not the roofs) */
 static int lives, lms, dm, alive, leader, prey;   /* this think's mode state (tmbr_BotsThink) */
 #define PREY_CHASERS 2   /* Man Hunt: bots that commit to the prey at once (the rest fight as usual) */
 static int lastLife(char* v)
@@ -1861,12 +1862,12 @@ static float egQ[4] __attribute__((aligned(16)));
 static int roofMap(void) { return tmbr_levelIndex == 4 || tmbr_levelIndex == 13 || tmbr_levelIndex == 20; }
 static int roofNoNav(void) { return ROOF_GAME_DRIVING && roofMap(); }
 static int navOn(void) { return SIMPLE_DRIVING ? navHelpMap() : !roofNoNav(); }
+static int navFor(char* g, char* v) { return navOn() || idleNav[(int)(v - g) / 0x31B0 & 7] > 0; }
 /* idle check (g183): every 30 frames; a bot that moved under IDLE_MOVE units in the last 3 s while alive and not
  * in its respawn shield is sent cruising to a far zone (the game's own driving takes it there) */
 #define IDLE_MOVE 60
-static float idlePos[8][2], idleSpot[8][2];
-static int idleN[8], idleRep[8], idleMan[8];
-extern int gamePlaceAtStart(char* game, char* v, int pt) __asm__("func_0013D7B8");
+static float idlePos[8][2];
+static int idleN[8];
 static void idleCheck(char* g, char* v)
 {
     int i = (int)(v - g) / 0x31B0 & 7;
@@ -1874,14 +1875,7 @@ static void idleCheck(char* g, char* v)
     float* p;
     int m;
     if (idleHunt[i] > 0) idleHunt[i]--;
-    if (idleMan[i] > 0 && F(v, 0x2028)) {    /* g187: wriggle out - reverse with the wheel turned, then drive out the other way */
-        unsigned char* pad = PAD(v);
-        int side = (idleRep[i] & 1) ? 1 : -1;
-        idleMan[i]--;
-        pad[2] = 0; pad[7] = 0;
-        if (idleMan[i] >= 30) { pad[4] = 0; pad[6] = 1; pad[9] = side < 0; pad[0xA] = side > 0; }
-        else { pad[6] = 0; pad[4] = 1; pad[9] = side > 0; pad[0xA] = side < 0; }
-    }
+    if (idleNav[i] > 0) idleNav[i]--;
     if ((thinkTick + i) % 30 || !F(v, 0x2028) || !drv) return;
     p = (float*)POS(v);
     m = (int)(p[0] - idlePos[i][0]); if (m < 0) m = -m;
@@ -1889,24 +1883,6 @@ static void idleCheck(char* g, char* v)
     if (m >= IDLE_MOVE || *(signed char*)(v + 0x497) >= 4) { idlePos[i][0] = p[0]; idlePos[i][1] = p[1]; idleN[i] = 0; return; }
     if (++idleN[i] < 4) return;                                /* 2 s (g186: was 3) */
     idleN[i] = 0; idlePos[i][0] = p[0]; idlePos[i][1] = p[1];
-    /* g187 (Ark: one still sat and did nothing - log: hunting, 1 unit of movement in a minute, right after a respawn):
-     * the same spot again and again: 3rd time (6 s) a wriggle-out, 6th time (12 s) the game puts it on a start point */
-    {
-        int sm = (int)(p[0] - idleSpot[i][0]); if (sm < 0) sm = -sm;
-        { int sy = (int)(p[1] - idleSpot[i][1]); sm += sy < 0 ? -sy : sy; }
-        if (sm < 80) idleRep[i]++; else { idleRep[i] = 1; idleSpot[i][0] = p[0]; idleSpot[i][1] = p[1]; }
-        if (idleRep[i] >= 6) {
-            scePrintf("TMBR idle: bot %d stuck at %d %d %d for 12 s, back on a start point (level %d)\n", i, (int)p[0], (int)p[1], (int)p[2], tmbr_levelIndex);
-            gamePlaceAtStart(g, v, -1);
-            idleRep[i] = 0;
-            return;
-        }
-        if (idleRep[i] >= 3) {
-            idleMan[i] = 75;
-            scePrintf("TMBR idle: bot %d stuck at %d %d %d, wriggles out (level %d)\n", i, (int)p[0], (int)p[1], (int)p[2], tmbr_levelIndex);
-            return;
-        }
-    }
     {   /* g186 (Ark 2026-10-29: "sits in a spot and won't move until something gets near"): cruising did not move
          * them (the game's cruise parks at its zone) - hunt the nearest enemy instead, for 15 s, at any distance */
         int k, bd = 0x7FFFFFFF;
@@ -1922,8 +1898,12 @@ static void idleCheck(char* g, char* v)
             driverSetTarget(drv, best);
             driverSetMode(drv, 2);                              /* hunt (2): after the target set, not the nearest human (5) */
             idleHunt[i] = 900;
-            scePrintf("TMBR idle: bot %d sat still at %d %d %d, hunts car %d (%d away), level %d\n", i, (int)p[0], (int)p[1], (int)p[2],
-                (int)(best - g) / 0x31B0, bd, tmbr_levelIndex);
+            /* g188 (Ark: "it isn't stuck - it sits in a spot until someone gets near"): the game's hunt waits where
+             * it is when its attractor graph has no way to the target - so our route map drives it there (it hands
+             * back to the game's own fighting once the target is in sight) */
+            if (!roofMap()) idleNav[i] = 900;
+            scePrintf("TMBR idle: bot %d sat still at %d %d %d, hunts car %d (%d away)%s, level %d\n", i, (int)p[0], (int)p[1], (int)p[2],
+                (int)(best - g) / 0x31B0, bd, idleNav[i] ? ", route map drives" : "", tmbr_levelIndex);
         } else cruiseFar(g, v, drv);
     }
 }
@@ -1960,6 +1940,7 @@ static void edgeGuard(char* g, char* v)
  * rather than dying, while players still die"): a bot that drops well below the lowest roof (route map minimum
  * - ~130) is put back on a start point by the game's own placement (func_0013D7B8: start point, speed zeroed,
  * heading set) and loses 5 % of its max health (never below 1). Humans are not touched. */
+extern int gamePlaceAtStart(char* game, char* v, int pt) __asm__("func_0013D7B8");
 static float RESC[4] = { -230.0f, 0.0f, 0.05f, 1.0f };   /* Skyscrapers / Mini Skyscrapers floor, Warhawk's roof floor, penalty, min hp */
 static void fallRescue(char* g, char* v)
 {
@@ -1992,7 +1973,7 @@ int tmbr_AiUpdate(char* v)
             if (!roofMap()) turboUse(D_004FA030, v, 0);
             energyUse(D_004FA030, v, 0);
             idleCheck(D_004FA030, v);
-            if (navHelpMap() && tmbr_NavFollowing(v)) guard(D_004FA030, v);   /* on a route: walls and drops ahead */
+            if (navFor(D_004FA030, v) && tmbr_NavFollowing(v)) guard(D_004FA030, v);   /* on a route: walls and drops ahead */
             return r;
         }
         if (!roofMap()) {
@@ -2026,7 +2007,7 @@ static int aiUpdate(char* v)
         if (++shieldT[si] > 600) { shieldOff(v); shieldT[si] = 0; scePrintf("TMBR shield: bot %d off\n", si); }    /* 10 s, like the players' shield */
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
 #if TMBR_NAV
-        if (navOn()) tmbr_NavDrive(g, v, 0);          /* roam the route map */
+        if (navFor(g, v)) tmbr_NavDrive(g, v, 0);          /* roam the route map */
 #endif
         return r;
     }
@@ -2048,7 +2029,7 @@ keepFlee:
     if (tmbr_botCount < 0 || !t || !F(t, 0x2028)) {
         t0 = tmbr_Cycles(); r = aiFrame(v); tmbr_PerfAdd(1, t0);
 #if TMBR_NAV
-        if (tmbr_botCount >= 0 && F(v, 0x2014) && navOn()) tmbr_NavDrive(g, v, 0);
+        if (tmbr_botCount >= 0 && F(v, 0x2014) && navFor(g, v)) tmbr_NavDrive(g, v, 0);
 #endif
         return r;
     }
@@ -2065,7 +2046,7 @@ keepFlee:
     if (SIMPLE_DRIVING) simpleFire(g, v);    /* g185: every frame, any driver mode, before route driving */
     t0 = tmbr_Cycles();
 #if TMBR_NAV
-    if (navOn() && tmbr_NavDrive(g, v, t)) { tmbr_PerfAdd(2, t0); return r; }
+    if (navFor(g, v) && tmbr_NavDrive(g, v, t)) { tmbr_PerfAdd(2, t0); return r; }
 #endif
     if (!SIMPLE_DRIVING && !roofMap()) aggressiveTurn(g, v, t);   /* (simple driving: simpleFire above instead) */
     tmbr_PerfAdd(2, t0);
