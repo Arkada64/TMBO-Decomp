@@ -641,6 +641,7 @@ static void weapTest(char* g)
     if (F(v, 0x21B0) != last) { last = F(v, 0x21B0); scePrintf("TMBR weaptest: car %d (%x) weapon %d\n", k, F(v, 0x20F4), last); }
 }
 #endif
+static void fireLog(char* g);
 void tmbr_BotsThink(void)
 {
     char* g = D_004FA030;
@@ -666,7 +667,9 @@ void tmbr_BotsThink(void)
 #if TMBR_NAV
     tmbr_NavFrame();
 #endif
-    if (++thinkTick % 30) return;
+    ++thinkTick;
+    fireLog(g);                    /* g185: per-bot fire summary every 10 s */
+    if (thinkTick % 30) return;
     F(g, 0x9A3D4) = tmbr_botDiff;   /* AI difficulty: 0 (online's value) never lets a bot line up a normal shot */
     /* how many bots hunt each car, how crowded each car is */
     for (k = 0; k < 8; k++) { hunted[k] = 0; crowd[k] = 0; }
@@ -1068,6 +1071,48 @@ static int aimShot(char* g, char* v, int idx, int b, int a, int d)
     else if (F(br, 0x414) == 7) aiSetAttackState(v, 5);   /* the AI's own fire request waits for the line-up */
     dbgWhy[idx] = 60;
     return 1;
+}
+
+/* g185 (Ark 2026-10-29: "too much waiting for line-ups ... not seeing shots go out"): in simple driving the
+ * trigger runs every AI frame whatever the driver mode (it only ran in attack mode 5, and not at all while a bot
+ * followed a route), picks a weapon itself when none is up, and fires straight weapons within FIRE_ANG / homing
+ * after half the lock time, in sight within FIRE_DIST. The game's line-up gives up after STALL_SIMPLE. */
+void tmbr_AiPickWeapon(char* v);
+static int fireWant[8], fireGo[8];
+static void simpleFire(char* g, char* v)
+{
+    char* br = (char*)F(v, 0x2014);
+    int idx = (int)(v - g) / 0x31B0, st, a, d, w, seen;
+    if (idx < 0 || idx > 7 || !br) return;
+    st = F(br, 0x414);
+    if (st == 6 && F(br, 0x488) > STALL_SIMPLE) { aiSetAttackState(v, 1); return; }
+    a = fbits(*(float*)(br + 0x24)) & 0x7FFFFFFF;
+    d = fbits(*(float*)(br + 0x20));
+    seen = F(br, 0x598) || F(br, 0x4B0) < 10;
+    if (d >= 0 && d < FIRE_DIST && a < LOCK_ANG && seen) { if (lockT[idx] < 100) lockT[idx]++; }
+    else lockT[idx] = 0;
+    if (charging(g, v, idx)) return;
+    if (d < 0 || d >= FIRE_DIST || !seen || st == 7) return;
+    fireWant[idx]++;
+    w = F(br, 0x47C);
+    if (!w) { tmbr_AiPickWeapon(v); w = F(br, 0x47C); }
+    if (!w || w == 1) return;                                  /* (the special keeps the game's own line-up rules) */
+    if (w == 3 ? lockT[idx] >= LOCK_T / 2 : a < FIRE_ANG) { aiSetAttackState(v, 7); fireGo[idx]++; dbgShots[idx]++; }
+}
+/* every 10 s, one line per bot: driver mode, attack state, weapon up, in-sight frames, fire calls (g185 check) */
+static void fireLog(char* g)
+{
+    int k;
+    if (thinkTick % 600) return;
+    for (k = 0; k < 8; k++) {
+        char* v = g + k * 0x31B0;
+        char* br = (char*)F(v, 0x2014);
+        char* drv = (char*)F(v, 0x2018);
+        if (!br || !drv || !F(v, 0x2028)) continue;
+        scePrintf("TMBR fire: bot %d mode %d state %d weapon %d dist %d, in sight %d, fired %d (10 s)\n", k, F(drv, 4),
+            F(br, 0x414), F(br, 0x47C), fbits(*(float*)(br + 0x20)) >= 0 ? (int)*(float*)(br + 0x20) : -1, fireWant[k], fireGo[k]);
+        fireWant[k] = fireGo[k] = 0;
+    }
 }
 
 static void aggressiveTurn(char* g, char* v, char* t)
@@ -1732,7 +1777,7 @@ static void avoid(char* g, char* v)
  * ramming a target right ahead, or off the route map (no data there). Replaces the 4-frame wall feeler (avoid). */
 #define GD_LOOK 6
 #define GD_HOLD 6
-static float GDK[4] = { 20.0f, 0.4f, 8.0f, 150.0f };    /* frames of travel to keep free, min speed (units / frame), ground band, fall depth */
+static float GDK[4] = { 10.0f, 0.4f, 8.0f, 150.0f };   /* (g185: 20 -> 10 frames: on Death5 it turned them every few seconds) */    /* frames of travel to keep free, min speed (units / frame), ground band, fall depth */
 static float gdGround[8][3];
 static signed char gdFell[8];
 extern float tmbr_NavCell(void);
@@ -1972,11 +2017,12 @@ keepFlee:
     r = aiFrame(v);
     tmbr_PerfAdd(1, t0);
     if (swap) F(g, 0x9FD40 + k * 4) = save;
+    if (SIMPLE_DRIVING) simpleFire(g, v);    /* g185: every frame, any driver mode, before route driving */
     t0 = tmbr_Cycles();
 #if TMBR_NAV
     if (navOn() && tmbr_NavDrive(g, v, t)) { tmbr_PerfAdd(2, t0); return r; }
 #endif
-    if (SIMPLE_DRIVING || !roofMap()) aggressiveTurn(g, v, t);   /* (simple driving: the trigger only, every map) */
+    if (!SIMPLE_DRIVING && !roofMap()) aggressiveTurn(g, v, t);   /* (simple driving: simpleFire above instead) */
     tmbr_PerfAdd(2, t0);
     return r;
 }
