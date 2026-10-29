@@ -1864,8 +1864,9 @@ static int navOn(void) { return SIMPLE_DRIVING ? navHelpMap() : !roofNoNav(); }
 /* idle check (g183): every 30 frames; a bot that moved under IDLE_MOVE units in the last 3 s while alive and not
  * in its respawn shield is sent cruising to a far zone (the game's own driving takes it there) */
 #define IDLE_MOVE 60
-static float idlePos[8][2];
-static int idleN[8];
+static float idlePos[8][2], idleSpot[8][2];
+static int idleN[8], idleRep[8], idleMan[8];
+extern int gamePlaceAtStart(char* game, char* v, int pt) __asm__("func_0013D7B8");
 static void idleCheck(char* g, char* v)
 {
     int i = (int)(v - g) / 0x31B0 & 7;
@@ -1873,6 +1874,14 @@ static void idleCheck(char* g, char* v)
     float* p;
     int m;
     if (idleHunt[i] > 0) idleHunt[i]--;
+    if (idleMan[i] > 0 && F(v, 0x2028)) {    /* g187: wriggle out - reverse with the wheel turned, then drive out the other way */
+        unsigned char* pad = PAD(v);
+        int side = (idleRep[i] & 1) ? 1 : -1;
+        idleMan[i]--;
+        pad[2] = 0; pad[7] = 0;
+        if (idleMan[i] >= 30) { pad[4] = 0; pad[6] = 1; pad[9] = side < 0; pad[0xA] = side > 0; }
+        else { pad[6] = 0; pad[4] = 1; pad[9] = side > 0; pad[0xA] = side < 0; }
+    }
     if ((thinkTick + i) % 30 || !F(v, 0x2028) || !drv) return;
     p = (float*)POS(v);
     m = (int)(p[0] - idlePos[i][0]); if (m < 0) m = -m;
@@ -1880,6 +1889,24 @@ static void idleCheck(char* g, char* v)
     if (m >= IDLE_MOVE || *(signed char*)(v + 0x497) >= 4) { idlePos[i][0] = p[0]; idlePos[i][1] = p[1]; idleN[i] = 0; return; }
     if (++idleN[i] < 4) return;                                /* 2 s (g186: was 3) */
     idleN[i] = 0; idlePos[i][0] = p[0]; idlePos[i][1] = p[1];
+    /* g187 (Ark: one still sat and did nothing - log: hunting, 1 unit of movement in a minute, right after a respawn):
+     * the same spot again and again: 3rd time (6 s) a wriggle-out, 6th time (12 s) the game puts it on a start point */
+    {
+        int sm = (int)(p[0] - idleSpot[i][0]); if (sm < 0) sm = -sm;
+        { int sy = (int)(p[1] - idleSpot[i][1]); sm += sy < 0 ? -sy : sy; }
+        if (sm < 80) idleRep[i]++; else { idleRep[i] = 1; idleSpot[i][0] = p[0]; idleSpot[i][1] = p[1]; }
+        if (idleRep[i] >= 6) {
+            scePrintf("TMBR idle: bot %d stuck at %d %d %d for 12 s, back on a start point (level %d)\n", i, (int)p[0], (int)p[1], (int)p[2], tmbr_levelIndex);
+            gamePlaceAtStart(g, v, -1);
+            idleRep[i] = 0;
+            return;
+        }
+        if (idleRep[i] >= 3) {
+            idleMan[i] = 75;
+            scePrintf("TMBR idle: bot %d stuck at %d %d %d, wriggles out (level %d)\n", i, (int)p[0], (int)p[1], (int)p[2], tmbr_levelIndex);
+            return;
+        }
+    }
     {   /* g186 (Ark 2026-10-29: "sits in a spot and won't move until something gets near"): cruising did not move
          * them (the game's cruise parks at its zone) - hunt the nearest enemy instead, for 15 s, at any distance */
         int k, bd = 0x7FFFFFFF;
@@ -1933,7 +1960,6 @@ static void edgeGuard(char* g, char* v)
  * rather than dying, while players still die"): a bot that drops well below the lowest roof (route map minimum
  * - ~130) is put back on a start point by the game's own placement (func_0013D7B8: start point, speed zeroed,
  * heading set) and loses 5 % of its max health (never below 1). Humans are not touched. */
-extern int gamePlaceAtStart(char* game, char* v, int pt) __asm__("func_0013D7B8");
 static float RESC[4] = { -230.0f, 0.0f, 0.05f, 1.0f };   /* Skyscrapers / Mini Skyscrapers floor, Warhawk's roof floor, penalty, min hp */
 static void fallRescue(char* g, char* v)
 {
