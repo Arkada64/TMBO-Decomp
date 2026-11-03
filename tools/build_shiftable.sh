@@ -30,6 +30,7 @@ if [ "$MODS" = 1 ]; then
   # bisect knobs (the private build copy is re-synced every time, so editing its mods/ is fine)
   [ -n "$TMBR_STACK" ] && sed -i "s/^.set TMBR_STACK_SIZE, .*/.set TMBR_STACK_SIZE, $TMBR_STACK/" mods/memory.s && echo "stack $TMBR_STACK"
   [ "$TMBR_NO_PEDS" = 1 ] && sed -i '/^Pedestrians Online/d' mods/tmbr_sections.txt && echo "no peds"
+  [ "$TMBR_NO_REVIVAL_DNS" = 1 ] && sed -i '/^Force Revival Server DNS/d' mods/pnach_sections.txt && echo "no revival DNS"
   [ "$TMBR_NO_POSTLINK" = 1 ] && : > mods/postlink.txt && echo "no postlink"
   python3 tools/mods/apply_mods.py apply
   mkdir -p build/mods; TXT=""; BSS=""
