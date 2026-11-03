@@ -19,4 +19,4 @@ for l in lvls:
     rf, of = set(r["fod"]), set(o["fod"]) if o else set()
     print(f"{l:9s} peds retail {len(rp):2d} online {len(op_):2d} missing {sorted(rp - op_)[:10]}"
           f" | fodder ids retail {len(rf):3d} online {len(of):3d} missing {len(rf - of)}", flush=True)
-json.dump(res, open("/mnt/c/Users/Ark/Desktop/TMB Decomp/fx/survey2.json", "w"))
+json.dump(res, open("/mnt/d/TMB Decomp/fx/survey2.json", "w"))

@@ -5,9 +5,9 @@ Level database analyzer (retail vs online). NGP member data is stored as if load
 Usage: python3 ngpdb.py dump LEVEL   |   extract LEVEL  (caches to fx/)
 """
 import sys, struct, zlib, os, collections
-sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp")
+sys.path.insert(0, "/mnt/d/TMB Decomp")
 from isols import opener, walk
-B = "/mnt/c/Users/Ark/Desktop/TMB Decomp/"
+B = "/mnt/d/TMB Decomp/"
 FX = B + "fx/"; os.makedirs(FX, exist_ok=True)
 IMGS = {"retail": B + "Twisted Metal - Black.iso", "online": B + "Twisted Metal - Black Online.bin"}
 BASE = 0x980000

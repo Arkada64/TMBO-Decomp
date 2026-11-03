@@ -2,7 +2,7 @@
 # Which ped-related names (models/anims/textures) are in each map's NGP, retail vs online?
 import sys, re
 
-sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp")
+sys.path.insert(0, "/mnt/d/TMB Decomp")
 from pedcount import files, members, W
 
 want = ("/LVL/FREEWAY.NGP", "/LVL/PRISON.NGP", "/LVL/SUBURB.NGP")

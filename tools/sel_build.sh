@@ -1,7 +1,7 @@
 #!/bin/bash
 # sel_build.sh NAME SKIPLIST [env...] : test build with some mod hook groups left out -> test/SEL_NAME.ELF + .bat
 # (NAME "normal" = the regular test build -> TRAFFIC_TEST.ELF / FREECAM_TEST.ELF)
-cd '/mnt/c/Users/Ark/Desktop/TMB Decomp'
+cd '/mnt/d/TMB Decomp'
 N=$1; S=$2; shift 2; [ "$S" = - ] && S=""     # "-" = skip nothing
 env TMBR_TEST=1 TMBR_SKIP="$S" "$@" bash mods_copy_build.sh > copybuild_$N.log 2>&1
 echo "$N: done=$(grep -c COPYDONE copybuild_$N.log) $(grep -E 'hooks left out|text pad|^stack|no peds|no postlink|rror|FAILED|Pedestrians' copybuild_$N.log | head -5 | tr '\n' ' ')"

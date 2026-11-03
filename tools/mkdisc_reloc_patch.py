@@ -1,6 +1,6 @@
 # mkdisc.py: when a directory's extent is full, move it to the end of the image with one more sector
 # (root record, its "." record, the L/M path tables updated).
-p = "/mnt/c/Users/Ark/Desktop/TMB Decomp/mkdisc.py"
+p = "/mnt/d/TMB Decomp/mkdisc.py"
 s = open(p).read()
 old = '''        tail = dirrecs(secs[last])[1]
 '''

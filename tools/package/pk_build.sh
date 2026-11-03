@@ -5,7 +5,7 @@
 set -e
 # Layout (Ark 2026-10-26): top level = TMBR.exe, README.txt, bios\, game\, emulator\ (all of PCSX2; it makes its own
 # cache / logs / snaps ... folders there when it needs them).
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; R="/mnt/c/Users/Ark/Desktop/TMBO Ready2Play Edition"; P="$W/release/TMBR_Player"; E="$P/emulator"
+W="/mnt/d/TMB Decomp"; R="/mnt/d/TMBR/emulator"; P="$W/release/TMBR_Player"; E="$P/emulator"
 mkdir -p "$P"/{bios,game} "$E"/{inis,memcards}
 cp -u "$R"/pcsx2-qt.exe "$R"/*.dll "$R"/qt.conf "$E"/   # (not updater.exe: no auto updates, Ark 2026-10-26)
 cp -ru "$R"/QtPlugins "$R"/D3D12 "$R"/resources "$E"/

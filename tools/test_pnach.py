@@ -4,8 +4,8 @@ carrying over the revival-server essentials (DNS, bugfixes, skip intros) with ad
 into the shifted build via the symbol tables."""
 import struct, re, bisect
 from pathlib import Path
-R = Path.home() / "tmbo_decomp"; T = Path("/mnt/c/Users/Ark/Desktop/TMB Decomp/test")
-SRC = Path("/mnt/c/Users/Ark/Desktop/TMBO Ready2Play Edition/PCSX2/patches/SCUS-97196_C54E5CF2.pnach")
+R = Path.home() / "tmbo_decomp"; T = Path("/mnt/d/TMB Decomp/test")
+SRC = Path("/mnt/d/TMBR/emulator/PCSX2/patches/SCUS-97196_C54E5CF2.pnach")
 def crc(p):
     d = p.read_bytes(); d += b"\0" * (-len(d) % 4); c = 0
     for (w,) in struct.iter_unpack("<I", d): c ^= w

@@ -3,7 +3,7 @@
 # of our C functions, put that function on the skip list (cloud/in/nm_skip.txt) and go again. Stops when a run
 # is clean (60 fps lines and no faults), when a fault is outside our C (needs a look), or after N rounds.
 #   bash cloud/in/nm_loop.sh N SRC.c ...
-cd "/mnt/c/Users/Ark/Desktop/TMB Decomp"
+cd "/mnt/d/TMB Decomp"
 N=$1; shift
 touch cloud/in/nm_skip.txt; L=cloud/qb_out/nm_loop.txt; echo "start $(date)" > $L
 for r in $(seq 1 $N); do

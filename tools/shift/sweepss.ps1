@@ -20,5 +20,5 @@ foreach ($V in ($Vs -split ',')) {
   "$V pressmode=$press tlb=$tlb ss=$([bool]$ss)" | Add-Content $out
 }
 Copy-Item "$ini.sweep.bak" $ini -Force
-wsl -e bash "/mnt/c/Users/Ark/Desktop/TMB Decomp/ext.sh" @($Vs -split ',') | Out-Null
+wsl -e bash "/mnt/d/TMB Decomp/ext.sh" @($Vs -split ',') | Out-Null
 "SWEEPDONE" | Add-Content $out

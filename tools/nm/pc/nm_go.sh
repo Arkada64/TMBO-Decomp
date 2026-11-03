@@ -7,7 +7,7 @@ echo "start $(date)" > "$L"
 cd ~/tmbo_decomp && git fetch -q reloaded >> "$L" 2>&1 || echo "fetch failed" >> "$L"
 rm -rf $T; mkdir -p $T && git archive reloaded/main tools/nm_apply.py tools/nm_ld.py tools/nm_build.sh tools/nm tools/qb | tar -x -C $T || { echo "archive failed" >> "$L"; exit 1; }
 cd $T/tools
-sed -i 's#/mnt/c/Users/Ark/Desktop/TMB Decomp#/mnt/d/TMB Decomp#g' nm_build.sh
+sed -i 's#/mnt/d/TMB Decomp#/mnt/d/TMB Decomp#g' nm_build.sh
 sed -i "s#cp \"\$W/cloud/in/nm_apply.py\" tools/#cp $T/tools/nm_apply.py tools/#; s#cp \"\$W/cloud/in/bytefix.py\" tools/#cp $T/tools/nm/bytefix.py tools/#; s#cp \"\$W\"/cloud/in/hand/\*.c logs/hand/#cp $T/tools/nm/hand/*.c logs/hand/#; s#cp \"\$W/cloud/in/nm_ld.py\" tools/#cp $T/tools/nm_ld.py tools/#" nm_build.sh
 bash nm_build.sh >> "$L" 2>&1
 python3 - >> "$L" 2>&1 <<'PY'

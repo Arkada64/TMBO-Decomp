@@ -3,12 +3,12 @@
 #   S1 = start of .text (everything moves)   S2 = end of .text (data/rodata/sdata/bss move)
 #   S3 = before .sdata (sdata/bss move)        S4 = start of .bss (only bss moves)
 cd ~/tmbo_decomp && source .venv/bin/activate
-OUT="/mnt/c/Users/Ark/Desktop/TMB Decomp/test"; P="/mnt/c/Users/Ark/Desktop/TMBO Ready2Play Edition/PCSX2/patches"
+OUT="/mnt/d/TMB Decomp/test"; P="/mnt/d/TMBR/emulator/PCSX2/patches"
 LD=config/US/SCUS_971.96.ld
 cp $LD /tmp/ld.bak; cp build.ninja /tmp/ninja.bak; cp asm/gcc/_crt0.s /tmp/crt0.bak; rm -f /tmp/bss.bak
 rm -f build/SCUS_971.96.rom; ninja > /dev/null 2>&1; cmp -s build/SCUS_971.96.rom disks/SCUS_971.96.rom || { echo "base not matching"; exit 1; }
 mips-linux-gnu-nm -n build/SCUS_971.96.elf > logs/bis_nm_base.txt
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cp "$W/symbase.py" "$W/symbolize_data.py" "$W/make_shiftable.py" tools/
+W="/mnt/d/TMB Decomp"; cp "$W/symbase.py" "$W/symbolize_data.py" "$W/make_shiftable.py" tools/
 python3 tools/symbolize_data.py build/SCUS_971.96.elf
 cp "$W/fix_rawlo.py" tools/; python3 tools/fix_rawlo.py build/SCUS_971.96.elf
 rm -f build/SCUS_971.96.rom; ninja > /dev/null 2>&1; cmp -s build/SCUS_971.96.rom disks/SCUS_971.96.rom || { echo "base broken after symbolize"; exit 1; }
@@ -98,7 +98,7 @@ for l in src.splitlines():
         if mm: l = f"{mm.group(1)}{mm.group(2)}{tr(int(mm.group(3), 16)):07X}{mm.group(4)}"
         out.append(l)
 if src and os.path.isdir(P): open(f'{P}/{c:08X}.pnach', 'w').write("\n".join(out) + "\n")
-open(f'{OUT}/Run {V}.bat', 'w').write('@echo off\r\nset P=C:\\Users\\Ark\\Desktop\\TMBO Ready2Play Edition\\PCSX2\r\n'
+open(f'{OUT}/Run {V}.bat', 'w').write('@echo off\r\nset P=D:\\TMBR\\emulator\\PCSX2\r\n'
     f'"%P%\\pcsx2-qt.exe" -elf "%~dp0{V}.ELF" -- "%P%\\_games\\Twisted Metal - Black Online (USA).chd"\r\n')
 print(f"{V}: CRC {c:08X}, symbol moves {dict(moves.most_common(3))}")
 EOF

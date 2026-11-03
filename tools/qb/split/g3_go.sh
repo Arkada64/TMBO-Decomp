@@ -1,7 +1,7 @@
 #!/bin/bash
 # guest car-select test: build (guests pick on the real car select, reticle charging), Suburbs 130 %, multitap,
 # controller 2 presses START in the waiting room, picks 2 cars right, confirms; pictures of the pick and the match
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; L=cloud/qb_out/g3.txt; S=cloud/in/g3
+W="/mnt/d/TMB Decomp"; cd "$W"; L=cloud/qb_out/g3.txt; S=cloud/in/g3
 echo "waiting for a gap $(date)" >> $L
 while pgrep -f "[t]ools/qb/qbrun.py" > /dev/null; do sleep 15; done
 bash cloud/in/stopall.sh > /dev/null 2>&1; sleep 5

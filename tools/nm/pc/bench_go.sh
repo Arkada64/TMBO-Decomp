@@ -1,7 +1,7 @@
 #!/bin/bash
 # function test bench snapshot: stop the night run, build with every draft linked beside its asm (NM_BENCH=1),
 # boot a match with it and keep the mid-match savestate, then restart the night run.
-cd "/mnt/c/Users/Ark/Desktop/TMB Decomp"
+cd "/mnt/d/TMB Decomp"
 L=cloud/qb_out/bench_go.txt
 echo "start $(date)" > $L
 bash cloud/in/stopall.sh >> $L 2>&1

@@ -1,5 +1,5 @@
 #!/bin/bash
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; L=cloud/qb_out/rdiag.txt; R=cloud/in/retail
+W="/mnt/d/TMB Decomp"; cd "$W"; L=cloud/qb_out/rdiag.txt; R=cloud/in/retail
 echo "waiting $(date)" > $L
 while pgrep -f "tools/qb/qbrun.py" > /dev/null || pgrep -f rstress_go > /dev/null; do sleep 15; done
 bash cloud/in/stopall.sh > /dev/null 2>&1; sleep 5

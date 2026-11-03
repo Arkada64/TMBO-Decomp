@@ -28,7 +28,7 @@ for f in files:
         n31 = txt.count("0x31B0")
         out.append((nice(fn), f.replace(R, ""), n31, bounds, cnt, calls))
 out.sort(key=lambda x: -x[2])
-with open("/mnt/c/Users/Ark/Desktop/TMB Decomp/fx/vehloops.txt", "w") as o:
+with open("/mnt/d/TMB Decomp/fx/vehloops.txt", "w") as o:
     for fn, f, n31, b, c, calls in out:
         uniq = list(dict.fromkeys(calls))
         o.write(f"{fn} [{f}] x{n31} slti{b} cnt{c} calls: {', '.join(uniq[:14])}{' ...' if len(uniq) > 14 else ''}\n")

@@ -1,6 +1,6 @@
 #!/bin/bash
 # retail split-screen stress between night runs: 2/3/4 players on Suburbs at the EE cycle rates given (default 0 = 100 %)
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; L=cloud/qb_out/rstress.txt; R=cloud/in/retail
+W="/mnt/d/TMB Decomp"; cd "$W"; L=cloud/qb_out/rstress.txt; R=cloud/in/retail
 echo "waiting for a gap $(date)" >> $L
 while pgrep -f "tools/qb/qbrun.py" > /dev/null; do sleep 15; done
 bash cloud/in/stopall.sh > /dev/null 2>&1; sleep 5

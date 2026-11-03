@@ -1,7 +1,7 @@
 #!/bin/bash
 # Rebuild every content pack, verify, and make the test disc. Usage: bash buildpacks.sh
 set -e
-cd "/mnt/c/Users/Ark/Desktop/TMB Decomp"
+cd "/mnt/d/TMB Decomp"
 for p in "FREEWAY ZFP ped" "PRISON ZRP ped"; do
   set -- $p
   python3 mkpack.py $1 $2 $3 > /dev/null

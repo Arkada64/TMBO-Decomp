@@ -3,7 +3,7 @@
 # then link SHIFTABLE with a 72-byte insertion and write SHIFT_TEST.ELF + its patch file.
 # NOTE: never run `configure.py generate` here: it re-runs splat and wipes asm/ edits.
 cd ~/tmbo_decomp && source .venv/bin/activate
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; OUT="$W/test"
+W="/mnt/d/TMB Decomp"; OUT="$W/test"
 cp "$W/symbolize_data.py" "$W/make_shiftable.py" "$W/test_pnach.py" tools/
 t0=$(date +%s)
 git checkout -q -- config/US/undefined_syms_auto.txt config/US/undefined_funcs.txt
@@ -47,7 +47,7 @@ import struct
 d = bytearray(open('build/SCUS_971.96.elf', 'rb').read())
 struct.pack_into('<I', d, 0x18, 0x100008)
 ph = struct.unpack_from('<I', d, 0x1C)[0]; struct.pack_into('<I', d, ph + 12, struct.unpack_from('<I', d, ph + 8)[0])
-open('/mnt/c/Users/Ark/Desktop/TMB Decomp/test/SHIFT_TEST.ELF', 'wb').write(d)
+open('/mnt/d/TMB Decomp/test/SHIFT_TEST.ELF', 'wb').write(d)
 def load(p):
     r = {}
     for l in open(p):
@@ -62,5 +62,5 @@ EOF
 cp /tmp/ai.c.bak src/tmb/ai.c; cp /tmp/build.ninja.bak build.ninja; cp /tmp/ld.bak config/US/SCUS_971.96.ld; cp /tmp/crt0.bak asm/gcc/_crt0.s
 rm -f build/SCUS_971.96.rom; ninja > logs/shift3_restore.log 2>&1 && cmp -s build/SCUS_971.96.rom disks/SCUS_971.96.rom && echo "restored: byte-identical again"
 python3 tools/test_pnach.py
-cp "$OUT"/*.pnach "/mnt/c/Users/Ark/Desktop/TMBO Ready2Play Edition/PCSX2/patches/"
+cp "$OUT"/*.pnach "/mnt/d/TMBR/emulator/PCSX2/patches/"
 echo "done in $(( $(date +%s) - t0 ))s"

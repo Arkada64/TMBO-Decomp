@@ -9,11 +9,11 @@
 # run, nothing deleted). Needs test/TMBR_TEST.ELF from mktest.sh (or mods_copy_build.sh) built with these mods.
 #   bash tools/lost/mklostslots.sh            (from anywhere; works in "TMB Decomp")
 set -e -o pipefail
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; S=cloud/lost2; O=packs/lost3
+W="/mnt/d/TMB Decomp"; cd "$W"; S=cloud/lost2; O=packs/lost3
 mkdir -p $O/LVL $O/PTS $O/PCAR
 python3 - <<'PY'
 import sys, struct, zlib, shutil, os
-sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp")
+sys.path.insert(0, "/mnt/d/TMB Decomp")
 from ngpdb import rawfile
 S, O = "cloud/lost2", "packs/lost3"
 MAPS = ["SC", "SU", "GD", "ND", "ST"]          # Lost's menu order = mods/lostslots.c LCODE
@@ -75,5 +75,5 @@ sys.argv = ["../mkdisc.py"] + sys.argv[1:]
 runpy.run_path("../mkdisc.py", run_name="__main__")
 PY
 ) | tail -12
-printf '@echo off\r\nset P=C:\\Users\\Ark\\Desktop\\TMBO Ready2Play Edition\r\n"%%P%%\\pcsx2-qt.exe" -elf "%%~dp0TMBR_TEST.ELF" -- "%%~dp0LOSTSLOTS.iso"\r\nfor /f %%%%t in ('"'"'powershell -NoProfile -Command Get-Date -Format yyyyMMdd_HHmmss'"'"') do set TS=%%%%t\r\ncopy /y "%%P%%\\logs\\emulog.txt" "%%~dp0..\\logs_runs\\LOSTSLOTS_%%TS%%.txt" > nul\r\n' > "test/Run LOSTSLOTS.bat"
+printf '@echo off\r\nset P=D:\\TMBR\\emulator\r\n"%%P%%\\pcsx2-qt.exe" -elf "%%~dp0TMBR_TEST.ELF" -- "%%~dp0LOSTSLOTS.iso"\r\nfor /f %%%%t in ('"'"'powershell -NoProfile -Command Get-Date -Format yyyyMMdd_HHmmss'"'"') do set TS=%%%%t\r\ncopy /y "%%P%%\\logs\\emulog.txt" "%%~dp0..\\logs_runs\\LOSTSLOTS_%%TS%%.txt" > nul\r\n' > "test/Run LOSTSLOTS.bat"
 ls -la test/LOSTSLOTS.iso; echo LOSTSLOTS_DONE

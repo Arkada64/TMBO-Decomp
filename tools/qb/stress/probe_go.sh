@@ -1,6 +1,6 @@
 #!/bin/bash
 # stress-test probes between night rounds: level list + lobby flow pictures (minimized), then the night run again
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; L=cloud/qb_out/probe.txt
+W="/mnt/d/TMB Decomp"; cd "$W"; L=cloud/qb_out/probe.txt
 echo "waiting for a gap in the night run $(date)" > $L
 while pgrep -f "tools/qb/qbrun.py" > /dev/null; do sleep 15; done
 bash cloud/in/stopall.sh > /dev/null 2>&1; sleep 5

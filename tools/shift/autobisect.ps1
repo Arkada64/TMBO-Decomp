@@ -6,7 +6,7 @@ $P = "C:\Users\Ark\Desktop\TMBO Ready2Play Edition"
 if (!(Test-Path "$P\pcsx2-qt.exe")) { $P = "$P\PCSX2" }
 $ini = "$P\inis\PCSX2.ini"
 $res = "$W\bisect_result.txt"
-$L = "/mnt/c/Users/Ark/Desktop/TMB Decomp"   # same folder, as WSL sees it
+$L = "/mnt/d/TMB Decomp"   # same folder, as WSL sees it
 Add-Type -AssemblyName System.Drawing
 function Log($s) { $line = "$(Get-Date -Format HH:mm:ss) $s"; Write-Host $line; Add-Content $res $line }
 function Stripes($png) {

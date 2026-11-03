@@ -2,7 +2,7 @@
 """Story phase 3 survey: every level's node ids (callback ids) and its other files, retail vs online.
 Run from TMB Decomp: python3 cloud/in/g3/survey3.py > cloud/qb_out/survey3.txt"""
 import sys, collections
-sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp"); sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp/tools/shift")
+sys.path.insert(0, "/mnt/d/TMB Decomp"); sys.path.insert(0, "/mnt/d/TMB Decomp/tools/shift")
 from ngpdb import get, disc
 from ngptrav import visit
 def cls(i):

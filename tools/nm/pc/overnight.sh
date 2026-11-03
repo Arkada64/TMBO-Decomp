@@ -2,7 +2,7 @@
 # Overnight (2026-10-24): after the view.c bisect finishes, put working C into every file that has drafts,
 # check the normal build stays byte-identical, build the C version (test/NM_TEST.ELF), boot-test it once,
 # then resume the permuter. Log: cloud/qb_out/overnight.txt
-cd "/mnt/c/Users/Ark/Desktop/TMB Decomp"
+cd "/mnt/d/TMB Decomp"
 L=cloud/qb_out/overnight.txt; echo "start $(date)" > $L
 while pgrep -f nm_bisect.sh > /dev/null; do sleep 60; done
 echo "bisect done $(date): $(grep CULPRIT cloud/qb_out/nm_bisect.txt)" >> $L

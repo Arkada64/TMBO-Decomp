@@ -6,7 +6,7 @@
 # 0x1881A8 (InitializeFodderCars -> func_001B0688 -> the HighwayDirector::init functions at 0x1B0D30.. and setNumSegments, only called by them).
 # Needs the matching ELF built in the private copy (build/SCUS_971.96.elf, with symbols).
 set -e
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; T=/home/ark/modshome/tmbo_decomp; B=$T/build/SCUS_971.96.elf
+W="/mnt/d/TMB Decomp"; T=/home/ark/modshome/tmbo_decomp; B=$T/build/SCUS_971.96.elf
 CAVE=0x1B0978; CAVE_END=0x1B10E0
 # second cave for the C parts: getVehicleSection .. func_001B1B68 (0x1B10E8..0x1B1CC8), all only reachable
 # from the two NOPed calls (setTrafficDensity at 0x1B10E0 between them is live)

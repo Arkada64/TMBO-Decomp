@@ -10,10 +10,10 @@ SCRIPT.json: {"steps": [["CROSS", 10], ["", 120], ...], "loop_from": 12,
   shots = seconds after launch to capture; stop = seconds after launch to kill PCSX2; state_at = seconds after launch to save a savestate (PINE). Output: qb_out/<timestamp>/ (emulog.txt + PNGs)."""
 import sys, os, json, struct, time, subprocess, shutil, glob, argparse
 
-W = "/mnt/c/Users/Ark/Desktop/TMB Decomp"
-P = "/mnt/c/Users/Ark/Desktop/TMBO Ready2Play Edition"
-WP = r"C:\Users\Ark\Desktop\TMBO Ready2Play Edition"
-WW = r"C:\Users\Ark\Desktop\TMB Decomp"
+W = "/mnt/d/TMB Decomp"
+P = "/mnt/d/TMBR/emulator"
+WP = r"D:\TMBR\emulator"
+WW = r"D:\TMB Decomp"
 BTN = dict(SELECT=0x1, L3=0x2, R3=0x4, START=0x8, UP=0x10, RIGHT=0x20, DOWN=0x40, LEFT=0x80, L2=0x100, R2=0x200,
            L1=0x400, R1=0x800, TRIANGLE=0x1000, CIRCLE=0x2000, CROSS=0x4000, SQUARE=0x8000)
 MAGIC = struct.pack('<I', 0x42514D54)

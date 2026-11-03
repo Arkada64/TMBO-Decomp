@@ -2,7 +2,7 @@
 # List the LVL files of FREEWAY / PRISON / SUBURB / JUNKYARD on both discs, and the members inside each NGP.
 import sys, struct
 
-sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp")
+sys.path.insert(0, "/mnt/d/TMB Decomp")
 from pedcount import files, members, W
 
 for img, tag in (

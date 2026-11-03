@@ -2,11 +2,11 @@
 # Count pedestrian (0xBB8..0xF9F) and fodder (0x401..0xBB7) node heads in every LVL/*.NGP, retail vs online.
 import sys, struct, zlib, collections
 
-sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp")
+sys.path.insert(0, "/mnt/d/TMB Decomp")
 sys.path.insert(0, "/home/ark/tmbo_decomp/tools/shift")
 from isols import opener, walk
 
-W = "/mnt/c/Users/Ark/Desktop/TMB Decomp/"
+W = "/mnt/d/TMB Decomp/"
 
 
 def files(img):

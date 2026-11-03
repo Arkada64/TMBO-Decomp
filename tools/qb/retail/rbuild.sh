@@ -2,7 +2,7 @@
 # build the retail harness and a patched ELF: rbuild.sh SCRIPT.json OUT.ELF   (in WSL)
 set -e
 S=$(realpath "$1"); O=$(realpath -m "$2")
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; R=/home/ark/tmbo_decomp; SN=tools/compilers/ee-gcc2.95.3-114
+W="/mnt/d/TMB Decomp"; R=/home/ark/tmbo_decomp; SN=tools/compilers/ee-gcc2.95.3-114
 H="$W/cloud/in/retail"; T=/home/ark/retailqb; mkdir -p $T
 cp "$H/retail_qb.c" $T/
 cd $R && "$R/$SN/bin/ee-gcc.exe" "-B$SN/lib/gcc-lib/ee/2.95.3/" -c -O2 -G0 $T/retail_qb.c -o $T/retail_qb.o 2>&1 | grep -v "^$" || true

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Final mod-build disc: stop my automation, final_ps2.sh (bots v5 / nav v5 / peds + mktest), then a standalone ISO
 # that boots the mod ELF itself: release/TMB Reloaded/TMB Reloaded.iso (label TMB_RELOADED). Restarts the crash loop.
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; L=cloud/qb_out/final.txt; exec > $L 2>&1
+W="/mnt/d/TMB Decomp"; cd "$W"; L=cloud/qb_out/final.txt; exec > $L 2>&1
 echo "start $(date)"
 bash cloud/in/stopall.sh; sleep 5
 tasklist.exe | grep -qi pcsx2 && { echo "PCSX2 is open (you are playing?) - not building"; exit 1; }

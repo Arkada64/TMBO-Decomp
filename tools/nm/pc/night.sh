@@ -7,7 +7,7 @@
 #   4. otherwise (fault in asm, hang, exit): halve the files with C until one file is left, then halve that
 #      file's functions until one is left (bisect)                  -> skip it, go again
 # Every skip is a line in cloud/in/nm_skip.txt with the reason. Log: cloud/qb_out/night.txt (opens in Notepad).
-cd "/mnt/c/Users/Ark/Desktop/TMB Decomp"
+cd "/mnt/d/TMB Decomp"
 L=cloud/qb_out/night.txt; NH=/home/ark/nmhome/tmbo_decomp
 END=$(( $(date +%s) + ${1:-10} * 3600 ))
 echo "start $(date), until $(date -d @$END)" > $L

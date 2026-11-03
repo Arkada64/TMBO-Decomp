@@ -3,7 +3,7 @@ z = zipfile.ZipFile(sys.argv[1]); d = z.read('PCSX2 Internal Structures.dat')
 t = d.find(b'cpuRegs\x00'); b = t + 0x20
 cp0 = struct.unpack_from('<32I', d, b + 512 + 32)
 g = lambda r: struct.unpack_from('<I', d, b + 16 * r)[0]
-out = subprocess.run(['nm', '-n', '/mnt/c/Users/Ark/Desktop/TMB Decomp/test/QUICK.ELF'], capture_output=True, text=True).stdout
+out = subprocess.run(['nm', '-n', '/mnt/d/TMB Decomp/test/QUICK.ELF'], capture_output=True, text=True).stdout
 s = [(int(p[0], 16), p[2]) for p in (l.split() for l in out.splitlines()) if len(p) == 3 and p[1] in 'tTwW']
 a = [x for x, _ in s]
 def nm(v):

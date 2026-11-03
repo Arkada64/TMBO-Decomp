@@ -1,7 +1,7 @@
 #!/bin/bash
 # recompile every draft for the bench (no boot: the plain build and its snapshot don't change) with the current
 # bytefix / hand C, in a private tree (~/benchhome), then link cloud/bench/DRAFTS2.ELF
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; L="$W/cloud/qb_out/redrafts.txt"
+W="/mnt/d/TMB Decomp"; L="$W/cloud/qb_out/redrafts.txt"
 H=/home/ark/benchhome; D=$H/tmbo_decomp; O=$H/bench_o
 echo "start $(date)" > "$L"
 mkdir -p $H; rsync -a --delete --exclude 'logs/perm*' --exclude 'logs/fast' /home/ark/tmbo_decomp/ $D/

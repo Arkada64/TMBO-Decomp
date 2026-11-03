@@ -9,7 +9,7 @@ top-most wanted node (in traversal order). Data = every chunk reachable through 
 import sys, os, bisect, struct, json, collections
 from ngpdb import get, w, head, BASE
 from ngptrav import traverse
-OUT = "/mnt/c/Users/Ark/Desktop/TMB Decomp/packs/"; os.makedirs(OUT, exist_ok=True)
+OUT = "/mnt/d/TMB Decomp/packs/"; os.makedirs(OUT, exist_ok=True)
 RANGES = {"ped": (3000, 4000), "fod": (0x401, 0xBB8)}
 
 def load(lvl, tag="retail"):

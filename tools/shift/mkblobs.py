@@ -10,7 +10,7 @@ Cuts inside the model data only where the set of owning instances changes (point
 import sys, struct, json, bisect, collections
 import mkpack
 from ngpdb import w, BASE
-OUT = "/mnt/c/Users/Ark/Desktop/TMB Decomp/packs/"
+OUT = "/mnt/d/TMB Decomp/packs/"
 SECTOR = 2048
 A128 = lambda x: (x + 127) & ~127
 # online fixed memory map

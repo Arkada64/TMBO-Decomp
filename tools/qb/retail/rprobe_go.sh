@@ -1,6 +1,6 @@
 #!/bin/bash
 # retail probe between night runs: build the harness ELF, boot retail TMB minimized with pictures, then the night run
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; L=cloud/qb_out/rprobe.txt
+W="/mnt/d/TMB Decomp"; cd "$W"; L=cloud/qb_out/rprobe.txt
 echo "waiting for a gap $(date)" > $L
 while pgrep -f "tools/qb/qbrun.py" > /dev/null; do sleep 15; done
 bash cloud/in/stopall.sh > /dev/null 2>&1; sleep 5

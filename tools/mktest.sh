@@ -12,7 +12,7 @@ B="ZZP.NGP ZZP.PTR ZZP.RTX ZZP.TEX ACAR/ZZA.NGP ACAR/ZZA.PTR ACAR/ZZA.RTX ACAR/Z
 cd packs && rm -f ../test/TMBR_TEST.iso
 python3 ../mkdisc.py ../test/TMBR_TEST.iso $B | tail -3
 cd .. && python3 checkdisc.py test/TMBR_TEST.iso $B | tail -1
-printf '@echo off\r\nset P=C:\\Users\\Ark\\Desktop\\TMBO Ready2Play Edition\r\n"%%P%%\\pcsx2-qt.exe" -elf "%%~dp0TMBR_TEST.ELF" -- "%%~dp0TMBR_TEST.iso"\r\nfor /f %%%%t in ('"'"'powershell -NoProfile -Command Get-Date -Format yyyyMMdd_HHmmss'"'"') do set TS=%%%%t\r\ncopy /y "%%P%%\\logs\\emulog.txt" "%%~dp0..\\logs_runs\\TMBR_TEST_%%TS%%.txt" > nul\r\n' > "test/Run TMBR_TEST.bat"
+printf '@echo off\r\nset P=D:\\TMBR\\emulator\r\n"%%P%%\\pcsx2-qt.exe" -elf "%%~dp0TMBR_TEST.ELF" -- "%%~dp0TMBR_TEST.iso"\r\nfor /f %%%%t in ('"'"'powershell -NoProfile -Command Get-Date -Format yyyyMMdd_HHmmss'"'"') do set TS=%%%%t\r\ncopy /y "%%P%%\\logs\\emulog.txt" "%%~dp0..\\logs_runs\\TMBR_TEST_%%TS%%.txt" > nul\r\n' > "test/Run TMBR_TEST.bat"
 if [ "${CLEAN:-0}" = 1 ]; then
   cd test
   for f in *; do

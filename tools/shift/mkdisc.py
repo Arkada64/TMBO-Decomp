@@ -7,9 +7,9 @@ directory's sectors (names starting with Z sort last); the PVD volume size is up
 The plain ISO conversion is cached in packs/TMBO_base.iso.
 """
 import sys, os, struct, shutil
-sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp")
+sys.path.insert(0, "/mnt/d/TMB Decomp")
 from isols import opener
-W = "/mnt/c/Users/Ark/Desktop/TMB Decomp/"
+W = "/mnt/d/TMB Decomp/"
 ONLINE = W + "Twisted Metal - Black Online.bin"
 BASEISO = W + "packs/TMBO_base.iso"
 S = 2048

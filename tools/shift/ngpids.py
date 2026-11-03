@@ -1,7 +1,7 @@
 # ruff: noqa
 import struct, collections
 
-D = "/mnt/c/Users/Ark/Desktop/TMB Decomp/fx/"
+D = "/mnt/d/TMB Decomp/fx/"
 
 
 def rng(i):

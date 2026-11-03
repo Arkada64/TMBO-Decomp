@@ -1,7 +1,7 @@
 # ruff: noqa
 """Pickup files (PKP) retail vs online: count by type per level (story health pads)."""
 import sys, struct, collections
-sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp"); sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp/tools/shift")
+sys.path.insert(0, "/mnt/d/TMB Decomp"); sys.path.insert(0, "/mnt/d/TMB Decomp/tools/shift")
 from ngpdb import disc, rawfile
 for tag in ("retail", "online"):
     fs = disc(tag)[1]

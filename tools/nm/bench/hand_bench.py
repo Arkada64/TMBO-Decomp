@@ -2,7 +2,7 @@
 """hand_bench.py HAND.c... : compile each //@@ block of hand-written C as <name>__c (as the bench drafts are) and link
 them into cloud/bench/HAND.ELF against cloud/bench/BASE.ELF, for the bench to test before they go in."""
 import os, re, shutil, subprocess, sys
-R = "/home/ark/tmbo_decomp"; SN = "tools/compilers/ee-gcc2.95.3-114"; W = "/mnt/c/Users/Ark/Desktop/TMB Decomp"
+R = "/home/ark/tmbo_decomp"; SN = "tools/compilers/ee-gcc2.95.3-114"; W = "/mnt/d/TMB Decomp"
 CF = ["-O2", "-G0", "-fno-exceptions", "-Iinclude", "-isystem", "include/gcc", "-isystem", "include/gcc/gcc-lib",
       "-isystem", "include/sdk", "-isystem", "include/sdk/common", "-isystem", "include/sdk/ee"]
 out = "/home/ark/nmhome/hand_o"; shutil.rmtree(out, ignore_errors=True); os.makedirs(out)

@@ -1,7 +1,7 @@
 #!/bin/bash
 # split-screen stress (experimental): TMBR with extra views following bots (mods/freecam.c tmbr_split), 7 bots +
 # traffic, minimized. MAPS / VIEWS / RATES from the environment. Results: cloud/qb_out/split.txt
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; L=cloud/qb_out/split.txt; S=cloud/in/split
+W="/mnt/d/TMB Decomp"; cd "$W"; L=cloud/qb_out/split.txt; S=cloud/in/split
 echo "waiting for a gap $(date)" >> $L
 while pgrep -f "[t]ools/qb/qbrun.py" > /dev/null; do sleep 15; done
 bash cloud/in/stopall.sh > /dev/null 2>&1; sleep 5

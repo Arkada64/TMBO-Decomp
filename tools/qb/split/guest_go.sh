@@ -1,6 +1,6 @@
 #!/bin/bash
 # split-screen guests test: build (guests.c + hooks), Suburbs 130 %, 1 guest (2 views) and 3 guests (4 views), pictures
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; L=cloud/qb_out/guests.txt; S=cloud/in/split
+W="/mnt/d/TMB Decomp"; cd "$W"; L=cloud/qb_out/guests.txt; S=cloud/in/split
 echo "waiting for a gap $(date)" >> $L
 while pgrep -f "[t]ools/qb/qbrun.py" > /dev/null; do sleep 15; done
 bash cloud/in/stopall.sh > /dev/null 2>&1; sleep 5

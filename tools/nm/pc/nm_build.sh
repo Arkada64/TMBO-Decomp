@@ -5,7 +5,7 @@
 #   3. the shiftable build with mods and -DNON_MATCHING -> TMB Decomp/test/NM_TEST.ELF
 #   bash tools/nm_build.sh [SRC.c ...]       (default: all files with drafts)
 set -e -o pipefail
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"
+W="/mnt/d/TMB Decomp"
 SRC=/home/ark/tmbo_decomp; NH=/home/ark/nmhome; D=$NH/tmbo_decomp
 mkdir -p $NH
 rsync -a --delete --exclude 'logs/perm*' --exclude 'logs/fast' $SRC/ $D/

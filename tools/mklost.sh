@@ -5,10 +5,10 @@
 #   Dogpound -> Death Port, Sewers -> Stadium Slaughter
 #   bash cloud/lost2/mklost.sh      (after mktest.sh)
 set -e
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; S=cloud/lost2; O=packs/lost2; mkdir -p $O
+W="/mnt/d/TMB Decomp"; cd "$W"; S=cloud/lost2; O=packs/lost2; mkdir -p $O
 python3 - <<'PY'
 import sys, struct, zlib, os
-sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp")
+sys.path.insert(0, "/mnt/d/TMB Decomp")
 from ngpdb import rawfile
 S, O = "cloud/lost2", "packs/lost2"
 SLOTS = {"HCGD": "DEATH1", "HCSU": "DEATH2", "HCSC": "DEATH4", "HCND": "DEATH3", "HCST": "DEATH5"}
@@ -40,5 +40,5 @@ for src, lv in SLOTS.items():
 open(f"{O}/args.txt", "w").write(" ".join(args))
 PY
 python3 mkswap.py test/TMBR_TEST.iso test/TMBR_LOST.iso $(cat $O/args.txt) | tail -3
-printf '@echo off\r\nset P=C:\\Users\\Ark\\Desktop\\TMBO Ready2Play Edition\r\n"%%P%%\\pcsx2-qt.exe" -elf "%%~dp0TMBR_TEST.ELF" -- "%%~dp0TMBR_LOST.iso"\r\nfor /f %%%%t in ('"'"'powershell -NoProfile -Command Get-Date -Format yyyyMMdd_HHmmss'"'"') do set TS=%%%%t\r\ncopy /y "%%P%%\\logs\\emulog.txt" "%%~dp0..\\logs_runs\\TMBR_LOST_%%TS%%.txt" > nul\r\n' > "test/Run TMBR_LOST.bat"
+printf '@echo off\r\nset P=D:\\TMBR\\emulator\r\n"%%P%%\\pcsx2-qt.exe" -elf "%%~dp0TMBR_TEST.ELF" -- "%%~dp0TMBR_LOST.iso"\r\nfor /f %%%%t in ('"'"'powershell -NoProfile -Command Get-Date -Format yyyyMMdd_HHmmss'"'"') do set TS=%%%%t\r\ncopy /y "%%P%%\\logs\\emulog.txt" "%%~dp0..\\logs_runs\\TMBR_LOST_%%TS%%.txt" > nul\r\n' > "test/Run TMBR_LOST.bat"
 ls -la test/TMBR_LOST.iso; echo LOST_DONE

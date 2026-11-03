@@ -27,7 +27,7 @@ for lvl, idx in LEVELS.items():
 import json, os, mkblobs
 def region(lvl):
     ar = [(a, cap) for a, cap, nm in mkblobs.areas(lvl)]
-    lay = "/mnt/c/Users/Ark/Desktop/TMB Decomp/packs/"
+    lay = "/mnt/d/TMB Decomp/packs/"
     used = []
     for f in os.listdir(lay):
         if f.endswith(".layout.json"):
@@ -49,4 +49,4 @@ for idx, lvl, n in tables:
     out.append(f"    {{ {idx}, fod_{lvl.lower()}, {n}, 0x{a:X}, 0x{e:X} }}, /* {lvl} */")
 out.append("};")
 out.append(f"const int tmbr_numFodderLevels = {len(tables)};")
-open("/mnt/c/Users/Ark/Desktop/TMB Decomp/mods/traffic_nodes.c", "w").write("\n".join(out) + "\n")
+open("/mnt/d/TMB Decomp/mods/traffic_nodes.c", "w").write("\n".join(out) + "\n")

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Find the C draft that breaks a boot test when the failure points at no function (hang, exit to the BIOS):
 # halve the drafts in use until one is left, put it on cloud/in/nm_skip.txt.  bash nm_bisect.sh SRC.c ...
-cd "/mnt/c/Users/Ark/Desktop/TMB Decomp"
+cd "/mnt/d/TMB Decomp"
 L=cloud/qb_out/nm_bisect.txt; echo "start $(date)" > $L
 base=$(grep -v '^#' cloud/in/nm_skip.txt | awk '{print $1}' | paste -sd, -)
 cand=$(for f in "$@"; do grep -o 'NM:[A-Za-z0-9_]*' "$f" | cut -c4-; done)

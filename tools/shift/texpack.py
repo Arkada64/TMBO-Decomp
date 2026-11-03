@@ -9,7 +9,7 @@ TEX0 fields: TBP0 0-13, TBW 14-19, PSM 20-25, TW 26-29, TH 30-33, TCC 34, TFX 35
 import sys, struct, json, collections
 from ngpdb import get, w
 from texfile import recs
-OUT = "/mnt/c/Users/Ark/Desktop/TMB Decomp/packs/"
+OUT = "/mnt/d/TMB Decomp/packs/"
 RES_PSM = {0x1B, 0x24, 0x2C}
 
 def rec_psm(r): return (r["gs"] >> 32) & 0x3F       # bits 32-37 of the record word, as texmResRelocate tests

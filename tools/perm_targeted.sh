@@ -3,10 +3,10 @@
 # with a wider window (up to 30 differing instructions, 10 min each). These are the functions the
 # bigger-vehicle-list mod (traffic, more AI) has to change, so getting them into C pays off directly.
 # Run it AFTER decomp_run.sh has finished (both use the same build folder).
-#   bash "/mnt/c/Users/Ark/Desktop/TMB Decomp/perm_targeted.sh"
+#   bash "/mnt/d/TMB Decomp/perm_targeted.sh"
 #   watch:  tail -f ~/tmbo_decomp/logs/perm_targeted.txt
 set -e
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"
+W="/mnt/d/TMB Decomp"
 cd ~/tmbo_decomp && source .venv/bin/activate
 pgrep -f "tools/perm_run" > /dev/null && { echo "another permuter run is still going - wait for it"; exit 1; }
 cp "$W/vehicle_funcs.txt" logs/vehicle_funcs.txt

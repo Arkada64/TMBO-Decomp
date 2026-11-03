@@ -5,7 +5,7 @@
 import os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 from elfcrc import crc
-G = "/mnt/c/Users/Ark/Desktop/TMBO Ready2Play Edition/gamesettings"
+G = "/mnt/d/TMBR/emulator/gamesettings"
 c = crc(sys.argv[1])
 p = "%s/SCUS-97196_%08X.ini" % (G, c)
 if os.path.exists(p) and "EECycleRate" in open(p).read(): print("gamesettings: already there", p); sys.exit(0)

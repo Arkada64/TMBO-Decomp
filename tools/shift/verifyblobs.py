@@ -5,7 +5,7 @@ pairs/TEX/RTX. Usage: python3 verifyblobs.py NAME"""
 import sys, struct, collections, json
 import ngptrav
 from texfile import recs
-OUT = "/mnt/c/Users/Ark/Desktop/TMB Decomp/packs/"
+OUT = "/mnt/d/TMB Decomp/packs/"
 name = sys.argv[1]
 lay = json.load(open(OUT + name + ".layout.json"))
 blobs = [(fn, int(a, 16), sz) for fn, a, sz in lay["blobs"]]

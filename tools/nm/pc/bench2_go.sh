@@ -1,7 +1,7 @@
 #!/bin/bash
 # function test bench, take 2: the plain build (no C, the game's layout untouched) + its mid-match savestate, and
 # every draft compiled on its own into a separate image (bench_img.py). Waits for iso_go.sh, then the night run.
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; L=cloud/qb_out/bench2_go.txt
+W="/mnt/d/TMB Decomp"; cd "$W"; L=cloud/qb_out/bench2_go.txt
 echo "waiting for the ISO build $(date)" > $L
 until grep -q "night restart" cloud/qb_out/iso_go.txt 2>/dev/null; do sleep 30; done
 sleep 10; bash cloud/in/stopall.sh > /dev/null 2>&1; sleep 5

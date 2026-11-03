@@ -1,7 +1,7 @@
 # ruff: noqa
 import sys, struct, zlib, collections
 
-sys.path.insert(0, "/mnt/c/Users/Ark/Desktop/TMB Decomp")
+sys.path.insert(0, "/mnt/d/TMB Decomp")
 from isols import opener, walk
 
 
@@ -34,11 +34,11 @@ for img, tag in (
     ("Twisted Metal - Black.iso", "retail"),
     ("Twisted Metal - Black Online.bin", "online"),
 ):
-    blob = getfile("/mnt/c/Users/Ark/Desktop/TMB Decomp/" + img, "/LVL/SUBURB.NGP")
+    blob = getfile("/mnt/d/TMB Decomp/" + img, "/LVL/SUBURB.NGP")
     ms, sig = members(blob)
     print(tag, "sig", sig, [(n, len(d)) for n, d in ms])
     for n, d in ms:
-        open(f"/mnt/c/Users/Ark/Desktop/TMB Decomp/fx/{tag}_{n}", "wb").write(d)
+        open(f"/mnt/d/TMB Decomp/fx/{tag}_{n}", "wb").write(d)
         c = collections.Counter()
         for (w,) in struct.iter_unpack("<I", d[: len(d) // 4 * 4]):
             nid = w >> 18

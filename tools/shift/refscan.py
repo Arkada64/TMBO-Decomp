@@ -2,7 +2,7 @@
 import struct
 import sys
 
-T = "/mnt/c/Users/Ark/Desktop/TMB Decomp/test/"
+T = "/mnt/d/TMB Decomp/test/"
 
 
 def load(p):

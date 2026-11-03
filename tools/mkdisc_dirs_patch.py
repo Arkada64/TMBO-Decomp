@@ -1,7 +1,7 @@
 # replaces build() in mkdisc.py: files can go to \PCAR (default) or \ACAR ("ACAR/NAME" argument); when the last
 # used directory sector is full, the next (empty) sector of the directory's extent is used.
 import re
-p = "/mnt/c/Users/Ark/Desktop/TMB Decomp/mkdisc.py"
+p = "/mnt/d/TMB Decomp/mkdisc.py"
 s = open(p).read()
 i = s.index("def build(out, files):")
 j = s.index('if __name__ == "__main__":')

@@ -1,7 +1,7 @@
 #!/bin/bash
 # stress tests between night rounds: 3 big maps x 7 bots + traffic x EE cycle rate 100 / 130 %, minimized;
 # then the night run again. Results: cloud/qb_out/stress.txt (TMBR perf lines per run)
-W="/mnt/c/Users/Ark/Desktop/TMB Decomp"; cd "$W"; L=cloud/qb_out/stress.txt
+W="/mnt/d/TMB Decomp"; cd "$W"; L=cloud/qb_out/stress.txt
 echo "waiting for a gap in the night run $(date)" > $L
 while pgrep -f "tools/qb/qbrun.py" > /dev/null; do sleep 15; done
 bash cloud/in/stopall.sh > /dev/null 2>&1; sleep 5
