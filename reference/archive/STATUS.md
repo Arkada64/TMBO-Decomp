@@ -151,3 +151,17 @@
   whether that value exists in the savestate RAM; the next step is the other side (compare the same field in
   PCSX2 while paused), then either a safer root (call the frame function only after the game's own update has
   run one frame in the interpreter) or a fixed state loader.
+
+## Working-C build does NOT boot (2026-11-03, LAN-only build)
+- First boot test of the working-C build (925 of 2009 functions): it stops at UI state 1, logs 50 TLB misses at
+  5.57-5.67 s, and never reaches the main menu or renders a frame (TMBR perf 0). The first faulting pc is inside
+  func_001FE4D0 (src/tmb/dbs.c), which is still INCLUDE_ASM - so the corruption comes from a C replacement that
+  ran before it, not from that function.
+- Control: the same mods build with no C boots to the main menu and into a match, so the mods and the toolchain are
+  fine; the difference is the C. The 810-function build was never boot-tested either, so this may predate today.
+- Safety: LAN-only (TMBR_NO_REVIVAL_DNS=1, 0 matches for the server address in the ELF), normal build stayed
+  byte-identical, and test/NM_TEST.ELF is this working-C LAN ELF.
+- Next: bisect. Cheapest axis is tools/nm_build.sh file arguments - only the named files get their C blocks, the
+  rest stay asm - halving the list per step and booting, looking for TMBR ui: state 6 and TMBR perf lines in
+  cloud/qb_out/<run>/emulog.txt. tools/nm/pc/nm_loop.sh and nm_skip.txt already keep a skip list for a faulting
+  function; update their stale paths first.
