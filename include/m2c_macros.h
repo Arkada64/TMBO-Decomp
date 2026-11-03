@@ -8,6 +8,12 @@ typedef s8 M2C_UNK8;
 typedef s16 M2C_UNK16;
 typedef s32 M2C_UNK32;
 typedef long long M2C_UNK64;
+/* m2c's 16-byte type (quadword / VU0 128-bit register). mode(TI) makes it a true 128-bit scalar, so whole
+ * quadword copies (the lqc2/sqc2 patterns) compile and assign/compare like any scalar. This compiler cannot
+ * convert a float or int INTO it, so m2c's `(s128) <scalar>` casts still fail ('unsupported wide integer
+ * operation') and those drafts need hand C. */
+typedef int s128 __attribute__((mode(TI)));
+typedef unsigned int u128 __attribute__((mode(TI)));
 /* m2c passes the POINTER type: M2C_FIELD(p, f32*, 0x10) is the f32 at p+0x10 */
 #define M2C_FIELD(expr, type, offset) (*(type)((u8*)(expr) + (offset)))
 #define M2C_BITWISE(type, expr) ((type)(expr))
