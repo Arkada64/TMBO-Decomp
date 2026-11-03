@@ -12,7 +12,7 @@ rsync -a --delete --exclude 'logs/perm*' --exclude 'logs/fast' $SRC/ $D/
 cd $D
 # (the working-C tools come with the repo itself: tools/nm_apply.py, tools/nm/bytefix.py, tools/nm/hand/*.c,
 #  tools/nm_ld.py - the rsync above puts them here; nm_build.sh used to copy them from the old cloud/in folder)
-for t in tools/nm_apply.py tools/nm_ld.py tools/bytefix.py tools/nm_ld.py; do [ -f "$t" ] || { echo "missing $t"; exit 1; }; done
+for t in tools/nm_apply.py tools/nm_ld.py tools/nm/bytefix.py; do [ -f "$t" ] || { echo "missing $t"; exit 1; }; done
 git checkout -q -- src
 grep -rlI "/home/ark/tmbo_decomp" build.ninja config src tools 2>/dev/null | xargs -r sed -i "s#/home/ark/tmbo_decomp#$D#g"
 mkdir -p logs tools/mods mods
@@ -24,6 +24,7 @@ HOME=$NH python3 tools/nm_apply.py "$@" | tail -3
 rm -f build/SCUS_971.96.rom; ninja > logs/nm_base.log 2>&1 || { tail -5 logs/nm_base.log; exit 1; }
 cmp -s build/SCUS_971.96.rom disks/SCUS_971.96.rom && echo "normal build: byte-identical" || { echo "normal build NOT identical"; exit 1; }
 # alignment-safe link for the C replacements (tools/nm_ld.py: text growth in 0x80 steps, literals after .sdata)
+python3 tools/nm_ld.py build/SCUS_971.96.map config/US/SCUS_971.96.ld "$@"
 # -DNON_MATCHING for the shiftable link only (build.ninja is restored by build_shiftable.sh)
 sed -i 's#^grep -q data_ptrs_shiftable#[ "${NONMATCHING:-0}" = 1 ] \&\& sed -i "s|tools/sn_cc.sh -c |tools/sn_cc.sh -c -DNON_MATCHING |" build.ninja\n&#' tools/build_shiftable.sh
 rm -f build/SCUS_971.96.shift.elf
