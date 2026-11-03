@@ -165,3 +165,10 @@
   rest stay asm - halving the list per step and booting, looking for TMBR ui: state 6 and TMBR perf lines in
   cloud/qb_out/<run>/emulog.txt. tools/nm/pc/nm_loop.sh and nm_skip.txt already keep a skip list for a faulting
   function; update their stale paths first.
+
+## 2026-11-03 13:58 CST - boot failure bisected to one function
+- File-level bisect over all 181 candidate files (cloud/in/nm2/bisect_boot.sh): building ONLY src/tmb/disp.c as C reproduces the failure, every other file boots to the main menu.
+- Per-function bisect inside disp.c (cloud/in/nm2/bisect_disp.sh, subset kept as C, rest forced to asm via NM_SKIP): dispSetTags__FP8_DisplayPUiPviiiiiii alone reproduces it (50 TLB misses, never reaches state 6). dispCreate__FP8_Displayii alone boots fine (10 tlb, menu reached). Guards in the script prove NM_SKIP really takes effect.
+- Likely cause: the m2c draft for dispSetTags keeps only 4 of the 8 real arguments, so the GIF packet chain gets garbage.
+- dispSetTags is now on logs/nm_skip.txt (gitignored build input, also copied into nmhome), i.e. it stays asm.
+- PENDING: the full working-C build with that skip, then a LAN-only boot to an actual match (cloud/out/nm_boot_lan.log). Started 13:52 CST, unverified at the time of this note.
