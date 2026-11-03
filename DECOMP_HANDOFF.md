@@ -40,19 +40,29 @@ Folders moved from `C:\Users\Ark\Desktop` to `D:` on 2026-10-29. Some scripts in
 `/mnt/c/Users/Ark/Desktop/...`: replace it with `/mnt/d/...` when you use them (the scripts at the top level of
 `D:\TMB Decomp` were already fixed).
 
-## Current state (status run 2026-10-31, `D:\TMB Decomp\cloud\out\nm_go.txt`)
+## Current state (status run 2026-11-03, `D:\TMB Decomp\cloud\out\nm_go.txt`)
 Online: 2,009 functions still `INCLUDE_ASM` in `src/`.
 
 | | functions |
 |---|---|
-| **in C** in the working-C build (m2c draft or hand-written, compiles in its file) | **810** |
+| **in C** in the working-C build (m2c draft or hand-written, compiles in its file) | **905** |
 | no draft (m2c failed or emitted `M2C_ERROR`) | 417 |
-| draft does not compile on its own | 480 |
-| compiles alone but breaks the whole file (dropped) | 233 |
+| draft does not compile on its own | 371 |
+| compiles alone but breaks the whole file (dropped) | 247 |
 | kept asm on purpose (mod hooks, hand `*Asm` routines, `logs/nm_skip.txt`) | 69 |
 
 The normal build stayed byte-identical and `NM_TEST.ELF` built. **Not yet boot-tested** in this state (last boot
 tests were 2026-10-24/25, with fewer functions).
+
+2026-11-03 draft repair pass (+95 in C, 810 -> 905): `tools/nm/dsurv.py` groups the real compiler errors of the
+non-compiling drafts (cached, `--fails-only` rechecks just the failures); `tools/nm/draftfix.py` repairs them in
+place, error-driven and line-targeted; m2c's 16-byte `s128` is now typedef'd (`mode(TI)`) in
+`include/m2c_macros.h`, which alone was 302 undeclared + 123 parse errors. Drafts that compile on their own:
+1,034 -> 1,146 of 1,534. Repairs live in `logs/auto/*.drafts.c` (local, gitignored): `tools/auto_m2c.py`
+regenerates raw drafts, so run `tools/nm/draftfix.py` again after it. What is left needs hand C:
+**212** drafts use `subroutine_argN` (a register value m2c could not name - a guess would feed the game
+garbage), **66** `(s128) <float>` casts (this compiler cannot convert into a 128-bit type), **36**
+`second half of f64` (m2c gave up), then ~70 one-offs. Details: `reference/archive/STATUS.md`.
 
 ## The working-C pipeline (all in `tools/`, read `tools/nm/README.md` first)
 - `nm_apply.py`: puts each compiling m2c draft (from `logs/auto/*.drafts.c`) into the source as
@@ -80,8 +90,8 @@ tests were 2026-10-24/25, with fewer functions).
 
 ## Next steps, in order
 1. **Raise the count, compile-only (no permission needed):**
-   - the 480 non-compiling drafts: group the compiler errors (`nm_apply` logs them per file in `logs/nm/`), fix
-     the common m2c patterns in a tool (as `bytefix.py` did), hand-fix the rest into `tools/nm/hand/`.
+   - the 371 non-compiling drafts: the common m2c patterns are done (`tools/nm/dsurv.py` + `tools/nm/draftfix.py`,
+     see Current state). What remains is hand C into `tools/nm/hand/`.
    - the 233 dropped in context: usually a draft's declarations clash with the file's (types, prototypes,
      aliases); same treatment.
    - the 417 without drafts: re-run m2c with better context (`M2C_CONTEXT`, `M2C_PROTOS`; see
