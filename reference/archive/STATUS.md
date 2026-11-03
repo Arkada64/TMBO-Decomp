@@ -109,3 +109,23 @@
 - Still INCLUDE_ASM: 2054 total, 176 in net.c.
 - Next: permuter run 3 on remaining <=8-insn near misses (resumable), re-rank after fixup
   (delete logs/perm/near.json), then hand work on net.c.
+
+## Working C, 2026-11-03 (draft repair pass)
+- `tools/nm/dsurv.py` (new): survey of the drafts that do not compile, grouped by the real compiler error
+  (cached; `--fails-only` rechecks just the failures). `tools/nm/draftfix.py` (new): repairs them in place in
+  `logs/auto/*.drafts.c`, error-driven and line-targeted (compile, rewrite only the lines the compiler names,
+  compile again).
+- Biggest single cause: m2c's 16-byte type `s128` was defined nowhere, so every draft touching a quadword /
+  VU0 copy failed (302 undeclared + 123 parse errors). It is now in `include/m2c_macros.h` as
+  `typedef int s128 __attribute__((mode(TI)))` - a true 128-bit scalar, so quadword copies compile.
+- Second: a dereference of a value m2c left untyped (`*(v + x)`, v a void*/int) is a word access in the asm ->
+  rewritten to `*(s32*)(v + x)`; 73 drafts.
+- Drafts that compile on their own: **1034 -> 1146** of 1534 (497 -> 385 failing) before this status build.
+- Status build with the repairs: in C now **905** of the 2009 INCLUDE_ASM functions
+  (was 810), normal build byte-identical, `test/NM_TEST.ELF` rebuilt. Not boot-tested since 2026-10-25.
+- Left for hand C (385 drafts): 212 use `subroutine_argN` (a register value m2c could not name - a guess would
+  feed the game garbage, so they stay asm on purpose), 66 `(s128) <float>` casts (this compiler cannot convert
+  into a 128-bit type), 36 "second half of f64" (m2c gave up), then ~70 one-offs (incompatible types, invalid
+  operands on a void*/float argument, duplicate switch cases).
+- Next: function bench (`tools/nm/bench`) on the new C, then the 233 drafts still dropped in context
+  (their declarations clash with the file's), then the 417 functions with no draft at all.
