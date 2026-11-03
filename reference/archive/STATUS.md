@@ -144,3 +144,10 @@
   the drafts did not cause: `unaligned 4-byte read at 3c01806a` in `calculatePanAngle__FP7VehicleP8_fvector+0x2c`,
   which ends every root after ~1k-250k steps. Next: teach ee.py that read (or pick roots that avoid it) before
   the bench can say anything about the 105 drafts.
+- Bench follow-up (same day): the fault is not the load transition. A savestate taken 45 s later in the race
+  faults at the identical address (`calculatePanAngle+0x2c`, `3c01806a`), and `vehicle+0x2028` holds the same
+  `0x3C018002` in it - so either the game really has that pointer at that moment (the bench then starts mid-frame
+  and the state is not a safe entry point) or the state loading / interpreter is wrong. The check above says
+  whether that value exists in the savestate RAM; the next step is the other side (compare the same field in
+  PCSX2 while paused), then either a safer root (call the frame function only after the game's own update has
+  run one frame in the interpreter) or a fixed state loader.
