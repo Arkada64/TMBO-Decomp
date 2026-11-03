@@ -129,3 +129,18 @@
   operands on a void*/float argument, duplicate switch cases).
 - Next: function bench (`tools/nm/bench`) on the new C, then the 233 drafts still dropped in context
   (their declarations clash with the file's), then the 417 functions with no draft at all.
+
+## Boot tests are LAN-only (2026-11-03)
+- A bench boot signed in to the live revival server with the owner's account. Cause: the baked community patch
+  `Force Revival Server DNS` overwrites the netcnf hostname, and the network stack (`NETNETCNF` / `eznetcnf`)
+  loads at boot - the menu path does not matter. Never boot a build that carries that patch.
+- Test builds: `TMBR_NO_REVIVAL_DNS=1 bash tools/nm_build.sh ...` (build_shiftable.sh drops the section).
+  Verify the ELF before booting: 0 matches for the server address (2 before). Tests run under the LAN function
+  (SINGLE PLAYER is the LAN host path; ONLINE -> LAN is the online page, cursor 4).
+- Function bench (tools/nm/bench) on src/tmb/ai.c, src/tmb/particle.c, src/online/after_clapper_09.c,
+  src/online/after_ai_03.c with the LAN-only no-C build: normal build byte-identical, 105 drafts linked into
+  DRAFTS.ELF (0 left out), mid-match savestate 42 MB, 5 frames. **2 drafts reached, 5 calls, 0 FAIL**, 1 `ret?`
+  (func_0022CA48: only v0 differs - a void function's leftover). Coverage is capped by an EE-interpreter fault
+  the drafts did not cause: `unaligned 4-byte read at 3c01806a` in `calculatePanAngle__FP7VehicleP8_fvector+0x2c`,
+  which ends every root after ~1k-250k steps. Next: teach ee.py that read (or pick roots that avoid it) before
+  the bench can say anything about the 105 drafts.
