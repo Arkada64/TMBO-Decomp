@@ -16,6 +16,7 @@ for t in tools/nm_apply.py tools/nm_ld.py tools/nm/bytefix.py; do [ -f "$t" ] ||
 git checkout -q -- src
 grep -rlI "/home/ark/tmbo_decomp" build.ninja config src tools 2>/dev/null | xargs -r sed -i "s#/home/ark/tmbo_decomp#$D#g"
 mkdir -p logs tools/mods mods
+mkdir -p logs/hand && cp "$SRC"/tools/nm/hand/*.c logs/hand/ 2>/dev/null || true
 rm -f mods/*.c; cp "$W"/mods/*.s "$W"/mods/*.c "$W"/mods/*.pnach "$W"/mods/*_sections.txt "$W"/mods/postlink.txt mods/
 cp "$W/mods/apply_mods.py" "$W/mods/apply_pnach.py" "$W/mods/bps.py" tools/mods/
 cp "$W/build_shiftable.sh" tools/

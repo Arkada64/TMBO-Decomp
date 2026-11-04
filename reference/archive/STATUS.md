@@ -172,3 +172,28 @@
 - Likely cause: the m2c draft for dispSetTags keeps only 4 of the 8 real arguments, so the GIF packet chain gets garbage.
 - dispSetTags is now on logs/nm_skip.txt (gitignored build input, also copied into nmhome), i.e. it stays asm.
 - PENDING: the full working-C build with that skip, then a LAN-only boot to an actual match (cloud/out/nm_boot_lan.log). Started 13:52 CST, unverified at the time of this note.
+## 2026-11-04 — the boot stall is not only disp.c: font.c found and fixed
+
+- Full working-C build with all 11 disp.c drafts forced back to asm still stalls
+  (`cloud/out/test_alloff.log`, VERDICT BAD, state 1 at 6.4 s, 50 TLB misses). The earlier
+  per-function bisect had only ever built disp.c alone, so it could not see this.
+- Tracing the crashing pc back to a function does not work yet: the running ELF is the shifted
+  link, and 0x2039e8 is `addiu $a3,$zero,1` in the unshifted image, so map lookups name the wrong
+  function. Resolving boot crashes needs the shifted map kept alongside `test/NM_TEST.ELF`.
+- File-subset bisect in the full context (`cloud/in/nm2/bisect2.sh`, 90/91 split): half A
+  (67 online + 23 tmb files) boots to the menu, half B (91 src/tmb files) stalls; halving converged
+  on **src/tmb/font.c** (`cloud/out/bisect2.log` — MINIMAL CULPRIT).
+- Function bisect inside font.c (`cloud/in/nm2/bisect_font.sh`): **fontDmaFontData__Fv** alone, as
+  C, is enough to stall the boot. Two defects in its draft: `(0x8000 << 0x2D)` is a 32-bit shift by
+  45 (undefined), so the GIF A+D tag was 0x10008001 instead of 0x1000000000008001; and the
+  `D_004FB5C4 == 2` branch stored 4 bytes where the asm does `sh`, clobbering the next field.
+- Also fixed: `func_00202AD8`, `func_00202B30` and `fontSetColor__Fiiii` all call
+  `func_002029D8` with `$4` = the font index, but the drafts passed the colour bytes (`0xC0`,
+  `0x80`) or nothing, i.e. a packet write at `(garbage << 5)` past `D_00505EF0`.
+- The fixes live in `tools/nm/hand/src_tmb_font.c` (hand-written C, same `//@@ name` format).
+  `tools/nm_build.sh` now copies `tools/nm/hand/*.c` into `logs/hand/` before nm_apply runs — the
+  hand-written path has always existed in nm_apply, but nothing ever populated `logs/hand`, so every
+  hand file was silently unused.
+- Verified by boot: font.c with only fontDmaFontData__Fv as C (the hand version) reaches the menu
+  (`cloud/out/test_font.log`, only_dma OK). font.c with all of its drafts is still BAD, so font.c
+  has at least one more culprit; the bisect was restarted from there.
