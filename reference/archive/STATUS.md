@@ -197,3 +197,20 @@
 - Verified by boot: font.c with only fontDmaFontData__Fv as C (the hand version) reaches the menu
   (`cloud/out/test_font.log`, only_dma OK). font.c with all of its drafts is still BAD, so font.c
   has at least one more culprit; the bisect was restarted from there.
+## 2026-11-04 (later) — font.c fixed by hand; the full build still stalls, so the search moves on
+
+- `fontDmaFontData__Fv` and the three callers whose draft lost `func_002029D8`'s argument
+  (`func_00202AD8`, `func_00202B30`, `fontSetColor__Fiiii`) are fixed as hand-written C in
+  `tools/nm/hand/src_tmb_font.c`, and `tools/nm_build.sh` now copies `tools/nm/hand/*.c` into
+  `logs/hand/` (nm_apply always supported hand files; nothing ever populated that directory).
+- `func_002029D8` carries the same tag-width defect (`0x9000 << 0x2E` shifted as a 32-bit int), but a
+  hand version that matches the asm instruction for instruction still hung the boot — reproducibly,
+  UI state 1, no TLB misses, the log simply stops inside the DMA wait — so it stays asm via
+  `logs/nm_skip.txt` until that is understood. Font packets are involved in both paths, so a second
+  look there is the obvious follow-up.
+- Verified by boot: font.c with those fixes and `func_002029D8` as asm reaches the menu
+  (`cloud/out/test_font.log`, tag `skip29d8` -> OK).
+- The full working-C build is still BAD (`cloud/out/full_boot.log`): 50 TLB misses, state 1, the same
+  signature as before font.c was fixed. Half A of the file bisect (67 online + 23 tmb) booted, so at
+  least one more of the 91 `src/tmb` files breaks the boot; the bisect restarts on that half with
+  font.c removed.

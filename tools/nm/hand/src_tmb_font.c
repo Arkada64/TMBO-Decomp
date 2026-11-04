@@ -1,11 +1,15 @@
 //@@ fontDmaFontData__Fv hand
 /* Found by the boot bisect: font.c alone stalls (cloud/out/bisect2.log), and inside font.c this one
    function as C is enough (cloud/out/bisect_font.log: MINIMAL CULPRIT fontDmaFontData__Fv).
-   Two m2c/bytefix defects, both fatal:
+   Two defects, both fatal:
      - (0x8000 << 0x2D) is a 32-bit shift by 45 (UB) -> 0x10008001 instead of 0x1000000000008001, so the
        GIF A+D tag written into the packet was garbage;
      - the D_004FB5C4 == 2 branch did a 4-byte store where the asm does `sh`, clobbering the next field.
-   The asm: dsll32 $6, $6, 13 on 0x8000 (= << 45). */
+   The asm: dsll32 $6, $6, 13 on 0x8000 (= << 45).
+   NB func_002029D8 has the same class of defect but is kept as asm for now: a hand version that reads
+   instruction-for-instruction like the asm (same tags, same stores) still hung the boot at UI state 1
+   with no TLB misses, i.e. a DMA wait that never completes. It is in logs/nm_skip.txt until that is
+   understood. */
 void sceGsSyncPath_pf() __asm__("sceGsSyncPath");
 void sceGsExecLoadImage_pf() __asm__("sceGsExecLoadImage");
 void FlushCache_pf() __asm__("FlushCache");
@@ -40,14 +44,14 @@ void fontDmaFontData__Fv(void) {
         D_004FAEAC_pf = 0;
     }
     if (D_004FB5C4_pf == 2) {
-        *(u16*)(D_004FB5C8_pf * 0x10 + pkts) = (u16)D_004FB5BC_pf;
+        *(u16*)(pkts + D_004FB5C8_pf * 0x10) = (u16)D_004FB5BC_pf;
     }
     t = D_004FB5C0_pf;
     tag = ((s64)0x8000 << 0x2D) | 0x8001;
-    p = t * 0x10 + pkts;
+    p = pkts + t * 0x10;
     *((s64*)(p + 8)) = 0xE;
     *((s64*)p) = tag;
-    p = (t + 1) * 0x10 + pkts;
+    p = pkts + (t + 1) * 0x10;
     D_004FB5C0_pf = t + 2;
     *((s64*)(p + 8)) = 0x4A;
     *((s64*)p) = 0;
