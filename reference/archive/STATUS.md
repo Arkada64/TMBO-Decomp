@@ -277,3 +277,8 @@
   the block silently fails and the m2c draft wins (that is what wasted the previous full build).
 - Isolated check: src/tmb/videodec.c alone with the hand blocks as C boots to "TMBR ui: state 6"
   (`cloud/out/bisect_font.log`, 15:03), where the same two functions as drafts were BAD.
+
+## 2026-11-04 15:35 - full working-C build boots to the menu again
+- RESULT full OK (cloud/out/full_boot.log): the working-C build reaches TMBR ui: state 6 at 9.05 s.
+- Fixed this round: movie.c func_00222820 and videodec.c videoDecFlush parked as asm; videodec.c func_00244660 (non-volatile busy-wait, gcc hoisted the load) and func_00244510 (dropped args) hand C.
+- Half A of the corpus had always been fine; the second break was in half B alongside videoDecFlush.
