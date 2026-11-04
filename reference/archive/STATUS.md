@@ -259,3 +259,21 @@
   remains. It must be in the 90-file half A (67 online + 23 tmb, cloud/out/b2_halfA.txt): that half
   was only ever booted before the hand files and tools/shiftfix.py were wired in.
   Bisect restarted on it with VERIFY_SEED=1.
+## 2026-11-04 15:05 - second videodec.c culprit: the busy-wait that never reloads
+
+- With func_00222820 (movie.c) and videoDecFlush__FP8VideoDec (videodec.c) parked, half A of the
+  draft corpus booted OK (`cloud/out/bisect2.log`, seed 90 files) but half B (91 files) was still
+  BAD, and halving it landed back on src/tmb/videodec.c with only two C blocks left:
+  func_00244510 and func_00244660.
+- func_00244660 was the break: the draft waits with `do { } while (M2C_FIELD(&D_004B4728, s32*, 0xC) != 0);`
+  on a plain load. gcc 2.95 hoists that load out of the loop, so the loop can never see the clear the
+  interrupt handler writes and the boot hangs in the wait (state 1, 50 TLB). The asm reloads 0xC($4)
+  every iteration. Hand version reads through a `volatile s32*`.
+- func_00244510 in the same file had the dropped-argument defect too: it passed `sp` (a local offset)
+  as videoDecBeginPut's VideoDec* instead of the incoming $4, dropped the &spC out-param and added
+  two uninitialised locals to return. Hand version passes arg0 and all three out-params.
+- Both hand blocks are in tools/nm/hand/src_tmb_videodec.c. Note for hand C in general: nm_apply
+  compiles each block on its own, so every block needs its own #include "m2c_macros.h" - without it
+  the block silently fails and the m2c draft wins (that is what wasted the previous full build).
+- Isolated check: src/tmb/videodec.c alone with the hand blocks as C boots to "TMBR ui: state 6"
+  (`cloud/out/bisect_font.log`, 15:03), where the same two functions as drafts were BAD.
