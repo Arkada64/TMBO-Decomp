@@ -239,3 +239,23 @@
 - Parked func_00222820 in logs/nm_skip.txt (asm) until the two-argument hand version is written and boot-verified.
 - The full working-C build is STILL BAD (state 1 at 5.4 s, 50 TLB) => at least one more culprit remains.
   Bisecting the untested remainder (90-file half B minus b2_c1.txt = 45 files, cloud/out/b2_c2.txt), VERIFY_SEED=1.
+## 2026-11-04 10:10 - boot regression bisect: videodec.c videoDecFlush
+- Halving bisect of the 45-file remainder (cloud/out/b2_c2.txt) narrowed to src/tmb/videodec.c;
+  the in-file function bisect (cloud/out/bisect_font.log, 8 candidates) named
+  videoDecFlush__FP8VideoDec as BAD on its own and func_00244660 as OK.
+- Root cause, same dropped-argument class as font.c and movie.c: the draft calls
+  videoDecBeginPut with &sp10 in place of the incoming VideoDec* and drops the two out-params
+  &sp18/&sp1C, so sp1C stays uninitialised and is used as the second cpy2area length (wild DMA);
+  cpy2area itself is called with its four trailing arguments (sp, 4, 0, 0) missing, and
+  func_00244510 loses the incoming VideoDec* plus its &spC out-param.
+- A hand version was written (tools/nm/hand/src_tmb_videodec.c, kept aside as .pending): it boots
+  OK when applied, but it never reached the build - nm_apply compiles each block on its own and a
+  hand block without #include "m2c_macros.h" fails, so the m2c draft silently took precedence
+  (src/tmb/videodec.c kept the draft body, stats 'used': 3). Fix before reusing: add the include to
+  every hand block.
+- Parked videoDecFlush__FP8VideoDec in logs/nm_skip.txt (asm) rather than blocked on that.
+- With movie.c func_00222820 and videodec.c videoDecFlush both parked the full working-C build is
+  STILL BAD (state 1 at 6.5 s, 50 TLB, cloud/out/full_boot.log), so at least one more culprit
+  remains. It must be in the 90-file half A (67 online + 23 tmb, cloud/out/b2_halfA.txt): that half
+  was only ever booted before the hand files and tools/shiftfix.py were wired in.
+  Bisect restarted on it with VERIFY_SEED=1.
