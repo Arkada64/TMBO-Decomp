@@ -214,3 +214,18 @@
   signature as before font.c was fixed. Half A of the file bisect (67 online + 23 tmb) booted, so at
   least one more of the 91 `src/tmb` files breaks the boot; the bisect restarts on that half with
   font.c removed.
+## 2026-11-04 (later still) — a systemic defect class found: 32-bit shifts of 64-bit tags
+
+- `bytefix.py` only rewrites pointer arithmetic; it never touched shift widths. m2c renders the asm's
+  `dsll32`/`dsrl32` pairs as `(x << 0x2N)` on a 32-bit `int`, which is undefined behaviour, and gcc
+  2.95 wraps the count mod 32 — so `(0x8000 << 0x2D)` becomes `0x10008001` instead of
+  `0x1000000000008001`. Both boot breaks found in font.c were exactly this. The draft corpus has 68
+  such shifts across 30 files (view.c 13, disp.c 9, file.c 5, ...).
+- New pass `tools/shiftfix.py`, wired into `nm_apply.py` after bytefix. It only rewrites shifts
+  **above 32**: a shift by exactly 32 survives by accident (the wrapped shift equals the signal
+  extension the asm performs), and rewriting those 51 sites cost 18 drafts that then failed to
+  compile (used 903 instead of 921). With the restriction it changes 22 sites and keeps the corpus
+  at 921.
+- The full working-C build is still BAD (`cloud/out/full_boot.log`, 50 TLB misses, state 1), with and
+  without the pass, so the current blocker is something else: the file bisect resumes on the 45-file
+  half that the previous run marked BAD (`cloud/out/bisect2.log`, test [2]).

@@ -17,6 +17,7 @@ Writes logs/nm/summary.json (per file: used / no draft / no compiling draft / dr
 """
 import json, os, re, subprocess, sys
 from pathlib import Path
+from shiftfix import shiftfix   # 64-bit asm shifts that m2c wrote as 32-bit ones (tools/nm/shiftfix.py)
 sys.path.insert(0, str(Path(__file__).resolve().parent)); sys.path.insert(0, str(Path(__file__).resolve().parent / "nm"))
 try:
     from bytefix import bytefix            # m2c's byte-offset pointer arithmetic on typed pointers (tools/nm/bytefix.py)
@@ -80,6 +81,8 @@ def apply(src):
         if bytefix and n not in handn:                 # (hand-written C is already right)
             c2, ch = bytefix(c)
             if ch: st["bytefix"] = st.get("bytefix", 0) + 1; c = c2
+        c2, sh = shiftfix(c)                           # (0x8000 << 0x2D) etc: undefined in 32-bit C
+        if sh: st["shiftfix"] = st.get("shiftfix", 0) + sh; c = c2
         variants.setdefault(n, []).append(c)
     hdr = header_for(rel); chosen = {}
     for n in names:
