@@ -229,3 +229,13 @@
 - The full working-C build is still BAD (`cloud/out/full_boot.log`, 50 TLB misses, state 1), with and
   without the pass, so the current blocker is something else: the file bisect resumes on the 45-file
   half that the previous run marked BAD (`cloud/out/bisect2.log`, test [2]).
+
+## 2026-11-04 04:55 - boot regression bisect: movie.c func_00222820
+- Halving bisect of the 45-file set (cloud/out/b2_c1.txt) narrowed to src/tmb/movie.c; the in-file function
+  bisect named func_00222820.
+- Root cause: m2c dropped the 5th argument of BOTH videoDecSetStream calls. The asm loads  = D_004FB07C
+  (the read ring buffer) right before each jal (0x1228CC, 0x1228F0); the draft passed only four arguments, so
+  the MPEG decoder ran on a wild buffer pointer. Same dropped-argument class as the font.c fixes.
+- Parked func_00222820 in logs/nm_skip.txt (asm) until the two-argument hand version is written and boot-verified.
+- The full working-C build is STILL BAD (state 1 at 5.4 s, 50 TLB) => at least one more culprit remains.
+  Bisecting the untested remainder (90-file half B minus b2_c1.txt = 45 files, cloud/out/b2_c2.txt), VERIFY_SEED=1.
