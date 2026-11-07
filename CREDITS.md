@@ -13,8 +13,7 @@ All game code, data and trademarks belong to their respective owners.
 ## Decompilation this project is built on
 - **[tmb_decomp](https://github.com/abelbriggs1/tmb_decomp)**: Abel Briggs and contributors
   (including Zweronz). The retail Twisted Metal: Black decompilation that this project's
-  build system, headers, symbol names and matched code started from. Upstream history is
-  preserved in this repository.
+  build system, headers, symbol names and matched code started from.
 
 ## Tools
 - [splat](https://github.com/ethteck/splat): binary splitting
