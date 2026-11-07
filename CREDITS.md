@@ -1,6 +1,6 @@
 # Credits
 
-TMB-Reloaded is a preservation and modding project for *Twisted Metal: Black* and
+TMB-Decomp is a preservation and modding project for *Twisted Metal: Black* and
 *Twisted Metal: Black Online* (PS2). No game data is included in this repository; building it
 requires your own legally obtained discs.
 
